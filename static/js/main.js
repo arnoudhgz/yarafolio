@@ -901,11 +901,11 @@ function drawModalChart(e) {
     
     let label = '';
     if (dStr.startsWith(t)) {
-      label = 'Today ' + dStr.slice(11, 16);
+      label = dStr.slice(11, 16);
     } else if (dStr.length <= 10) {
-      label = dStr.slice(5);
+      label = dStr;
     } else {
-      label = dStr.slice(5, 16);
+      label = dStr;
     }
     return label + (isAdded ? ' (Added)' : '');
   });
