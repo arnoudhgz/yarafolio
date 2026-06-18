@@ -352,6 +352,82 @@
       ]
     },
     {
+      "id": "JNJ-0001",
+      "ticker": "JNJ",
+      "name": "Johnson & Johnson",
+      "firstAdvised": "2026-06-13",
+      "source": "diversify",
+      "rating": "A-",
+      "rsiAtAdvice": 20.0,
+      "priceAtAdvice": 140.0,
+      "reason": "Defensive rotation.",
+      "risk": "Litigation.",
+      "sector": "Healthcare",
+      "buyBelow": 145.0,
+      "dropBelow": 125.0,
+      "dropAbove": 160.0,
+      "status": "watching",
+      "boughtAt": null,
+      "soldAt": null,
+      "units": null,
+      "droppedDate": null,
+      "lots": [],
+      "priceHistory": [
+        {
+          "date": "2026-06-13",
+          "price": 140.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 141.5
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-06-13",
+          "text": "Advised."
+        }
+      ]
+    },
+    {
+      "id": "XOM-0001",
+      "ticker": "XOM",
+      "name": "Exxon Mobil",
+      "firstAdvised": "2026-06-16",
+      "source": "diversify",
+      "rating": "B",
+      "rsiAtAdvice": 25.0,
+      "priceAtAdvice": 105.0,
+      "reason": "Energy pullback.",
+      "risk": "Oil prices.",
+      "sector": "Basic Materials",
+      "buyBelow": 110.0,
+      "dropBelow": 90.0,
+      "dropAbove": 120.0,
+      "status": "watching",
+      "boughtAt": null,
+      "soldAt": null,
+      "units": null,
+      "droppedDate": null,
+      "lots": [],
+      "priceHistory": [
+        {
+          "date": "2026-06-16",
+          "price": 105.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 106.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-06-16",
+          "text": "Advised."
+        }
+      ]
+    },
+    {
       "id": "SNOW-0001",
       "ticker": "SNOW",
       "name": "Snowflake",
