@@ -9,3 +9,4 @@ data/private/
 !data/sample/
 data/*.bak
 scratch/
+news_output.json
