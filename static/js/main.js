@@ -1098,6 +1098,7 @@ async function fetchMacro() {
     );
     
     if (filtered.length === 0) {
+      empty.textContent = "No (more) events this week";
       empty.style.display = 'block';
     } else {
       let html = '';
@@ -1122,10 +1123,10 @@ async function fetchMacro() {
           }
         }
         
-        if (isPast) continue;
+        let rowStyle = isPast ? 'opacity: 0.5; cursor: pointer;' : 'cursor: pointer;';
         
         let displayTime = esc(e.time);
-        if (isToday && e.time && e.time !== 'All Day' && e.time !== 'Tentative') {
+        if (isToday && e.time && e.time !== 'All Day' && e.time !== 'Tentative' && !isPast) {
           displayTime += ` <span class="macro-timer" data-time="${esc(e.time)}" style="color:var(--blue); font-size:11px; white-space:nowrap;"></span>`;
         }
         
@@ -1136,7 +1137,7 @@ async function fetchMacro() {
         const jsPrev = esc(e.previous).replace(/'/g, "\\'");
         const jsCountry = esc(e.country).replace(/'/g, "\\'");
         
-        html += `<tr style="cursor: pointer;" onclick="openMacroModal('${jsTitle}', '${jsImpact}', '${jsForecast}', '${jsPrev}', '${jsCountry}', '${jsDate}')">
+        html += `<tr style="${rowStyle}" onclick="openMacroModal('${jsTitle}', '${jsImpact}', '${jsForecast}', '${jsPrev}', '${jsCountry}', '${jsDate}')">
           <td style="white-space: nowrap;">${displayDate}</td>
           <td>${displayTime}</td>
           <td style="font-weight:bold">${esc(e.country)}</td>
@@ -1147,6 +1148,10 @@ async function fetchMacro() {
         </tr>`;
       }
       list.innerHTML = html;
+      if (!html) {
+        empty.textContent = "No (more) events this week";
+        empty.style.display = 'block';
+      }
     }
     window.macroLoaded = true;
   } catch (err) {
