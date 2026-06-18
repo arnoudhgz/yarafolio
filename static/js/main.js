@@ -869,6 +869,7 @@ function openMacroModal(title, impact, forecast, previous, country, date) {
     '</div>';
   document.getElementById('macroModal').hidden = false;
 }
+window.openMacroModal = openMacroModal;
 
 function drawModalChart(e) {
   if (modalChart) { modalChart.destroy(); modalChart = null; }
