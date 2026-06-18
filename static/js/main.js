@@ -1199,10 +1199,11 @@ async function fetchMacro() {
   }
 }
 
-async function fetchIpos() {
+async function fetchIpos(force = false) {
   document.getElementById('iposLoading').style.display = 'block';
   try {
-    const res = await fetch('/api/ipos');
+    const url = force ? '/api/ipos?force=1' : '/api/ipos';
+    const res = await fetch(url);
     const data = await res.json();
     
     let html = '';
@@ -1298,7 +1299,7 @@ window.markNotListed = async function(ticker) {
   }
 };
 
-document.getElementById('refreshIposBtn').addEventListener('click', fetchIpos);
+document.getElementById('refreshIposBtn').addEventListener('click', () => fetchIpos(true));
 document.getElementById('refreshMacroBtn').addEventListener('click', fetchMacro);
 
 function renderEOD() {

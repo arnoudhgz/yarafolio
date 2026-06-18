@@ -116,10 +116,11 @@ class Handler(SimpleHTTPRequestHandler):
             self.handle_macro()
         elif self.path.startswith("/api/agent_run"):
             self.handle_agent_run()
-        elif self.path == "/api/ipos":
+        elif self.path == "/api/ipos" or self.path.startswith("/api/ipos?"):
+            force = "force=1" in self.path
             import time
             cache_file = os.path.join(ROOT, "data", "ipos_cache.json")
-            if os.path.exists(cache_file):
+            if os.path.exists(cache_file) and not force:
                 age = time.time() - os.path.getmtime(cache_file)
                 if age < 4 * 3600:
                     with open(cache_file) as f:
