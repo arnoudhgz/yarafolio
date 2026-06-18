@@ -257,12 +257,96 @@
         },
         {
           "date": "2026-06-18",
-          "price": 172.5
+          "price": 168.0
         }
       ],
       "notes": [
         {
           "date": "2026-06-08",
+          "text": "Advised."
+        }
+      ]
+    },
+    {
+      "id": "RIVN-0001",
+      "ticker": "RIVN",
+      "name": "Rivian",
+      "firstAdvised": "2026-06-03",
+      "source": "advice",
+      "rating": "C+",
+      "rsiAtAdvice": 22.0,
+      "priceAtAdvice": 15.0,
+      "reason": "EV slump.",
+      "risk": "Cash burn.",
+      "sector": "Consumer Goods",
+      "buyBelow": 16.0,
+      "dropBelow": 12.0,
+      "dropAbove": 18.0,
+      "status": "watching",
+      "boughtAt": null,
+      "soldAt": null,
+      "units": null,
+      "droppedDate": null,
+      "lots": [],
+      "priceHistory": [
+        {
+          "date": "2026-06-03",
+          "price": 15.0
+        },
+        {
+          "date": "2026-06-08",
+          "price": 14.5
+        },
+        {
+          "date": "2026-06-18",
+          "price": 11.5
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-06-03",
+          "text": "Advised."
+        }
+      ]
+    },
+    {
+      "id": "NVDA-0001",
+      "ticker": "NVDA",
+      "name": "NVIDIA",
+      "firstAdvised": "2026-05-24",
+      "source": "advice",
+      "rating": "A+",
+      "rsiAtAdvice": 30.0,
+      "priceAtAdvice": 90.0,
+      "reason": "AI momentum.",
+      "risk": "Supply chain.",
+      "sector": "Technology",
+      "buyBelow": 95.0,
+      "dropBelow": 75.0,
+      "dropAbove": 110.0,
+      "status": "watching",
+      "boughtAt": null,
+      "soldAt": null,
+      "units": null,
+      "droppedDate": null,
+      "lots": [],
+      "priceHistory": [
+        {
+          "date": "2026-05-24",
+          "price": 90.0
+        },
+        {
+          "date": "2026-06-08",
+          "price": 105.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 115.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-24",
           "text": "Advised."
         }
       ]
