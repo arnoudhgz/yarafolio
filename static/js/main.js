@@ -982,7 +982,15 @@ function renderAINews() {
     let html = '';
     const summaries = [...DATA.newsSummaries].reverse();
     for (const s of summaries) {
-      let content = esc(s.article || s.summary || '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/###\s*(.*?)(\n|$)/g, '<h3>$1</h3>').replace(/\n/g, '<br>');
+      let contentStr = s.article || s.summary || '';
+      let title = 'News Summary';
+      const titleMatch = contentStr.match(/^###\s*(.*?)(\n|$)/);
+      if (titleMatch) {
+        title = esc(titleMatch[1]);
+        contentStr = contentStr.replace(/^###\s*(.*?)(\n|$)/, '');
+      }
+
+      let content = esc(contentStr.trim()).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/###\s*(.*?)(\n|$)/g, '<h3>$1</h3>').replace(/\n/g, '<br>');
       content = content.replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
         const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
         const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
@@ -994,7 +1002,7 @@ function renderAINews() {
       html += `
         <div class="ai-article">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
-            <h3 style="margin:0; font-size:16px;">Management Summary</h3>
+            <h3 style="margin:0; font-size:16px;">${title}</h3>
             <span style="font-size:12px; color:var(--muted);">${esc(s.timestamp || s.date || '')}</span>
           </div>
           <div style="line-height: 1.6; font-size: 14px;" class="article-content">${content}</div>

@@ -973,7 +973,7 @@
   ],
   "newsSummaries": [
     {
-      "date": "2026-06-17",
+      "timestamp": "2026-06-16 20:00:00",
       "tickers": [
         "AAPL",
         "TSLA"
@@ -981,7 +981,7 @@
       "article": "### Tech Sector Daily Brief\n\n**AAPL** reported strong quarterly earnings, beating expectations by 4%. The stock surged in after-hours trading as the CEO highlighted robust growth in services.\n\n**TSLA** announced a new update to its autonomous driving stack, although deliveries slightly missed the quarterly forecast. Market reaction was mixed, with analysts maintaining a cautious outlook.\n\n**Macro:** Inflation data came in cooler than expected, which is lifting overall sentiment across the broader tech landscape."
     },
     {
-      "date": "2026-06-16",
+      "timestamp": "2026-06-15 20:00:00",
       "tickers": [
         "NVDA",
         "JNJ",
