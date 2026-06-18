@@ -139,7 +139,8 @@
           "units": 2.5,
           "lastPrice": 425.0,
           "tslEnabled": true,
-          "soldAt": "2026-06-13",
+          "soldAt": 425.0,
+          "closedDate": "2026-06-13",
           "exitEstimated": false
         }
       ],
@@ -196,8 +197,9 @@
           "units": 10.0,
           "lastPrice": 94.0,
           "tslEnabled": false,
-          "soldAt": "2026-05-29",
-          "exitEstimated": false
+          "soldAt": 94.0,
+          "closedDate": "2026-05-29",
+          "exitEstimated": true
         }
       ],
       "priceHistory": [
