@@ -900,10 +900,8 @@ function drawModalChart(e) {
     if (isAdded) dStr = dStr.replace(' (Added)', '');
     
     let label = '';
-    if (dStr.startsWith(t)) {
+    if (dStr.length > 10) {
       label = dStr.slice(11, 16);
-    } else if (dStr.length <= 10) {
-      label = dStr;
     } else {
       label = dStr;
     }

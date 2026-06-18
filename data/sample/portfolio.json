@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-06-18",
+  "lastUpdated": "2026-06-19",
   "totalInvested": 14202.5,
   "holdings": [
     {
@@ -14,11 +14,11 @@
       "currentPrice": 185.2,
       "plDollar": 63.5,
       "plPct": 7.36,
-      "firstOpen": "2026-05-11",
+      "firstOpen": "2026-05-12",
       "lots": [
         {
           "positionID": 101,
-          "openDate": "2026-05-11",
+          "openDate": "2026-05-12",
           "openRate": 172.5,
           "units": 5.0,
           "tslEnabled": true
@@ -37,11 +37,11 @@
       "currentPrice": 86.5,
       "plDollar": -55.0,
       "plPct": -5.98,
-      "firstOpen": "2026-05-21",
+      "firstOpen": "2026-05-22",
       "lots": [
         {
           "positionID": 102,
-          "openDate": "2026-05-21",
+          "openDate": "2026-05-22",
           "openRate": 92.0,
           "units": 10.0,
           "tslEnabled": false
@@ -60,11 +60,11 @@
       "currentPrice": 98.0,
       "plDollar": -30.0,
       "plPct": -2.97,
-      "firstOpen": "2026-05-05",
+      "firstOpen": "2026-05-06",
       "lots": [
         {
           "positionID": 203,
-          "openDate": "2026-05-05",
+          "openDate": "2026-05-06",
           "openRate": 101.0,
           "units": 10.0,
           "tslEnabled": true
@@ -83,11 +83,11 @@
       "currentPrice": 92.0,
       "plDollar": -90.0,
       "plPct": -8.91,
-      "firstOpen": "2026-05-05",
+      "firstOpen": "2026-05-06",
       "lots": [
         {
           "positionID": 209,
-          "openDate": "2026-05-05",
+          "openDate": "2026-05-06",
           "openRate": 101.0,
           "units": 10.0,
           "tslEnabled": true
@@ -106,18 +106,18 @@
       "currentPrice": 540.0,
       "plDollar": 400.0,
       "plPct": 8.0,
-      "firstOpen": "2025-11-30",
+      "firstOpen": "2025-12-01",
       "lots": [
         {
           "positionID": 300101,
-          "openDate": "2025-11-30",
+          "openDate": "2025-12-01",
           "openRate": 480.0,
           "units": 5.0,
           "tslEnabled": false
         },
         {
           "positionID": 300102,
-          "openDate": "2026-01-19",
+          "openDate": "2026-01-20",
           "openRate": 520.0,
           "units": 5.0,
           "tslEnabled": true
@@ -136,11 +136,11 @@
       "currentPrice": 265.0,
       "plDollar": -225.0,
       "plPct": -5.35,
-      "firstOpen": "2026-02-18",
+      "firstOpen": "2026-02-19",
       "lots": [
         {
           "positionID": 300201,
-          "openDate": "2026-02-18",
+          "openDate": "2026-02-19",
           "openRate": 280.0,
           "units": 15.0,
           "tslEnabled": false
@@ -159,11 +159,11 @@
       "currentPrice": 68.5,
       "plDollar": 170.0,
       "plPct": 14.16,
-      "firstOpen": "2025-12-20",
+      "firstOpen": "2025-12-21",
       "lots": [
         {
           "positionID": 300301,
-          "openDate": "2025-12-20",
+          "openDate": "2025-12-21",
           "openRate": 60.0,
           "units": 20.0,
           "tslEnabled": true

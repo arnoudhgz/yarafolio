@@ -1,11 +1,11 @@
 {
-  "lastUpdated": "2026-06-18",
+  "lastUpdated": "2026-06-19",
   "entries": [
     {
       "id": "AAPL-0001",
       "ticker": "AAPL",
       "name": "Apple Inc.",
-      "firstAdvised": "2026-05-09",
+      "firstAdvised": "2026-05-10",
       "source": "advice",
       "rating": "A-",
       "rsiAtAdvice": 29.5,
@@ -24,7 +24,7 @@
       "lots": [
         {
           "positionID": 101,
-          "openDate": "2026-05-11",
+          "openDate": "2026-05-12",
           "openRate": 172.5,
           "units": 5.0,
           "lastPrice": 185.2,
@@ -35,25 +35,25 @@
       ],
       "priceHistory": [
         {
-          "date": "2026-05-09",
+          "date": "2026-05-10",
           "price": 170.0
         },
         {
-          "date": "2026-05-14",
+          "date": "2026-05-15",
           "price": 173.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 180.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 185.2
         }
       ],
       "notes": [
         {
-          "date": "2026-05-09",
+          "date": "2026-05-10",
           "text": "Advised."
         }
       ]
@@ -62,7 +62,7 @@
       "id": "NKE-0001",
       "ticker": "NKE",
       "name": "Nike",
-      "firstAdvised": "2026-05-19",
+      "firstAdvised": "2026-05-20",
       "source": "premarket",
       "rating": "B",
       "rsiAtAdvice": 22.0,
@@ -81,7 +81,7 @@
       "lots": [
         {
           "positionID": 102,
-          "openDate": "2026-05-21",
+          "openDate": "2026-05-22",
           "openRate": 92.0,
           "units": 10.0,
           "lastPrice": 86.5,
@@ -92,21 +92,21 @@
       ],
       "priceHistory": [
         {
-          "date": "2026-05-19",
+          "date": "2026-05-20",
           "price": 90.0
         },
         {
-          "date": "2026-06-03",
+          "date": "2026-06-04",
           "price": 88.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 86.5
         }
       ],
       "notes": [
         {
-          "date": "2026-05-19",
+          "date": "2026-05-20",
           "text": "Advised."
         }
       ]
@@ -115,7 +115,7 @@
       "id": "MSFT-0001",
       "ticker": "MSFT",
       "name": "Microsoft Corporation",
-      "firstAdvised": "2026-04-19",
+      "firstAdvised": "2026-04-20",
       "source": "advice",
       "rating": "A+",
       "rsiAtAdvice": 35.0,
@@ -134,37 +134,37 @@
       "lots": [
         {
           "positionID": 103,
-          "openDate": "2026-04-21",
+          "openDate": "2026-04-22",
           "openRate": 398.0,
           "units": 2.5,
           "lastPrice": 425.0,
           "tslEnabled": true,
           "soldAt": 425.0,
-          "closedDate": "2026-06-13",
+          "closedDate": "2026-06-14",
           "exitEstimated": false
         }
       ],
       "priceHistory": [
         {
-          "date": "2026-04-19",
+          "date": "2026-04-20",
           "price": 395.0
         },
         {
-          "date": "2026-04-29",
+          "date": "2026-04-30",
           "price": 405.0
         },
         {
-          "date": "2026-06-08",
+          "date": "2026-06-09",
           "price": 425.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 422.0
         }
       ],
       "notes": [
         {
-          "date": "2026-04-19",
+          "date": "2026-04-20",
           "text": "Advised."
         }
       ]
@@ -173,7 +173,7 @@
       "id": "DIS-0001",
       "ticker": "DIS",
       "name": "Walt Disney",
-      "firstAdvised": "2026-03-20",
+      "firstAdvised": "2026-03-21",
       "source": "diversify",
       "rating": "C+",
       "rsiAtAdvice": 25.0,
@@ -192,37 +192,37 @@
       "lots": [
         {
           "positionID": 104,
-          "openDate": "2026-03-22",
+          "openDate": "2026-03-23",
           "openRate": 106.0,
           "units": 10.0,
           "lastPrice": 94.0,
           "tslEnabled": false,
           "soldAt": 94.0,
-          "closedDate": "2026-05-29",
+          "closedDate": "2026-05-30",
           "exitEstimated": true
         }
       ],
       "priceHistory": [
         {
-          "date": "2026-03-20",
+          "date": "2026-03-21",
           "price": 105.0
         },
         {
-          "date": "2026-04-09",
+          "date": "2026-04-10",
           "price": 100.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 94.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 92.0
         }
       ],
       "notes": [
         {
-          "date": "2026-03-20",
+          "date": "2026-03-21",
           "text": "Advised."
         }
       ]
@@ -231,7 +231,7 @@
       "id": "TSLA-0001",
       "ticker": "TSLA",
       "name": "Tesla Inc.",
-      "firstAdvised": "2026-06-08",
+      "firstAdvised": "2026-06-09",
       "source": "premarket",
       "rating": "B",
       "rsiAtAdvice": 25.1,
@@ -250,21 +250,21 @@
       "lots": [],
       "priceHistory": [
         {
-          "date": "2026-06-08",
+          "date": "2026-06-09",
           "price": 165.0
         },
         {
-          "date": "2026-06-13",
+          "date": "2026-06-14",
           "price": 168.2
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 168.0
         }
       ],
       "notes": [
         {
-          "date": "2026-06-08",
+          "date": "2026-06-09",
           "text": "Advised."
         }
       ]
@@ -273,7 +273,7 @@
       "id": "AMD-0001",
       "ticker": "AMD",
       "name": "Advanced Micro Devices",
-      "firstAdvised": "2026-06-10",
+      "firstAdvised": "2026-06-11",
       "source": "advice",
       "rating": "A-",
       "rsiAtAdvice": 29.0,
@@ -292,33 +292,33 @@
       "lots": [],
       "priceHistory": [
         {
-          "date": "2026-06-10",
+          "date": "2026-06-11",
           "price": 145.0
         },
         {
-          "date": "2026-06-14",
+          "date": "2026-06-15",
           "price": 146.5
         },
         {
-          "date": "2026-06-17",
+          "date": "2026-06-18",
           "price": 147.2
         },
         {
-          "date": "2026-06-17 15:12:00",
+          "date": "2026-06-18 16:58:54",
           "price": 148.0
         },
         {
-          "date": "2026-06-17 17:36:00",
+          "date": "2026-06-18 19:22:54",
           "price": 148.5
         },
         {
-          "date": "2026-06-17 20:00:00",
+          "date": "2026-06-18 21:46:54",
           "price": 149.0
         }
       ],
       "notes": [
         {
-          "date": "2026-06-10",
+          "date": "2026-06-11",
           "text": "Advised."
         }
       ]
@@ -327,7 +327,7 @@
       "id": "CRM-0001",
       "ticker": "CRM",
       "name": "Salesforce",
-      "firstAdvised": "2026-06-12",
+      "firstAdvised": "2026-06-13",
       "source": "premarket",
       "rating": "B+",
       "rsiAtAdvice": 26.5,
@@ -346,33 +346,33 @@
       "lots": [],
       "priceHistory": [
         {
-          "date": "2026-06-12",
+          "date": "2026-06-13",
           "price": 250.0
         },
         {
-          "date": "2026-06-15",
+          "date": "2026-06-16",
           "price": 248.0
         },
         {
-          "date": "2026-06-17",
+          "date": "2026-06-18",
           "price": 252.0
         },
         {
-          "date": "2026-06-17 16:24:00",
+          "date": "2026-06-18 18:10:54",
           "price": 253.5
         },
         {
-          "date": "2026-06-17 18:48:00",
+          "date": "2026-06-18 20:34:54",
           "price": 254.0
         },
         {
-          "date": "2026-06-17 20:00:00",
+          "date": "2026-06-18 21:46:54",
           "price": 255.0
         }
       ],
       "notes": [
         {
-          "date": "2026-06-12",
+          "date": "2026-06-13",
           "text": "Advised."
         }
       ]
@@ -381,7 +381,7 @@
       "id": "RIVN-0001",
       "ticker": "RIVN",
       "name": "Rivian",
-      "firstAdvised": "2026-06-03",
+      "firstAdvised": "2026-06-04",
       "source": "advice",
       "rating": "C+",
       "rsiAtAdvice": 22.0,
@@ -400,21 +400,21 @@
       "lots": [],
       "priceHistory": [
         {
-          "date": "2026-06-03",
+          "date": "2026-06-04",
           "price": 15.0
         },
         {
-          "date": "2026-06-08",
+          "date": "2026-06-09",
           "price": 14.5
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 11.5
         }
       ],
       "notes": [
         {
-          "date": "2026-06-03",
+          "date": "2026-06-04",
           "text": "Advised."
         }
       ]
@@ -423,7 +423,7 @@
       "id": "NVDA-0001",
       "ticker": "NVDA",
       "name": "NVIDIA",
-      "firstAdvised": "2026-05-24",
+      "firstAdvised": "2026-05-25",
       "source": "advice",
       "rating": "A+",
       "rsiAtAdvice": 30.0,
@@ -442,21 +442,21 @@
       "lots": [],
       "priceHistory": [
         {
-          "date": "2026-05-24",
+          "date": "2026-05-25",
           "price": 90.0
         },
         {
-          "date": "2026-06-08",
+          "date": "2026-06-09",
           "price": 105.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 115.0
         }
       ],
       "notes": [
         {
-          "date": "2026-05-24",
+          "date": "2026-05-25",
           "text": "Advised."
         }
       ]
@@ -465,7 +465,7 @@
       "id": "JNJ-0001",
       "ticker": "JNJ",
       "name": "Johnson & Johnson",
-      "firstAdvised": "2026-06-13",
+      "firstAdvised": "2026-06-14",
       "source": "diversify",
       "rating": "A-",
       "rsiAtAdvice": 20.0,
@@ -481,41 +481,41 @@
       "lots": [],
       "priceHistory": [
         {
-          "date": "2026-06-13",
+          "date": "2026-06-14",
           "price": 140.0
         },
         {
-          "date": "2026-06-14",
+          "date": "2026-06-15",
           "price": 140.5
         },
         {
-          "date": "2026-06-15",
+          "date": "2026-06-16",
           "price": 141.0
         },
         {
-          "date": "2026-06-16",
+          "date": "2026-06-17",
           "price": 141.2
         },
         {
-          "date": "2026-06-17",
+          "date": "2026-06-18",
           "price": 141.5
         },
         {
-          "date": "2026-06-17 17:36:00",
+          "date": "2026-06-18 19:22:54",
           "price": 141.7
         },
         {
-          "date": "2026-06-17 18:48:00",
+          "date": "2026-06-18 20:34:54",
           "price": 141.8
         },
         {
-          "date": "2026-06-17 20:00:00",
+          "date": "2026-06-18 21:46:54",
           "price": 141.9
         }
       ],
       "notes": [
         {
-          "date": "2026-06-13",
+          "date": "2026-06-14",
           "text": "Advised."
         }
       ]
@@ -524,7 +524,7 @@
       "id": "XOM-0001",
       "ticker": "XOM",
       "name": "Exxon Mobil",
-      "firstAdvised": "2026-06-16",
+      "firstAdvised": "2026-06-17",
       "source": "diversify",
       "rating": "B",
       "rsiAtAdvice": 25.0,
@@ -540,29 +540,29 @@
       "lots": [],
       "priceHistory": [
         {
-          "date": "2026-06-16",
+          "date": "2026-06-17",
           "price": 105.0
         },
         {
-          "date": "2026-06-17",
+          "date": "2026-06-18",
           "price": 105.5
         },
         {
-          "date": "2026-06-17 17:36:00",
+          "date": "2026-06-18 19:22:54",
           "price": 105.7
         },
         {
-          "date": "2026-06-17 18:48:00",
+          "date": "2026-06-18 20:34:54",
           "price": 105.8
         },
         {
-          "date": "2026-06-17 20:00:00",
+          "date": "2026-06-18 21:46:54",
           "price": 106.0
         }
       ],
       "notes": [
         {
-          "date": "2026-06-16",
+          "date": "2026-06-17",
           "text": "Advised."
         }
       ]
@@ -571,7 +571,7 @@
       "id": "SNOW-0001",
       "ticker": "SNOW",
       "name": "Snowflake",
-      "firstAdvised": "2026-04-29",
+      "firstAdvised": "2026-04-30",
       "source": "advice",
       "rating": "C",
       "rsiAtAdvice": 19.5,
@@ -586,29 +586,29 @@
       "boughtAt": null,
       "soldAt": null,
       "units": null,
-      "droppedDate": "2026-05-29",
+      "droppedDate": "2026-05-30",
       "lots": [],
       "priceHistory": [
         {
-          "date": "2026-04-29",
+          "date": "2026-04-30",
           "price": 145.0
         },
         {
-          "date": "2026-05-09",
+          "date": "2026-05-10",
           "price": 140.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 128.0
         }
       ],
       "notes": [
         {
-          "date": "2026-04-29",
+          "date": "2026-04-30",
           "text": "Advised."
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "text": "Dropped below drop-below threshold."
         }
       ]
@@ -617,7 +617,7 @@
       "id": "GOOG-0001",
       "ticker": "GOOG",
       "name": "GOOG Corp",
-      "firstAdvised": "2026-05-04",
+      "firstAdvised": "2026-05-05",
       "source": "advice",
       "rating": "A",
       "rsiAtAdvice": 28,
@@ -632,21 +632,21 @@
       "droppedDate": null,
       "priceHistory": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "price": 100.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 105.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 110.0
         }
       ],
       "notes": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "text": "Advised."
         }
       ],
@@ -656,13 +656,13 @@
       "lots": [
         {
           "positionID": 200,
-          "openDate": "2026-05-05",
+          "openDate": "2026-05-06",
           "openRate": 101.0,
           "units": 10.0,
           "lastPrice": 110.0,
           "tslEnabled": true,
           "soldAt": 110.0,
-          "closedDate": "2026-06-13",
+          "closedDate": "2026-06-14",
           "exitEstimated": false
         }
       ]
@@ -671,7 +671,7 @@
       "id": "AMZN-0001",
       "ticker": "AMZN",
       "name": "AMZN Corp",
-      "firstAdvised": "2026-05-04",
+      "firstAdvised": "2026-05-05",
       "source": "premarket",
       "rating": "A",
       "rsiAtAdvice": 32,
@@ -683,24 +683,24 @@
       "dropBelow": 80.0,
       "dropAbove": 120.0,
       "status": "dropped",
-      "droppedDate": "2026-06-08",
+      "droppedDate": "2026-06-09",
       "priceHistory": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "price": 100.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 102.5
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 105.0
         }
       ],
       "notes": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "text": "Advised."
         }
       ],
@@ -713,7 +713,7 @@
       "id": "JPM-0001",
       "ticker": "JPM",
       "name": "JPM Corp",
-      "firstAdvised": "2026-05-04",
+      "firstAdvised": "2026-05-05",
       "source": "advice",
       "rating": "B+",
       "rsiAtAdvice": 26,
@@ -728,21 +728,21 @@
       "droppedDate": null,
       "priceHistory": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "price": 100.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 104.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 108.0
         }
       ],
       "notes": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "text": "Advised."
         }
       ],
@@ -752,13 +752,13 @@
       "lots": [
         {
           "positionID": 202,
-          "openDate": "2026-05-05",
+          "openDate": "2026-05-06",
           "openRate": 101.0,
           "units": 10.0,
           "lastPrice": 108.0,
           "tslEnabled": true,
           "soldAt": 108.0,
-          "closedDate": "2026-06-13",
+          "closedDate": "2026-06-14",
           "exitEstimated": false
         }
       ]
@@ -767,7 +767,7 @@
       "id": "V-0001",
       "ticker": "V",
       "name": "V Corp",
-      "firstAdvised": "2026-05-04",
+      "firstAdvised": "2026-05-05",
       "source": "premarket",
       "rating": "B",
       "rsiAtAdvice": 24,
@@ -782,21 +782,21 @@
       "droppedDate": null,
       "priceHistory": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "price": 100.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 99.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 98.0
         }
       ],
       "notes": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "text": "Advised."
         }
       ],
@@ -806,7 +806,7 @@
       "lots": [
         {
           "positionID": 203,
-          "openDate": "2026-05-05",
+          "openDate": "2026-05-06",
           "openRate": 101.0,
           "units": 10.0,
           "lastPrice": 98.0,
@@ -821,7 +821,7 @@
       "id": "JNJ-0001",
       "ticker": "JNJ",
       "name": "JNJ Corp",
-      "firstAdvised": "2026-05-04",
+      "firstAdvised": "2026-05-05",
       "source": "advice",
       "rating": "A-",
       "rsiAtAdvice": 20,
@@ -836,21 +836,21 @@
       "droppedDate": null,
       "priceHistory": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "price": 100.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 101.5
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 103.0
         }
       ],
       "notes": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "text": "Advised."
         }
       ],
@@ -860,13 +860,13 @@
       "lots": [
         {
           "positionID": 204,
-          "openDate": "2026-05-05",
+          "openDate": "2026-05-06",
           "openRate": 101.0,
           "units": 10.0,
           "lastPrice": 103.0,
           "tslEnabled": true,
           "soldAt": 103.0,
-          "closedDate": "2026-06-13",
+          "closedDate": "2026-06-14",
           "exitEstimated": false
         }
       ]
@@ -875,7 +875,7 @@
       "id": "UNH-0001",
       "ticker": "UNH",
       "name": "UNH Corp",
-      "firstAdvised": "2026-05-04",
+      "firstAdvised": "2026-05-05",
       "source": "premarket",
       "rating": "B+",
       "rsiAtAdvice": 15,
@@ -887,24 +887,24 @@
       "dropBelow": 80.0,
       "dropAbove": 120.0,
       "status": "dropped",
-      "droppedDate": "2026-06-08",
+      "droppedDate": "2026-06-09",
       "priceHistory": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "price": 100.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 97.5
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 95.0
         }
       ],
       "notes": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "text": "Advised."
         }
       ],
@@ -917,7 +917,7 @@
       "id": "PG-0001",
       "ticker": "PG",
       "name": "PG Corp",
-      "firstAdvised": "2026-05-04",
+      "firstAdvised": "2026-05-05",
       "source": "advice",
       "rating": "B",
       "rsiAtAdvice": 30,
@@ -932,21 +932,21 @@
       "droppedDate": null,
       "priceHistory": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "price": 100.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 101.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 102.0
         }
       ],
       "notes": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "text": "Advised."
         }
       ],
@@ -956,13 +956,13 @@
       "lots": [
         {
           "positionID": 206,
-          "openDate": "2026-05-05",
+          "openDate": "2026-05-06",
           "openRate": 101.0,
           "units": 10.0,
           "lastPrice": 102.0,
           "tslEnabled": true,
           "soldAt": 102.0,
-          "closedDate": "2026-06-13",
+          "closedDate": "2026-06-14",
           "exitEstimated": false
         }
       ]
@@ -971,7 +971,7 @@
       "id": "KO-0001",
       "ticker": "KO",
       "name": "KO Corp",
-      "firstAdvised": "2026-05-04",
+      "firstAdvised": "2026-05-05",
       "source": "premarket",
       "rating": "C+",
       "rsiAtAdvice": 22,
@@ -983,24 +983,24 @@
       "dropBelow": 80.0,
       "dropAbove": 120.0,
       "status": "dropped",
-      "droppedDate": "2026-06-08",
+      "droppedDate": "2026-06-09",
       "priceHistory": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "price": 100.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 99.5
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 99.0
         }
       ],
       "notes": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "text": "Advised."
         }
       ],
@@ -1013,7 +1013,7 @@
       "id": "XOM-0001",
       "ticker": "XOM",
       "name": "XOM Corp",
-      "firstAdvised": "2026-05-04",
+      "firstAdvised": "2026-05-05",
       "source": "advice",
       "rating": "B-",
       "rsiAtAdvice": 28,
@@ -1028,21 +1028,21 @@
       "droppedDate": null,
       "priceHistory": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "price": 100.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 106.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 112.0
         }
       ],
       "notes": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "text": "Advised."
         }
       ],
@@ -1052,13 +1052,13 @@
       "lots": [
         {
           "positionID": 208,
-          "openDate": "2026-05-05",
+          "openDate": "2026-05-06",
           "openRate": 101.0,
           "units": 10.0,
           "lastPrice": 112.0,
           "tslEnabled": true,
           "soldAt": 112.0,
-          "closedDate": "2026-06-13",
+          "closedDate": "2026-06-14",
           "exitEstimated": false
         }
       ]
@@ -1067,7 +1067,7 @@
       "id": "NEE-0001",
       "ticker": "NEE",
       "name": "NEE Corp",
-      "firstAdvised": "2026-05-04",
+      "firstAdvised": "2026-05-05",
       "source": "premarket",
       "rating": "C",
       "rsiAtAdvice": 18,
@@ -1082,21 +1082,21 @@
       "droppedDate": null,
       "priceHistory": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "price": 100.0
         },
         {
-          "date": "2026-05-29",
+          "date": "2026-05-30",
           "price": 96.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-19",
           "price": 92.0
         }
       ],
       "notes": [
         {
-          "date": "2026-05-04",
+          "date": "2026-05-05",
           "text": "Advised."
         }
       ],
@@ -1106,7 +1106,7 @@
       "lots": [
         {
           "positionID": 209,
-          "openDate": "2026-05-05",
+          "openDate": "2026-05-06",
           "openRate": 101.0,
           "units": 10.0,
           "lastPrice": 92.0,
@@ -1120,7 +1120,7 @@
   ],
   "newsSummaries": [
     {
-      "timestamp": "2026-06-16 20:00:00",
+      "timestamp": "2026-06-17 21:46:54",
       "tickers": [
         "AAPL",
         "TSLA"
@@ -1128,7 +1128,7 @@
       "article": "### Tech Sector Daily Brief\n\n**AAPL** reported strong quarterly earnings, beating expectations by 4%. The stock surged in after-hours trading as the CEO highlighted robust growth in services.\n\n**TSLA** announced a new update to its autonomous driving stack, although deliveries slightly missed the quarterly forecast. Market reaction was mixed, with analysts maintaining a cautious outlook.\n\n**Macro:** Inflation data came in cooler than expected, which is lifting overall sentiment across the broader tech landscape."
     },
     {
-      "timestamp": "2026-06-15 20:00:00",
+      "timestamp": "2026-06-16 21:46:54",
       "tickers": [
         "NVDA",
         "JNJ",
@@ -1139,11 +1139,11 @@
   ],
   "eodReports": [
     {
-      "date": "2026-06-17",
+      "date": "2026-06-18",
       "summary": "### EOD Action Required\n**NVDA**: Raise TSL to $125.00. Stock is up +6% since entry. Lock in gains before the weekend.\n**AAPL**: Hold. Approaching target resistance, tracking normally.\n**TSLA**: Hold. Earnings are tomorrow, expect volatility."
     },
     {
-      "date": "2026-06-15",
+      "date": "2026-06-16",
       "summary": "### EOD Action Required\n**RIVN**: DROP. Slipped below the $12.00 drop-below marker in late afternoon trading. Cut losses here to prevent further downside.\n**XOM**: Monitor. Oil futures are slipping; consider a tighter stop if it crosses $100."
     }
   ]
