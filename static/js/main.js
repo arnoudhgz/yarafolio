@@ -895,9 +895,19 @@ function drawModalChart(e) {
   const t = today();
   const labels = hist.map(h => {
     if (!h.date) return '';
-    if (h.date.length <= 10) return h.date;
-    if (h.date.startsWith(t)) return h.date.slice(11, 16);
-    return h.date.slice(5, 16);
+    let dStr = h.date;
+    const isAdded = dStr.includes('(Added)');
+    if (isAdded) dStr = dStr.replace(' (Added)', '');
+    
+    let label = '';
+    if (dStr.startsWith(t)) {
+      label = 'Today ' + dStr.slice(11, 16);
+    } else if (dStr.length <= 10) {
+      label = dStr.slice(5);
+    } else {
+      label = dStr.slice(5, 16);
+    }
+    return label + (isAdded ? ' (Added)' : '');
   });
   const datasets = [{ label: 'Price', data: hist.map(h => h.price), 
     borderColor: '#3b82f6', borderWidth: 3, pointRadius: 3, tension: 0.4,
@@ -935,10 +945,20 @@ function drawModalChart(e) {
     data: { labels, datasets },
     options: {
       maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#e6edf3' } } },
+      plugins: { 
+        legend: { labels: { color: '#e6edf3' } },
+        tooltip: {
+          callbacks: {
+            title: (items) => {
+              const idx = items[0].dataIndex;
+              return hist[idx] ? hist[idx].date : items[0].label;
+            }
+          }
+        }
+      },
       scales: {
-        x: { ticks: { color: '#8b98a5' }, grid: { color: '#2a3441' } },
-        y: { ticks: { color: '#8b98a5' }, grid: { color: '#2a3441' } }
+        x: { ticks: { color: '#8b98a5' }, grid: { color: '#2a3441', drawBorder: false } },
+        y: { ticks: { color: '#8b98a5' }, grid: { color: '#2a3441', drawBorder: false } }
       }
     }
   });
