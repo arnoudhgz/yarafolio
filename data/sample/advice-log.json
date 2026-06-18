@@ -365,9 +365,6 @@
       "reason": "Defensive rotation.",
       "risk": "Litigation.",
       "sector": "Healthcare",
-      "buyBelow": 145.0,
-      "dropBelow": 125.0,
-      "dropAbove": 160.0,
       "status": "watching",
       "boughtAt": null,
       "soldAt": null,
@@ -380,8 +377,32 @@
           "price": 140.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-14",
+          "price": 140.5
+        },
+        {
+          "date": "2026-06-15",
+          "price": 141.0
+        },
+        {
+          "date": "2026-06-16",
+          "price": 141.2
+        },
+        {
+          "date": "2026-06-17",
           "price": 141.5
+        },
+        {
+          "date": "2026-06-17 17:36:00",
+          "price": 141.7
+        },
+        {
+          "date": "2026-06-17 18:48:00",
+          "price": 141.8
+        },
+        {
+          "date": "2026-06-17 20:00:00",
+          "price": 141.9
         }
       ],
       "notes": [
@@ -403,9 +424,6 @@
       "reason": "Energy pullback.",
       "risk": "Oil prices.",
       "sector": "Basic Materials",
-      "buyBelow": 110.0,
-      "dropBelow": 90.0,
-      "dropAbove": 120.0,
       "status": "watching",
       "boughtAt": null,
       "soldAt": null,
@@ -418,7 +436,19 @@
           "price": 105.0
         },
         {
-          "date": "2026-06-18",
+          "date": "2026-06-17",
+          "price": 105.5
+        },
+        {
+          "date": "2026-06-17 17:36:00",
+          "price": 105.7
+        },
+        {
+          "date": "2026-06-17 18:48:00",
+          "price": 105.8
+        },
+        {
+          "date": "2026-06-17 20:00:00",
           "price": 106.0
         }
       ],
