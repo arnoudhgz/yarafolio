@@ -970,5 +970,33 @@
         }
       ]
     }
+  ],
+  "newsSummaries": [
+    {
+      "date": "2026-06-17",
+      "tickers": [
+        "AAPL",
+        "TSLA"
+      ],
+      "article": "### Market Summary\nTech stocks rallied today with **AAPL** leading the charge after a positive earnings beat. Meanwhile, **TSLA** saw mixed movements as it missed delivery estimates but announced new autonomous driving features. Overall sentiment remains cautiously optimistic as inflation data cooled."
+    },
+    {
+      "date": "2026-06-16",
+      "tickers": [
+        "NVDA",
+        "JNJ"
+      ],
+      "article": "### Mixed Signals\n**NVDA** continues its incredible AI momentum, surging past key resistance levels. In contrast, defensive stocks like **JNJ** have seen slight pullbacks as investors rotate back into high-growth sectors, despite strong dividend announcements."
+    }
+  ],
+  "eodReports": [
+    {
+      "date": "2026-06-17",
+      "summary": "EOD Check: Market closed strong. Secured +6% profit on NVDA by raising trailing stop loss. No other immediate actions required; low-conviction picks held their ground."
+    },
+    {
+      "date": "2026-06-15",
+      "summary": "EOD Check: Tech sector exhibited late-day weakness. RIVN dropped significantly below the drop-below threshold. Closed out position to prevent further losses."
+    }
   ]
 }
