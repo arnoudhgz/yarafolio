@@ -14,7 +14,16 @@
       "currentPrice": 185.2,
       "plDollar": 63.5,
       "plPct": 0.0736,
-      "firstOpen": "2026-05-11"
+      "firstOpen": "2026-05-11",
+      "lots": [
+        {
+          "positionID": 101,
+          "openDate": "2026-05-11",
+          "openRate": 172.5,
+          "units": 5.0,
+          "tslEnabled": true
+        }
+      ]
     },
     {
       "ticker": "NKE",
@@ -28,7 +37,16 @@
       "currentPrice": 86.5,
       "plDollar": -55.0,
       "plPct": -0.0598,
-      "firstOpen": "2026-05-21"
+      "firstOpen": "2026-05-21",
+      "lots": [
+        {
+          "positionID": 102,
+          "openDate": "2026-05-21",
+          "openRate": 92.0,
+          "units": 10.0,
+          "tslEnabled": false
+        }
+      ]
     },
     {
       "ticker": "V",
@@ -42,7 +60,16 @@
       "currentPrice": 98.0,
       "plDollar": -30.0,
       "plPct": -0.0297,
-      "firstOpen": "2026-05-05"
+      "firstOpen": "2026-05-05",
+      "lots": [
+        {
+          "positionID": 203,
+          "openDate": "2026-05-05",
+          "openRate": 101.0,
+          "units": 10.0,
+          "tslEnabled": true
+        }
+      ]
     },
     {
       "ticker": "NEE",
@@ -56,7 +83,16 @@
       "currentPrice": 92.0,
       "plDollar": -90.0,
       "plPct": -0.0891,
-      "firstOpen": "2026-05-05"
+      "firstOpen": "2026-05-05",
+      "lots": [
+        {
+          "positionID": 209,
+          "openDate": "2026-05-05",
+          "openRate": 101.0,
+          "units": 10.0,
+          "tslEnabled": true
+        }
+      ]
     },
     {
       "ticker": "SPY",
@@ -70,7 +106,23 @@
       "currentPrice": 540.0,
       "plDollar": 400.0,
       "plPct": 0.08,
-      "firstOpen": "2025-11-30"
+      "firstOpen": "2025-11-30",
+      "lots": [
+        {
+          "positionID": 300101,
+          "openDate": "2025-11-30",
+          "openRate": 480.0,
+          "units": 5.0,
+          "tslEnabled": false
+        },
+        {
+          "positionID": 300102,
+          "openDate": "2026-01-19",
+          "openRate": 520.0,
+          "units": 5.0,
+          "tslEnabled": true
+        }
+      ]
     }
   ]
 }
