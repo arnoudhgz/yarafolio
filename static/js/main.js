@@ -1411,13 +1411,17 @@ document.getElementById('syncBtn').addEventListener('click', async () => {
     const [resRef, resImp] = await Promise.all([pRef, pImp]);
     
     let msgs = [];
-    if (resRef.ok) msgs.push('Quotes updated (' + (resRef.refreshed || 0) + ')');
-    if (resImp.ok) msgs.push('eToro synced');
-    
-    if (msgs.length) {
-      banner(msgs.join(' & ') + '!', 'success');
+    if (resRef.demo || resImp.demo) {
+      banner('Simulated sync (Demo Mode)', 'success');
     } else {
-      banner('Sync failed: Check serve.py logs for details.');
+      if (resRef.ok) msgs.push('Quotes updated (' + (resRef.refreshed || 0) + ')');
+      if (resImp.ok) msgs.push('eToro synced');
+      
+      if (msgs.length) {
+        banner(msgs.join(' & ') + '!', 'success');
+      } else {
+        banner('Sync failed: Check serve.py logs for details.');
+      }
     }
     await load();
   } catch (err) {

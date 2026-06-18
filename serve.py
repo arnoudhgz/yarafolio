@@ -171,7 +171,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def handle_import(self):
         if is_demo:
-            self.respond_json(200, {"ok": True, "preview": "Demo mode: import simulated", "merge": "Demo mode: merge simulated"})
+            self.respond_json(200, {"ok": True, "preview": "Demo mode: import simulated", "merge": "Demo mode: merge simulated", "demo": True})
             return
         length = int(self.headers.get("Content-Length", 0))
         location = ""
@@ -219,7 +219,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def handle_refresh(self):
         if is_demo:
-            self.respond_json(200, {"ok": True})
+            self.respond_json(200, {"ok": True, "demo": True})
             return
         # Refresh reads tickers + writes from disk, not the browser's in-memory state, so
         # any unsaved browser edits would be lost. In practice the dashboard saves on every

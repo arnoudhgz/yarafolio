@@ -12,8 +12,8 @@
       "invested": 862.5,
       "avgOpen": 172.5,
       "currentPrice": 185.2,
-      "plDollar": 63.49999999999994,
-      "plPct": 0.07362318840579704,
+      "plDollar": 63.5,
+      "plPct": 0.0736,
       "firstOpen": "2026-05-11"
     },
     {
@@ -27,7 +27,7 @@
       "avgOpen": 92.0,
       "currentPrice": 86.5,
       "plDollar": -55.0,
-      "plPct": -0.059782608695652176,
+      "plPct": -0.0598,
       "firstOpen": "2026-05-21"
     },
     {
@@ -41,7 +41,7 @@
       "avgOpen": 101.0,
       "currentPrice": 98.0,
       "plDollar": -30.0,
-      "plPct": -0.0297029702970297,
+      "plPct": -0.0297,
       "firstOpen": "2026-05-05"
     },
     {
@@ -55,7 +55,7 @@
       "avgOpen": 101.0,
       "currentPrice": 92.0,
       "plDollar": -90.0,
-      "plPct": -0.0891089108910891,
+      "plPct": -0.0891,
       "firstOpen": "2026-05-05"
     },
     {

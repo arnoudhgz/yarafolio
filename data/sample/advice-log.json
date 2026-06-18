@@ -341,7 +341,7 @@
         },
         {
           "date": "2026-06-18",
-          "price": 110.00000000000001
+          "price": 110.0
         }
       ],
       "notes": [
@@ -352,14 +352,14 @@
       ],
       "boughtAt": 101.0,
       "units": 10.0,
-      "soldAt": 110.00000000000001,
+      "soldAt": 110.0,
       "lots": [
         {
           "positionID": 200,
           "openDate": "2026-05-05",
           "openRate": 101.0,
           "units": 10.0,
-          "lastPrice": 110.00000000000001,
+          "lastPrice": 110.0,
           "tslEnabled": true,
           "soldAt": "2026-06-13",
           "exitEstimated": false
@@ -732,7 +732,7 @@
         },
         {
           "date": "2026-06-18",
-          "price": 112.00000000000001
+          "price": 112.0
         }
       ],
       "notes": [
@@ -743,14 +743,14 @@
       ],
       "boughtAt": 101.0,
       "units": 10.0,
-      "soldAt": 112.00000000000001,
+      "soldAt": 112.0,
       "lots": [
         {
           "positionID": 208,
           "openDate": "2026-05-05",
           "openRate": 101.0,
           "units": 10.0,
-          "lastPrice": 112.00000000000001,
+          "lastPrice": 112.0,
           "tslEnabled": true,
           "soldAt": "2026-06-13",
           "exitEstimated": false
