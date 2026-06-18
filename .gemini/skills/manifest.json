@@ -1,0 +1,39 @@
+{
+  "skills": {
+    "advice": {
+      "status": "installed",
+      "disabled": false,
+      "error": null
+    },
+    "check": {
+      "status": "installed",
+      "disabled": false,
+      "error": null
+    },
+    "diversify": {
+      "status": "installed",
+      "disabled": false,
+      "error": null
+    },
+    "import": {
+      "status": "installed",
+      "disabled": false,
+      "error": null
+    },
+    "learn": {
+      "status": "installed",
+      "disabled": false,
+      "error": null
+    },
+    "premarket": {
+      "status": "installed",
+      "disabled": false,
+      "error": null
+    },
+    "aftermarket": {
+      "status": "installed",
+      "disabled": false,
+      "error": null
+    }
+  }
+}

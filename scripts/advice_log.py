@@ -1,0 +1,435 @@
+#!/usr/bin/env python3
+"""Mutate and query data/advice-log.json from the command line.
+
+All deterministic log work goes through this CLI so skills don't hand-edit JSON.
+Every mutating command bumps lastUpdated.
+
+Usage:
+  python3 scripts/advice_log.py add-pick SBUX --source advice --price 81.20 --rating B+ --rsi 27 \
+      --sector Services --buy-below 78.50 --drop-below 72.00 --drop-above 92.00 --name "Starbucks" \
+      --reason "tariff overreaction" --risk "china exposure"
+  python3 scripts/advice_log.py touch SBUX --price 83.10
+  echo '{"SBUX": 83.10, "ONC": 270.5}' | python3 scripts/advice_log.py touch-many
+  python3 scripts/advice_log.py add-note SBUX --text "Q2 beat, tariff fear overdone, analysts at \$95"
+  python3 scripts/advice_log.py set-status SBUX bought --price 81.00
+  python3 scripts/advice_log.py set-tsl SBUX [--off]
+  python3 scripts/advice_log.py checkin-candidates
+  python3 scripts/advice_log.py compare
+  python3 scripts/advice_log.py sector-gaps
+
+add-pick upserts: an existing ticker gets a priceHistory point plus refreshed
+rating/rsi/sector/buyBelow/dropBelow/dropAbove (source stays as it was), a new
+ticker becomes a watching entry (--source required).
+"""
+import argparse
+import json
+import os
+import sys
+from datetime import date, datetime
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+def get_env(key):
+    v = os.environ.get(key)
+    if v is not None: return v
+    try:
+        with open(os.path.join(ROOT, ".env")) as f:
+            for line in f:
+                k, _, val = line.partition("=")
+                if k.replace("export", "").strip() == key:
+                    return val.strip().strip("\"'")
+    except OSError:
+        pass
+    return None
+
+is_demo = get_env("DEMO_MODE") == "1"
+subdir = "sample" if is_demo else "private"
+LOG_FILE = os.path.join(ROOT, "data", subdir, "advice-log.json")
+PORTFOLIO_FILE = os.path.join(ROOT, "data", subdir, "portfolio.json")
+
+SECTORS = ("Basic Materials", "Conglomerates", "Consumer Goods", "Financial",
+           "Healthcare", "Industrial Goods", "Services", "Technology",
+           "Utilities", "ETF / Other")
+NEW_PICK_SOURCES = ("advice", "premarket", "diversify")
+
+
+def load_log():
+    with open(LOG_FILE) as f:
+        return json.load(f)
+
+
+def save_log(data):
+    data["lastUpdated"] = date.today().isoformat()
+    tmp = LOG_FILE + ".tmp"
+    with open(tmp, "w") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
+    os.replace(tmp, LOG_FILE)
+
+
+def find(data, ticker):
+    for e in data["entries"]:
+        if e["ticker"] == ticker and e["status"] in ("watching", "bought"):
+            return e
+    return None
+
+def find_by_id(data, id):
+    for e in data["entries"]:
+        if e.get("id") == id:
+            return e
+    return None
+
+def require_by_id(data, id):
+    e = find_by_id(data, id)
+    if e is None:
+        import sys
+        sys.exit(f"{id} is not tracked")
+    return e
+
+
+
+def require(data, ticker):
+    e = find(data, ticker)
+    if e is None:
+        sys.exit(f"{ticker} is not tracked")
+    return e
+
+
+def latest_price(e):
+    return e["priceHistory"][-1]["price"] if e["priceHistory"] else e.get("priceAtAdvice")
+
+
+def push_history(e, price):
+    now = datetime.now()
+    now_str = now.strftime("%Y-%m-%d %H:%M")
+    today_str = now.strftime("%Y-%m-%d")
+    
+    hist = e.setdefault("priceHistory", [])
+    if hist and hist[-1]["price"] == price:
+        pass # Skip adding extra entry if price is identical
+    elif hist and hist[-1]["date"] == now_str:
+        hist[-1]["price"] = price
+    else:
+        hist.append({"date": now_str, "price": price})
+        
+    # Prune historical intraday points to prevent bloat
+    new_hist = []
+    for i, point in enumerate(hist):
+        date_str = point["date"][:10]
+        if date_str == today_str:
+            new_hist.append(point)
+        else:
+            is_last = True
+            if i + 1 < len(hist) and hist[i+1]["date"][:10] == date_str:
+                is_last = False
+            if is_last:
+                new_hist.append({"date": date_str, "price": point["price"]})
+    e["priceHistory"] = new_hist
+
+
+def push_note(e, text):
+    e.setdefault("notes", []).append({"date": date.today().isoformat(), "text": text})
+
+
+def cmd_add_pick(args):
+    data = load_log()
+    today = date.today().isoformat()
+    
+    # Only update an existing entry if it was advised TODAY. Otherwise, create a new one.
+    e = None
+    for x in data["entries"]:
+        if x["ticker"] == args.ticker and x.get("firstAdvised") == today and x.get("source") != "import":
+            e = x
+            break
+
+    if e is None:
+        if not args.source:
+            import sys
+            sys.exit(f"{args.ticker} is new: --source ({'|'.join(NEW_PICK_SOURCES)}) is required")
+        count = sum(1 for x in data["entries"] if x["ticker"] == args.ticker) + 1
+        e = {
+            "id": f"{args.ticker}-{count:04d}",
+            "ticker": args.ticker, "name": args.name or "",
+            "firstAdvised": date.today().isoformat(), "source": args.source,
+            "rating": None, "rsiAtAdvice": None, "priceAtAdvice": args.price,
+            "reason": None, "risk": None, "sector": None,
+            "buyBelow": None, "dropBelow": None, "dropAbove": None,
+            "status": "watching", "boughtAt": None, "soldAt": None,
+            "units": None, "priceHistory": [], "notes": [],
+        }
+        data["entries"].append(e)
+        action = "added"
+        if args.reason:
+            push_note(e, f"Advised ({args.source}): {args.reason}")
+    else:
+        action = "updated"
+    push_history(e, args.price)
+    for field, value in (("rating", args.rating), ("rsiAtAdvice", args.rsi),
+                         ("sector", args.sector), ("buyBelow", args.buy_below),
+                         ("dropBelow", args.drop_below), ("dropAbove", args.drop_above),
+                         ("name", args.name), ("reason", args.reason), ("risk", args.risk)):
+        if value is not None:
+            e[field] = value
+    if args.note:
+        push_note(e, args.note)
+    save_log(data)
+    print(f"{action} {args.ticker} ({e['status']}) @ ${args.price}")
+
+
+def cmd_add_note(args):
+    data = load_log()
+    e = require(data, args.ticker)
+    push_note(e, args.text)
+    save_log(data)
+    print(f"{args.ticker}: note added ({len(e['notes'])} total)")
+
+
+def cmd_add_eod(args):
+    data = load_log()
+    data.setdefault("eodReports", []).append({
+        "date": date.today().isoformat(),
+        "summary": args.summary
+    })
+    save_log(data)
+    print("EOD report added.")
+
+
+def cmd_add_news_summary(args):
+    data = load_log()
+    from datetime import datetime
+    data.setdefault("newsSummaries", []).append({
+        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "summary": args.summary
+    })
+    data["newsSummaries"] = data["newsSummaries"][-5:]
+    save_log(data)
+    print("News summary added.")
+
+
+def cmd_touch(args):
+    data = load_log()
+    e = require(data, args.ticker)
+    push_history(e, args.price)
+    save_log(data)
+    print(f"{args.ticker}: price point ${args.price} added")
+
+
+def cmd_touch_many(_args):
+    """Batch price update: read {"TICKER": price, ...} from stdin, one save.
+
+    Used by serve.py /api/refresh so the web layer never hand-edits the JSON.
+    """
+    try:
+        prices = json.load(sys.stdin)
+    except json.JSONDecodeError as exc:
+        sys.exit(f"touch-many expects a JSON map on stdin: {exc}")
+    if not isinstance(prices, dict):
+        sys.exit('touch-many expects a JSON object like {"AAPL": 312.7}')
+    data = load_log()
+    touched, skipped = [], []
+    for ticker, payload in prices.items():
+        if isinstance(payload, (int, float)):
+            price = payload
+            earnings_date = None
+        elif isinstance(payload, dict) and "price" in payload:
+            price = payload["price"]
+            earnings_date = payload.get("earningsDate")
+        else:
+            skipped.append(ticker)
+            continue
+        
+        found_any = False
+        for e in data["entries"]:
+            if e["ticker"] == ticker and e["status"] in ("watching", "bought"):
+                push_history(e, float(price))
+                if earnings_date and earnings_date not in ("", "-"):
+                    e["earningsDate"] = earnings_date
+                found_any = True
+                
+        if found_any:
+            touched.append(ticker)
+        else:
+            skipped.append(ticker)
+            
+    if touched:
+        save_log(data)
+    msg = f"touched {len(touched)}: {', '.join(touched) or '-'}"
+    if skipped:
+        msg += f" (skipped untracked: {', '.join(skipped)})"
+    print(msg)
+
+
+def cmd_set_status(args):
+    data = load_log()
+    e = require(data, args.ticker)
+    price = args.price if args.price is not None else latest_price(e)
+    if args.price is not None:
+        push_history(e, args.price)
+    if args.status == "bought":
+        e["boughtAt"] = price
+    elif args.status == "sold":
+        e["soldAt"] = price
+        e.pop("exitEstimated", None)  # an explicit sold price confirms the exit
+    elif args.status == "dropped":
+        e["droppedDate"] = date.today().isoformat()  # lots opened after this aren't the advice's trade
+    e["status"] = args.status
+    push_note(e, f"Status changed to {args.status} @ ${price}")
+    save_log(data)
+    print(f"{args.ticker}: {args.status} @ ${price}")
+
+
+def cmd_set_tsl(args):
+    data = load_log()
+    e = require(data, args.ticker)
+    e["tslSet"] = not args.off
+    push_note(e, "Trailing stop loss removed on eToro" if args.off
+              else "Trailing stop loss set on eToro")
+    save_log(data)
+    print(f"{args.ticker}: tslSet = {e['tslSet']}")
+
+
+def cmd_checkin_candidates(_args):
+    data = load_log()
+    today = date.today()
+    rows = []
+    for e in data["entries"]:
+        est_lots = [l for l in e.get("lots", []) if l.get("exitEstimated")]
+        if est_lots:
+            rows.append((0, 0.0,
+                         f"{e['ticker']}: {len(est_lots)} lot(s) auto-closed at estimated exit, "
+                         f"confirm the real price (dashboard Confirm, or set-status sold --price X)"))
+        if e["status"] == "watching":
+            price = latest_price(e)
+            if e.get("dropAbove") and price is not None and price >= e["dropAbove"]:
+                rows.append((0, -price,
+                             f"{e['ticker']}: now ${price} >= drop-above ${e['dropAbove']}, "
+                             f"the oversold bounce already ran - drop it?"))
+            else:
+                age = (today - datetime.strptime(e["firstAdvised"], "%Y-%m-%d").date()).days
+                if age > 7:
+                    rows.append((1, -age,
+                                 f"{e['ticker']}: watching {age}d, advised @ ${e['priceAtAdvice']}, "
+                                 f"now ${latest_price(e)}"))
+        elif e["status"] == "bought" and e.get("boughtAt") and not e.get("tslSet"):
+            pct = (latest_price(e) - e["boughtAt"]) / e["boughtAt"] * 100
+            if pct >= 5:
+                rows.append((0, -pct,
+                             f"{e['ticker']}: bought @ ${e['boughtAt']}, now ${latest_price(e)} "
+                             f"({pct:+.1f}%) - trailing stop territory"))
+    if not rows:
+        print("No check-in candidates.")
+        return
+    for _, _, line in sorted(rows):
+        print(line)
+
+
+def load_portfolio():
+    if not os.path.exists(PORTFOLIO_FILE):
+        sys.exit("data/portfolio.json missing: run the eToro import first")
+    with open(PORTFOLIO_FILE) as f:
+        return json.load(f)
+
+
+def cmd_compare(_args):
+    data = load_log()
+    held = {h["ticker"]: h for h in load_portfolio()["holdings"]}
+    hits = [(e, held[e["ticker"]]) for e in data["entries"]
+            if e.get("source") != "import" and e["ticker"] in held]
+    if not hits:
+        print("No advised picks currently held.")
+        return
+    for e, h in hits:
+        pl = f"{h['plPct']:+.1f}%" if h.get("plPct") is not None else "?"
+        print(f"{e['ticker']}: advised @ ${e['priceAtAdvice']} ({e['firstAdvised']}), "
+              f"entry ${h['avgOpen']}, now ${h['currentPrice']} ({pl})")
+
+
+def cmd_sector_gaps(_args):
+    portfolio = load_portfolio()
+    total = portfolio.get("totalInvested") or sum(h["invested"] for h in portfolio["holdings"])
+    by_sector = {}
+    for h in portfolio["holdings"]:
+        by_sector[h.get("sector") or "ETF / Other"] = \
+            by_sector.get(h.get("sector") or "ETF / Other", 0.0) + h["invested"]
+    print(f"Invested: ${total:,.2f} across {len(portfolio['holdings'])} holdings\n")
+    for sector in SECTORS:
+        invested = by_sector.get(sector, 0.0)
+        pct = invested / total * 100 if total else 0.0
+        print(f"{sector:18} ${invested:>10,.2f}  {pct:5.1f}%")
+    unknown = by_sector.get("Unknown", 0.0)
+    if unknown:
+        print(f"{'Unknown':18} ${unknown:>10,.2f}  {unknown / total * 100:5.1f}%")
+    under = [s for s in SECTORS if s != "ETF / Other"
+             and (by_sector.get(s, 0.0) / total * 100 if total else 0.0) < 5.0]
+    print(f"\nUnderweight (<5% of invested): {', '.join(under) if under else 'none'}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    p = sub.add_parser("add-pick", help="upsert an advice pick")
+    p.add_argument("ticker")
+    p.add_argument("--price", type=float, required=True)
+    p.add_argument("--source", choices=NEW_PICK_SOURCES)
+    p.add_argument("--rating")
+    p.add_argument("--rsi", type=float)
+    p.add_argument("--sector", choices=SECTORS)
+    p.add_argument("--buy-below", type=float)
+    p.add_argument("--drop-below", type=float)
+    p.add_argument("--drop-above", type=float,
+                   help="ceiling: above this the oversold bounce already ran, drop the watch")
+    p.add_argument("--name")
+    p.add_argument("--reason")
+    p.add_argument("--risk")
+    p.add_argument("--note", help="dated commentary for the notes history (news, what happened)")
+    p.set_defaults(func=cmd_add_pick)
+
+    p = sub.add_parser("touch", help="append a price point")
+    p.add_argument("ticker")
+    p.add_argument("--price", type=float, required=True)
+    p.set_defaults(func=cmd_touch)
+
+    p = sub.add_parser("touch-many", help='batch price update from a {"TICKER": price} JSON map on stdin')
+    p.set_defaults(func=cmd_touch_many)
+
+    p = sub.add_parser("add-note", help="append dated commentary to a tracked ticker")
+    p.add_argument("ticker")
+    p.add_argument("--text", required=True)
+    p.set_defaults(func=cmd_add_note)
+
+    peod = sub.add_parser("add-eod", help="append a daily EOD report summary")
+    peod.add_argument("--summary", required=True)
+    peod.set_defaults(func=cmd_add_eod)
+
+    pnews = sub.add_parser("add-news-summary", help="append an AI news summary")
+    pnews.add_argument("--summary", required=True)
+    pnews.set_defaults(func=cmd_add_news_summary)
+
+    p = sub.add_parser("set-status", help="change entry status")
+    p.add_argument("ticker")
+    p.add_argument("status", choices=("watching", "bought", "sold", "dropped"))
+    p.add_argument("--price", type=float)
+    p.set_defaults(func=cmd_set_status)
+
+    p = sub.add_parser("set-tsl", help="mark trailing stop loss active on eToro")
+    p.add_argument("ticker")
+    p.add_argument("--off", action="store_true")
+    p.set_defaults(func=cmd_set_tsl)
+
+    p = sub.add_parser("checkin-candidates", help="tickers due for the keep/drop check-in")
+    p.set_defaults(func=cmd_checkin_candidates)
+
+    p = sub.add_parser("compare", help="advised picks vs current eToro holdings")
+    p.set_defaults(func=cmd_compare)
+
+    p = sub.add_parser("sector-gaps", help="portfolio sector split + underweight sectors")
+    p.set_defaults(func=cmd_sector_gaps)
+
+    args = parser.parse_args()
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()

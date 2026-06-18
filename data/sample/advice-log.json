@@ -1,0 +1,814 @@
+{
+  "lastUpdated": "2026-06-18",
+  "entries": [
+    {
+      "id": "AAPL-0001",
+      "ticker": "AAPL",
+      "name": "Apple Inc.",
+      "firstAdvised": "2026-05-09",
+      "source": "advice",
+      "rating": "A-",
+      "rsiAtAdvice": 29.5,
+      "priceAtAdvice": 170.0,
+      "reason": "Oversold supply chain.",
+      "risk": "EU regulations.",
+      "sector": "Technology",
+      "buyBelow": 175.0,
+      "dropBelow": 160.0,
+      "dropAbove": 190.0,
+      "status": "bought",
+      "boughtAt": 172.5,
+      "soldAt": null,
+      "units": 5.0,
+      "droppedDate": null,
+      "lots": [
+        {
+          "positionID": 101,
+          "openDate": "2026-05-11",
+          "openRate": 172.5,
+          "units": 5.0,
+          "lastPrice": 185.2,
+          "tslEnabled": true,
+          "soldAt": null,
+          "exitEstimated": false
+        }
+      ],
+      "priceHistory": [
+        {
+          "date": "2026-05-09",
+          "price": 170.0
+        },
+        {
+          "date": "2026-05-14",
+          "price": 173.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 180.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 185.2
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-09",
+          "text": "Advised."
+        }
+      ]
+    },
+    {
+      "id": "NKE-0001",
+      "ticker": "NKE",
+      "name": "Nike",
+      "firstAdvised": "2026-05-19",
+      "source": "premarket",
+      "rating": "B",
+      "rsiAtAdvice": 22.0,
+      "priceAtAdvice": 90.0,
+      "reason": "Earnings overreaction.",
+      "risk": "Inventory issues.",
+      "sector": "Consumer Goods",
+      "buyBelow": 95.0,
+      "dropBelow": 85.0,
+      "dropAbove": 110.0,
+      "status": "bought",
+      "boughtAt": 92.0,
+      "soldAt": null,
+      "units": 10.0,
+      "droppedDate": null,
+      "lots": [
+        {
+          "positionID": 102,
+          "openDate": "2026-05-21",
+          "openRate": 92.0,
+          "units": 10.0,
+          "lastPrice": 86.5,
+          "tslEnabled": false,
+          "soldAt": null,
+          "exitEstimated": false
+        }
+      ],
+      "priceHistory": [
+        {
+          "date": "2026-05-19",
+          "price": 90.0
+        },
+        {
+          "date": "2026-06-03",
+          "price": 88.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 86.5
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-19",
+          "text": "Advised."
+        }
+      ]
+    },
+    {
+      "id": "MSFT-0001",
+      "ticker": "MSFT",
+      "name": "Microsoft Corporation",
+      "firstAdvised": "2026-04-19",
+      "source": "advice",
+      "rating": "A+",
+      "rsiAtAdvice": 35.0,
+      "priceAtAdvice": 395.0,
+      "reason": "AI growth.",
+      "risk": "Valuation.",
+      "sector": "Technology",
+      "buyBelow": 405.0,
+      "dropBelow": 380.0,
+      "dropAbove": 430.0,
+      "status": "sold",
+      "boughtAt": 398.0,
+      "soldAt": 425.0,
+      "units": 2.5,
+      "droppedDate": null,
+      "lots": [
+        {
+          "positionID": 103,
+          "openDate": "2026-04-21",
+          "openRate": 398.0,
+          "units": 2.5,
+          "lastPrice": 425.0,
+          "tslEnabled": true,
+          "soldAt": "2026-06-13",
+          "exitEstimated": false
+        }
+      ],
+      "priceHistory": [
+        {
+          "date": "2026-04-19",
+          "price": 395.0
+        },
+        {
+          "date": "2026-04-29",
+          "price": 405.0
+        },
+        {
+          "date": "2026-06-08",
+          "price": 425.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 422.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-04-19",
+          "text": "Advised."
+        }
+      ]
+    },
+    {
+      "id": "DIS-0001",
+      "ticker": "DIS",
+      "name": "Walt Disney",
+      "firstAdvised": "2026-03-20",
+      "source": "diversify",
+      "rating": "C+",
+      "rsiAtAdvice": 25.0,
+      "priceAtAdvice": 105.0,
+      "reason": "Streaming profitability.",
+      "risk": "Parks slowdown.",
+      "sector": "Services",
+      "buyBelow": 110.0,
+      "dropBelow": 95.0,
+      "dropAbove": 120.0,
+      "status": "sold",
+      "boughtAt": 106.0,
+      "soldAt": 94.0,
+      "units": 10.0,
+      "droppedDate": null,
+      "lots": [
+        {
+          "positionID": 104,
+          "openDate": "2026-03-22",
+          "openRate": 106.0,
+          "units": 10.0,
+          "lastPrice": 94.0,
+          "tslEnabled": false,
+          "soldAt": "2026-05-29",
+          "exitEstimated": false
+        }
+      ],
+      "priceHistory": [
+        {
+          "date": "2026-03-20",
+          "price": 105.0
+        },
+        {
+          "date": "2026-04-09",
+          "price": 100.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 94.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 92.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-03-20",
+          "text": "Advised."
+        }
+      ]
+    },
+    {
+      "id": "TSLA-0001",
+      "ticker": "TSLA",
+      "name": "Tesla Inc.",
+      "firstAdvised": "2026-06-08",
+      "source": "premarket",
+      "rating": "B",
+      "rsiAtAdvice": 25.1,
+      "priceAtAdvice": 165.0,
+      "reason": "Delivery miss.",
+      "risk": "Margins.",
+      "sector": "Consumer Goods",
+      "buyBelow": 170.0,
+      "dropBelow": 140.0,
+      "dropAbove": 200.0,
+      "status": "watching",
+      "boughtAt": null,
+      "soldAt": null,
+      "units": null,
+      "droppedDate": null,
+      "lots": [],
+      "priceHistory": [
+        {
+          "date": "2026-06-08",
+          "price": 165.0
+        },
+        {
+          "date": "2026-06-13",
+          "price": 168.2
+        },
+        {
+          "date": "2026-06-18",
+          "price": 172.5
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-06-08",
+          "text": "Advised."
+        }
+      ]
+    },
+    {
+      "id": "SNOW-0001",
+      "ticker": "SNOW",
+      "name": "Snowflake",
+      "firstAdvised": "2026-04-29",
+      "source": "advice",
+      "rating": "C",
+      "rsiAtAdvice": 19.5,
+      "priceAtAdvice": 145.0,
+      "reason": "SaaS selloff.",
+      "risk": "High multiple.",
+      "sector": "Technology",
+      "buyBelow": 150.0,
+      "dropBelow": 130.0,
+      "dropAbove": 170.0,
+      "status": "dropped",
+      "boughtAt": null,
+      "soldAt": null,
+      "units": null,
+      "droppedDate": "2026-05-29",
+      "lots": [],
+      "priceHistory": [
+        {
+          "date": "2026-04-29",
+          "price": 145.0
+        },
+        {
+          "date": "2026-05-09",
+          "price": 140.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 128.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-04-29",
+          "text": "Advised."
+        },
+        {
+          "date": "2026-05-29",
+          "text": "Dropped below drop-below threshold."
+        }
+      ]
+    },
+    {
+      "id": "GOOG-0001",
+      "ticker": "GOOG",
+      "name": "GOOG Corp",
+      "firstAdvised": "2026-05-04",
+      "source": "advice",
+      "rating": "A",
+      "rsiAtAdvice": 28,
+      "priceAtAdvice": 100.0,
+      "reason": "Sample reason.",
+      "risk": "Sample risk.",
+      "sector": "Technology",
+      "buyBelow": 105.0,
+      "dropBelow": 80.0,
+      "dropAbove": 120.0,
+      "status": "sold",
+      "droppedDate": null,
+      "priceHistory": [
+        {
+          "date": "2026-05-04",
+          "price": 100.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 105.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 110.00000000000001
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-04",
+          "text": "Advised."
+        }
+      ],
+      "boughtAt": 101.0,
+      "units": 10.0,
+      "soldAt": 110.00000000000001,
+      "lots": [
+        {
+          "positionID": 200,
+          "openDate": "2026-05-05",
+          "openRate": 101.0,
+          "units": 10.0,
+          "lastPrice": 110.00000000000001,
+          "tslEnabled": true,
+          "soldAt": "2026-06-13",
+          "exitEstimated": false
+        }
+      ]
+    },
+    {
+      "id": "AMZN-0001",
+      "ticker": "AMZN",
+      "name": "AMZN Corp",
+      "firstAdvised": "2026-05-04",
+      "source": "premarket",
+      "rating": "A",
+      "rsiAtAdvice": 32,
+      "priceAtAdvice": 100.0,
+      "reason": "Sample reason.",
+      "risk": "Sample risk.",
+      "sector": "Technology",
+      "buyBelow": 105.0,
+      "dropBelow": 80.0,
+      "dropAbove": 120.0,
+      "status": "dropped",
+      "droppedDate": "2026-06-08",
+      "priceHistory": [
+        {
+          "date": "2026-05-04",
+          "price": 100.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 102.5
+        },
+        {
+          "date": "2026-06-18",
+          "price": 105.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-04",
+          "text": "Advised."
+        }
+      ],
+      "boughtAt": null,
+      "units": null,
+      "soldAt": null,
+      "lots": []
+    },
+    {
+      "id": "JPM-0001",
+      "ticker": "JPM",
+      "name": "JPM Corp",
+      "firstAdvised": "2026-05-04",
+      "source": "advice",
+      "rating": "B+",
+      "rsiAtAdvice": 26,
+      "priceAtAdvice": 100.0,
+      "reason": "Sample reason.",
+      "risk": "Sample risk.",
+      "sector": "Financial",
+      "buyBelow": 105.0,
+      "dropBelow": 80.0,
+      "dropAbove": 120.0,
+      "status": "sold",
+      "droppedDate": null,
+      "priceHistory": [
+        {
+          "date": "2026-05-04",
+          "price": 100.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 104.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 108.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-04",
+          "text": "Advised."
+        }
+      ],
+      "boughtAt": 101.0,
+      "units": 10.0,
+      "soldAt": 108.0,
+      "lots": [
+        {
+          "positionID": 202,
+          "openDate": "2026-05-05",
+          "openRate": 101.0,
+          "units": 10.0,
+          "lastPrice": 108.0,
+          "tslEnabled": true,
+          "soldAt": "2026-06-13",
+          "exitEstimated": false
+        }
+      ]
+    },
+    {
+      "id": "V-0001",
+      "ticker": "V",
+      "name": "V Corp",
+      "firstAdvised": "2026-05-04",
+      "source": "premarket",
+      "rating": "B",
+      "rsiAtAdvice": 24,
+      "priceAtAdvice": 100.0,
+      "reason": "Sample reason.",
+      "risk": "Sample risk.",
+      "sector": "Financial",
+      "buyBelow": 105.0,
+      "dropBelow": 80.0,
+      "dropAbove": 120.0,
+      "status": "bought",
+      "droppedDate": null,
+      "priceHistory": [
+        {
+          "date": "2026-05-04",
+          "price": 100.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 99.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 98.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-04",
+          "text": "Advised."
+        }
+      ],
+      "boughtAt": 101.0,
+      "units": 10.0,
+      "soldAt": null,
+      "lots": [
+        {
+          "positionID": 203,
+          "openDate": "2026-05-05",
+          "openRate": 101.0,
+          "units": 10.0,
+          "lastPrice": 98.0,
+          "tslEnabled": true,
+          "soldAt": null,
+          "exitEstimated": false
+        }
+      ]
+    },
+    {
+      "id": "JNJ-0001",
+      "ticker": "JNJ",
+      "name": "JNJ Corp",
+      "firstAdvised": "2026-05-04",
+      "source": "advice",
+      "rating": "A-",
+      "rsiAtAdvice": 20,
+      "priceAtAdvice": 100.0,
+      "reason": "Sample reason.",
+      "risk": "Sample risk.",
+      "sector": "Healthcare",
+      "buyBelow": 105.0,
+      "dropBelow": 80.0,
+      "dropAbove": 120.0,
+      "status": "sold",
+      "droppedDate": null,
+      "priceHistory": [
+        {
+          "date": "2026-05-04",
+          "price": 100.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 101.5
+        },
+        {
+          "date": "2026-06-18",
+          "price": 103.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-04",
+          "text": "Advised."
+        }
+      ],
+      "boughtAt": 101.0,
+      "units": 10.0,
+      "soldAt": 103.0,
+      "lots": [
+        {
+          "positionID": 204,
+          "openDate": "2026-05-05",
+          "openRate": 101.0,
+          "units": 10.0,
+          "lastPrice": 103.0,
+          "tslEnabled": true,
+          "soldAt": "2026-06-13",
+          "exitEstimated": false
+        }
+      ]
+    },
+    {
+      "id": "UNH-0001",
+      "ticker": "UNH",
+      "name": "UNH Corp",
+      "firstAdvised": "2026-05-04",
+      "source": "premarket",
+      "rating": "B+",
+      "rsiAtAdvice": 15,
+      "priceAtAdvice": 100.0,
+      "reason": "Sample reason.",
+      "risk": "Sample risk.",
+      "sector": "Healthcare",
+      "buyBelow": 105.0,
+      "dropBelow": 80.0,
+      "dropAbove": 120.0,
+      "status": "dropped",
+      "droppedDate": "2026-06-08",
+      "priceHistory": [
+        {
+          "date": "2026-05-04",
+          "price": 100.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 97.5
+        },
+        {
+          "date": "2026-06-18",
+          "price": 95.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-04",
+          "text": "Advised."
+        }
+      ],
+      "boughtAt": null,
+      "units": null,
+      "soldAt": null,
+      "lots": []
+    },
+    {
+      "id": "PG-0001",
+      "ticker": "PG",
+      "name": "PG Corp",
+      "firstAdvised": "2026-05-04",
+      "source": "advice",
+      "rating": "B",
+      "rsiAtAdvice": 30,
+      "priceAtAdvice": 100.0,
+      "reason": "Sample reason.",
+      "risk": "Sample risk.",
+      "sector": "Consumer Goods",
+      "buyBelow": 105.0,
+      "dropBelow": 80.0,
+      "dropAbove": 120.0,
+      "status": "sold",
+      "droppedDate": null,
+      "priceHistory": [
+        {
+          "date": "2026-05-04",
+          "price": 100.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 101.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 102.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-04",
+          "text": "Advised."
+        }
+      ],
+      "boughtAt": 101.0,
+      "units": 10.0,
+      "soldAt": 102.0,
+      "lots": [
+        {
+          "positionID": 206,
+          "openDate": "2026-05-05",
+          "openRate": 101.0,
+          "units": 10.0,
+          "lastPrice": 102.0,
+          "tslEnabled": true,
+          "soldAt": "2026-06-13",
+          "exitEstimated": false
+        }
+      ]
+    },
+    {
+      "id": "KO-0001",
+      "ticker": "KO",
+      "name": "KO Corp",
+      "firstAdvised": "2026-05-04",
+      "source": "premarket",
+      "rating": "C+",
+      "rsiAtAdvice": 22,
+      "priceAtAdvice": 100.0,
+      "reason": "Sample reason.",
+      "risk": "Sample risk.",
+      "sector": "Consumer Goods",
+      "buyBelow": 105.0,
+      "dropBelow": 80.0,
+      "dropAbove": 120.0,
+      "status": "dropped",
+      "droppedDate": "2026-06-08",
+      "priceHistory": [
+        {
+          "date": "2026-05-04",
+          "price": 100.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 99.5
+        },
+        {
+          "date": "2026-06-18",
+          "price": 99.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-04",
+          "text": "Advised."
+        }
+      ],
+      "boughtAt": null,
+      "units": null,
+      "soldAt": null,
+      "lots": []
+    },
+    {
+      "id": "XOM-0001",
+      "ticker": "XOM",
+      "name": "XOM Corp",
+      "firstAdvised": "2026-05-04",
+      "source": "advice",
+      "rating": "B-",
+      "rsiAtAdvice": 28,
+      "priceAtAdvice": 100.0,
+      "reason": "Sample reason.",
+      "risk": "Sample risk.",
+      "sector": "Basic Materials",
+      "buyBelow": 105.0,
+      "dropBelow": 80.0,
+      "dropAbove": 120.0,
+      "status": "sold",
+      "droppedDate": null,
+      "priceHistory": [
+        {
+          "date": "2026-05-04",
+          "price": 100.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 106.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 112.00000000000001
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-04",
+          "text": "Advised."
+        }
+      ],
+      "boughtAt": 101.0,
+      "units": 10.0,
+      "soldAt": 112.00000000000001,
+      "lots": [
+        {
+          "positionID": 208,
+          "openDate": "2026-05-05",
+          "openRate": 101.0,
+          "units": 10.0,
+          "lastPrice": 112.00000000000001,
+          "tslEnabled": true,
+          "soldAt": "2026-06-13",
+          "exitEstimated": false
+        }
+      ]
+    },
+    {
+      "id": "NEE-0001",
+      "ticker": "NEE",
+      "name": "NEE Corp",
+      "firstAdvised": "2026-05-04",
+      "source": "premarket",
+      "rating": "C",
+      "rsiAtAdvice": 18,
+      "priceAtAdvice": 100.0,
+      "reason": "Sample reason.",
+      "risk": "Sample risk.",
+      "sector": "Utilities",
+      "buyBelow": 105.0,
+      "dropBelow": 80.0,
+      "dropAbove": 120.0,
+      "status": "bought",
+      "droppedDate": null,
+      "priceHistory": [
+        {
+          "date": "2026-05-04",
+          "price": 100.0
+        },
+        {
+          "date": "2026-05-29",
+          "price": 96.0
+        },
+        {
+          "date": "2026-06-18",
+          "price": 92.0
+        }
+      ],
+      "notes": [
+        {
+          "date": "2026-05-04",
+          "text": "Advised."
+        }
+      ],
+      "boughtAt": 101.0,
+      "units": 10.0,
+      "soldAt": null,
+      "lots": [
+        {
+          "positionID": 209,
+          "openDate": "2026-05-05",
+          "openRate": 101.0,
+          "units": 10.0,
+          "lastPrice": 92.0,
+          "tslEnabled": true,
+          "soldAt": null,
+          "exitEstimated": false
+        }
+      ]
+    }
+  ]
+}

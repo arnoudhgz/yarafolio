@@ -1,0 +1,11 @@
+.idea/
+.DS_Store
+__pycache__/
+*.pyc
+.claude/settings.local.json
+.env
+tmp/
+data/private/
+!data/sample/
+data/*.bak
+scratch/

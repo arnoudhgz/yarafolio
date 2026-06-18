@@ -1,0 +1,64 @@
+# 📈 YaraFolio
+
+Welcome to **YaraFolio**! I built this because I needed a comprehensive tool where I could combine AI analytics with managing my eToro portfolio. 
+
+Instead of jumping between different apps, YaraFolio acts as a single, sleek local dashboard (**designed explicitly for desktop web browsers**) that syncs your eToro trades and lets an AI (like Gemini or Claude) run point on your research. 
+
+> **Note:** Out of the box, the AI strategies and algorithms here are tuned to my personal preference: hunting for **oversold opportunities** and catching bounces. If you have a different trading style, you can easily change this!
+
+---
+
+## 📚 Documentation
+
+- 🛠️ [**Installation & Setup**](docs/SETUP.md): How to clone, configure your API keys, and run the server.
+- 🖥️ [**Dashboard Screens**](docs/SCREENS.md): An explanation of the different tabs (Advice, Positions, Analytics) and features.
+- 🔒 [**Demo Mode & Privacy**](docs/DEMO_MODE.md): How YaraFolio uses JSON to keep your data 100% private and sync it to a separate private repository.
+
+---
+
+## 🚀 Zero-Dependency Architecture
+This project stubbornly refuses to use NPM, Webpack, React, or complex Python frameworks. 
+- The Python backend runs entirely on the standard library (`http.server`).
+- The web frontend is split into highly readable HTML, CSS, and JS files that the browser stitches together natively using standard ES6 `<script type="module">`. You just edit a file, refresh the browser, and it works!
+
+---
+
+## 🤖 The AI "Skills" (And How to Tune Them)
+
+This project is driven by custom agent instructions. When you talk to the AI, it reads these files to know exactly how to fetch data, evaluate stocks, and update your dashboard.
+
+Out of the box, these instructions reflect my personal "oversold bounce" strategy. **You should absolutely tune these to your own liking.**
+
+Here is where the magic happens:
+1. **The Core Strategies**: Check out [`GEMINI.md`](GEMINI.md) and [`CLAUDE.md`](CLAUDE.md). This is where the overarching rules live (what defines a "buy", risk tolerance, sector preferences). 
+2. **The Specific Commands**: Look inside the `.gemini/skills/` and `.claude/skills/` directories. Each folder contains a `SKILL.md` file that teaches the AI how to execute a specific command. Here are the tools currently loaded:
+   - `/advice`: Run the primary stock screening workflow (finds oversold stocks with bounce potential).
+   - `/aftermarket`: Runs the advice workflow using after-hours data to catch earnings overreactions.
+   - `/check [TICKER]`: Do a deep-dive on a single stock (news, lawsuits, analyst moves) and give a Hold/Add/Exit verdict.
+   - `/diversify`: Scans your eToro portfolio for missing sectors and recommends quality stocks to fill the gaps.
+   - `/eod`: End-of-Day check to secure small profits on low-conviction picks before the market closes.
+   - `/import`: Parses a screenshot or text paste of your eToro portfolio and syncs it to the tracker.
+   - `/learn`: Does a self-learning pass over past advice outcomes to suggest improvements to the strategy.
+   - `/news`: Generates a quick AI management summary of the latest news for your active and watched tickers.
+   - `/premarket`: Runs the advice workflow specifically using today's premarket data before the US open.
+
+---
+
+## ⚠️ Disclaimer & Scraping Considerations
+This tool includes a lightweight Python scraper (`scripts/screen.py`) designed to fetch live quotes and news from public sources like Yahoo Finance. 
+
+**Is this safe to use?**
+Yes, but use it responsibly. This dashboard is intended for **local, personal use**. Because it only fetches data sporadically when you click "Refresh" or ask the AI to run an advice check, it perfectly mimics normal human web traffic. 
+
+However, if you attempt to deploy this on a cloud server and spam refresh every 2 seconds, financial websites *will* rate-limit or temporarily block your IP. Keep it local, keep it reasonable, and it will run flawlessly!
+
+*Note: This software is for educational and informational purposes only. It does not constitute financial advice. Do your own research before executing any financial trades.*
+
+---
+
+## ☕ Support & Follow
+If this project makes your day a little better, consider buying me a coffee or following my trades!
+
+- [Buy me a coffee on Ko-fi ☕](https://ko-fi.com/arnoudhgz) (Not required, never paywalled — purely optional)
+- [Follow me on eToro 📈](https://www.etoro.com/people/arnoudhgz)
+- [Join eToro 🤝](https://etoro.tw/46AcIfc)

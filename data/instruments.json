@@ -1,0 +1,522 @@
+{
+  "1002": {
+    "ticker": "GOOG",
+    "name": "Alphabet",
+    "sector": "Technology"
+  },
+  "1016": {
+    "ticker": "DIS",
+    "name": "Walt Disney",
+    "sector": "Services"
+  },
+  "1022": {
+    "ticker": "JNJ",
+    "name": "Johnson & Johnson",
+    "sector": "Healthcare"
+  },
+  "1029": {
+    "ticker": "PG",
+    "name": "Procter & Gamble Co",
+    "sector": "Consumer Goods"
+  },
+  "1042": {
+    "ticker": "NKE",
+    "name": "NIKE",
+    "sector": "Consumer Goods"
+  },
+  "1047": {
+    "ticker": "VOD",
+    "name": "Vodafone Group plc-ADR",
+    "sector": "Technology"
+  },
+  "1069": {
+    "ticker": "SMCI",
+    "name": "Super Micro Computer, Inc",
+    "sector": "Technology"
+  },
+  "1126": {
+    "ticker": "ADBE",
+    "name": "Adobe Systems Inc",
+    "sector": "Technology"
+  },
+  "1127": {
+    "ticker": "NFLX",
+    "name": "Netflix, Inc.",
+    "sector": "Services"
+  },
+  "1133": {
+    "ticker": "AGNC",
+    "name": "AGNC Investment Corp",
+    "sector": "Financial"
+  },
+  "1203": {
+    "ticker": "BAYN.DE",
+    "name": "Bayer AG",
+    "sector": "Healthcare"
+  },
+  "1206": {
+    "ticker": "MBG.DE",
+    "name": "Mercedes-Benz Group AG",
+    "sector": "Consumer Goods"
+  },
+  "1210": {
+    "ticker": "VOW3.DE",
+    "name": "Volkswagen AG",
+    "sector": "Consumer Goods"
+  },
+  "1250": {
+    "ticker": "KER.PA",
+    "name": "Kering SA",
+    "sector": "Consumer Goods"
+  },
+  "1253": {
+    "ticker": "MC.PA",
+    "name": "LVMH Moet Hennessy Louis Vuitton SA",
+    "sector": "Consumer Goods"
+  },
+  "1259": {
+    "ticker": "RI.PA",
+    "name": "Pernod-Ricard SA",
+    "sector": "Consumer Goods"
+  },
+  "1400": {
+    "ticker": "NESN.ZU",
+    "name": "Nestle SA",
+    "sector": "Consumer Goods"
+  },
+  "1477": {
+    "ticker": "MDT.US",
+    "name": "Medtronic PLC",
+    "sector": "Healthcare"
+  },
+  "1484": {
+    "ticker": "PYPL",
+    "name": "PayPal Holdings",
+    "sector": "Technology"
+  },
+  "1490": {
+    "ticker": "TGT",
+    "name": "Target Corp",
+    "sector": "Consumer Goods"
+  },
+  "1506": {
+    "ticker": "FMC",
+    "name": "FMC Corp",
+    "sector": "Basic Materials"
+  },
+  "1522": {
+    "ticker": "HCA",
+    "name": "HCA Holdings Inc",
+    "sector": "Healthcare"
+  },
+  "1545": {
+    "ticker": "NOC",
+    "name": "Northrop Grumman Corp",
+    "sector": "Industrial Goods"
+  },
+  "1584": {
+    "ticker": "THC",
+    "name": "Tenet Healthcare Corp",
+    "sector": "Healthcare"
+  },
+  "1620": {
+    "ticker": "WM",
+    "name": "Waste Management Inc",
+    "sector": "Industrial Goods"
+  },
+  "1636": {
+    "ticker": "MRSH",
+    "name": "Marsh & McLennan Cos Inc",
+    "sector": "Financial"
+  },
+  "1696": {
+    "ticker": "AZO",
+    "name": "Autozone Inc",
+    "sector": "Services"
+  },
+  "1722": {
+    "ticker": "BDX",
+    "name": "Becton Dickinson & Co.",
+    "sector": "Healthcare"
+  },
+  "1823": {
+    "ticker": "INGR",
+    "name": "Ingredion Inc",
+    "sector": "Consumer Goods"
+  },
+  "1957": {
+    "ticker": "WSO",
+    "name": "Watsco Inc",
+    "sector": "Services"
+  },
+  "1972": {
+    "ticker": "REGN",
+    "name": "Regeneron Pharmaceuticals Inc",
+    "sector": "Healthcare"
+  },
+  "2455": {
+    "ticker": "FIVN",
+    "name": "Five9 Inc",
+    "sector": "Technology"
+  },
+  "2504": {
+    "ticker": "EVT.DE",
+    "name": "EVOTEC",
+    "sector": "Healthcare"
+  },
+  "3018": {
+    "ticker": "UNG",
+    "name": "US Natural Gas",
+    "sector": "ETF / Other"
+  },
+  "3020": {
+    "ticker": "TLT",
+    "name": "iShares 20+ Year Treasury Bond ETF ",
+    "sector": "ETF / Other"
+  },
+  "3022": {
+    "ticker": "XLP",
+    "name": "State Street Consumer Staples Select Sector SPDR ETF",
+    "sector": "ETF / Other"
+  },
+  "3199": {
+    "ticker": "LABU.US",
+    "name": "Direxion Daily S&P Biotech Bull 3X ETF",
+    "sector": "ETF / Other"
+  },
+  "3221": {
+    "ticker": "SDIV",
+    "name": "Global X SuperDividend ETF",
+    "sector": "ETF / Other"
+  },
+  "4061": {
+    "ticker": "GDDY",
+    "name": "GoDaddy Inc.",
+    "sector": "Technology"
+  },
+  "4072": {
+    "ticker": "HSY",
+    "name": "Hershey Co",
+    "sector": "Consumer Goods"
+  },
+  "4108": {
+    "ticker": "MELI",
+    "name": "MercadoLibre Inc",
+    "sector": "Services"
+  },
+  "4138": {
+    "ticker": "ROP",
+    "name": "Roper Technologies Inc",
+    "sector": "Industrial Goods"
+  },
+  "4254": {
+    "ticker": "TMUS",
+    "name": "T-Mobile Us Inc",
+    "sector": "Services"
+  },
+  "4263": {
+    "ticker": "WDAY",
+    "name": "Workday Inc A",
+    "sector": "Technology"
+  },
+  "4286": {
+    "ticker": "TEAM",
+    "name": "Atlassian Corp PLC A",
+    "sector": "Technology"
+  },
+  "4292": {
+    "ticker": "USMV",
+    "name": "iShares Edge MSCI Min Vol USA",
+    "sector": "ETF / Other"
+  },
+  "4323": {
+    "ticker": "VEEV",
+    "name": "Veeva Systems Inc A",
+    "sector": "Technology"
+  },
+  "4330": {
+    "ticker": "DXC",
+    "name": "DXC Technology Co",
+    "sector": "Technology"
+  },
+  "4335": {
+    "ticker": "YUMC",
+    "name": "Yum China Holdings Inc",
+    "sector": "Consumer Goods"
+  },
+  "4399": {
+    "ticker": "TTD",
+    "name": "Trade Desk Inc",
+    "sector": "Services"
+  },
+  "4489": {
+    "ticker": "NIO",
+    "name": "Nio Inc.-ADR",
+    "sector": "Consumer Goods"
+  },
+  "4533": {
+    "ticker": "RAND.NV",
+    "name": "Randstad Holding NV",
+    "sector": "Consumer Goods"
+  },
+  "4537": {
+    "ticker": "TKWY.NV",
+    "name": "Just Eat Takeaway.com NV",
+    "sector": "Consumer Goods"
+  },
+  "5005": {
+    "ticker": "AF.PA",
+    "name": "Air France-KLM",
+    "sector": "Consumer Goods"
+  },
+  "5042": {
+    "ticker": "UBI.PA",
+    "name": "Ubisoft Entertainment SA",
+    "sector": "Technology"
+  },
+  "5628": {
+    "ticker": "CNMD",
+    "name": "Conmed Corp.",
+    "sector": "Consumer Goods"
+  },
+  "5634": {
+    "ticker": "ENPH",
+    "name": "Enphase Energy Inc.",
+    "sector": "Industrial Goods"
+  },
+  "5683": {
+    "ticker": "INSP",
+    "name": "Inspire Medical Systems Inc.",
+    "sector": "Consumer Goods"
+  },
+  "5708": {
+    "ticker": "SFM",
+    "name": "Sprouts Farmers Market Inc.",
+    "sector": "Consumer Goods"
+  },
+  "5960": {
+    "ticker": "SE",
+    "name": "Sea Ltd-ADR",
+    "sector": "Technology"
+  },
+  "5973": {
+    "ticker": "MPT",
+    "name": "Medical Properties Trust Inc",
+    "sector": "Financial"
+  },
+  "5976": {
+    "ticker": "BMRN",
+    "name": "BioMarin Pharmaceutical Inc",
+    "sector": "Consumer Goods"
+  },
+  "5988": {
+    "ticker": "IT",
+    "name": "Gartner Inc",
+    "sector": "Consumer Goods"
+  },
+  "6051": {
+    "ticker": "DECK",
+    "name": "Deckers Outdoor Corp",
+    "sector": "Consumer Goods"
+  },
+  "6230": {
+    "ticker": "HTGMQ",
+    "name": "HTG Molecular Diagnostics Inc",
+    "sector": "Consumer Goods"
+  },
+  "6255": {
+    "ticker": "NNDM",
+    "name": "Nano Dimension Ltd-ADR",
+    "sector": "Technology"
+  },
+  "6300": {
+    "ticker": "XELA",
+    "name": "Exela Technologies Inc",
+    "sector": "Technology"
+  },
+  "6353": {
+    "ticker": "QYLD",
+    "name": "Global X Nasdaq 100 Covered Call ETF",
+    "sector": "ETF / Other"
+  },
+  "6529": {
+    "ticker": "SDGR",
+    "name": "Schrodinger Inc/United States",
+    "sector": "Technology"
+  },
+  "6581": {
+    "ticker": "ADC",
+    "name": "Agree Realty Corp",
+    "sector": "Financial"
+  },
+  "6703": {
+    "ticker": "COUR",
+    "name": "Coursera Inc.",
+    "sector": "Consumer Goods"
+  },
+  "6794": {
+    "ticker": "NOMD",
+    "name": "Nomad Foods Ltd",
+    "sector": "Consumer Goods"
+  },
+  "6817": {
+    "ticker": "PHR",
+    "name": "Phreesia Inc",
+    "sector": "Technology"
+  },
+  "6844": {
+    "ticker": "NVO",
+    "name": "Novo-Nordisk A/S SPONS ADR",
+    "sector": "Consumer Goods"
+  },
+  "6849": {
+    "ticker": "SITC",
+    "name": "SITE Centers Corp",
+    "sector": "Financial"
+  },
+  "6886": {
+    "ticker": "UL.US",
+    "name": "Unilever PLC-ADR",
+    "sector": "Consumer Goods"
+  },
+  "7528": {
+    "ticker": "PRX.NV",
+    "name": "Prosus NV",
+    "sector": "Services"
+  },
+  "7916": {
+    "ticker": "VITL",
+    "name": "Vital Farms Inc",
+    "sector": "Consumer Goods"
+  },
+  "7996": {
+    "ticker": "U",
+    "name": "Unity Software Inc.",
+    "sector": "Consumer Goods"
+  },
+  "8617": {
+    "ticker": "NLOP",
+    "name": "Net Lease Office Properties",
+    "sector": "Financial"
+  },
+  "8637": {
+    "ticker": "DUOL",
+    "name": "Duolingo",
+    "sector": "Technology"
+  },
+  "8653": {
+    "ticker": "SICP",
+    "name": "SilverGate Capital",
+    "sector": "Financial"
+  },
+  "8716": {
+    "ticker": "PHG",
+    "name": "Koninklijke Philips NV",
+    "sector": "Consumer Goods"
+  },
+  "8870": {
+    "ticker": "G.US",
+    "name": "Genpact Limited",
+    "sector": "Technology"
+  },
+  "8877": {
+    "ticker": "ATR",
+    "name": "AptarGroup Inc.",
+    "sector": "Consumer Goods"
+  },
+  "8983": {
+    "ticker": "EYE",
+    "name": "National Vision Holdings Inc.",
+    "sector": "Consumer Goods"
+  },
+  "9033": {
+    "ticker": "AHCO",
+    "name": "AdaptHealth Corp.",
+    "sector": "Consumer Goods"
+  },
+  "9267": {
+    "ticker": "OTLY",
+    "name": "Oatly Group AB",
+    "sector": "Consumer Goods"
+  },
+  "9278": {
+    "ticker": "MFLTY",
+    "name": "MissFresh Ltd. ADR",
+    "sector": "Services"
+  },
+  "9523": {
+    "ticker": "CCOI",
+    "name": "Cogent Communications Holdings Inc",
+    "sector": "Services"
+  },
+  "9542": {
+    "ticker": "PERI",
+    "name": "Perion Network Ltd",
+    "sector": "Services"
+  },
+  "9575": {
+    "ticker": "INTA",
+    "name": "Intapp Inc",
+    "sector": "Technology"
+  },
+  "9638": {
+    "ticker": "PSNY",
+    "name": "Polestar Automotive Holding UK PLC",
+    "sector": "Consumer Goods"
+  },
+  "10482": {
+    "ticker": "JILL",
+    "name": "JJill Inc",
+    "sector": "Consumer Goods"
+  },
+  "12233": {
+    "ticker": "DOU.DE",
+    "name": "Douglas AG",
+    "sector": "Consumer Goods"
+  },
+  "14296": {
+    "ticker": "WBA US CVR",
+    "name": "WBA US merger CVR",
+    "sector": "Basic Materials"
+  },
+  "15618": {
+    "ticker": "SPCX",
+    "name": "Space Exploration Technologies Corp",
+    "sector": "Technology"
+  },
+  "1469": {
+    "ticker": "HON",
+    "name": "Honeywell International Inc",
+    "sector": "Industrial Goods"
+  },
+  "6689": {
+    "ticker": "EQT",
+    "name": "EQT Corp",
+    "sector": "Consumer Goods"
+  },
+  "1859": {
+    "ticker": "LDOS",
+    "name": "Leidos Holdings Inc",
+    "sector": "Technology"
+  },
+  "8692": {
+    "ticker": "ONC",
+    "name": "BeiGene Ltd-ADR",
+    "sector": "Consumer Goods"
+  },
+  "1525": {
+    "ticker": "TSN",
+    "name": "Tyson Foods Inc",
+    "sector": "Consumer Goods"
+  },
+  "4167": {
+    "ticker": "TRMB",
+    "name": "Trimble Inc.",
+    "sector": "Technology"
+  },
+  "1450": {
+    "ticker": "ACN",
+    "name": "Accenture Plc",
+    "sector": "Services"
+  }
+}

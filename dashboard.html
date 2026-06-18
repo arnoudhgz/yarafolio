@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YaraFolio</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"
+        integrity="sha384-b0GXujLkk9eYYSmcSfoyZbfyElGAQnDyY0skCHSG6w3JgTMFnz11ggrTAr7seu9f"
+        crossorigin="anonymous"></script>
+<link rel="stylesheet" href="static/css/styles.css">
+
+</head>
+<body>
+  <h1>YaraFolio</h1>
+  <div class="header-row">
+    <p class="subtitle" id="lastUpdated">Loading...</p>
+    <div id="marketTimer" style="margin-left: 12px; display: flex; align-items: center; white-space: nowrap; height: 26px;"></div>
+    <button id="syncBtn" style="margin-left:auto">&#x21bb; Sync Data</button>
+    <select id="locationSelect" style="display:none; padding: 6px 10px; border-radius: 8px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-size: 13px;"></select>
+  </div>
+  <div id="banner"></div>
+
+  <div class="cards">
+    <div class="card"><div class="label">Advised picks</div><div class="value" id="cTracked">0</div></div>
+    <div class="card"><div class="label">Open positions</div><div class="value" id="cOpen">0</div></div>
+    <div class="card"><div class="label">Watching</div><div class="value" id="cWatching">0</div></div>
+  </div>
+
+  <div class="search-row">
+    <input id="search" type="search" placeholder="Search ticker, name, reason, sector&hellip;" autocomplete="off">
+    <span class="search-count" id="searchCount"></span>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button data-tab="advice" class="active">Advice</button>
+    <button data-tab="archive">Archive</button>
+    <button data-tab="positions">Positions</button>
+    <button data-tab="portfolio">Portfolio</button>
+    <button data-tab="analytics">Analytics</button>
+    <button data-tab="eod">EOD Reports</button>
+    <button data-tab="news">AI News</button>
+    <button data-tab="rawnews">Raw News</button>
+    <button data-tab="macro">Macro Calendar</button>
+    <button data-tab="ipos">IPO Tracker</button>
+  </div>
+
+  <section id="tab-advice" class="tab-section active">
+    <div class="panel">
+      <h2>Watchlist (live advice)</h2>
+      <details class="info">
+        <summary>What do the ratings and levels mean?</summary>
+        <ul>
+          <li><strong>A</strong> = clean overreaction: strong balance sheet, clear catalyst for recovery.</li>
+          <li><strong>B</strong> = decent bounce odds, some open questions.</li>
+          <li><strong>C</strong> = cheap for a reason, falling-knife risk.</li>
+          <li><strong>+ / -</strong> shade quality within the grade (B+ leans A, B- leans C).</li>
+          <li><strong>RSI</strong>: under 30 = oversold (the candidate pool), under 20 = deeply oversold, often a falling knife.</li>
+          <li><strong>Buy below</strong>: suggested entry trigger from the advice run (support or gap-fill level). Green row marker when the price is at or under it; the Buy zone filter shows only those.</li>
+          <li><strong>Drop below</strong>: thesis invalidation level. Red row marker when the price is at or under it (the bounce idea is broken, reconsider the pick); the Drop alert filter shows only those.</li>
+          <li><strong>Drop above</strong>: opportunity-gone ceiling. Grey row marker when a watching pick's price is at or above it: the oversold bounce already ran, so the cheap entry is gone and it's worth dropping. The Missed filter shows only those (watching only).</li>
+          <li><strong>Sector</strong>: <span style="color:var(--red);font-weight:600">red</span> = a sector you hold none of (a gap), <span style="color:var(--orange);font-weight:600">orange</span> = underweight (under 5% of your portfolio). The Sector gap / Underweight filters show only those. Same logic as the Portfolio sector-coverage view.</li>
+          <li>This tab is your live watchlist. Dropped picks are moved to the <strong>Archive</strong> tab. Once you buy a pick it moves to the <strong>Positions</strong> tab, along with whatever you later sell.</li>
+        </ul>
+      </details>
+      <div class="filters" id="filters">
+        <button data-filter="watching" class="active">Watching</button>
+        <button data-filter="buyzone">Buy zone</button>
+        <button data-filter="drophit">Drop alert</button>
+        <button data-filter="missed">Missed</button>
+        <button data-filter="gap">Sector gap</button>
+        <button data-filter="under">Underweight</button>
+      </div>
+      <table id="adviceTable">
+        <thead>
+          <tr>
+            <th data-key="firstAdvised">First advised</th>
+            <th data-key="ticker">Ticker</th>
+            <th data-key="priceThen">Price then</th>
+            <th data-key="priceNow">Price now</th>
+            <th data-key="changePct">Change</th>
+            <th data-key="rating">Rating</th>
+            <th data-key="rsi">RSI</th>
+            <th data-key="sector">Sector</th>
+            <th data-key="buyBelow">Buy below</th>
+            <th data-key="dropBelow">Drop below</th>
+            <th data-key="dropAbove">Drop above</th>
+            <th class="spark-col">Trend</th>
+            <th data-key="status">Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="empty" id="emptyMsg" style="display:none">No watched picks yet. Run /advice, /premarket or /import in Claude Code to fill this in.</div>
+    </div>
+  </section>
+
+  <section id="tab-archive" class="tab-section">
+    <div class="panel">
+      <h2>Dropped Picks Archive</h2>
+      <table id="archiveTable">
+        <thead>
+          <tr>
+            <th data-key="firstAdvised">First advised</th>
+            <th data-key="ticker">Ticker</th>
+            <th data-key="priceThen">Price then</th>
+            <th data-key="priceNow">Price now</th>
+            <th data-key="changePct">Change</th>
+            <th data-key="rating">Rating</th>
+            <th data-key="rsi">RSI</th>
+            <th data-key="sector">Sector</th>
+            <th data-key="status">Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="empty" id="archiveEmptyMsg" style="display:none">No dropped picks yet.</div>
+    </div>
+  </section>
+
+  <section id="tab-positions" class="tab-section">
+    <div class="cards">
+      <div class="card"><div class="label">Win rate (closed)</div><div class="value" id="pWinRate">-</div></div>
+      <div class="card"><div class="label">Realized P/L</div><div class="value" id="pRealized">-</div></div>
+      <div class="card"><div class="label">Open P/L (unrealized)</div><div class="value" id="pOpen">-</div></div>
+    </div>
+    <div class="panel">
+      <h2>Positions from advice (bought &amp; sold)</h2>
+      <details class="info">
+        <summary>What's this tab?</summary>
+        <ul>
+          <li>One row per eToro lot, kept forever. Only lots opened on/after a pick's advice date count as the advice's trade, lots you held before the advice, or opened after dropping it, stay plain holdings on the Portfolio tab.</li>
+          <li><strong>P/L $</strong> is real money, per lot: closed = (sold - bought) x units, open = (now - bought) x units.</li>
+          <li>An <span class="badge est">est</span> badge means the lot was auto-closed when it vanished from eToro and the exit is the last price we saw. The <strong>Needs confirm</strong> filter lists those; click Confirm to set the real exit.</li>
+        </ul>
+      </details>
+      <div class="filters" id="posFilters">
+        <button data-posfilter="all">All</button>
+        <button data-posfilter="open" class="active">Open</button>
+        <button data-posfilter="closed">Closed</button>
+        <button data-posfilter="needsconfirm">Needs confirm</button>
+      </div>
+      <table id="positionsTable">
+        <thead>
+          <tr>
+            <th data-key="firstAdvised">First advised</th>
+            <th data-key="openDate">Bought on</th>
+            <th data-key="closedDate">Closed on</th>
+            <th data-key="ticker">Ticker</th>
+            <th data-key="priceAtAdvice">Advised At</th>
+            <th data-key="boughtAt">Bought</th>
+            <th data-key="units">Units</th>
+            <th data-key="exitOrNow">Now / Exit</th>
+            <th data-key="plPct">P/L %</th>
+            <th data-key="plDollar">P/L $</th>
+            <th data-key="status">Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="empty" id="positionsEmpty" style="display:none">No bought or sold advice picks yet. They land here once you buy a watched pick (or the eToro import matches one).</div>
+    </div>
+  </section>
+
+  <section id="tab-portfolio" class="tab-section">
+    <div class="panel">
+      <div style="display:flex; align-items:center; margin-bottom:12px;">
+        <h2 style="margin:0;">eToro holdings</h2>
+        <div class="view-toggle">
+          <button id="btnCollapse" class="active">Collapse</button>
+          <button id="btnSplit">Split</button>
+        </div>
+      </div>
+      <table id="portfolioTable">
+        <thead>
+          <tr>
+            <th data-key="ticker">Ticker</th>
+            <th data-key="name">Name</th>
+            <th data-key="sector">Sector</th>
+            <th data-key="units">Units</th>
+            <th data-key="invested">Invested</th>
+            <th data-key="avgOpen">Avg open</th>
+            <th data-key="currentPrice">Price</th>
+            <th data-key="plDollar">P/L $</th>
+            <th data-key="plPct">P/L %</th>
+            <th data-key="firstOpen">First open</th>
+            <th data-key="positions">Pos</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div class="empty" id="portfolioEmpty" style="display:none">No portfolio snapshot yet. Click "Update from eToro" or run /import in Claude Code.</div>
+    </div>
+    <div class="panel">
+      <h2>Sector coverage vs full taxonomy</h2>
+      <div class="donut-row">
+        <div class="donut-wrap"><canvas id="sectorCoverageChart"></canvas></div>
+        <ul class="gap-list" id="sectorGaps"></ul>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Sector division (invested $)</h2>
+      <div class="donut-row">
+        <div class="donut-wrap"><canvas id="sectorChart"></canvas></div>
+        <ul class="sector-list" id="sectorList"></ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-analytics" class="tab-section">
+    <div class="cards" id="analyticsCards"></div>
+    <div class="panel">
+      <h2>~7 days after advice</h2>
+      <div id="sevenDayBox"></div>
+    </div>
+    <div class="panel"><h2>Win rate &amp; move by rating</h2><div class="chart-wrap"><canvas id="chartRating"></canvas></div><div id="chartRatingNote"></div></div>
+    <div class="panel"><h2>By RSI band</h2><div class="chart-wrap"><canvas id="chartRsiBand"></canvas></div><div id="chartRsiBandNote"></div></div>
+    <div class="panel"><h2>By sector</h2><div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div></div>
+    <div class="panel"><h2>By source</h2><div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div></div>
+    <div class="empty" id="analyticsEmpty" style="display:none">Not enough finished advice yet to learn from. Outcomes appear once picks are sold, dropped, or 7+ days old.</div>
+  </section>
+
+  <section id="tab-eod" class="tab-section">
+    <div class="panel">
+      <h2>End of Day Reports</h2>
+      <div id="eodList" style="margin-top: 16px;"></div>
+      <div class="empty" id="eodEmpty" style="display:none">No EOD reports logged yet.</div>
+    </div>
+  </section>
+
+  <section id="tab-macro" class="tab-section">
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2>This Week's Macro Economic Events</h2>
+        <button id="refreshMacroBtn" class="refresh-btn">&#x21bb; Refresh Calendar</button>
+      </div>
+      <table id="macroTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Time (EST)</th>
+            <th>Currency</th>
+            <th>Impact</th>
+            <th>Event</th>
+            <th>Forecast</th>
+            <th>Previous</th>
+          </tr>
+        </thead>
+        <tbody id="macroList"></tbody>
+      </table>
+      <div id="macroLoading" style="display:none; color:var(--muted); margin: 10px 0;">Loading economic calendar...</div>
+      <div class="empty" id="macroEmpty" style="display:none">No major USD/EUR events found.</div>
+    </div>
+  </section>
+
+  <section id="tab-news" class="tab-section">
+    <div class="panel">
+      <h2>AI Management Summaries</h2>
+      <div id="newsSummary" style="margin-top: 16px;"></div>
+    </div>
+  </section>
+
+  <section id="tab-rawnews" class="tab-section" style="display:none;">
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+        <h2>Raw News Feed (Last 48 Hours)</h2>
+        <button id="refreshRawNewsBtn" style="display:inline-block">&#x21bb; Fetch Latest</button>
+      </div>
+      <div class="filters" id="rawNewsFilters">
+        <button data-newsfilter="all">All</button>
+        <button data-newsfilter="advised" class="active">Advised</button>
+        <button data-newsfilter="etoro">eToro</button>
+      </div>
+      <div id="newsLoading" style="display:none; color:var(--muted); margin: 10px 0;">Loading news from Google News RSS...</div>
+      <div id="newsContent" style="margin-top: 16px; display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-ipos" class="tab-section" style="display:none">
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2>IPO Tracker</h2>
+        <button id="refreshIposBtn" class="refresh-btn">&#x21bb; Refresh IPOs</button>
+      </div>
+      <details class="info">
+        <summary>How this works</summary>
+        <ul style="margin-top:8px; padding-left:20px; color:var(--muted)">
+          <li><strong>Recent:</strong> IPOs from the last 2 months.</li>
+          <li><strong>Upcoming:</strong> Scheduled IPOs.</li>
+          <li><strong>eToro likely:</strong> We flag an IPO if it has a Deal Size > $200M or Market Cap > $1B. eToro almost exclusively lists well-capitalized or high-profile brands.</li>
+        </ul>
+      </details>
+      <div class="filters" id="ipoFilters" style="margin-top:16px;">
+        <button data-ipofilter="all">All</button>
+        <button data-ipofilter="listed" class="active">Listed / Likely</button>
+        <button data-ipofilter="dropped">Dropped (Not Listed)</button>
+      </div>
+      <div id="iposLoading" style="display:none; color:var(--muted); margin: 10px 0;">Loading IPO data...</div>
+      
+      <div class="table-container" style="margin-top:24px;">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Ticker</th><th>Name</th><th>Return</th><th>eToro Likely</th><th style="text-align:center">Action</th></tr>
+          </thead>
+          <tbody id="iposBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <footer style="margin-top: 60px; padding: 30px; text-align: center; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border);">
+    <a href="https://github.com/arnoudhgz/assisted-stock-advice" target="_blank" style="color: var(--muted); margin: 0 15px; text-decoration: none;">GitHub</a>
+    <a href="https://ko-fi.com/arnoudhgz" target="_blank" style="color: var(--muted); margin: 0 15px; text-decoration: none;">Buy me a coffee ☕</a>
+    <a href="https://www.etoro.com/people/arnoudhgz" target="_blank" style="color: var(--muted); margin: 0 15px; text-decoration: none;">Follow me on eToro 📈</a>
+    <a href="https://etoro.tw/46AcIfc" target="_blank" style="color: var(--muted); margin: 0 15px; text-decoration: none;">Join eToro 🤝</a>
+  </footer>
+
+  <div id="modal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <button class="modal-close" aria-label="Close">&times;</button>
+      <div id="modalBody" style="display: flex; gap: 40px; height: 100%; min-height: 0;"></div>
+    </div>
+  </div>
+
+  <div id="macroModal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(650px, 92vw); height: auto; max-height: 90vh; padding: 32px;">
+      <button class="modal-close" onclick="document.getElementById('macroModal').hidden=true" aria-label="Close">&times;</button>
+      <div id="macroModalBody"></div>
+    </div>
+  </div>
+
+<script type="module" src="static/js/main.js"></script>
+
+</body>
+</html>
