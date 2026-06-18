@@ -362,6 +362,7 @@ def cmd_ipos(args):
             if mc and 'B' in row[mc_idx]: return True
         return False
 
+    seen_tickers = set()
     if "IPO Date" in recent_headers:
         d_idx = recent_headers.index("IPO Date")
         sym_idx = recent_headers.index("Symbol") if "Symbol" in recent_headers else 1
@@ -372,13 +373,16 @@ def cmd_ipos(args):
                 try:
                     d = datetime.strptime(row[d_idx], "%b %d, %Y").date()
                     if d >= cutoff:
-                        out["recent"].append({
-                            "date": row[d_idx],
-                            "ticker": row[sym_idx] if len(row) > sym_idx else "?",
-                            "name": row[name_idx] if len(row) > name_idx else "?",
-                            "return": row[ret_idx] if ret_idx >= 0 and len(row) > ret_idx else "?",
-                            "etoroLikely": True # If it's recent and survived, eToro might have it
-                        })
+                        ticker = row[sym_idx] if len(row) > sym_idx else "?"
+                        if ticker not in seen_tickers:
+                            seen_tickers.add(ticker)
+                            out["recent"].append({
+                                "date": row[d_idx],
+                                "ticker": ticker,
+                                "name": row[name_idx] if len(row) > name_idx else "?",
+                                "return": row[ret_idx] if ret_idx >= 0 and len(row) > ret_idx else "?",
+                                "etoroLikely": True # If it's recent and survived, eToro might have it
+                            })
                 except:
                     pass
 
@@ -392,12 +396,15 @@ def cmd_ipos(args):
                 try:
                     d = datetime.strptime(row[d_idx], "%b %d, %Y").date()
                     if d >= datetime.today().date() - timedelta(days=1):
-                        out["upcoming"].append({
-                            "date": row[d_idx],
-                            "ticker": row[sym_idx] if len(row) > sym_idx else "?",
-                            "name": row[name_idx] if len(row) > name_idx else "?",
-                            "etoroLikely": etoro_likely(row, upcoming_headers, True)
-                        })
+                        ticker = row[sym_idx] if len(row) > sym_idx else "?"
+                        if ticker not in seen_tickers:
+                            seen_tickers.add(ticker)
+                            out["upcoming"].append({
+                                "date": row[d_idx],
+                                "ticker": ticker,
+                                "name": row[name_idx] if len(row) > name_idx else "?",
+                                "etoroLikely": etoro_likely(row, upcoming_headers, True)
+                            })
                 except:
                     pass
 

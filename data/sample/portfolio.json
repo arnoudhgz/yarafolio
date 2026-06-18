@@ -1,6 +1,6 @@
 {
   "lastUpdated": "2026-06-18",
-  "totalInvested": 8802.5,
+  "totalInvested": 14202.5,
   "holdings": [
     {
       "ticker": "AAPL",
@@ -120,6 +120,52 @@
           "openDate": "2026-01-19",
           "openRate": 520.0,
           "units": 5.0,
+          "tslEnabled": true
+        }
+      ]
+    },
+    {
+      "ticker": "MCD",
+      "name": "McDonald's",
+      "instrumentID": 3002,
+      "sector": "Consumer Goods",
+      "positions": 1,
+      "units": 15.0,
+      "invested": 4200.0,
+      "avgOpen": 280.0,
+      "currentPrice": 265.0,
+      "plDollar": -225.0,
+      "plPct": -5.35,
+      "firstOpen": "2026-02-18",
+      "lots": [
+        {
+          "positionID": 300201,
+          "openDate": "2026-02-18",
+          "openRate": 280.0,
+          "units": 15.0,
+          "tslEnabled": false
+        }
+      ]
+    },
+    {
+      "ticker": "WMT",
+      "name": "Walmart",
+      "instrumentID": 3003,
+      "sector": "Consumer Goods",
+      "positions": 1,
+      "units": 20.0,
+      "invested": 1200.0,
+      "avgOpen": 60.0,
+      "currentPrice": 68.5,
+      "plDollar": 170.0,
+      "plPct": 14.16,
+      "firstOpen": "2025-12-20",
+      "lots": [
+        {
+          "positionID": 300301,
+          "openDate": "2025-12-20",
+          "openRate": 60.0,
+          "units": 20.0,
           "tslEnabled": true
         }
       ]
