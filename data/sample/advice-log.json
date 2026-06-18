@@ -978,25 +978,26 @@
         "AAPL",
         "TSLA"
       ],
-      "article": "### Market Summary\nTech stocks rallied today with **AAPL** leading the charge after a positive earnings beat. Meanwhile, **TSLA** saw mixed movements as it missed delivery estimates but announced new autonomous driving features. Overall sentiment remains cautiously optimistic as inflation data cooled."
+      "article": "### Tech Sector Daily Brief\n\n**AAPL** reported strong quarterly earnings, beating expectations by 4%. The stock surged in after-hours trading as the CEO highlighted robust growth in services.\n\n**TSLA** announced a new update to its autonomous driving stack, although deliveries slightly missed the quarterly forecast. Market reaction was mixed, with analysts maintaining a cautious outlook.\n\n**Macro:** Inflation data came in cooler than expected, which is lifting overall sentiment across the broader tech landscape."
     },
     {
       "date": "2026-06-16",
       "tickers": [
         "NVDA",
-        "JNJ"
+        "JNJ",
+        "XOM"
       ],
-      "article": "### Mixed Signals\n**NVDA** continues its incredible AI momentum, surging past key resistance levels. In contrast, defensive stocks like **JNJ** have seen slight pullbacks as investors rotate back into high-growth sectors, despite strong dividend announcements."
+      "article": "### Rotation Out of Defensive Stocks\n\n**NVDA** continues to hit new all-time highs as AI infrastructure demand shows no signs of slowing down.\n\n**JNJ** and other defensive healthcare plays saw slight pullbacks as capital rotated back into high-growth sectors. However, their dividend yields remain attractive to long-term holders.\n\n**XOM** traded flat as oil prices stabilized around $80/bbl."
     }
   ],
   "eodReports": [
     {
       "date": "2026-06-17",
-      "summary": "EOD Check: Market closed strong. Secured +6% profit on NVDA by raising trailing stop loss. No other immediate actions required; low-conviction picks held their ground."
+      "summary": "### EOD Action Required\n**NVDA**: Raise TSL to $125.00. Stock is up +6% since entry. Lock in gains before the weekend.\n**AAPL**: Hold. Approaching target resistance, tracking normally.\n**TSLA**: Hold. Earnings are tomorrow, expect volatility."
     },
     {
       "date": "2026-06-15",
-      "summary": "EOD Check: Tech sector exhibited late-day weakness. RIVN dropped significantly below the drop-below threshold. Closed out position to prevent further losses."
+      "summary": "### EOD Action Required\n**RIVN**: DROP. Slipped below the $12.00 drop-below marker in late afternoon trading. Cut losses here to prevent further downside.\n**XOM**: Monitor. Oil futures are slipping; consider a tighter stop if it crosses $100."
     }
   ]
 }
