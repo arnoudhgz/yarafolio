@@ -294,7 +294,10 @@ class Handler(SimpleHTTPRequestHandler):
 
     def handle_stats(self):
         try:
-            proc = subprocess.run([sys.executable, LEARN_SCRIPT, "--json"],
+            cmd = [sys.executable, LEARN_SCRIPT, "--json"]
+            if is_demo:
+                cmd.append("--sample")
+            proc = subprocess.run(cmd,
                                   capture_output=True, text=True, timeout=30, cwd=ROOT)
         except subprocess.TimeoutExpired:
             self.respond_json(504, {"ok": False, "error": "learn_stats timed out"})

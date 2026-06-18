@@ -523,7 +523,8 @@
           "units": 10.0,
           "lastPrice": 110.0,
           "tslEnabled": true,
-          "soldAt": "2026-06-13",
+          "soldAt": 110.0,
+          "closedDate": "2026-06-13",
           "exitEstimated": false
         }
       ]
@@ -618,7 +619,8 @@
           "units": 10.0,
           "lastPrice": 108.0,
           "tslEnabled": true,
-          "soldAt": "2026-06-13",
+          "soldAt": 108.0,
+          "closedDate": "2026-06-13",
           "exitEstimated": false
         }
       ]
@@ -672,6 +674,7 @@
           "lastPrice": 98.0,
           "tslEnabled": true,
           "soldAt": null,
+          "closedDate": null,
           "exitEstimated": false
         }
       ]
@@ -724,7 +727,8 @@
           "units": 10.0,
           "lastPrice": 103.0,
           "tslEnabled": true,
-          "soldAt": "2026-06-13",
+          "soldAt": 103.0,
+          "closedDate": "2026-06-13",
           "exitEstimated": false
         }
       ]
@@ -819,7 +823,8 @@
           "units": 10.0,
           "lastPrice": 102.0,
           "tslEnabled": true,
-          "soldAt": "2026-06-13",
+          "soldAt": 102.0,
+          "closedDate": "2026-06-13",
           "exitEstimated": false
         }
       ]
@@ -914,7 +919,8 @@
           "units": 10.0,
           "lastPrice": 112.0,
           "tslEnabled": true,
-          "soldAt": "2026-06-13",
+          "soldAt": 112.0,
+          "closedDate": "2026-06-13",
           "exitEstimated": false
         }
       ]
@@ -968,6 +974,7 @@
           "lastPrice": 92.0,
           "tslEnabled": true,
           "soldAt": null,
+          "closedDate": null,
           "exitEstimated": false
         }
       ]

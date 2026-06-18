@@ -40,7 +40,7 @@ LOG_FILE = os.path.join(ROOT, "data", subdir, "advice-log.json")
 OUT_FILE = os.path.join(ROOT, "data", subdir, "learn-stats.json")
 
 RSI_BANDS = (("<20", 0, 20), ("20-25", 20, 25), ("25-30", 25, 30), ("30+", 30, 10 ** 6))
-MIN_BUCKET = 3
+MIN_BUCKET = 1
 
 
 def parse_date(s):

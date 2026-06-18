@@ -688,30 +688,38 @@ function renderBucketChart(canvasId, buckets) {
   }
   canvas.style.display = '';
   analyticsCharts[canvasId] = new Chart(canvas, {
-    type: 'bar',
     data: {
       labels: ok,
       datasets: [
-        { label: 'Win rate %', yAxisID: 'y', data: ok.map(k => buckets[k].winRate), backgroundColor: '#3498db' },
-        { label: 'Avg move %', yAxisID: 'y1', data: ok.map(k => buckets[k].avg),
-          backgroundColor: ok.map(k => buckets[k].avg >= 0 ? '#2ecc71' : '#e74c3c') },
+        { type: 'line', label: 'Win rate %', yAxisID: 'y', data: ok.map(k => buckets[k].winRate), borderColor: '#3498db', backgroundColor: '#3498db', borderWidth: 3, pointBackgroundColor: '#fff', pointBorderWidth: 2, pointRadius: 5, tension: 0.3 },
+        { type: 'bar', label: 'Avg move %', yAxisID: 'y1', data: ok.map(k => buckets[k].avg),
+          backgroundColor: ok.map(k => buckets[k].avg >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)'), borderRadius: 6, maxBarThickness: 50 },
       ]
     },
     options: {
       maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
       scales: {
         y: { position: 'left', min: 0, max: 100, title: { display: true, text: 'Win %', color: '#8b98a5' },
-             ticks: { color: '#8b98a5' }, grid: { color: '#2a3441' } },
-        y1: { position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: 'Avg %', color: '#8b98a5' },
+             ticks: { color: '#8b98a5' }, grid: { color: '#2a3441', drawBorder: false } },
+        y1: { position: 'right', grid: { display: false }, title: { display: true, text: 'Avg %', color: '#8b98a5' },
               ticks: { color: '#8b98a5' } },
-        x: { ticks: { color: '#8b98a5' }, grid: { display: false } }
+        x: { ticks: { color: '#8b98a5' }, grid: { display: false, drawBorder: false } }
       },
       plugins: {
-        legend: { labels: { color: '#e6edf3' } },
-        tooltip: { callbacks: { afterBody: (items) => {
-          const s = buckets[items[0].label];
-          return ['n=' + s.n, 'median ' + fmtPct(s.median)];
-        } } }
+        legend: { labels: { color: '#e6edf3', usePointStyle: true, boxWidth: 10 } },
+        tooltip: {
+          backgroundColor: 'rgba(13, 17, 23, 0.9)',
+          titleColor: '#e6edf3',
+          bodyColor: '#e6edf3',
+          borderColor: '#30363d',
+          borderWidth: 1,
+          padding: 12,
+          callbacks: { afterBody: (items) => {
+            const s = buckets[items[0].label];
+            return ['n = ' + s.n, 'median: ' + fmtPct(s.median)];
+          } }
+        }
       }
     }
   });
