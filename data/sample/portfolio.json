@@ -13,7 +13,7 @@
       "avgOpen": 172.5,
       "currentPrice": 185.2,
       "plDollar": 63.5,
-      "plPct": 0.0736,
+      "plPct": 7.36,
       "firstOpen": "2026-05-11",
       "lots": [
         {
@@ -36,7 +36,7 @@
       "avgOpen": 92.0,
       "currentPrice": 86.5,
       "plDollar": -55.0,
-      "plPct": -0.0598,
+      "plPct": -5.98,
       "firstOpen": "2026-05-21",
       "lots": [
         {
@@ -59,7 +59,7 @@
       "avgOpen": 101.0,
       "currentPrice": 98.0,
       "plDollar": -30.0,
-      "plPct": -0.0297,
+      "plPct": -2.97,
       "firstOpen": "2026-05-05",
       "lots": [
         {
@@ -82,7 +82,7 @@
       "avgOpen": 101.0,
       "currentPrice": 92.0,
       "plDollar": -90.0,
-      "plPct": -0.0891,
+      "plPct": -8.91,
       "firstOpen": "2026-05-05",
       "lots": [
         {
@@ -105,7 +105,7 @@
       "avgOpen": 500.0,
       "currentPrice": 540.0,
       "plDollar": 400.0,
-      "plPct": 0.08,
+      "plPct": 8.0,
       "firstOpen": "2025-11-30",
       "lots": [
         {
