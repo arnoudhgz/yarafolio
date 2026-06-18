@@ -1138,12 +1138,12 @@ async function fetchMacro() {
           displayTime += ` <span class="macro-timer" data-time="${esc(e.time)}" style="color:var(--blue); font-size:11px; white-space:nowrap;"></span>`;
         }
         
-        const jsDate = displayDate.replace(/'/g, "\\'");
-        const jsTitle = esc(e.title).replace(/'/g, "\\'");
-        const jsImpact = esc(e.impact).replace(/'/g, "\\'");
-        const jsForecast = esc(e.forecast).replace(/'/g, "\\'");
-        const jsPrev = esc(e.previous).replace(/'/g, "\\'");
-        const jsCountry = esc(e.country).replace(/'/g, "\\'");
+        const jsDate = esc(displayDate).replace(/&#39;/g, "\\'");
+        const jsTitle = esc(e.title).replace(/&#39;/g, "\\'");
+        const jsImpact = esc(e.impact).replace(/&#39;/g, "\\'");
+        const jsForecast = esc(e.forecast).replace(/&#39;/g, "\\'");
+        const jsPrev = esc(e.previous).replace(/&#39;/g, "\\'");
+        const jsCountry = esc(e.country).replace(/&#39;/g, "\\'");
         
         html += `<tr style="${rowStyle}" onclick="openMacroModal('${jsTitle}', '${jsImpact}', '${jsForecast}', '${jsPrev}', '${jsCountry}', '${jsDate}')">
           <td style="white-space: nowrap;">${displayDate}</td>
