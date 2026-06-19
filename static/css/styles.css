@@ -248,10 +248,6 @@
   #search:disabled { opacity: 0.4; cursor: not-allowed; }
   .search-count { color: var(--muted); font-size: 12px; }
 
-  .view-toggle { display: flex; gap: 8px; margin-left: 16px; }
-  .view-toggle button { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 4px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
-  .view-toggle button.active { background: var(--blue); border-color: var(--blue); color: #fff; }
-
   /* AI News formatting */
   .article-content h3 { margin: 20px 0 10px 0; font-size: 15px; color: var(--blue); }
   .article-content h3:first-child { margin-top: 0; }
