@@ -124,20 +124,11 @@
       <div class="card"><div class="label">Open P/L (unrealized)</div><div class="value" id="pOpen">-</div></div>
     </div>
     
-    <div style="background: var(--bg); border: 1px solid var(--border); padding: 12px; margin-bottom: 20px; border-radius: 6px; font-size: 0.9em; color: var(--muted); text-align: center;">
-      <strong>Note:</strong> This tab only tracks individual eToro lots that were opened <em>after</em> the stock was advised by the system. For a complete view of all your current eToro holdings (including unadvised stocks), see the <a href="#" onclick="document.querySelector('.tabs button[data-tab=\'portfolio\']').click(); return false;" style="color: var(--blue); text-decoration: none;">Portfolio tab</a>.
-    </div>
-
     <div class="panel">
-      <h2>Positions from advice (bought &amp; sold)</h2>
-      <details class="info">
-        <summary>What's this tab?</summary>
-        <ul>
-          <li>One row per eToro lot, kept forever. Only lots opened on/after a pick's advice date count as the advice's trade, lots you held before the advice, or opened after dropping it, stay plain holdings on the Portfolio tab.</li>
-          <li><strong>P/L $</strong> is real money, per lot: closed = (sold - bought) x units, open = (now - bought) x units.</li>
-          <li>An <span class="badge est">est</span> badge means the lot was auto-closed when it vanished from eToro and the exit is the last price we saw. The <strong>Needs confirm</strong> filter lists those; click Confirm to set the real exit.</li>
-        </ul>
-      </details>
+      <h2 style="display:flex; align-items:center; gap:10px;">
+        Positions from advice (bought &amp; sold)
+        <span onclick="document.getElementById('posInfoModal').hidden=false" style="cursor:pointer; display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--blue); color:var(--bg); font-size:12px; font-weight:bold; font-style:italic; opacity:0.8;" title="What's this tab?">i</span>
+      </h2>
       <div class="filters" id="posFilters">
         <button data-posfilter="all">All</button>
         <button data-posfilter="open" class="active">Open</button>
@@ -332,6 +323,19 @@
     <div class="modal-card" role="dialog" aria-modal="true" style="width: min(650px, 92vw); height: auto; max-height: 90vh; padding: 32px;">
       <button class="modal-close" onclick="document.getElementById('macroModal').hidden=true" aria-label="Close">&times;</button>
       <div id="macroModalBody"></div>
+    </div>
+  </div>
+
+  <div id="posInfoModal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(600px, 92vw); height: auto; padding: 32px;">
+      <button class="modal-close" onclick="document.getElementById('posInfoModal').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">What is this tab?</h2>
+      <p style="margin-bottom:16px; color:var(--text); line-height:1.5;">This tab only tracks individual eToro lots that were opened <em>after</em> the stock was advised by the system. For a complete view of all your current eToro holdings (including unadvised stocks), see the <a href="#" onclick="document.getElementById('posInfoModal').hidden=true; document.querySelector('.tabs button[data-tab=\'portfolio\']').click(); return false;" style="color: var(--blue); text-decoration: none;">Portfolio tab</a>.</p>
+      <ul style="color:var(--muted); line-height:1.6; padding-left:20px; margin:0;">
+        <li style="margin-bottom:8px;">One row per eToro lot, kept forever. Only lots opened on/after a pick's advice date count as the advice's trade.</li>
+        <li style="margin-bottom:8px;"><strong>P/L $</strong> is real money, per lot: closed = (sold - bought) x units, open = (now - bought) x units.</li>
+        <li>An <span class="badge est">est</span> badge means the lot was auto-closed when it vanished from eToro and the exit is the last price we saw. The <strong>Needs confirm</strong> filter lists those; click Confirm to set the real exit.</li>
+      </ul>
     </div>
   </div>
 
