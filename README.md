@@ -16,10 +16,10 @@ Instead of jumping between different apps, YaraFolio acts as a single, sleek loc
 
 ---
 
-## 🚀 Zero-Dependency Architecture
-This project stubbornly refuses to use NPM, Webpack, React, or complex Python frameworks. 
-- The Python backend runs entirely on the standard library (`http.server`).
-- The web frontend is split into highly readable HTML, CSS, and JS files that the browser stitches together natively using standard ES6 `<script type="module">`. You just edit a file, refresh the browser, and it works!
+## 🚀 Architecture
+This project uses a lightweight stack without complex build steps or heavy frameworks.
+- The Python backend utilizes the standard library (`http.server`) to serve files and handle local API endpoints.
+- The frontend is built with vanilla HTML, CSS, and JavaScript, utilizing standard ES6 `<script type="module">`. The only external library is `marked.js` (loaded via CDN) for rendering AI markdown summaries. No system fonts are fetched externally; it relies on the user's native OS fonts (Apple System, BlinkMacSystemFont, Segoe UI, Roboto).
 
 ---
 
