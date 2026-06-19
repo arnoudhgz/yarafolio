@@ -919,25 +919,13 @@ function drawModalChart(e) {
     borderColor: '#8b98a5', borderDash: [5, 5], borderWidth: 1, pointRadius: 0 });
 
   if (e.boughtAt && e.status === 'bought') {
-    let maxPrice = e.boughtAt;
-    hist.forEach(h => { if (h.price > maxPrice) maxPrice = h.price; });
-    if (maxPrice >= e.boughtAt * 1.05) {
-      const estTsl = maxPrice * 0.95;
-      datasets.push({ label: 'Est. TSL', data: labels.map(() => estTsl),
-        borderColor: '#f1c40f', borderDash: [2, 2], borderWidth: 1, pointRadius: 0 });
-    }
+    datasets.push({ label: 'Bought', data: labels.map(() => e.boughtAt),
+      borderColor: '#3498db', borderDash: [2, 2], borderWidth: 1, pointRadius: 0 });
+    
+    datasets.push({ label: 'TSL Target (+5%)', data: labels.map(() => e.boughtAt * 1.05),
+      borderColor: '#f1c40f', borderDash: [2, 2], borderWidth: 1, pointRadius: 0 });
   }
-  const marker = (price, color, style, label) => {
-    const idx = hist.findIndex(h => h.price === price);
-    if (idx < 0) return null;
-    const arr = labels.map(() => null); arr[idx] = price;
-    return { label, data: arr, borderColor: color, backgroundColor: color,
-      pointRadius: 7, pointStyle: style, showLine: false };
-  };
-  const bm = e.boughtAt ? marker(e.boughtAt, '#2ecc71', 'triangle', 'Bought') : null;
-  const sm = e.soldAt ? marker(e.soldAt, '#f39c12', 'rect', 'Sold') : null;
-  if (bm) datasets.push(bm);
-  if (sm) datasets.push(sm);
+
   modalChart = new Chart(canvas, {
     type: 'line',
     data: { labels, datasets },
