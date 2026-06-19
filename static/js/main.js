@@ -1479,9 +1479,16 @@ modalEl.addEventListener('click', (ev) => {
   if (ev.target === modalEl || ev.target.closest('.modal-close')) closeModal();
 });
 document.addEventListener('keydown', (ev) => {
-  if (ev.key === 'Escape' && !modalEl.hidden) closeModal();
+  if (ev.key === 'Escape') {
+    if (!modalEl.hidden) closeModal();
+    document.querySelectorAll('.modal-backdrop:not([hidden])').forEach(m => m.hidden = true);
+  }
 });
-
+document.addEventListener('click', (ev) => {
+  if (ev.target.classList.contains('modal-backdrop')) {
+    ev.target.hidden = true;
+  }
+});
 function updateTimer() {
   const nyDate = new Date(new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
   const day = nyDate.getDay();
