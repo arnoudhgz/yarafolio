@@ -251,6 +251,11 @@
   /* AI News formatting */
   .article-content h3 { margin: 20px 0 10px 0; font-size: 15px; color: var(--blue); }
   .article-content h3:first-child { margin-top: 0; }
+  
+  .news-markdown p:first-child { margin-top: 0; }
+  .news-markdown p:last-child { margin-bottom: 0; }
+  .news-markdown ul { margin: 8px 0; padding-left: 20px; }
+  .news-markdown strong { color: var(--text); }
   .article-content p { margin: 0 0 14px 0; }
   .article-content ul, .article-content ol { margin: 0 0 14px 0; padding-left: 24px; }
   .article-content li { margin-bottom: 8px; }
