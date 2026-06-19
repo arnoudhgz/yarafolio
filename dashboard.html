@@ -83,7 +83,10 @@
 
   <section id="tab-archive" class="tab-section">
     <div class="panel">
-      <h2>Dropped Picks Archive</h2>
+      <h2 style="display:flex; align-items:center; gap:8px;">
+        Dropped Picks Archive
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('archiveInfoModal').hidden=false" title="What is the archive?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      </h2>
       <table id="archiveTable">
         <thead>
           <tr>
@@ -148,8 +151,11 @@
 
   <section id="tab-portfolio" class="tab-section">
     <div class="panel">
-      <div style="display:flex; align-items:center; margin-bottom:12px;">
-        <h2 style="margin:0;">eToro holdings</h2>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">
+          eToro holdings
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('portfolioInfoModal').hidden=false" title="About portfolio"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        </h2>
         <div class="view-toggle">
           <button id="btnCollapse" class="active">Collapse</button>
           <button id="btnSplit">Split</button>
@@ -194,6 +200,13 @@
   <section id="tab-analytics" class="tab-section">
     <div class="cards" id="analyticsCards"></div>
     <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 24px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">
+          Analytics
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('analyticsInfoModal').hidden=false" title="About analytics"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        </h2>
+        <div id="analyticsUpdated" style="color:var(--muted);font-size:12px;"></div>
+      </div>
       <h2>~7 days after advice</h2>
       <div id="sevenDayBox"></div>
     </div>
@@ -206,7 +219,10 @@
 
   <section id="tab-eod" class="tab-section">
     <div class="panel">
-      <h2>End of Day Reports</h2>
+      <h2 style="display:flex; align-items:center; gap:8px;">
+        End of Day Reports
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('eodInfoModal').hidden=false" title="About End of Day"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      </h2>
       <div id="eodList" style="margin-top: 16px;"></div>
       <div class="empty" id="eodEmpty" style="display:none">No EOD reports logged yet.</div>
     </div>
@@ -215,7 +231,10 @@
   <section id="tab-macro" class="tab-section">
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h2>This Week's Macro Economic Events</h2>
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">
+          This Week's Macro Economic Events
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('macroInfoModal').hidden=false" title="About Macro events"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        </h2>
         <button id="refreshMacroBtn" class="refresh-btn">&#x21bb; Refresh Calendar</button>
       </div>
       <table id="macroTable">
@@ -239,7 +258,10 @@
 
   <section id="tab-news" class="tab-section">
     <div class="panel">
-      <h2>AI Management Summaries</h2>
+      <h2 style="display:flex; align-items:center; gap:8px;">
+        AI Management Summaries
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('newsInfoModal').hidden=false" title="About News"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      </h2>
       <div id="newsSummary" style="margin-top: 16px;"></div>
     </div>
   </section>
@@ -356,6 +378,55 @@
     </div>
   </div>
 
+  <div id="archiveInfoModal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
+      <button class="modal-close" onclick="document.getElementById('archiveInfoModal').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">What is the Archive?</h2>
+      <p style="color:var(--muted); line-height:1.6; margin:0;">This tab contains picks that were previously advised but have since been dropped. This happens when a stock hits its drop-below level (thesis broken), drop-above level (opportunity missed), or if you manually reject it.</p>
+    </div>
+  </div>
+
+  <div id="portfolioInfoModal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
+      <button class="modal-close" onclick="document.getElementById('portfolioInfoModal').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">About eToro Holdings</h2>
+      <p style="color:var(--muted); line-height:1.6; margin:0;">This tab shows your entire eToro portfolio, including both advised and unadvised positions. The sector charts help you quickly identify diversification gaps (red) or underweighted sectors (orange).</p>
+    </div>
+  </div>
+
+  <div id="analyticsInfoModal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
+      <button class="modal-close" onclick="document.getElementById('analyticsInfoModal').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">About Analytics</h2>
+      <p style="color:var(--muted); line-height:1.6; margin:0;">This tab tracks the performance of your system over time. It calculates win rates and average moves across different dimensions like rating, RSI band, and sector, helping you identify which setups work best.</p>
+    </div>
+  </div>
+
+  <div id="eodInfoModal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
+      <button class="modal-close" onclick="document.getElementById('eodInfoModal').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">About End of Day</h2>
+      <p style="color:var(--muted); line-height:1.6; margin:0;">The End of Day check helps you secure small profits on low-conviction picks before the market closes, minimizing overnight gap risk.</p>
+    </div>
+  </div>
+
+  <div id="macroInfoModal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
+      <button class="modal-close" onclick="document.getElementById('macroInfoModal').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">About Macro Events</h2>
+      <p style="color:var(--muted); line-height:1.6; margin:0;">This tab displays major economic events for the week that could cause market volatility. It helps you stay aware of days where the market might act unpredictably due to macro data releases.</p>
+    </div>
+  </div>
+
+  <div id="newsInfoModal" class="modal-backdrop" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
+      <button class="modal-close" onclick="document.getElementById('newsInfoModal').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">About News</h2>
+      <p style="color:var(--muted); line-height:1.6; margin:0;">This tab provides AI-generated management summaries and a raw news feed for the tickers you are tracking, helping you quickly spot red flags or catalysts.</p>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script type="module" src="static/js/main.js"></script>
 
 </body>
