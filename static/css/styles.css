@@ -78,11 +78,6 @@
     border-radius: 12px;
     padding: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   }
   .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: space-between; }
   .card .value { font-size: 26px; font-weight: 700; margin-top: 6px; }
@@ -322,10 +317,11 @@
   .modal-card {
     background: rgba(15, 20, 30, 0.95); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px;
     backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-    padding: 36px 48px; width: min(1300px, 96vw); height: min(850px, 92vh); position: relative;
+    padding: 36px 48px; width: min(1300px, 96vw); height: auto; max-height: 92vh; position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     display: flex; flex-direction: column;
     font-size: 12.5px; line-height: 1.5; color: #cbd5e1;
+    overflow-y: auto;
   }
   .modal-close { position: absolute; top: 12px; right: 14px; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; }
   .modal-close:hover { color: var(--text); }
