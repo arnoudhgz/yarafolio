@@ -1,5 +1,8 @@
 # 🛠️ Installation & Setup
 
+### Prerequisites
+Before you begin, ensure that your system has **Python 3** installed. You can check this by running `python3 --version` in your terminal. All background tasks and local API endpoints rely on Python.
+
 1. **Clone the repository**:
    ```bash
    git clone git@github.com:arnoudhgz/assisted-stock-advice.git
