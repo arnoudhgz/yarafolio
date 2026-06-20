@@ -2,7 +2,7 @@
 
 Welcome to **YaraFolio**! I built this because I needed a comprehensive tool where I could combine AI analytics with managing my eToro portfolio. 
 
-Instead of jumping between different apps, YaraFolio acts as a single local dashboard that syncs your eToro trades and lets an AI (like Gemini or Claude) run point on your research.
+Instead of jumping between different apps, YaraFolio acts as a single local dashboard that syncs your eToro trades and organizes your AI-assisted stock research.
 
 > **Note:** Out of the box, the AI strategies and algorithms here are tuned to my personal preference: hunting for **oversold opportunities** and catching bounces. If you have a different trading style, you can easily change this!
 
