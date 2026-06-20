@@ -19,7 +19,9 @@ Instead of jumping between different apps, YaraFolio acts as a single local dash
 ## 🚀 Architecture
 This project uses a lightweight stack without complex build steps or heavy frameworks.
 - The Python backend utilizes the standard library (`http.server`) to serve files and handle local API endpoints.
-- The frontend is built with vanilla HTML, CSS, and JavaScript, utilizing standard ES6 `<script type="module">`. The only external library is `marked.js` (served locally) for rendering AI markdown summaries. No web fonts are fetched externally; it relies on the user's native OS sans-serif fonts (Apple System, BlinkMacSystemFont, Segoe UI, Roboto) for a clean, fast UI.
+- The frontend is built with vanilla HTML, CSS, and JavaScript, utilizing standard ES6 `<script type="module">`.
+- **Zero-Dependency TypeScript**: Instead of compiling `.ts` files (which would require npm and a build step like Webpack or Vite), we use `// @ts-check` and JSDoc annotations in our vanilla JavaScript files. This gives us full TypeScript IDE intellisense and type safety while maintaining the zero-dependency architecture!
+- The only external library is `marked.js` (served locally) for rendering AI markdown summaries. No web fonts are fetched externally; it relies on the user's native OS sans-serif fonts (Apple System, BlinkMacSystemFont, Segoe UI, Roboto) for a clean, fast UI.
 
 ---
 
