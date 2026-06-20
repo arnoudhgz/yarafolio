@@ -149,7 +149,7 @@ export function renderTable() {
   else if (currentFilter === 'under') msg = 'No watched picks in underweight sectors.';
   
   if (searchQuery && rows.length === 0) {
-    msg = `No results with your current filter ('${esc(searchQuery)}'). <a href="#" onclick="document.getElementById('search').value=''; document.getElementById('search').dispatchEvent(new Event('input')); return false;">Clear the filter</a>`;
+    msg = `No results with your current filter ('${esc(searchQuery)}'). <a href="#" onclick="document.getElementById('search').value=''; document.getElementById('search').dispatchEvent(new Event('input')); return false;">Clear filter</a>`;
   }
   
   emptyMsgEl.innerHTML = msg;
@@ -261,7 +261,7 @@ export function renderPositions() {
   else if (posFilter === 'needsconfirm') msg = 'No positions needing exit confirmation.';
   
   if (searchQuery && rows.length === 0) {
-    msg = `No results with your current filter ('${esc(searchQuery)}'). <a href="#" onclick="document.getElementById('search').value=''; document.getElementById('search').dispatchEvent(new Event('input')); return false;">Clear the filter</a>`;
+    msg = `No results with your current filter ('${esc(searchQuery)}'). <a href="#" onclick="document.getElementById('search').value=''; document.getElementById('search').dispatchEvent(new Event('input')); return false;">Clear filter</a>`;
   }
   
   emptyMsgEl.innerHTML = msg;
@@ -335,7 +335,7 @@ export function renderPortfolioTable() {
   const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('portfolioEmpty'));
   let msg = 'No portfolio snapshot yet. Click "Update from eToro" or run /import in the AI CLI.';
   if (searchQuery && holdings.length === 0) {
-    msg = `No results with your current filter ('${esc(searchQuery)}'). <a href="#" onclick="document.getElementById('search').value=''; document.getElementById('search').dispatchEvent(new Event('input')); return false;">Clear the filter</a>`;
+    msg = `No results with your current filter ('${esc(searchQuery)}'). <a href="#" onclick="document.getElementById('search').value=''; document.getElementById('search').dispatchEvent(new Event('input')); return false;">Clear filter</a>`;
   }
   
   emptyMsgEl.innerHTML = msg;
