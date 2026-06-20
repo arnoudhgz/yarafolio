@@ -12,17 +12,17 @@ async function load() {
       fetch('data/portfolio.json', { cache: 'no-store' }),
     ]);
     if (!logRes.ok) throw new Error(logRes.statusText);
-    setDATA(await logRes.json();
-    setPORTFOLIO(pfRes.ok ? await pfRes.json() : { lastUpdated: null, totalInvested: 0, holdings: [] };
-    setCanSave(location.protocol.startsWith('http');
+    setDATA(await logRes.json());
+    setPORTFOLIO(pfRes.ok ? await pfRes.json() : { lastUpdated: null, totalInvested: 0, holdings: [] });
+    setCanSave(location.protocol.startsWith('http'));
     if (!canSave) banner('Opened as a local file: buttons are disabled. Start with: python3 serve.py');
-    document.getElementById('syncBtn').style.display = canSave ? 'block' : 'none');
+    /** @type {HTMLElement} */ (document.getElementById('syncBtn')).style.display = canSave ? 'block' : 'none';
     if (canSave) {
       fetch('/api/locations').then(r => r.json()).then(data => {
         if (data.prefixes && data.prefixes.length > 0) {
-          const sel = document.getElementById('locationSelect');
+          const sel = /** @type {HTMLElement} */ (document.getElementById('locationSelect'));
           sel.innerHTML = data.prefixes.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join('');
-          sel.style.display = 'block');
+          sel.style.display = 'block';
           
           const saved = localStorage.getItem('etoroLocation');
           if (saved && data.prefixes.includes(saved)) {
@@ -50,27 +50,27 @@ async function load() {
   }
 
   // Background check for near-term IPOs to update the tab dot
-  if (document.getElementById('iposBody').innerHTML === '') {
+  if (/** @type {HTMLElement} */ (document.getElementById('iposBody')).innerHTML === '') {
     fetchIpos().catch(() => {});
   }
 }
 
-let setPortfolioViewMode('collapsed');
-document.getElementById('btnCollapse').addEventListener('click', () => {
+setPortfolioViewMode('collapsed');
+/** @type {HTMLElement} */ (document.getElementById('btnCollapse')).addEventListener('click', () => {
   setPortfolioViewMode('collapsed');
-  document.getElementById('btnCollapse').classList.add('active');
-  document.getElementById('btnSplit').classList.remove('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.add('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.remove('active');
   renderPortfolioTable();
 });
-document.getElementById('btnSplit').addEventListener('click', () => {
+/** @type {HTMLElement} */ (document.getElementById('btnSplit')).addEventListener('click', () => {
   setPortfolioViewMode('split');
-  document.getElementById('btnSplit').classList.add('active');
-  document.getElementById('btnCollapse').classList.remove('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.add('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.remove('active');
   renderPortfolioTable();
 });
 
-document.getElementById('macroModal').addEventListener('click', e => {
-  if (e.target.id === 'macroModal') document.getElementById('macroModal').hidden = true;
+/** @type {HTMLElement} */ (document.getElementById('macroModal')).addEventListener('click', e => {
+  if (e.target.id === 'macroModal') /** @type {HTMLElement} */ (document.getElementById('macroModal')).hidden = true;
 });
 
 document.querySelectorAll('.tabs button').forEach(b => {
@@ -79,16 +79,16 @@ document.querySelectorAll('.tabs button').forEach(b => {
     document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('active'));
     document.querySelectorAll('.tab-section').forEach(x => x.style.display = 'none');
     b.classList.add('active');
-    document.getElementById('tab-' + b.dataset.tab).style.display = 'block');
+    document.getElementById('tab-' + b.dataset.tab).style.display = 'block';
 
-    if (b.dataset.tab === 'macro' && document.getElementById('macroList').innerHTML === '') {
+    if (b.dataset.tab === 'macro' && /** @type {HTMLElement} */ (document.getElementById('macroList')).innerHTML === '') {
       fetchMacro();
     }
-    if (b.dataset.tab === 'ipos' && document.getElementById('iposBody').innerHTML === '') {
+    if (b.dataset.tab === 'ipos' && /** @type {HTMLElement} */ (document.getElementById('iposBody')).innerHTML === '') {
       fetchIpos();
     }
-    const searchable = b.dataset.tab === 'advice' || b.dataset.tab === 'archive' || b.dataset.tab === 'positions' || b.dataset.tab === 'portfolio');
-    document.getElementById('search').disabled = !searchable;
+    const searchable = b.dataset.tab === 'advice' || b.dataset.tab === 'archive' || b.dataset.tab === 'positions' || b.dataset.tab === 'portfolio';
+    /** @type {HTMLElement} */ (document.getElementById('search')).disabled = !searchable;
     setActiveTab(b.dataset.tab);
     if (activeTab === 'advice') renderTable();
     else if (activeTab === 'archive') renderArchive();
@@ -96,21 +96,21 @@ document.querySelectorAll('.tabs button').forEach(b => {
     else if (activeTab === 'portfolio') { if (!portfolioRendered) renderPortfolio(); else renderPortfolioTable(); }
     else if (activeTab === 'eod') renderEOD();
     else if (activeTab === 'news') renderAINews();
-    else document.getElementById('searchCount').textContent = '');
+    else /** @type {HTMLElement} */ (document.getElementById('searchCount')).textContent = '';
     if (activeTab === 'analytics') { loadLearn().then(renderAnalytics); }
     if (activeTab === 'rawnews' && !window.rawNewsLoaded) {
-      document.getElementById('refreshRawNewsBtn').click();
+      /** @type {HTMLElement} */ (document.getElementById('refreshRawNewsBtn')).click();
     }
   });
 });
 
-document.getElementById('refreshRawNewsBtn').addEventListener('click', async () => {
-  const btn = document.getElementById('refreshRawNewsBtn');
-  const loading = document.getElementById('newsLoading');
-  const content = document.getElementById('newsContent');
+/** @type {HTMLElement} */ (document.getElementById('refreshRawNewsBtn')).addEventListener('click', async () => {
+  const btn = /** @type {HTMLElement} */ (document.getElementById('refreshRawNewsBtn'));
+  const loading = /** @type {HTMLElement} */ (document.getElementById('newsLoading'));
+  const content = /** @type {HTMLElement} */ (document.getElementById('newsContent'));
   btn.disabled = true;
-  loading.style.display = 'block');
-  content.innerHTML = '');
+  loading.style.display = 'block';
+  content.innerHTML = '';
   
   try {
     const tickers = (DATA.entries || []).filter(e => e.status === 'watching' || e.status === 'bought').map(e => e.ticker).join(',');
@@ -134,13 +134,13 @@ document.getElementById('refreshRawNewsBtn').addEventListener('click', async () 
     const twoDaysAgo = new Date();
     twoDaysAgo.setHours(twoDaysAgo.getHours() - 48);
     
-    let html = '');
+    let html = '';
     for (const entry of allNews) {
       if (entry.dateObj < twoDaysAgo) continue;
       const { ticker, item } = entry;
       const dataEntry = DATA.entries.find(e => e.ticker === ticker);
-      const isBought = dataEntry && dataEntry.status === 'bought');
-      const statusClass = isBought ? 'bought' : 'watching');
+      const isBought = dataEntry && dataEntry.status === 'bought';
+      const statusClass = isBought ? 'bought' : 'watching';
       const badgeHTML = isBought 
         ? `<span class="badge" style="background: rgba(243, 156, 18, 0.1); color: var(--orange); border: 1px solid var(--orange); font-size: 10px; padding: 1px 6px;">eToro</span>`
         : `<span class="badge" style="background: rgba(46, 204, 113, 0.1); color: var(--green); border: 1px solid var(--green); font-size: 10px; padding: 1px 6px;">Advised</span>`;
@@ -157,10 +157,10 @@ document.getElementById('refreshRawNewsBtn').addEventListener('click', async () 
         <span class="meta">${esc(item.source)}</span>
       </div>`;
     }
-    content.innerHTML = html || '<div class="empty">No news found in the last 48 hours for tracked tickers.</div>');
+    content.innerHTML = html || '<div class="empty">No news found in the last 48 hours for tracked tickers.</div>';
     
     // Apply current filter
-    const activeBtn = document.querySelector('#rawNewsFilters button.active');
+    const activeBtn = /** @type {HTMLElement} */ (document.querySelector('#rawNewsFilters button.active'));
     if (activeBtn) activeBtn.click();
     
     window.rawNewsLoaded = true;
@@ -168,16 +168,16 @@ document.getElementById('refreshRawNewsBtn').addEventListener('click', async () 
     banner('Failed to load news: ' + err.message);
   } finally {
     btn.disabled = false;
-    loading.style.display = 'none');
+    loading.style.display = 'none';
   }
 });
 
-document.getElementById('refreshIposBtn').addEventListener('click', () => fetchIpos(true));
-document.getElementById('refreshMacroBtn').addEventListener('click', fetchMacro);
+/** @type {HTMLElement} */ (document.getElementById('refreshIposBtn')).addEventListener('click', () => fetchIpos(true));
+/** @type {HTMLElement} */ (document.getElementById('refreshMacroBtn')).addEventListener('click', fetchMacro);
 
 function headerSortHandler(tableId, stateKey, render) {
   document.querySelector('#' + tableId + ' thead').addEventListener('click', (ev) => {
-    const th = ev.target.closest('th[data-key]');
+    const th = /** @type {HTMLElement} */ (ev.target).closest('th[data-key]');
     if (!th) return;
     const state = sortState[stateKey];
     if (state.key === th.dataset.key) state.dir = -state.dir;
@@ -191,11 +191,11 @@ headerSortHandler('positionsTable', 'positions', renderPositions);
 headerSortHandler('portfolioTable', 'portfolio', renderPortfolioTable);
 
 const adviceClickHandler = (ev) => {
-  const btn = ev.target.closest('button');
+  const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
   if (!btn) {
     // ticker link goes to eToro; anything else on the row opens the drill-down
-    if (ev.target.closest('a')) return;
-    const row = ev.target.closest('tr[data-id]');
+    if (/** @type {HTMLElement} */ (ev.target).closest('a')) return;
+    const row = /** @type {HTMLElement} */ (ev.target).closest('tr[data-id]');
     if (row) openModal(row.dataset.id);
     return;
   }
@@ -211,12 +211,12 @@ const adviceClickHandler = (ev) => {
     }
   }
 };
-document.querySelector('#adviceTable tbody').addEventListener('click', adviceClickHandler);
-document.querySelector('#archiveTable tbody').addEventListener('click', adviceClickHandler);
+/** @type {HTMLElement} */ (document.querySelector('#adviceTable tbody')).addEventListener('click', adviceClickHandler);
+/** @type {HTMLElement} */ (document.querySelector('#archiveTable tbody')).addEventListener('click', adviceClickHandler);
 
 
-document.getElementById('filters').addEventListener('click', (ev) => {
-  const btn = ev.target.closest('button');
+/** @type {HTMLElement} */ (document.getElementById('filters')).addEventListener('click', (ev) => {
+  const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
   if (!btn) return;
   document.querySelectorAll('#filters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -224,8 +224,8 @@ document.getElementById('filters').addEventListener('click', (ev) => {
   renderTable();
 });
 
-document.getElementById('posFilters').addEventListener('click', (ev) => {
-  const btn = ev.target.closest('button');
+/** @type {HTMLElement} */ (document.getElementById('posFilters')).addEventListener('click', (ev) => {
+  const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
   if (!btn) return;
   document.querySelectorAll('#posFilters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -233,22 +233,22 @@ document.getElementById('posFilters').addEventListener('click', (ev) => {
   renderPositions();
 });
 
-document.getElementById('rawNewsFilters').addEventListener('click', (ev) => {
-  const btn = ev.target.closest('button');
+/** @type {HTMLElement} */ (document.getElementById('rawNewsFilters')).addEventListener('click', (ev) => {
+  const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
   if (!btn) return;
   document.querySelectorAll('#rawNewsFilters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const filter = btn.dataset.newsfilter;
   document.querySelectorAll('.news-card').forEach(card => {
-    if (filter === 'all') card.style.display = 'block');
-    else if (filter === 'advised' && card.dataset.status === 'watching') card.style.display = 'block');
-    else if (filter === 'etoro' && card.dataset.status === 'bought') card.style.display = 'block');
-    else card.style.display = 'none');
+    if (filter === 'all') card.style.display = 'block';
+    else if (filter === 'advised' && card.dataset.status === 'watching') card.style.display = 'block';
+    else if (filter === 'etoro' && card.dataset.status === 'bought') card.style.display = 'block';
+    else card.style.display = 'none';
   });
 });
 
-document.getElementById('ipoFilters').addEventListener('click', (ev) => {
-  const btn = ev.target.closest('button');
+/** @type {HTMLElement} */ (document.getElementById('ipoFilters')).addEventListener('click', (ev) => {
+  const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
   if (!btn) return;
   document.querySelectorAll('#ipoFilters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -259,19 +259,19 @@ document.getElementById('ipoFilters').addEventListener('click', (ev) => {
     let show = true;
     if (filter === 'listed') show = (st !== 'dropped');
     if (filter === 'dropped') show = (st === 'dropped');
-    tr.style.display = show ? '' : 'none');
+    tr.style.display = show ? '' : 'none';
   });
 });
 
-document.querySelector('#positionsTable tbody').addEventListener('click', (ev) => {
-  const btn = ev.target.closest('button');
+/** @type {HTMLElement} */ (document.querySelector('#positionsTable tbody')).addEventListener('click', (ev) => {
+  const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
   if (!btn) {
-    if (ev.target.closest('input, a')) return;
-    const row = ev.target.closest('tr[data-id]');
+    if (/** @type {HTMLElement} */ (ev.target).closest('input, a')) return;
+    const row = /** @type {HTMLElement} */ (ev.target).closest('tr[data-id]');
     if (row) openModal(row.dataset.id);
     return;
   }
-  const cell = btn.closest('td');
+  const cell = /** @type {HTMLElement} */ (btn.closest('td'));
   if (btn.dataset.confirm) {  // open an exit-price editor for that lot, pre-filled with the estimate
     const found = findLot(btn.dataset.confirm);
     if (!found) return;
@@ -279,7 +279,7 @@ document.querySelector('#positionsTable tbody').addEventListener('click', (ev) =
     cell.innerHTML =
       '<input type="number" step="0.01" min="0" value="' + suggested + '" aria-label="exit price"> ' +
       '<button class="ok" data-act="confirm-exit" data-pid="' + found.lot.positionID + '">OK</button>' +
-      '<button class="cancel" data-act="cancel-exit">X</button>');
+      '<button class="cancel" data-act="cancel-exit">X</button>';
     cell.querySelector('input').focus();
     return;
   }
@@ -293,12 +293,12 @@ document.querySelector('#positionsTable tbody').addEventListener('click', (ev) =
   }
 });
 
-document.getElementById('syncBtn').addEventListener('click', async () => {
-  const btn = document.getElementById('syncBtn');
-  const sel = document.getElementById('locationSelect');
+/** @type {HTMLElement} */ (document.getElementById('syncBtn')).addEventListener('click', async () => {
+  const btn = /** @type {HTMLElement} */ (document.getElementById('syncBtn'));
+  const sel = /** @type {HTMLElement} */ (document.getElementById('locationSelect'));
   const location = sel.style.display !== 'none' ? sel.value : "";
   const label = btn.textContent;
-  btn.textContent = 'Syncing...');
+  btn.textContent = 'Syncing...';
   document.body.classList.add('syncing');
   try {
     const pRef = fetch('/api/refresh', { method: 'POST' }).then(r => r.json().catch(() => ({})));
@@ -332,19 +332,19 @@ document.getElementById('syncBtn').addEventListener('click', async () => {
   }
 });
 
-document.getElementById('search').addEventListener('input', (ev) => {
+/** @type {HTMLElement} */ (document.getElementById('search')).addEventListener('input', (ev) => {
   clearTimeout(searchTimer);
   setSearchTimer(setTimeout(() => {
     setSearchQuery(ev.target.value.trim().toLowerCase());
     if (activeTab === 'advice') renderTable();
     else if (activeTab === 'positions') renderPositions();
     else if (activeTab === 'portfolio') renderPortfolioTable();
-  }, 180);
+  }, 180));
 });
 
-const modalEl = document.getElementById('modal');
+const modalEl = /** @type {HTMLElement} */ (document.getElementById('modal'));
 modalEl.addEventListener('click', (ev) => {
-  if (ev.target === modalEl || ev.target.closest('.modal-close')) closeModal();
+  if (ev.target === modalEl || /** @type {HTMLElement} */ (ev.target).closest('.modal-close')) closeModal();
 });
 document.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape') {
@@ -410,16 +410,16 @@ function updateTimer() {
     }
   }
   
-  const el = document.getElementById('marketTimer');
+  const el = /** @type {HTMLElement} */ (document.getElementById('marketTimer'));
   if (!el) return;
   el.textContent = st.text;
   el.style.color = st.color;
-  el.style.fontWeight = '600');
-  el.style.fontSize = '14px');
-  el.style.padding = '6px 12px');
+  el.style.fontWeight = '600';
+  el.style.fontSize = '14px';
+  el.style.padding = '6px 12px';
   el.style.border = '1px solid ' + st.color;
-  el.style.borderRadius = '6px');
-  el.style.animation = st.blink ? 'blink 1.5s ease-in-out infinite' : 'none');
+  el.style.borderRadius = '6px';
+  el.style.animation = st.blink ? 'blink 1.5s ease-in-out infinite' : 'none';
   
   updateMacroTimers(nyDate);
 }

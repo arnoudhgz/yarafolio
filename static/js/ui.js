@@ -18,7 +18,7 @@ export function markSortedHeader(table, { key, dir }) {
  * @param {string} [type]
  */
 export function banner(msg, type) {
-  const el = document.getElementById('banner');
+  const el = /** @type {HTMLElement} */ (document.getElementById('banner'));
   if (el) {
     el.textContent = msg;
     el.className = type === 'success' ? 'success' : '';
@@ -30,7 +30,7 @@ export function banner(msg, type) {
  * @param {number} n
  */
 export function setSearchCount(n) {
-  const el = document.getElementById('searchCount');
+  const el = /** @type {HTMLElement} */ (document.getElementById('searchCount'));
   if (el) el.textContent = searchQuery ? n + ' result' + (n === 1 ? '' : 's') : '';
 }
 
@@ -115,7 +115,7 @@ export function openMacroModal(title, impact, forecast, previous, country, date)
   const contextHTML = getMacroContext(title, forecast, previous);
   const safeTitle = esc(title);
   
-  document.getElementById('macroModalBody').innerHTML = 
+  /** @type {HTMLElement} */ (document.getElementById('macroModalBody')).innerHTML = 
     '<div style="font-size: 14px; line-height: 1.5;">' +
       '<h2 style="margin-bottom: 8px; font-size: 20px;">' + safeTitle + '</h2>' +
       '<div class="modal-meta" style="margin-bottom: 24px; font-size: 14px;">' +
@@ -131,7 +131,7 @@ export function openMacroModal(title, impact, forecast, previous, country, date)
         scenarioHTML +
       '</div>' +
     '</div>';
-  document.getElementById('macroModal').hidden = false;
+  /** @type {HTMLElement} */ (document.getElementById('macroModal')).hidden = false;
 }
 // @ts-ignore
 window.openMacroModal = openMacroModal;
@@ -145,7 +145,7 @@ export function openModal(id) {
   if (!e) return;
   const notes = e.notes || [];
   const links = Array.isArray(e.sources) ? e.sources : [];
-  document.getElementById('modalBody').innerHTML =
+  /** @type {HTMLElement} */ (document.getElementById('modalBody')).innerHTML =
     '<div style="flex: 1; overflow-y: auto; padding-right: 16px; display: flex; flex-direction: column;">' +
       '<h2>' + tickerLink(e.ticker) + '</h2>' +
       '<div class="modal-meta">' +
@@ -196,7 +196,7 @@ export function openModal(id) {
     '<div style="flex: 1.5; display: flex; flex-direction: column;">' +
       '<div class="modal-chart" style="flex: 1; height: 100%; margin: 0;"><canvas id="modalChartCanvas"></canvas></div>' +
     '</div>';
-  document.getElementById('modal').hidden = false;
+  /** @type {HTMLElement} */ (document.getElementById('modal')).hidden = false;
   drawModalChart(e);
 }
 
@@ -214,7 +214,7 @@ export function drawModalChart(e) {
       hist.unshift({ date: e.firstAdvised + ' (Added)', price: e.priceAtAdvice });
     }
   }
-  const canvas = document.getElementById('modalChartCanvas');
+  const canvas = /** @type {HTMLElement} */ (document.getElementById('modalChartCanvas'));
   if (!canvas || hist.length < 1) return;
   const t = today();
   const labels = hist.map(h => {
@@ -276,8 +276,8 @@ export function drawModalChart(e) {
 }
 
 export function closeModal() {
-  const m = document.getElementById('modal');
-  const mm = document.getElementById('macroModal');
+  const m = /** @type {HTMLElement} */ (document.getElementById('modal'));
+  const mm = /** @type {HTMLElement} */ (document.getElementById('macroModal'));
   if (m) m.hidden = true;
   if (mm) mm.hidden = true;
   if (modalChart) { modalChart.destroy(); setModalChart(null); }

@@ -1,4 +1,13 @@
+/** @type {any} */
+var Chart;
 // @ts-check
+/** @type {any} */
+export let Chart;
+if (typeof window !== 'undefined') Chart = window.Chart;
+
+/** @type {any} */
+export let marked;
+if (typeof window !== 'undefined') marked = window.marked;
 
 /**
  * @typedef {Object} PricePoint

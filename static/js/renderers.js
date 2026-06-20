@@ -5,12 +5,12 @@ import { markSortedHeader, setSearchCount } from './ui.js';
 
 function renderAll() {
   const entries = advised();
-  document.getElementById('lastUpdated').textContent =
+  /** @type {HTMLElement} */ (document.getElementById('lastUpdated')).textContent =
     'Last updated: ' + DATA.lastUpdated + ' · ' + entries.length + ' advised picks · ' +
     PORTFOLIO.holdings.length + ' holdings';
-  document.getElementById('cTracked').textContent = entries.length;
-  document.getElementById('cOpen').textContent = entries.filter(e => e.status === 'bought').length;
-  document.getElementById('cWatching').textContent = entries.filter(e => e.status === 'watching').length;
+  /** @type {HTMLElement} */ (document.getElementById('cTracked')).textContent = entries.length;
+  /** @type {HTMLElement} */ (document.getElementById('cOpen')).textContent = entries.filter(e => e.status === 'bought').length;
+  /** @type {HTMLElement} */ (document.getElementById('cWatching')).textContent = entries.filter(e => e.status === 'watching').length;
   renderTable();
   renderArchive();
   renderPositions();
@@ -118,7 +118,7 @@ function sectorFlag(secPct, sector) {
 }
 
 function renderTable() {
-  const tbody = document.querySelector('#adviceTable tbody');
+  const tbody = /** @type {HTMLElement} */ (document.querySelector('#adviceTable tbody'));
   tbody.innerHTML = '';
   const secPct = sectorPctMap();
   const rows = sortRows(
@@ -135,9 +135,9 @@ function renderTable() {
     }),
     sortState.advice);
   if (activeTab === 'advice') setSearchCount(rows.length);
-  markSortedHeader(document.getElementById('adviceTable'), sortState.advice);
-  document.getElementById('emptyMsg').style.display = rows.length ? 'none' : 'block';
-  document.getElementById('adviceTable').style.display = rows.length ? '' : 'none';
+  markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('adviceTable')), sortState.advice);
+  /** @type {HTMLElement} */ (document.getElementById('emptyMsg')).style.display = rows.length ? 'none' : 'block';
+  /** @type {HTMLElement} */ (document.getElementById('adviceTable')).style.display = rows.length ? '' : 'none';
   rows.forEach(r => {
     const e = r.e;
     const { dropHit, buyHit, missedHit } = tippingFlags(r);
@@ -170,7 +170,7 @@ function renderTable() {
 }
 
 function renderArchive() {
-  const tbody = document.querySelector('#archiveTable tbody');
+  const tbody = /** @type {HTMLElement} */ (document.querySelector('#archiveTable tbody'));
   tbody.innerHTML = '';
   const rows = sortRows(
     adviceRows().filter(r => {
@@ -180,9 +180,9 @@ function renderArchive() {
     }),
     sortState.archive);
   if (activeTab === 'archive') setSearchCount(rows.length);
-  markSortedHeader(document.getElementById('archiveTable'), sortState.archive);
-  document.getElementById('archiveEmptyMsg').style.display = rows.length ? 'none' : 'block';
-  document.getElementById('archiveTable').style.display = rows.length ? '' : 'none';
+  markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('archiveTable')), sortState.archive);
+  /** @type {HTMLElement} */ (document.getElementById('archiveEmptyMsg')).style.display = rows.length ? 'none' : 'block';
+  /** @type {HTMLElement} */ (document.getElementById('archiveTable')).style.display = rows.length ? '' : 'none';
   rows.forEach(r => {
     const e = r.e;
     const tr = document.createElement('tr');
@@ -244,7 +244,7 @@ function renderPositions() {
   const closed = all.filter(r => r.status === 'sold');
   const openRows = all.filter(r => r.status === 'bought');
   const needsConfirm = all.filter(r => r.exitEstimated).length;
-  document.querySelector('button[data-tab="positions"]').innerHTML = 'Positions' + (needsConfirm ? ' <span style="color:var(--orange);font-weight:bold;margin-left:4px">🔴 ' + needsConfirm + '</span>' : '');
+  /** @type {HTMLElement} */ (document.querySelector('button[data-tab="positions"]')).innerHTML = 'Positions' + (needsConfirm ? ' <span style="color:var(--orange);font-weight:bold;margin-left:4px">🔴 ' + needsConfirm + '</span>' : '');
   const wins = closed.filter(r => r.exitOrNow > r.boughtAt).length;
   const realizedTotal = closed.reduce((s, r) => s + r.plDollar, 0);
   const realizedInv = closed.reduce((s, r) => s + (r.boughtAt * r.units), 0);
@@ -254,9 +254,9 @@ function renderPositions() {
   const openInv = openRows.reduce((s, r) => s + (r.boughtAt * r.units), 0);
   const openPct = openInv ? (openTotal / openInv * 100) : 0;
   
-  document.getElementById('pWinRate').textContent = closed.length ? Math.round(100 * wins / closed.length) + '%' : '-';
-  const pRealized = document.getElementById('pRealized');
-  const pOpen = document.getElementById('pOpen');
+  /** @type {HTMLElement} */ (document.getElementById('pWinRate')).textContent = closed.length ? Math.round(100 * wins / closed.length) + '%' : '-';
+  const pRealized = /** @type {HTMLElement} */ (document.getElementById('pRealized'));
+  const pOpen = /** @type {HTMLElement} */ (document.getElementById('pOpen'));
   
   pRealized.innerHTML = closed.length ? fmtPL(realizedTotal) + ' <span style="font-size:13px;opacity:0.8;margin-left:4px">(' + (realizedPct > 0 ? '+' : '') + realizedPct.toFixed(2) + '%)</span>' : '-';
   pRealized.className = 'value ' + (closed.length && realizedTotal < 0 ? 'neg' : closed.length ? 'pos' : '');
@@ -272,10 +272,10 @@ function renderPositions() {
     return true;
   }), sortState.positions);
   if (activeTab === 'positions') setSearchCount(rows.length);
-  markSortedHeader(document.getElementById('positionsTable'), sortState.positions);
-  document.getElementById('positionsEmpty').style.display = rows.length ? 'none' : 'block';
-  document.getElementById('positionsTable').style.display = rows.length ? '' : 'none';
-  const tbody = document.querySelector('#positionsTable tbody');
+  markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('positionsTable')), sortState.positions);
+  /** @type {HTMLElement} */ (document.getElementById('positionsEmpty')).style.display = rows.length ? 'none' : 'block';
+  /** @type {HTMLElement} */ (document.getElementById('positionsTable')).style.display = rows.length ? '' : 'none';
+  const tbody = /** @type {HTMLElement} */ (document.querySelector('#positionsTable tbody'));
   tbody.innerHTML = '';
   rows.forEach(r => {
     const tr = document.createElement('tr');
@@ -340,12 +340,12 @@ function renderPortfolioTable() {
   }
   
   const empty = !holdings.length;
-  document.getElementById('portfolioEmpty').style.display = empty ? 'block' : 'none';
-  document.getElementById('portfolioTable').style.display = empty ? 'none' : '';
+  /** @type {HTMLElement} */ (document.getElementById('portfolioEmpty')).style.display = empty ? 'block' : 'none';
+  /** @type {HTMLElement} */ (document.getElementById('portfolioTable')).style.display = empty ? 'none' : '';
   if (activeTab === 'portfolio') setSearchCount(holdings.length);
-  const tbody = document.querySelector('#portfolioTable tbody');
+  const tbody = /** @type {HTMLElement} */ (document.querySelector('#portfolioTable tbody'));
   tbody.innerHTML = '';
-  markSortedHeader(document.getElementById('portfolioTable'), sortState.portfolio);
+  markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('portfolioTable')), sortState.portfolio);
   sortRows(holdings, sortState.portfolio).forEach(h => {
     const tr = document.createElement('tr');
     tr.innerHTML =
@@ -373,12 +373,12 @@ function renderSectorChart() {
   });
   const sorted = [...bySector.entries()].sort((a, b) => b[1] - a[1]);
   const total = sorted.reduce((sum, [, v]) => sum + v, 0);
-  const list = document.getElementById('sectorList');
+  const list = /** @type {HTMLElement} */ (document.getElementById('sectorList'));
   list.innerHTML = sorted.map(([s, v]) =>
     '<li><span class="dot" style="background:' + (SECTOR_COLORS[s] || '#7f8c8d') + '"></span>' + s +
     '<span class="amt">' + fmtMoney(v) + ' · ' + (100 * v / total).toFixed(1) + '%</span></li>').join('');
   if (!sorted.length) return;
-  setSectorChart(new Chart(document.getElementById('sectorChart'), {
+  setSectorChart(new Chart(/** @type {HTMLElement} */ (document.getElementById('sectorChart')), {
     type: 'doughnut',
     data: {
       labels: sorted.map(([s]) => s),
@@ -402,7 +402,7 @@ function renderSectorChart() {
         }
       }
     }
-  });
+  }));
 }
 
 function renderSectorCoverage() {
@@ -416,7 +416,7 @@ function renderSectorCoverage() {
   const adviceCount = {};
   advised().forEach(e => { if (e.sector) adviceCount[e.sector] = (adviceCount[e.sector] || 0) + 1; });
   const pct = (s) => total ? (invested[s] || 0) / total * 100 : 0;
-  document.getElementById('sectorGaps').innerHTML = SECTORS.map(s => {
+  /** @type {HTMLElement} */ (document.getElementById('sectorGaps')).innerHTML = SECTORS.map(s => {
     const p = pct(s), ac = adviceCount[s] || 0;
     let tag = '';
     if (s !== 'ETF / Other' && p === 0) tag = ' <span class="tag gap">gap</span>';
@@ -425,7 +425,7 @@ function renderSectorCoverage() {
       s + tag + '<span class="gp">' + p.toFixed(1) + '% · ' + ac + ' advice</span></li>';
   }).join('');
   if (!PORTFOLIO.holdings.length) return;
-  setSectorCoverageChart(new Chart(document.getElementById('sectorCoverageChart'), {
+  setSectorCoverageChart(new Chart(/** @type {HTMLElement} */ (document.getElementById('sectorCoverageChart')), {
     type: 'bar',
     data: {
       labels: SECTORS,
@@ -447,27 +447,27 @@ function renderSectorCoverage() {
         y: { ticks: { color: '#e6edf3' }, grid: { display: false } }
       }
     }
-  });
+  }));
 }
 
 function renderAnalytics() {
   analyticsRendered = true;
-  const empty = document.getElementById('analyticsEmpty');
+  const empty = /** @type {HTMLElement} */ (document.getElementById('analyticsEmpty'));
   if (!LEARN) {
-    document.getElementById('analyticsCards').innerHTML = '';
-    document.getElementById('sevenDayBox').innerHTML = '';
+    /** @type {HTMLElement} */ (document.getElementById('analyticsCards')).innerHTML = '';
+    /** @type {HTMLElement} */ (document.getElementById('sevenDayBox')).innerHTML = '';
     ['chartRating', 'chartRsiBand', 'chartSector', 'chartSource'].forEach(id => renderBucketChart(id, {}));
     empty.textContent = canSave ? 'No stats available yet. Run /learn to generate outcomes.'
       : 'Analytics needs the server. Start it with: python3 serve.py';
     empty.style.display = 'block';
     return;
   }
-  document.getElementById('analyticsCards').innerHTML = [
+  /** @type {HTMLElement} */ (document.getElementById('analyticsCards')).innerHTML = [
     ['Advised entries', LEARN.advisedEntries], ['Measurable outcomes', LEARN.measurableOutcomes],
     ['Watching now', LEARN.watchingNow],
   ].map(([l, v]) => '<div class="card"><div class="label">' + l + '</div><div class="value">' + (v ?? 0) + '</div></div>').join('');
   const sd = LEARN.sevenDayAfterAdvice || { n: 0 };
-  document.getElementById('sevenDayBox').innerHTML = sd.n
+  /** @type {HTMLElement} */ (document.getElementById('sevenDayBox')).innerHTML = sd.n
     ? '<span class="' + (sd.avg >= 0 ? 'pos' : 'neg') + '">avg ' + fmtPct(sd.avg) + '</span> · median <span class="' +
       (sd.median >= 0 ? 'pos' : 'neg') + '">' + fmtPct(sd.median) + '</span> (n=' + sd.n + ')'
     : '<div class="insufficient">No 7-day windows yet.</div>';
@@ -536,7 +536,7 @@ function renderBucketChart(canvasId, buckets) {
 }
 
 function renderAINews() {
-  const summaryContainer = document.getElementById('newsSummary');
+  const summaryContainer = /** @type {HTMLElement} */ (document.getElementById('newsSummary'));
   if (DATA.newsSummaries && DATA.newsSummaries.length > 0) {
     let html = '';
     const summaries = [...DATA.newsSummaries].reverse();
@@ -568,8 +568,8 @@ function renderAINews() {
 }
 
 function renderEOD() {
-  const eodList = document.getElementById('eodList');
-  const empty = document.getElementById('eodEmpty');
+  const eodList = /** @type {HTMLElement} */ (document.getElementById('eodList'));
+  const empty = /** @type {HTMLElement} */ (document.getElementById('eodEmpty'));
   const reports = [...(DATA.eodReports || [])].reverse();
   if (reports.length === 0) {
     eodList.innerHTML = '';

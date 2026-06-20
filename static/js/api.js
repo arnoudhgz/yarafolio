@@ -41,10 +41,10 @@ async function loadLearn() {
 }
 
 async function fetchMacro() {
-  const btn = document.getElementById('refreshMacroBtn');
-  const loading = document.getElementById('macroLoading');
-  const list = document.getElementById('macroList');
-  const empty = document.getElementById('macroEmpty');
+  const btn = /** @type {HTMLElement} */ (document.getElementById('refreshMacroBtn'));
+  const loading = /** @type {HTMLElement} */ (document.getElementById('macroLoading'));
+  const list = /** @type {HTMLElement} */ (document.getElementById('macroList'));
+  const empty = /** @type {HTMLElement} */ (document.getElementById('macroEmpty'));
   
   btn.disabled = true;
   loading.style.display = 'block';
@@ -120,9 +120,9 @@ async function fetchMacro() {
     }
     window.macroLoaded = true;
   } catch (err) {
-    document.getElementById('macroList').innerHTML = '<tr><td colspan="7" class="insufficient">Failed to fetch macro calendar.</td></tr>';
+    /** @type {HTMLElement} */ (document.getElementById('macroList')).innerHTML = '<tr><td colspan="7" class="insufficient">Failed to fetch macro calendar.</td></tr>';
   } finally {
-    document.getElementById('macroLoading').style.display = 'none';
+    /** @type {HTMLElement} */ (document.getElementById('macroLoading')).style.display = 'none';
     btn.disabled = false;
   }
 }
@@ -131,7 +131,7 @@ async function fetchMacro() {
  * @param {boolean} force
  */
 export async function fetchIpos(force = false) {
-  document.getElementById('iposLoading').style.display = 'block';
+  /** @type {HTMLElement} */ (document.getElementById('iposLoading')).style.display = 'block';
   try {
     const url = force ? '/api/ipos?force=1' : '/api/ipos';
     const res = await fetch(url);
@@ -179,9 +179,9 @@ export async function fetchIpos(force = false) {
       }
     }
 
-    document.getElementById('iposBody').innerHTML = html || '<tr><td colspan="6" class="empty">No IPOs found.</td></tr>';
+    /** @type {HTMLElement} */ (document.getElementById('iposBody')).innerHTML = html || '<tr><td colspan="6" class="empty">No IPOs found.</td></tr>';
     
-    const tabBtn = document.querySelector('button[data-tab="ipos"]');
+    const tabBtn = /** @type {HTMLElement} */ (document.querySelector('button[data-tab="ipos"]'));
     if (hasNearIpo) {
       tabBtn.innerHTML = 'IPO Tracker <span class="blink" style="color:var(--green);font-weight:bold;margin-left:4px">●</span>';
     } else {
@@ -189,7 +189,7 @@ export async function fetchIpos(force = false) {
     }
     
     // apply current filter
-    const activeFilter = document.querySelector('#ipoFilters button.active')?.dataset.ipofilter || 'listed';
+    const activeFilter = /** @type {HTMLElement} */ (document.querySelector('#ipoFilters button.active'))?.dataset.ipofilter || 'listed';
     document.querySelectorAll('#iposBody tr').forEach(tr => {
       if (tr.children.length === 1) return;
       const st = tr.getAttribute('data-ipostatus');
@@ -200,9 +200,9 @@ export async function fetchIpos(force = false) {
     });
 
   } catch (err) {
-    document.getElementById('iposBody').innerHTML = '<tr><td colspan="6" class="empty" style="color:var(--red)">Failed to fetch IPOs.</td></tr>';
+    /** @type {HTMLElement} */ (document.getElementById('iposBody')).innerHTML = '<tr><td colspan="6" class="empty" style="color:var(--red)">Failed to fetch IPOs.</td></tr>';
   } finally {
-    document.getElementById('iposLoading').style.display = 'none';
+    /** @type {HTMLElement} */ (document.getElementById('iposLoading')).style.display = 'none';
   }
 }
 
