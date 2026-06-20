@@ -1,7 +1,7 @@
 // @ts-check
 import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
-import { renderAll, renderTable, renderArchive, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot } from './renderers.js';
+import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
 import { applyChange, fetchMacro, fetchIpos, loadLearn } from './api.js';
 
@@ -96,7 +96,7 @@ document.querySelectorAll('.tabs button').forEach(b => {
     /** @type {HTMLInputElement} */ (document.getElementById('search')).disabled = !searchable;
     setActiveTab(_tab);
     if (activeTab === 'advice') renderTable();
-    else if (activeTab === 'archive') renderArchive();
+
     else if (activeTab === 'positions') renderPositions();
     else if (activeTab === 'portfolio') { if (!portfolioRendered) renderPortfolio(); else renderPortfolioTable(); }
     else if (activeTab === 'eod') renderEOD();
@@ -192,7 +192,7 @@ function headerSortHandler(tableId, stateKey, render) {
   });
 }
 headerSortHandler('adviceTable', 'advice', renderTable);
-headerSortHandler('archiveTable', 'archive', renderArchive);
+
 headerSortHandler('positionsTable', 'positions', renderPositions);
 headerSortHandler('portfolioTable', 'portfolio', renderPortfolioTable);
 

@@ -12,7 +12,6 @@ export function renderAll() {
   /** @type {HTMLElement} */ (document.getElementById('cOpen')).textContent = String(entries.filter(e => e.status === 'bought').length);
   /** @type {HTMLElement} */ (document.getElementById('cWatching')).textContent = String(entries.filter(e => e.status === 'watching').length);
   renderTable();
-  renderArchive();
   renderPositions();
   if (activeTab === 'portfolio') renderPortfolio();
   if (activeTab === 'analytics' && LEARN) renderAnalytics();
@@ -122,8 +121,12 @@ export function renderTable() {
   const secPct = sectorPctMap();
   const rows = sortRows(
     adviceRows().filter(r => {
-      if (r.status !== 'watching') return false;
-      if (r.e.lots && r.e.lots.length) return false;
+      if (currentFilter === 'dropped') {
+        if (r.status !== 'dropped') return false;
+      } else {
+        if (r.status !== 'watching') return false;
+        if (r.e.lots && r.e.lots.length) return false;
+      }
       if (!matchesSearch([r.ticker, r.e.name, r.e.reason, r.sector])) return false;
       if (currentFilter === 'gap') return sectorFlag(secPct, r.sector) === 'gap';
       if (currentFilter === 'under') return sectorFlag(secPct, r.sector) === 'under';
@@ -165,41 +168,6 @@ export function renderTable() {
       '<td class="actions">' + actionButtons(e) + '</td>';
     tbody.appendChild(tr);
     sparkline(tr.querySelector('canvas'), e);
-  });
-}
-
-export function renderArchive() {
-  const tbody = /** @type {HTMLElement} */ (document.querySelector('#archiveTable tbody'));
-  tbody.innerHTML = '';
-  const rows = sortRows(
-    adviceRows().filter(r => {
-      if (r.status !== 'dropped') return false;
-      if (!matchesSearch([r.ticker, r.e.name, r.e.reason, r.sector])) return false;
-      return true;
-    }),
-    sortState.archive);
-  if (activeTab === 'archive') setSearchCount(rows.length);
-  markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('archiveTable')), sortState.archive);
-  /** @type {HTMLElement} */ (document.getElementById('archiveEmptyMsg')).style.display = rows.length ? 'none' : 'block';
-  /** @type {HTMLElement} */ (document.getElementById('archiveTable')).style.display = rows.length ? '' : 'none';
-  rows.forEach(r => {
-    const e = r.e;
-    const tr = document.createElement('tr');
-    tr.dataset.id = e.id;
-    tr.innerHTML =
-      '<td>' + r.firstAdvised + '</td>' +
-      '<td title="' + esc(e.reason || '') + '">' +
-        tickerLink(r.ticker) +
-        (e.name ? '<span class="sub">' + esc(e.name) + '</span>' : '') + '</td>' +
-      '<td>' + fmtPrice(r.priceThen) + '</td>' +
-      '<td>' + fmtPrice(r.priceNow) + '</td>' +
-      '<td class="' + (r.changePct >= 0 ? 'pos' : 'neg') + '">' + fmtPct(r.changePct) + '</td>' +
-      '<td>' + (r.rating || '-') + '</td>' +
-      '<td>' + (r.rsi ?? '-') + '</td>' +
-      '<td>' + (r.sector || '-') + '</td>' +
-      '<td><span class="badge ' + r.status + '">' + r.status + '</span></td>' +
-      '<td class="actions">' + actionButtons(e) + '</td>';
-    tbody.appendChild(tr);
   });
 }
 

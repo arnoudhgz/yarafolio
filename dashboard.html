@@ -35,7 +35,7 @@
 
   <div class="tabs" id="tabs">
     <button data-tab="advice" class="active">Advice</button>
-    <button data-tab="archive">Archive</button>
+
     <button data-tab="positions">Positions</button>
     <button data-tab="portfolio">Portfolio</button>
     <button data-tab="analytics">Analytics</button>
@@ -53,8 +53,9 @@
         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('adviceInfoModal').hidden=false" title="What do the ratings and levels mean?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
       </h2>
       <div class="filters" id="filters">
-        <button data-filter="watching" class="active">Watching</button>
-        <button data-filter="buyzone">Buy zone</button>
+        <button class="filter-btn" data-filter="watching">Watching</button>
+        <button class="filter-btn" data-filter="dropped">Dropped</button>
+        <button class="filter-btn" data-filter="buyzone">Buy zone</button>
         <button data-filter="drophit">Drop alert</button>
         <button data-filter="missed">Missed</button>
         <button data-filter="gap">Sector gap</button>
@@ -82,33 +83,6 @@
         <tbody></tbody>
       </table>
       <div class="empty" id="emptyMsg" style="display:none">No watched picks yet. Run /advice, /premarket or /import in Claude Code to fill this in.</div>
-    </div>
-  </section>
-
-  <section id="tab-archive" class="tab-section">
-    <div class="panel">
-      <h2 style="display:flex; align-items:center; gap:8px;">
-        Dropped Picks Archive
-        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('archiveInfoModal').hidden=false" title="What is the archive?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-      </h2>
-      <table id="archiveTable">
-        <thead>
-          <tr>
-            <th data-key="firstAdvised">First advised</th>
-            <th data-key="ticker">Ticker</th>
-            <th data-key="priceThen">Price then</th>
-            <th data-key="priceNow">Price now</th>
-            <th data-key="changePct">Change</th>
-            <th data-key="rating">Rating</th>
-            <th data-key="rsi">RSI</th>
-            <th data-key="sector">Sector</th>
-            <th data-key="status">Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <div class="empty" id="archiveEmptyMsg" style="display:none">No dropped picks yet.</div>
     </div>
   </section>
 
@@ -377,7 +351,7 @@
         <li style="margin-bottom:8px;"><strong>Drop below</strong>: thesis invalidation level. Red row marker when the price is at or under it (the bounce idea is broken, reconsider the pick); the Drop alert filter shows only those.</li>
         <li style="margin-bottom:8px;"><strong>Drop above</strong>: opportunity-gone ceiling. Grey row marker when a watching pick's price is at or above it: the oversold bounce already ran, so the cheap entry is gone and it's worth dropping. The Missed filter shows only those (watching only).</li>
         <li style="margin-bottom:8px;"><strong>Sector</strong>: <span style="color:var(--red);font-weight:600">red</span> = a sector you hold none of (a gap), <span style="color:var(--orange);font-weight:600">orange</span> = underweight (under 5% of your portfolio). The Sector gap / Underweight filters show only those. Same logic as the Portfolio sector-coverage view.</li>
-        <li>This tab is your live watchlist. Dropped picks are moved to the <strong>Archive</strong> tab. Once you buy a pick it moves to the <strong>Positions</strong> tab, along with whatever you later sell.</li>
+        <li>This tab is your live watchlist. Once you buy a pick it moves to the <strong>Positions</strong> tab. If you drop a pick, it can be viewed by selecting the <strong>Dropped</strong> filter.</li>
       </ul>
     </div>
   </div>
@@ -392,14 +366,6 @@
         <li style="margin-bottom:8px;"><strong>eToro likely:</strong> We flag an IPO if it has a Deal Size > $200M or Market Cap > $1B. eToro almost exclusively lists well-capitalized or high-profile brands.</li>
         <li><strong>Drop:</strong> Hide an IPO if you are not interested in it so it won't show up in your advice runs anymore.</li>
       </ul>
-    </div>
-  </div>
-
-  <div id="archiveInfoModal" class="modal-backdrop" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
-      <button class="modal-close" onclick="document.getElementById('archiveInfoModal').hidden=true" aria-label="Close">&times;</button>
-      <h2 style="margin-top:0; margin-bottom:16px;">What is the Archive?</h2>
-      <p style="color:var(--muted); line-height:1.6; margin:0;">This tab contains picks that were previously advised but have since been manually dropped. The dashboard tracks your AI recommendations, but <strong>dropping a stock is always a manual decision</strong>. You typically drop a stock when it hits its drop-below level (thesis broken), drop-above level (opportunity missed), or if you simply lose conviction.</p>
     </div>
   </div>
 
