@@ -182,13 +182,13 @@
         <h2 style="margin:0;">Analytics</h2>
         <div id="analyticsUpdated" style="color:var(--muted);font-size:12px;"></div>
       </div>
-      <h2>~7 days after advice</h2>
+      <h2>~7 days after advice <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted); margin-left: 6px; vertical-align: -2px;" onclick="document.getElementById('infoSevenDays').hidden=false" title="About 7 days chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
       <div id="sevenDayBox"></div>
     </div>
-    <div class="panel"><h2>Win rate &amp; move by rating</h2><div class="chart-wrap"><canvas id="chartRating"></canvas></div><div id="chartRatingNote"></div></div>
-    <div class="panel"><h2>By RSI band</h2><div class="chart-wrap"><canvas id="chartRsiBand"></canvas></div><div id="chartRsiBandNote"></div></div>
-    <div class="panel"><h2>By sector</h2><div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div></div>
-    <div class="panel"><h2>By source</h2><div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div></div>
+    <div class="panel"><h2>Win rate &amp; move by rating <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted); margin-left: 6px; vertical-align: -2px;" onclick="document.getElementById('infoRating').hidden=false" title="About rating chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRating"></canvas></div><div id="chartRatingNote"></div></div>
+    <div class="panel"><h2>By RSI band <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted); margin-left: 6px; vertical-align: -2px;" onclick="document.getElementById('infoRsi').hidden=false" title="About RSI band chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRsiBand"></canvas></div><div id="chartRsiBandNote"></div></div>
+    <div class="panel"><h2>By sector <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted); margin-left: 6px; vertical-align: -2px;" onclick="document.getElementById('infoSector').hidden=false" title="About sector chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div></div>
+    <div class="panel"><h2>By source <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted); margin-left: 6px; vertical-align: -2px;" onclick="document.getElementById('infoSource').hidden=false" title="About source chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div></div>
     <div class="empty" id="analyticsEmpty" style="display:none">Not enough finished advice yet to learn from. Outcomes appear once picks are sold, dropped, or 7+ days old.</div>
   </section>
 
@@ -500,5 +500,45 @@
       <p style="margin-bottom:0;">The total current floating Profit/Loss in dollars from all active open positions.</p>
     </div>
   </div>
+  <div id="infoSevenDays" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoSevenDays').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">~7 days after advice</h2>
+      <p style="margin-bottom:0;">Tracks the median performance of picks specifically over their first 7 days following the AI recommendation. This highlights the short-term accuracy of the entry points.</p>
+    </div>
+  </div>
+
+  <div id="infoRating" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoRating').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Win rate &amp; move by rating</h2>
+      <p style="margin-bottom:0;">Breaks down the success rate and average profit/loss depending on the conviction rating assigned by the AI (e.g., 'Strong Buy' vs 'Buy'). This helps visualize if higher-conviction picks perform better.</p>
+    </div>
+  </div>
+
+  <div id="infoRsi" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoRsi').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">By RSI band</h2>
+      <p style="margin-bottom:0;">Analyzes performance based on how oversold a stock was when advised (its RSI). It helps determine whether catching stocks at more extreme oversold levels yields higher win rates.</p>
+    </div>
+  </div>
+
+  <div id="infoSector" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoSector').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">By sector</h2>
+      <p style="margin-bottom:0;">Shows which specific sectors your strategy performs best or worst in. Useful for recognizing blindspots or avoiding perma-bear sectors.</p>
+    </div>
+  </div>
+
+  <div id="infoSource" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoSource').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">By source</h2>
+      <p style="margin-bottom:0;">Compares the performance between different types of runs (e.g., standard /advice vs. /premarket vs. /aftermarket vs. /diversify).</p>
+    </div>
+  </div>
+
 </body>
 </html>
