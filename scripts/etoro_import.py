@@ -333,6 +333,9 @@ class EtoroImport:
                 item["boughtAt"] = item["currentPrice"]
             price_point = {"date": today, "price": item["currentPrice"] or item["boughtAt"]}
             if existing_e is not None:
+                import copy
+                original = copy.deepcopy(existing_e)
+                
                 existing_e.update(status="bought", boughtAt=item["boughtAt"], units=item["units"])
                 existing_e["tslSet"] = item.get("tslEnabled", existing_e.get("tslSet"))
                 if item["sector"] is not None:
@@ -345,7 +348,9 @@ class EtoroImport:
                     existing_e["priceHistory"][-1]["price"] = price_point["price"]
                 else:
                     existing_e["priceHistory"].append(price_point)
-                merged += 1
+                
+                if original != existing_e:
+                    merged += 1
             else:
                 data["entries"].append({
                     "ticker": item["ticker"], "name": item["name"],
