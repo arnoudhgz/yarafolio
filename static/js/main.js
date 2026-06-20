@@ -218,7 +218,6 @@ const adviceClickHandler = (ev) => {
   }
 };
 /** @type {HTMLElement} */ (document.querySelector('#adviceTable tbody')).addEventListener('click', adviceClickHandler);
-/** @type {HTMLElement} */ (document.querySelector('#archiveTable tbody')).addEventListener('click', adviceClickHandler);
 
 
 /** @type {HTMLElement} */ (document.getElementById('filters')).addEventListener('click', (ev) => {
