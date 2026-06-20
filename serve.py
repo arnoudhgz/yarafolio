@@ -4,7 +4,6 @@
 Usage:
   python3 serve.py [port]
   python3 serve.py --stop
-  python3 serve.py --restart [port]
 
 Opens http://127.0.0.1:8742/dashboard.html in the browser.
 POST /api/save    - dashboard buttons write data/advice-log.json
@@ -489,7 +488,7 @@ class DashboardServer:
             sys.exit(f"Unknown option: {unknown[0]}")
         ports = [arg for arg in args if not arg.startswith("--")]
         if len(ports) > 1:
-            sys.exit("Usage: python3 serve.py [--stop | --restart] [port]")
+            sys.exit("Usage: python3 serve.py [--stop] [port]")
         try:
             port = int(ports[0]) if ports else DEFAULT_PORT
         except ValueError:
@@ -502,8 +501,9 @@ class DashboardServer:
         if stop:
             self.stop_server()
             return
-        if restart:
-            self.stop_server()
+            
+        # Always attempt to stop any existing instance before starting
+        self.stop_server()
 
         os.makedirs(os.path.dirname(PID_FILE), exist_ok=True)
         os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
@@ -511,8 +511,8 @@ class DashboardServer:
             server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
         except OSError as exc:
             if exc.errno == 48:
-                sys.exit(f"Port {port} is already in use. Run `python3 serve.py --restart {port}` "
-                         "if it is this dashboard, or choose another port.")
+                sys.exit(f"Port {port} is already in use by another application. "
+                         "Please choose another port by setting PORT=... in your .env file.")
             raise
 
         with open(PID_FILE, "w") as f:
