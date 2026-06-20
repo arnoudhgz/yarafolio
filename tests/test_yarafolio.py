@@ -1,10 +1,9 @@
-import yarafolio
 import sys
 import unittest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-
+import yarafolio  # noqa: E402
 
 class RefreshableQuoteTest(unittest.TestCase):
     def test_same_day_quote_is_refreshable(self):
