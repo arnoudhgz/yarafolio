@@ -453,24 +453,3 @@ function updateTimer() {
 
 load();
 
-let lastPollMtime = null;
-async function pollData() {
-  if (document.body.classList.contains('syncing')) return; // skip if syncing or manually editing
-  try {
-    const res = await fetch('/api/poll');
-    if (!res.ok) return;
-    const mtimes = await res.json();
-    const currentMtime = mtimes.advice + '_' + mtimes.portfolio;
-    if (lastPollMtime === null) {
-      lastPollMtime = currentMtime;
-    } else if (lastPollMtime !== currentMtime) {
-      lastPollMtime = currentMtime;
-      await load();
-      banner('Dashboard auto-updated!', 'success');
-      setTimeout(() => banner(''), 3000);
-    }
-  } catch (err) {
-    // Silent fail if backend is unreachable
-  }
-}
-setInterval(pollData, 5000);

@@ -137,8 +137,6 @@ class Handler(SimpleHTTPRequestHandler):
                 self.respond_json(500, {"error": e.stderr})
         elif self.path == "/api/locations":
             self.handle_locations()
-        elif self.path == "/api/poll":
-            self.handle_poll()
         else:
             super().do_GET()
 
@@ -421,14 +419,6 @@ class Handler(SimpleHTTPRequestHandler):
             pass
         self.respond_json(200, {"prefixes": sorted(list(set(suffixes)))})
 
-    def handle_poll(self):
-        try:
-            mtime_advice = os.path.getmtime(DATA_FILE) if os.path.exists(DATA_FILE) else 0
-            pf_file = os.path.join(ROOT, "data", subdir, "portfolio.json")
-            mtime_pf = os.path.getmtime(pf_file) if os.path.exists(pf_file) else 0
-            self.respond_json(200, {"ok": True, "advice": mtime_advice, "portfolio": mtime_pf})
-        except Exception as exc:
-            self.respond_json(500, {"ok": False, "error": str(exc)})
 
     def end_headers(self):
         self.send_header("Cache-Control", "no-store")
