@@ -181,6 +181,8 @@
   .spark-col { width: 85px; min-width: 85px; max-width: 85px; }
   .spark { width: 70px; height: 30px; }
   .empty { color: var(--muted); text-align: center; padding: 40px 0; font-size: 14px; }
+  .empty a { color: var(--blue); text-decoration: none; }
+  .empty a:hover { text-decoration: underline; }
   .actions { white-space: nowrap; }
   .actions button {
     border: 1px solid var(--border);
