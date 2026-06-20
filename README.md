@@ -52,6 +52,7 @@ It is important to understand that the quality, accuracy, and depth of the stock
 - **Your AI Subscription & Provider**: Free-tier models may provide shallower analysis or hallucinate more often compared to premium, state-of-the-art models (like Claude 3.5 Sonnet, Claude 3 Opus, or Gemini 1.5 Pro).
 - **The Chosen Model**: Different models have different reasoning capabilities, training cutoffs, and context windows.
 - **Your Prompts & Skill Tuning**: The AI's performance is directly tied to the quality of the instructions in your local skill files. If you find the advice lacking, consider refining the rules in `GEMINI.md` or `CLAUDE.md` to be more explicit about your exact trading strategy and risk tolerance!
+- **Your AI CLI Tool**: Whether you use Google Antigravity, Claude Code, or OpenAI's Codex CLI, ensure the tool is configured to properly read and execute the local `.gemini/` or `.claude/` skill instructions in this repository.
 
 ---
 
