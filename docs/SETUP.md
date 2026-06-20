@@ -25,6 +25,9 @@
 
    *Note: The port defaults to 8742. You can configure this by adding `PORT=8080` to your `.env` file.*
 
+5. **Stop or Restart**:
+   To stop the server, go back to your terminal and press `Ctrl+C`. To restart, simply run `python3 serve.py` again.
+
 ## ⚠️ Disclaimer & Scraping Considerations
 This tool includes a lightweight Python scraper (`scripts/screen.py`) designed to fetch live quotes and news from public sources like Yahoo Finance. 
 
