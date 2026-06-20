@@ -30,7 +30,7 @@ This project uses a lightweight stack without complex build steps or heavy frame
 You might wonder why YaraFolio uses flat JSON files (`data/advice-log.json`) instead of a robust SQL database like Postgres or SQLite.
 1. **Minimum Dependencies**: You can clone this repo and run it instantly via Python without configuring Docker or databases.
 2. **Human-Readable & Editable**: If a scrape goes wrong or you need to fix a typo, you can literally open the JSON file in a text editor and change it. 
-3. **Git-Native Backups**: JSON diffs perfectly in Git. This allows for a completely decoupled backup system!
+3. **Git-Native Backups**: JSON diffs perfectly in Git. This allows for a completely decoupled backup system! Check this step in [the setup](docs/SETUP.md#configure-auto-sync-for-your-private-data-highly-recommended).
 
 ---
 

@@ -16,7 +16,7 @@ Create a `.env` file in the root of the project. Copy the `.env.sample` to get s
 ```bash
 cp .env.sample .env
 ```
-*Follow the instructions inside the `.env` file to retrieve your keys from `https://www.etoro.com/settings/trade`.*
+*Follow the instructions inside the `.env` file to retrieve your keys from [https://www.etoro.com/settings/trade](https://www.etoro.com/settings/trade).*
 
 **Important eToro Setup Details:**
 - **Read-Only**: YaraFolio only provides advice and insights; it does not execute trades. When generating your eToro API Key, **always create it in Read-Only mode** for maximum security.
