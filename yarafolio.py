@@ -336,6 +336,14 @@ class Handler(SimpleHTTPRequestHandler):
             REFRESH_RUNNING.release()
 
     def handle_stats(self):
+        if is_demo:
+            try:
+                with open(os.path.join(ROOT, "data", "sample", "learn-stats.json")) as f:
+                    self.respond_json(200, json.load(f))
+                return
+            except OSError:
+                pass # Fallback to running the script if file missing
+
         try:
             cmd = [sys.executable, LEARN_SCRIPT, "--json"]
             proc = subprocess.run(
