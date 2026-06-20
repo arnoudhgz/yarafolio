@@ -1,6 +1,6 @@
 # 🖥️ The Dashboard Screens
 
-YaraFolio features a lightning-fast local web interface that completely replaces complex spreadsheets. 
+YaraFolio features a local web interface that completely replaces complex spreadsheets. 
 
 ## 1. Advice Tab (Live Watchlist)
 ![Advice Tab Screenshot](images/advice_tab.png)

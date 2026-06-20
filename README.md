@@ -2,7 +2,7 @@
 
 Welcome to **YaraFolio**! I built this because I needed a comprehensive tool where I could combine AI analytics with managing my eToro portfolio. 
 
-Instead of jumping between different apps, YaraFolio acts as a single, sleek local dashboard (**designed explicitly for desktop web browsers**) that syncs your eToro trades and lets an AI (like Gemini or Claude) run point on your research. 
+Instead of jumping between different apps, YaraFolio acts as a single local dashboard that syncs your eToro trades and lets an AI (like Gemini or Claude) run point on your research.
 
 > **Note:** Out of the box, the AI strategies and algorithms here are tuned to my personal preference: hunting for **oversold opportunities** and catching bounces. If you have a different trading style, you can easily change this!
 
@@ -19,7 +19,7 @@ Instead of jumping between different apps, YaraFolio acts as a single, sleek loc
 ## 🚀 Architecture
 This project uses a lightweight stack without complex build steps or heavy frameworks.
 - The Python backend utilizes the standard library (`http.server`) to serve files and handle local API endpoints.
-- The frontend is built with vanilla HTML, CSS, and JavaScript, utilizing standard ES6 `<script type="module">`. The only external library is `marked.js` (loaded via CDN) for rendering AI markdown summaries. No system fonts are fetched externally; it relies on the user's native OS fonts (Apple System, BlinkMacSystemFont, Segoe UI, Roboto).
+- The frontend is built with vanilla HTML, CSS, and JavaScript, utilizing standard ES6 `<script type="module">`. The only external library is `marked.js` (served locally) for rendering AI markdown summaries. No web fonts are fetched externally; it relies on the user's native OS sans-serif fonts (Apple System, BlinkMacSystemFont, Segoe UI, Roboto) for a clean, fast UI.
 
 ---
 
@@ -29,7 +29,7 @@ This project is driven by custom agent instructions. When you talk to the AI, it
 
 Out of the box, these instructions reflect my personal "oversold bounce" strategy. **You should absolutely tune these to your own liking.**
 
-Here is where the magic happens:
+Here is the breakdown of the available tools:
 1. **The Core Strategies**: Check out [`GEMINI.md`](GEMINI.md) and [`CLAUDE.md`](CLAUDE.md). This is where the overarching rules live (what defines a "buy", risk tolerance, sector preferences). 
 2. **The Specific Commands**: Look inside the `.gemini/skills/` and `.claude/skills/` directories. Each folder contains a `SKILL.md` file that teaches the AI how to execute a specific command. Here are the tools currently loaded:
    - `/advice`: Run the primary stock screening workflow (finds oversold stocks with bounce potential).
