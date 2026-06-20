@@ -1,5 +1,10 @@
 # 📈 YaraFolio
 
+![GitHub Release](https://img.shields.io/github/v/release/arnoudhgz/yarafolio?style=flat-square)
+![Tests](https://img.shields.io/github/actions/workflow/status/arnoudhgz/yarafolio/ci.yml?branch=main&style=flat-square&label=tests)
+![GitHub License](https://img.shields.io/github/license/arnoudhgz/yarafolio?style=flat-square)
+![Python Version](https://img.shields.io/badge/python-3.9+-blue.svg?style=flat-square)
+
 Welcome to **YaraFolio**! I built this because I needed a comprehensive tool where I could combine AI analytics with managing my eToro portfolio. 
 
 Instead of jumping between different apps, YaraFolio acts as a single local dashboard that syncs your eToro trades and organizes your AI-assisted stock research.
