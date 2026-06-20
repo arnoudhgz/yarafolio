@@ -10,3 +10,4 @@ data/private/
 data/*.bak
 scratch/
 news_output.json
+data/*_cache.json
