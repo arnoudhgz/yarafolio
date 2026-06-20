@@ -138,7 +138,18 @@ export function renderTable() {
     sortState.advice);
   if (activeTab === 'advice') setSearchCount(rows.length);
   markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('adviceTable')), sortState.advice);
-  /** @type {HTMLElement} */ (document.getElementById('emptyMsg')).style.display = rows.length ? 'none' : 'block';
+  const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('emptyMsg'));
+  
+  let msg = 'No watched picks yet. Run /advice, /premarket or /import in Claude Code to fill this in.';
+  if (currentFilter === 'dropped') msg = 'No dropped picks yet.';
+  else if (currentFilter === 'buyzone') msg = 'No watched picks currently in the buy zone.';
+  else if (currentFilter === 'drophit') msg = 'No watched picks have hit their drop alert level.';
+  else if (currentFilter === 'missed') msg = 'No watched picks have hit their drop above level (missed).';
+  else if (currentFilter === 'gap') msg = 'No watched picks in sectors you have a gap in.';
+  else if (currentFilter === 'under') msg = 'No watched picks in underweight sectors.';
+  
+  emptyMsgEl.textContent = msg;
+  emptyMsgEl.style.display = rows.length ? 'none' : 'block';
   /** @type {HTMLElement} */ (document.getElementById('adviceTable')).style.display = rows.length ? '' : 'none';
   rows.forEach(r => {
     const e = r.e;
