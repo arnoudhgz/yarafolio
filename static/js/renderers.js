@@ -148,7 +148,11 @@ export function renderTable() {
   else if (currentFilter === 'gap') msg = 'No watched picks in sectors you have a gap in.';
   else if (currentFilter === 'under') msg = 'No watched picks in underweight sectors.';
   
-  emptyMsgEl.textContent = msg;
+  if (searchQuery && rows.length === 0) {
+    msg = `No results with your current filter ('${esc(searchQuery)}'). <a href="#" onclick="document.getElementById('search').value=''; document.getElementById('search').dispatchEvent(new Event('input')); return false;">Clear the filter</a>`;
+  }
+  
+  emptyMsgEl.innerHTML = msg;
   emptyMsgEl.style.display = rows.length ? 'none' : 'block';
   /** @type {HTMLElement} */ (document.getElementById('adviceTable')).style.display = rows.length ? '' : 'none';
   rows.forEach(r => {
@@ -251,7 +255,17 @@ export function renderPositions() {
   }), sortState.positions);
   if (activeTab === 'positions') setSearchCount(rows.length);
   markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('positionsTable')), sortState.positions);
-  /** @type {HTMLElement} */ (document.getElementById('positionsEmpty')).style.display = rows.length ? 'none' : 'block';
+  const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('positionsEmpty'));
+  let msg = 'No open positions linked to advice yet.';
+  if (posFilter === 'closed') msg = 'No closed positions yet.';
+  else if (posFilter === 'needsconfirm') msg = 'No positions needing exit confirmation.';
+  
+  if (searchQuery && rows.length === 0) {
+    msg = `No results with your current filter ('${esc(searchQuery)}'). <a href="#" onclick="document.getElementById('search').value=''; document.getElementById('search').dispatchEvent(new Event('input')); return false;">Clear the filter</a>`;
+  }
+  
+  emptyMsgEl.innerHTML = msg;
+  emptyMsgEl.style.display = rows.length ? 'none' : 'block';
   /** @type {HTMLElement} */ (document.getElementById('positionsTable')).style.display = rows.length ? '' : 'none';
   const tbody = /** @type {HTMLElement} */ (document.querySelector('#positionsTable tbody'));
   tbody.innerHTML = '';
@@ -318,7 +332,14 @@ export function renderPortfolioTable() {
   }
   
   const empty = !holdings.length;
-  /** @type {HTMLElement} */ (document.getElementById('portfolioEmpty')).style.display = empty ? 'block' : 'none';
+  const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('portfolioEmpty'));
+  let msg = 'No portfolio snapshot yet. Click "Update from eToro" or run /import in the AI CLI.';
+  if (searchQuery && holdings.length === 0) {
+    msg = `No results with your current filter ('${esc(searchQuery)}'). <a href="#" onclick="document.getElementById('search').value=''; document.getElementById('search').dispatchEvent(new Event('input')); return false;">Clear the filter</a>`;
+  }
+  
+  emptyMsgEl.innerHTML = msg;
+  emptyMsgEl.style.display = empty ? 'block' : 'none';
   /** @type {HTMLElement} */ (document.getElementById('portfolioTable')).style.display = empty ? 'none' : '';
   if (activeTab === 'portfolio') setSearchCount(holdings.length);
   const tbody = /** @type {HTMLElement} */ (document.querySelector('#portfolioTable tbody'));
