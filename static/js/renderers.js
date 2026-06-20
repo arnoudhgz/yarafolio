@@ -140,7 +140,7 @@ export function renderTable() {
   markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('adviceTable')), sortState.advice);
   const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('emptyMsg'));
   
-  let msg = 'No watched picks yet. Run /advice, /premarket or /import in Claude Code to fill this in.';
+  let msg = 'No watched picks yet. Run /advice, /premarket or /import in the AI CLI to fill this in.';
   if (currentFilter === 'dropped') msg = 'No dropped picks yet.';
   else if (currentFilter === 'buyzone') msg = 'No watched picks currently in the buy zone.';
   else if (currentFilter === 'drophit') msg = 'No watched picks have hit their drop alert level.';
