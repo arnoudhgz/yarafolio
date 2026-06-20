@@ -78,13 +78,8 @@
     border-radius: 12px;
     padding: 16px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  }
-  .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .card .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; justify-content: space-between; }
   .card .value { font-size: 26px; font-weight: 700; margin-top: 6px; }
   .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
   .tabs button {
@@ -186,6 +181,8 @@
   .spark-col { width: 85px; min-width: 85px; max-width: 85px; }
   .spark { width: 70px; height: 30px; }
   .empty { color: var(--muted); text-align: center; padding: 40px 0; font-size: 14px; }
+  .empty a { color: var(--blue); text-decoration: none; }
+  .empty a:hover { text-decoration: underline; }
   .actions { white-space: nowrap; }
   .actions button {
     border: 1px solid var(--border);
@@ -322,10 +319,11 @@
   .modal-card {
     background: rgba(15, 20, 30, 0.95); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px;
     backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-    padding: 36px 48px; width: min(1300px, 96vw); height: min(850px, 92vh); position: relative;
+    padding: 36px 48px; width: min(1300px, 96vw); height: auto; max-height: 92vh; position: relative;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     display: flex; flex-direction: column;
     font-size: 12.5px; line-height: 1.5; color: #cbd5e1;
+    overflow-y: auto;
   }
   .modal-close { position: absolute; top: 12px; right: 14px; background: none; border: none; color: var(--muted); font-size: 22px; cursor: pointer; line-height: 1; }
   .modal-close:hover { color: var(--text); }
@@ -341,3 +339,44 @@
   .news-card a { color: var(--text); text-decoration: none; line-height: 1.4; font-size: 14px; }
   .news-card a:hover { text-decoration: underline; color: var(--blue); }
   .news-card a.tlink { color: var(--blue); font-weight: bold; font-size: 15px; }
+
+  /* CSS-only Sparkles Background */
+  .sparkle-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: -1;
+    overflow: hidden;
+  }
+  
+  .sparkle {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: #e0f0ff;
+    clip-path: polygon(50% 0%, 52% 48%, 100% 50%, 52% 52%, 50% 100%, 48% 52%, 0% 50%, 48% 48%);
+    opacity: 0;
+    animation: twinkle linear infinite;
+  }
+  
+  @keyframes twinkle {
+    0%   { opacity: 0; transform: scale(0.3) rotate(0deg); }
+    50%  { opacity: 0.8; transform: scale(1.2) rotate(45deg); filter: drop-shadow(0 0 6px rgba(200, 230, 255, 0.8)); }
+    100% { opacity: 0; transform: scale(0.3) rotate(90deg); }
+  }
+
+  .sparkle-dot {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0;
+    box-shadow: 0 0 4px #fff, 0 0 8px #88ccff;
+  }
+
+  @keyframes blink {
+    0%   { opacity: 0; transform: scale(0.5); }
+    50%  { opacity: 0.6; transform: scale(1.2); }
+    100% { opacity: 0; transform: scale(0.5); }
+  }

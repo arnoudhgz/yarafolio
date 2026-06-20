@@ -2,16 +2,19 @@
 
 Welcome to **YaraFolio**! I built this because I needed a comprehensive tool where I could combine AI analytics with managing my eToro portfolio. 
 
-Instead of jumping between different apps, YaraFolio acts as a single, sleek local dashboard (**designed explicitly for desktop web browsers**) that syncs your eToro trades and lets an AI (like Gemini or Claude) run point on your research. 
+Instead of jumping between different apps, YaraFolio acts as a single local dashboard that syncs your eToro trades and organizes your AI-assisted stock research.
 
-> **Note:** Out of the box, the AI strategies and algorithms here are tuned to my personal preference: hunting for **oversold opportunities** and catching bounces. If you have a different trading style, you can easily change this!
+> **What is a "Yara"?**
+> When thinking of a name for this project, I looked around and Yara was looking at me with her big eyes. As she is my princess, the name was easily found. Yara is my cat. 🐾
+
+![YaraFolio Dashboard](docs/images/dashboard-main.png)
 
 ---
 
 ## 📚 Documentation
 
-- 🛠️ [**Installation & Setup**](docs/SETUP.md): How to clone, configure your API keys, and run the server.
-- 🖥️ [**Dashboard Screens**](docs/SCREENS.md): An explanation of the different tabs (Advice, Positions, Analytics) and features.
+- 🛠️ [**Installation & Setup**](docs/SETUP.md): How to clone, configure your API keys, and run YaraFolio.
+- 🖥️ [**User Manual**](docs/MANUAL.md): An explanation of the different tabs (Advice, Positions, Analytics) and features.
 - 🔒 [**Demo Mode & Privacy**](docs/DEMO_MODE.md): How YaraFolio uses JSON to keep your data 100% private and sync it to a separate private repository.
 
 ---
@@ -19,7 +22,15 @@ Instead of jumping between different apps, YaraFolio acts as a single, sleek loc
 ## 🚀 Architecture
 This project uses a lightweight stack without complex build steps or heavy frameworks.
 - The Python backend utilizes the standard library (`http.server`) to serve files and handle local API endpoints.
-- The frontend is built with vanilla HTML, CSS, and JavaScript, utilizing standard ES6 `<script type="module">`. The only external library is `marked.js` (loaded via CDN) for rendering AI markdown summaries. No system fonts are fetched externally; it relies on the user's native OS fonts (Apple System, BlinkMacSystemFont, Segoe UI, Roboto).
+- The frontend is built with vanilla HTML, CSS, and JavaScript, utilizing standard ES6 `<script type="module">`.
+- **Minimum Dependency TypeScript**: Instead of compiling `.ts` files (which would require installing npm or pip packages), we use `// @ts-check` and JSDoc annotations in our vanilla JavaScript files. This gives us full TypeScript IDE intellisense and type safety while maintaining the minimum dependency architecture!
+- The only external libraries are `marked.js` (for rendering AI markdown summaries) and `Chart.js` (for rendering portfolio graphs). Both are served locally. No web fonts are fetched externally; it relies on the user's native OS sans-serif fonts (Apple System, BlinkMacSystemFont, Segoe UI, Roboto) for a clean, fast UI.
+
+### Why JSON instead of a Database?
+You might wonder why YaraFolio uses flat JSON files (`data/advice-log.json`) instead of a robust SQL database like Postgres or SQLite.
+1. **Minimum Dependencies**: You can clone this repo and run it instantly via Python without configuring Docker or databases.
+2. **Human-Readable & Editable**: If a scrape goes wrong or you need to fix a typo, you can literally open the JSON file in a text editor and change it. 
+3. **Git-Native Backups**: JSON diffs perfectly in Git. This allows for a completely decoupled backup system! Check this step in [the setup](docs/SETUP.md#configure-auto-sync-for-your-private-data-highly-recommended).
 
 ---
 
@@ -29,7 +40,7 @@ This project is driven by custom agent instructions. When you talk to the AI, it
 
 Out of the box, these instructions reflect my personal "oversold bounce" strategy. **You should absolutely tune these to your own liking.**
 
-Here is where the magic happens:
+Here is the breakdown of the available tools:
 1. **The Core Strategies**: Check out [`GEMINI.md`](GEMINI.md) and [`CLAUDE.md`](CLAUDE.md). This is where the overarching rules live (what defines a "buy", risk tolerance, sector preferences). 
 2. **The Specific Commands**: Look inside the `.gemini/skills/` and `.claude/skills/` directories. Each folder contains a `SKILL.md` file that teaches the AI how to execute a specific command. Here are the tools currently loaded:
    - `/advice`: Run the primary stock screening workflow (finds oversold stocks with bounce potential).
@@ -41,6 +52,16 @@ Here is where the magic happens:
    - `/learn`: Does a self-learning pass over past advice outcomes to suggest improvements to the strategy.
    - `/news`: Generates a quick AI management summary of the latest news for your active and watched tickers.
    - `/premarket`: Runs the advice workflow specifically using today's premarket data before the US open.
+
+---
+
+## 🧠 A Note on AI Results
+
+It is important to understand that the quality, accuracy, and depth of the stock advice generated by YaraFolio depend heavily on your specific AI setup. The results you see will vary based on:
+- **Your AI Subscription & Provider**: Free-tier models may provide shallower analysis or hallucinate more often compared to premium, state-of-the-art models (like the latest iterations of Claude Opus, Gemini Pro, or OpenAI's frontier models).
+- **The Chosen Model**: Different models have different reasoning capabilities, training cutoffs, and context windows.
+- **Your Prompts & Skill Tuning**: The AI's performance is directly tied to the quality of the instructions in your local skill files. If you find the advice lacking, consider refining the rules in `GEMINI.md` or `CLAUDE.md` to be more explicit about your exact trading strategy and risk tolerance!
+- **Your AI CLI Tool**: Whether you use Google Antigravity, Claude Code, OpenAI's Codex CLI, or any other AI CLI tool, ensure the tool is configured to properly read and execute the local `.gemini/` or `.claude/` skill instructions in this repository. Or let it transform it to that specific CLI tool's instructions.
 
 ---
 

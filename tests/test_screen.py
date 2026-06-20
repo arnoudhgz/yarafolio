@@ -4,13 +4,14 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-import screen
+import screen  # noqa: E402
 
 
 class ParseQuoteTest(unittest.TestCase):
     def parse(self, markup):
-        with patch.object(screen, "fetch_symbol", return_value=markup):
-            return screen.parse_quote("TEST")
+        with patch.object(screen.Screen, "fetch_symbol", return_value=markup):
+            app = screen.Screen()
+            return app.parse_quote("TEST")
 
     def test_regular_quote(self):
         quote = self.parse(

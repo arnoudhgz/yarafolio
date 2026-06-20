@@ -27,7 +27,7 @@ Use Opus.
 | `/check TICKER [url]` | Re-check a single pick: news, lawsuits, analyst moves, verdict (skill: `.claude/skills/check`) |
 | `/import` | Import my eToro positions (screenshot/paste) into the tracker (skill: `.claude/skills/import`) |
 | `/diversify` | Sector-gap picks: quality stocks I don't hold, in underweighted sectors (skill: `.claude/skills/diversify`) |
-| `/learn` | Self-learning pass: outcome stats, proposes skill/GEMINI.md improvements, approval-gated (skill: `.claude/skills/learn`) |
+| `/learn` | Self-learning pass: outcome stats, proposes skill/CLAUDE.md improvements, approval-gated (skill: `.claude/skills/learn`) |
 | `/article TICKER` | Max 150-word article for my eToro feed, sources max 1 day old |
 
 ## Output rules (learned, non-negotiable)
@@ -65,7 +65,7 @@ Every `/advice`, `/premarket`, and `/aftermarket` run, after the table:
 2. `python3 scripts/advice_log.py compare` for the short "vs your portfolio" footnote.
 3. Log each pick via `python3 scripts/advice_log.py add-pick ...` (upserts: re-advised tickers get a priceHistory point, not a duplicate, never hand-edit it). Picks carry sector and buyBelow/dropBelow/dropAbove tipping points from the researcher.
 4. Keep/drop check-in: `python3 scripts/advice_log.py checkin-candidates`, then one AskUserQuestion round (max 4 tickers, most urgent first): bought? still holding? drop it? Apply via `set-status` / `set-tsl`. Skip when the CLI prints no candidates.
-5. Learn nudge: if `python3 scripts/learn_stats.py --count-only` is 10+ above the latest data/private/LEARNINGS.md baseline, suggest `/learn` in one sentence (never auto-run).
+5. Learn nudge: if `python3 scripts/learn_stats.py --count-only` is 10+ above the latest LEARNINGS.md baseline, suggest `/learn` in one sentence (never auto-run).
 
 `dashboard.html` is my visual view (start with `python3 yarafolio.py`), a global search bar (ticker/name/reason/sector, filters whichever table tab is active) plus four tabs:
 - **Advice** (default): my live watchlist (watching, with a Dropped filter; anything with eToro lots moves to Positions). Sortable table with buyBelow/dropBelow/dropAbove markers (green buy zone / red drop-below / grey "missed") + Buy zone / Drop alert / Missed filters, sector cell colored vs my portfolio (red gap / orange underweight) + Sector gap / Underweight filters, rating info box. Only a Drop button (buying happens in eToro and arrives via the import). Row click opens a drill-down modal: full thesis + risk + dated notes + per-lot breakdown + a price chart with buy/drop reference lines.
@@ -77,6 +77,6 @@ The Advice tab shows advised picks only; imported-only holdings live on Portfoli
 
 ## Auto-backup to the private repo
 
-The data lives in a private GitHub repo (`assisted-stock-advice`); `scripts/autosync.py` commits + pushes the data + generated files (`data/private/*.json`, `data/private/LEARNINGS.md`, never code) on every change. It runs from yarafolio.py after each dashboard save/import/refresh (background, best-effort) and as the last step of `/advice`, `/premarket`, `/aftermarket`, `/check`, `/diversify`, `/import`, `/learn`.
+The data lives in a private GitHub repo (`assisted-stock-advice`); `scripts/autosync.py` commits + pushes the data + generated files (`data/*.json`, `LEARNINGS.md`, never code) on every change. It runs from yarafolio.py after each dashboard save/import/refresh (background, best-effort) and as the last step of `/advice`, `/premarket`, `/aftermarket`, `/check`, `/diversify`, `/import`, `/learn`.
 
 **On by default**, via the project-local `.env` file (`STOCKS_AUTOSYNC=1`), which is gitignored so it stays out of the repo and a fresh clone is off. The `STOCKS_AUTOSYNC` env var **overrides** the file: set `STOCKS_AUTOSYNC=0` to force it off, which is exactly what dev/testing must do before running yarafolio.py or the scripts so test data never gets pushed. Best-effort: if the push fails (offline), the data is still committed locally and the next sync catches up. Code/skill changes are committed by hand, not by autosync.
