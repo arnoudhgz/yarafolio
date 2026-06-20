@@ -10,7 +10,7 @@
 </head>
 <body>
   <h1 style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
-    <img src="static/img/yara-logo.png" alt="Yara" style="width: 48px; height: 48px; border-radius: 50%;">
+    <img src="static/img/yara-logo.png" alt="Yara" style="width: 48px; height: 48px; border-radius: 50%; cursor: pointer;" onclick="document.getElementById('yaraModal').hidden=false" title="Click to see Yara!">
     YaraFolio
   </h1>
   <div class="header-row">
@@ -438,5 +438,11 @@
 <script src="static/js/vendor/marked.min.js"></script>
 <script type="module" src="static/js/main.js"></script>
 
+  <div id="yaraModal" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="width: auto; height: auto; padding: 24px; background: transparent; border: none; box-shadow: none; display: flex; flex-direction: column; align-items: center;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('yaraModal').hidden=true" aria-label="Close" style="background: var(--card); border-radius: 50%; width: 32px; height: 32px; right: 0; top: 0;">&times;</button>
+      <img src="static/img/yara-logo-large.png" alt="Yara (Princess)" style="width: min(600px, 90vw); height: auto; border-radius: 50%; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+    </div>
+  </div>
 </body>
 </html>
