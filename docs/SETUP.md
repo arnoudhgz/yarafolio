@@ -3,11 +3,13 @@
 ### Prerequisites
 Before you begin, ensure that your system has **Python 3** installed. You can check this by running `python3 --version` in your terminal. All background tasks and local API endpoints rely on Python.
 
-1. **Clone the repository**:
-   ```bash
-   git clone git@github.com:arnoudhgz/assisted-stock-advice.git
-   cd assisted-stock-advice
-   ```
+1. **Clone or Fork the repository**:
+   - **To just check it out:** Clone my repository directly to test it in demo mode.
+     ```bash
+     git clone git@github.com:arnoudhgz/assisted-stock-advice.git
+     cd assisted-stock-advice
+     ```
+   - **To really use it:** Click the **Fork** button on GitHub first to create your own copy of the repository. Then clone your forked version so you can customize the AI instructions (`GEMINI.md`, `CLAUDE.md`) to fit your own trading style!
 
 2. **Set up your environment variables (eToro API)**:
    Create a `.env` file in the root of the project. Copy the `.env.sample` to get started:
