@@ -322,11 +322,20 @@ const adviceClickHandler = (ev) => {
     if (resRef.demo || resImp.demo) {
       banner('Simulated sync (Demo Mode)', 'success');
     } else {
-      if (resRef.ok) msgs.push('Quotes updated (' + (resRef.refreshed || 0) + ')');
+      if (resRef.ok) msgs.push('Advised quotes updated (' + (resRef.refreshed || 0) + ')');
       else errs.push('Quotes: ' + (resRef.error || 'Failed'));
       
-      if (resImp.ok) msgs.push('eToro synced');
-      else errs.push('eToro: ' + (resImp.error || 'Failed'));
+      if (resImp.ok) {
+        let eMsg = 'synced';
+        if (typeof resImp.merge === 'string') {
+          const lines = resImp.merge.split('\n');
+          const mergeLine = lines.find(l => l.startsWith('Merged:'));
+          if (mergeLine) eMsg = mergeLine.replace('Merged: ', '').trim();
+        }
+        msgs.push('eToro: ' + eMsg);
+      } else {
+        errs.push('eToro: ' + (resImp.error || 'Failed'));
+      }
       
       if (errs.length) {
         banner('Sync issues: ' + errs.join(' | '));

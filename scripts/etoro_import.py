@@ -375,9 +375,15 @@ class EtoroImport:
 
         data["lastUpdated"] = today
         self.atomic_write(self.log_file, data)
-        logger.info(f"Merged: {added} new, {merged} updated, {backfilled} sectors backfilled, "
-              f"{closed_lots} advice lot(s) auto-closed (estimated, confirm). "
-              f"Total tracked: {len(data['entries'])}")
+        
+        parts = []
+        if added: parts.append(f"{added} new")
+        if merged: parts.append(f"{merged} updated")
+        if backfilled: parts.append(f"{backfilled} sectors backfilled")
+        if closed_lots: parts.append(f"{closed_lots} auto-closed")
+        
+        summary = ", ".join(parts) if parts else "0 changes"
+        logger.info(f"Merged: {summary}")
 
 
 def main():
