@@ -31,6 +31,39 @@ Once you start closing positions (or after 7 days have passed), this tab analyze
 - Sector
 - Source (Advice vs Diversify)
 
+## 5. EOD Reports Tab
+![EOD Reports Tab Screenshot](images/eod_reports_tab.png)
+
+A dedicated section for End-of-Day evaluations.
+- Summarizes advice on when to close low-conviction picks before the market gap overnight.
+
+## 6. AI News Tab
+![AI News Tab Screenshot](images/ai_news_tab.png)
+
+A hub for AI-generated summaries.
+- Quickly reads through major news events affecting your portfolio.
+- Helps you spot fundamental red flags or catalysts instantly.
+
+## 7. News Feed Tab
+![News Feed Tab Screenshot](images/news_feed_tab.png)
+
+The raw data behind the AI summaries.
+- Displays a live, unedited stream of headlines related to your tracked stocks directly from sources like Yahoo Finance.
+- Fully filterable by your Advised picks or eToro holdings.
+
+## 8. Macro Calendar Tab
+![Macro Calendar Tab Screenshot](images/macro_calendar_tab.png)
+
+Keeps you informed of large-scale market events.
+- Tracks major USD/EUR announcements (like CPI releases or Fed meetings) that could increase market volatility.
+
+## 9. IPO Tracker Tab
+![IPO Tracker Tab Screenshot](images/ipo_tracker_tab.png)
+
+Monitors newly listed and upcoming initial public offerings.
+- Helps identify fresh market opportunities before they hit the mainstream.
+
 ## Features Available on Every Screen
+- **Global Search:** Type any ticker or name to instantly filter the current view.
 - **Live Market Timers**: A built-in countdown clock synced exactly to the New York Stock Exchange (NYSE) trading hours, tracking the Pre-Market, Open Session, and After-Hours.
 - **Location Switcher**: A dropdown menu allowing you to swap between your Home or Office eToro API keys on the fly.
