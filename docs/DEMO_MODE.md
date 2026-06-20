@@ -1,10 +1,4 @@
-# 🏗️ Architecture & Privacy (Why JSON?)
-
-You might wonder why YaraFolio uses flat JSON files (`data/advice-log.json`) instead of a robust SQL database like Postgres or SQLite. 
-
-1. **Minimum Dependencies**: You can clone this repo and run it instantly via Python without running `npm install` or configuring Docker/databases. (Note: While it requires no heavy package installs, the dashboard does act as an aggregator, pulling live data from external APIs like eToro and Yahoo Finance).
-2. **Human-Readable & Editable**: If a scrape goes wrong or you need to fix a typo, you can literally open the JSON file in a text editor and change it. 
-3. **Git-Native Backups**: JSON diffs perfectly in Git. This allows for a completely decoupled backup system!
+# 🔒 Privacy & Demo Mode
 
 ## 🔒 Keeping Your Data Private & Demo Mode
 

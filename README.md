@@ -26,6 +26,12 @@ This project uses a lightweight stack without complex build steps or heavy frame
 - **Minimum Dependency TypeScript**: Instead of compiling `.ts` files (which would require installing npm or pip packages), we use `// @ts-check` and JSDoc annotations in our vanilla JavaScript files. This gives us full TypeScript IDE intellisense and type safety while maintaining the minimum dependency architecture!
 - The only external libraries are `marked.js` (for rendering AI markdown summaries) and `Chart.js` (for rendering portfolio graphs). Both are served locally. No web fonts are fetched externally; it relies on the user's native OS sans-serif fonts (Apple System, BlinkMacSystemFont, Segoe UI, Roboto) for a clean, fast UI.
 
+### Why JSON instead of a Database?
+You might wonder why YaraFolio uses flat JSON files (`data/advice-log.json`) instead of a robust SQL database like Postgres or SQLite.
+1. **Minimum Dependencies**: You can clone this repo and run it instantly via Python without configuring Docker or databases.
+2. **Human-Readable & Editable**: If a scrape goes wrong or you need to fix a typo, you can literally open the JSON file in a text editor and change it. 
+3. **Git-Native Backups**: JSON diffs perfectly in Git. This allows for a completely decoupled backup system!
+
 ---
 
 ## 🤖 The AI "Skills" (And How to Tune Them)
