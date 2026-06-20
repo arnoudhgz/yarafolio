@@ -20,7 +20,7 @@ async function load() {
     if (canSave) {
       fetch('/api/locations').then(r => r.json()).then(data => {
         if (data.prefixes && data.prefixes.length > 0) {
-          const sel = /** @type {HTMLElement} */ (document.getElementById('locationSelect'));
+          const sel = /** @type {HTMLSelectElement} */ (document.getElementById('locationSelect'));
           sel.innerHTML = data.prefixes.map(p => '<option value="' + esc(p) + '">' + esc(p) + '</option>').join('');
           sel.style.display = 'block';
           
@@ -46,7 +46,7 @@ async function load() {
   const savedTab = localStorage.getItem('activeTab');
   if (savedTab && savedTab !== 'advice') {
     const tabBtn = document.querySelector(`.tabs button[data-tab="${savedTab}"]`);
-    if (tabBtn) tabBtn.click();
+    if (tabBtn instanceof HTMLElement) tabBtn.click();
   }
 
   // Background check for near-term IPOs to update the tab dot
@@ -70,26 +70,27 @@ setPortfolioViewMode('collapsed');
 });
 
 /** @type {HTMLElement} */ (document.getElementById('macroModal')).addEventListener('click', e => {
-  if (e.target.id === 'macroModal') /** @type {HTMLElement} */ (document.getElementById('macroModal')).hidden = true;
+  if (/** @type {HTMLElement} */ (e.target).id === 'macroModal') /** @type {HTMLElement} */ (document.getElementById('macroModal')).hidden = true;
 });
 
 document.querySelectorAll('.tabs button').forEach(b => {
   b.addEventListener('click', () => {
-    localStorage.setItem('activeTab', b.dataset.tab);
+    localStorage.setItem('activeTab', /** @type {HTMLButtonElement} */ (b).dataset.tab);
     document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.tab-section').forEach(x => x.style.display = 'none');
+    document.querySelectorAll('.tab-section').forEach(x => { /** @type {HTMLElement} */ (x).style.display = 'none'; });
     b.classList.add('active');
-    document.getElementById('tab-' + b.dataset.tab).style.display = 'block';
+    document.getElementById('tab-' + /** @type {HTMLButtonElement} */ (b).dataset.tab).style.display = 'block';
 
-    if (b.dataset.tab === 'macro' && /** @type {HTMLElement} */ (document.getElementById('macroList')).innerHTML === '') {
+    if ((/** @type {HTMLButtonElement} */ (b)).dataset.tab === 'macro' && /** @type {HTMLElement} */ (document.getElementById('macroList')).innerHTML === '') {
       fetchMacro();
     }
-    if (b.dataset.tab === 'ipos' && /** @type {HTMLElement} */ (document.getElementById('iposBody')).innerHTML === '') {
+    if ((/** @type {HTMLButtonElement} */ (b)).dataset.tab === 'ipos' && /** @type {HTMLElement} */ (document.getElementById('iposBody')).innerHTML === '') {
       fetchIpos();
     }
-    const searchable = b.dataset.tab === 'advice' || b.dataset.tab === 'archive' || b.dataset.tab === 'positions' || b.dataset.tab === 'portfolio';
-    /** @type {HTMLElement} */ (document.getElementById('search')).disabled = !searchable;
-    setActiveTab(b.dataset.tab);
+    const _tab = (/** @type {HTMLButtonElement} */ (b)).dataset.tab;
+    const searchable = _tab === 'advice' || _tab === 'archive' || _tab === 'positions' || _tab === 'portfolio';
+    /** @type {HTMLInputElement} */ (document.getElementById('search')).disabled = !searchable;
+    setActiveTab(_tab);
     if (activeTab === 'advice') renderTable();
     else if (activeTab === 'archive') renderArchive();
     else if (activeTab === 'positions') renderPositions();
@@ -98,14 +99,14 @@ document.querySelectorAll('.tabs button').forEach(b => {
     else if (activeTab === 'news') renderAINews();
     else /** @type {HTMLElement} */ (document.getElementById('searchCount')).textContent = '';
     if (activeTab === 'analytics') { loadLearn().then(renderAnalytics); }
-    if (activeTab === 'rawnews' && !window.rawNewsLoaded) {
+      if (activeTab === 'rawnews' && !/** @type {any} */ (window).rawNewsLoaded) {
       /** @type {HTMLElement} */ (document.getElementById('refreshRawNewsBtn')).click();
     }
   });
 });
 
-/** @type {HTMLElement} */ (document.getElementById('refreshRawNewsBtn')).addEventListener('click', async () => {
-  const btn = /** @type {HTMLElement} */ (document.getElementById('refreshRawNewsBtn'));
+/** @type {HTMLButtonElement} */ (document.getElementById('refreshRawNewsBtn')).addEventListener('click', async () => {
+  const btn = /** @type {HTMLButtonElement} */ (document.getElementById('refreshRawNewsBtn'));
   const loading = /** @type {HTMLElement} */ (document.getElementById('newsLoading'));
   const content = /** @type {HTMLElement} */ (document.getElementById('newsContent'));
   btn.disabled = true;
@@ -129,7 +130,7 @@ document.querySelectorAll('.tabs button').forEach(b => {
       }
     }
     
-    allNews.sort((a, b) => b.dateObj - a.dateObj);
+    allNews.sort((a, b) => b.dateObj.getTime() - a.dateObj.getTime());
     
     const twoDaysAgo = new Date();
     twoDaysAgo.setHours(twoDaysAgo.getHours() - 48);
@@ -163,9 +164,9 @@ document.querySelectorAll('.tabs button').forEach(b => {
     const activeBtn = /** @type {HTMLElement} */ (document.querySelector('#rawNewsFilters button.active'));
     if (activeBtn) activeBtn.click();
     
-    window.rawNewsLoaded = true;
+    /** @type {any} */ (window).rawNewsLoaded = true;
   } catch (err) {
-    banner('Failed to load news: ' + err.message);
+    banner('Failed to load news: ' + (err instanceof Error ? err.message : String(err)));
   } finally {
     btn.disabled = false;
     loading.style.display = 'none';
@@ -180,8 +181,9 @@ function headerSortHandler(tableId, stateKey, render) {
     const th = /** @type {HTMLElement} */ (ev.target).closest('th[data-key]');
     if (!th) return;
     const state = sortState[stateKey];
-    if (state.key === th.dataset.key) state.dir = -state.dir;
-    else { state.key = th.dataset.key; state.dir = -1; }
+    const key = th.getAttribute('data-key');
+    if (state.key === key) state.dir = -state.dir;
+    else { state.key = key; state.dir = -1; }
     render();
   });
 }
@@ -196,7 +198,7 @@ const adviceClickHandler = (ev) => {
     // ticker link goes to eToro; anything else on the row opens the drill-down
     if (/** @type {HTMLElement} */ (ev.target).closest('a')) return;
     const row = /** @type {HTMLElement} */ (ev.target).closest('tr[data-id]');
-    if (row) openModal(row.dataset.id);
+    if (row) openModal((/** @type {HTMLElement} */ (row)).dataset.id);
     return;
   }
   if (btn.dataset.act === 'drop') {
@@ -240,10 +242,11 @@ const adviceClickHandler = (ev) => {
   btn.classList.add('active');
   const filter = btn.dataset.newsfilter;
   document.querySelectorAll('.news-card').forEach(card => {
-    if (filter === 'all') card.style.display = 'block';
-    else if (filter === 'advised' && card.dataset.status === 'watching') card.style.display = 'block';
-    else if (filter === 'etoro' && card.dataset.status === 'bought') card.style.display = 'block';
-    else card.style.display = 'none';
+    const cardEl = /** @type {HTMLElement} */ (card);
+    if (filter === 'all') cardEl.style.display = 'block';
+    else if (filter === 'advised' && cardEl.dataset.status === 'watching') cardEl.style.display = 'block';
+    else if (filter === 'etoro' && cardEl.dataset.status === 'bought') cardEl.style.display = 'block';
+    else cardEl.style.display = 'none';
   });
 });
 
@@ -254,12 +257,13 @@ const adviceClickHandler = (ev) => {
   btn.classList.add('active');
   const filter = btn.dataset.ipofilter;
   document.querySelectorAll('#iposBody tr').forEach(tr => {
-    if (tr.children.length === 1) return; // header row
-    const st = tr.getAttribute('data-ipostatus');
+    const row = /** @type {HTMLElement} */ (tr);
+    if (row.children.length === 1) return; // header row
+    const st = row.getAttribute('data-ipostatus');
     let show = true;
     if (filter === 'listed') show = (st !== 'dropped');
     if (filter === 'dropped') show = (st === 'dropped');
-    tr.style.display = show ? '' : 'none';
+    row.style.display = show ? '' : 'none';
   });
 });
 
@@ -267,8 +271,11 @@ const adviceClickHandler = (ev) => {
   const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
   if (!btn) {
     if (/** @type {HTMLElement} */ (ev.target).closest('input, a')) return;
-    const row = /** @type {HTMLElement} */ (ev.target).closest('tr[data-id]');
-    if (row) openModal(row.dataset.id);
+    const rowEl = /** @type {HTMLElement} */ (ev.target).closest('tr[data-id]');
+    if (rowEl) {
+      const row = /** @type {HTMLElement} */ (rowEl);
+      openModal(row.dataset.id);
+    }
     return;
   }
   const cell = /** @type {HTMLElement} */ (btn.closest('td'));
@@ -295,7 +302,7 @@ const adviceClickHandler = (ev) => {
 
 /** @type {HTMLElement} */ (document.getElementById('syncBtn')).addEventListener('click', async () => {
   const btn = /** @type {HTMLElement} */ (document.getElementById('syncBtn'));
-  const sel = /** @type {HTMLElement} */ (document.getElementById('locationSelect'));
+  const sel = /** @type {HTMLSelectElement} */ (document.getElementById('locationSelect'));
   const location = sel.style.display !== 'none' ? sel.value : "";
   const label = btn.textContent;
   btn.textContent = 'Syncing...';
@@ -311,21 +318,28 @@ const adviceClickHandler = (ev) => {
     const [resRef, resImp] = await Promise.all([pRef, pImp]);
     
     let msgs = [];
+    let errs = [];
     if (resRef.demo || resImp.demo) {
       banner('Simulated sync (Demo Mode)', 'success');
     } else {
       if (resRef.ok) msgs.push('Quotes updated (' + (resRef.refreshed || 0) + ')');
-      if (resImp.ok) msgs.push('eToro synced');
+      else errs.push('Quotes: ' + (resRef.error || 'Failed'));
       
-      if (msgs.length) {
+      if (resImp.ok) msgs.push('eToro synced');
+      else errs.push('eToro: ' + (resImp.error || 'Failed'));
+      
+      if (errs.length) {
+        banner('Sync issues: ' + errs.join(' | '));
+      } else if (msgs.length) {
         banner(msgs.join(' & ') + '!', 'success');
       } else {
-        banner('Sync failed: Check serve.py logs for details.');
+        banner('Sync finished with no changes.');
       }
     }
     await load();
   } catch (err) {
-    banner('Sync failed (' + err.message + '). Is serve.py still running?');
+    const message = err instanceof Error ? err.message : String(err);
+    banner('Sync failed (' + message + '). Is serve.py still running?');
   } finally {
     btn.textContent = label;
     document.body.classList.remove('syncing');
@@ -335,7 +349,7 @@ const adviceClickHandler = (ev) => {
 /** @type {HTMLElement} */ (document.getElementById('search')).addEventListener('input', (ev) => {
   clearTimeout(searchTimer);
   setSearchTimer(setTimeout(() => {
-    setSearchQuery(ev.target.value.trim().toLowerCase());
+    setSearchQuery((/** @type {HTMLInputElement} */ (ev.target)).value.trim().toLowerCase());
     if (activeTab === 'advice') renderTable();
     else if (activeTab === 'positions') renderPositions();
     else if (activeTab === 'portfolio') renderPortfolioTable();
@@ -349,11 +363,11 @@ modalEl.addEventListener('click', (ev) => {
 document.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape') {
     if (!modalEl.hidden) closeModal();
-    document.querySelectorAll('.modal-backdrop:not([hidden])').forEach(m => m.hidden = true);
+    document.querySelectorAll('.modal-backdrop:not([hidden])').forEach(m => /** @type {HTMLElement} */ (m).hidden = true);
   }
 });
 document.addEventListener('click', (ev) => {
-  if (ev.target.classList.contains('modal-backdrop')) {
+  if (ev.target instanceof HTMLElement && ev.target.classList.contains('modal-backdrop')) {
     ev.target.hidden = true;
   }
 });

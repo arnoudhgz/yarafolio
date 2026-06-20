@@ -91,6 +91,7 @@ class EtoroImport:
         return creds
 
     def get(self, path, creds):
+        import urllib.error
         req = urllib.request.Request(BASE + path, headers={
             "x-api-key": creds["ETORO_API_KEY"],
             "x-user-key": creds["ETORO_USER_KEY"],
@@ -98,8 +99,14 @@ class EtoroImport:
             "Accept": "application/json",
             "User-Agent": "curl/8.7.1",
         })
-        with urllib.request.urlopen(req, timeout=30) as res:
-            return json.loads(res.read())
+        try:
+            with urllib.request.urlopen(req, timeout=30) as res:
+                return json.loads(res.read())
+        except urllib.error.HTTPError as exc:
+            if exc.code in (401, 403):
+                sys.exit(f"eToro Authentication Failed ({exc.code}): Please check your ETORO_API_KEY and ETORO_USER_KEY in .env")
+            else:
+                sys.exit(f"eToro API Error ({exc.code}): {exc.reason}")
 
     def chunked(self, items, size=50):
         for i in range(0, len(items), size):
