@@ -4,10 +4,8 @@ Welcome to **YaraFolio**! I built this because I needed a comprehensive tool whe
 
 Instead of jumping between different apps, YaraFolio acts as a single local dashboard that syncs your eToro trades and organizes your AI-assisted stock research.
 
-> **🐱 What is a "Yara"?**
+> **What is a "Yara"?**
 > When thinking of a name for this project, I looked around and Yara was looking at me with her big eyes. As she is my princess, the name was easily found. Yara is my cat! 🐾
-
-> **Note:** Out of the box, the AI strategies and algorithms here are tuned to my personal preference: hunting for **oversold opportunities** and catching bounces. If you have a different trading style, you can easily change this!
 
 ---
 
