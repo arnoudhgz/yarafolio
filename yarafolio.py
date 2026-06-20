@@ -338,8 +338,6 @@ class Handler(SimpleHTTPRequestHandler):
     def handle_stats(self):
         try:
             cmd = [sys.executable, LEARN_SCRIPT, "--json"]
-            if is_demo:
-                cmd.append("--sample")
             proc = subprocess.run(
                 cmd,
                 capture_output=True,
