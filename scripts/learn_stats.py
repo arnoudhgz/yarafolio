@@ -29,16 +29,19 @@ logger.setLevel(logging.INFO)
 logger.handlers = []
 
 fh = logging.FileHandler(os.path.join(ROOT, "logs", "app.log"))
-fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+fh.setFormatter(logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 logger.addHandler(fh)
 
 ch = logging.StreamHandler(sys.stdout)
 ch.setFormatter(logging.Formatter('%(message)s'))
 logger.addHandler(ch)
 
+
 def get_env(key):
     v = os.environ.get(key)
-    if v is not None: return v
+    if v is not None:
+        return v
     try:
         with open(os.path.join(ROOT, ".env")) as f:
             for line in f:
@@ -49,8 +52,10 @@ def get_env(key):
         pass
     return None
 
+
 class LearnStats:
-    RSI_BANDS = (("<20", 0, 20), ("20-25", 20, 25), ("25-30", 25, 30), ("30+", 30, 10 ** 6))
+    RSI_BANDS = (("<20", 0, 20), ("20-25", 20, 25),
+                 ("25-30", 25, 30), ("30+", 30, 10 ** 6))
     MIN_BUCKET = 1
 
     def __init__(self):
@@ -71,15 +76,21 @@ class LearnStats:
         latest = self.latest_price(e)
         status = e["status"]
         if status == "sold" and e.get("boughtAt") and e.get("soldAt"):
-            return "realized", (e["soldAt"] - e["boughtAt"]) / e["boughtAt"] * 100, True
+            return "realized", (e["soldAt"] - e["boughtAt"]
+                                ) / e["boughtAt"] * 100, True
         if status == "bought" and e.get("boughtAt") and latest is not None:
             age = (today - self.parse_date(e["firstAdvised"])).days
-            return "unrealized", (latest - e["boughtAt"]) / e["boughtAt"] * 100, age >= 7
-        if status == "dropped" and e.get("priceAtAdvice") and latest is not None:
+            return "unrealized", (latest -
+                                  e["boughtAt"]) / e["boughtAt"] * 100, age >= 7
+        if status == "dropped" and e.get(
+                "priceAtAdvice") and latest is not None:
             # negative pct after a drop means dropping was right
-            return "post-drop", (latest - e["priceAtAdvice"]) / e["priceAtAdvice"] * 100, True
-        if status == "watching" and e.get("priceAtAdvice") and latest is not None:
-            return "watching", (latest - e["priceAtAdvice"]) / e["priceAtAdvice"] * 100, False
+            return "post-drop", (latest - e["priceAtAdvice"]) / \
+                e["priceAtAdvice"] * 100, True
+        if status == "watching" and e.get(
+                "priceAtAdvice") and latest is not None:
+            return "watching", (latest - e["priceAtAdvice"]) / \
+                e["priceAtAdvice"] * 100, False
         return None, None, False
 
     def rsi_band(self, rsi):
@@ -153,26 +164,36 @@ class LearnStats:
             for name, key in dims.items()
         }
 
-        seven = [p for p in (self.seven_day_pct(e) for e in advised) if p is not None]
+        seven = [p for p in (self.seven_day_pct(e)
+                             for e in advised) if p is not None]
         return {
             "advisedEntries": len(advised),
             "measurableOutcomes": len(measurable),
-            "watchingNow": sum(1 for e, k, _, _ in all_outcomes if k == "watching"),
+            "watchingNow": sum(
+                1 for e,
+                k,
+                _,
+                _ in all_outcomes if k == "watching"),
             "buckets": buckets,
             "sevenDayAfterAdvice": {
                 "n": len(seven),
-                "avg": round(statistics.mean(seven), 2) if seven else None,
-                "median": round(statistics.median(seven), 2) if seven else None,
+                "avg": round(
+                    statistics.mean(seven),
+                    2) if seven else None,
+                "median": round(
+                    statistics.median(seven),
+                    2) if seven else None,
             },
         }
 
     def print_human(self, stats):
         logger.info(f"Advised entries: {stats['advisedEntries']} "
-              f"(measurable outcomes: {stats['measurableOutcomes']}, "
-              f"watching: {stats['watchingNow']})")
+                    f"(measurable outcomes: {stats['measurableOutcomes']}, "
+                    f"watching: {stats['watchingNow']})")
         sd = stats["sevenDayAfterAdvice"]
         if sd["n"]:
-            logger.info(f"~7 days after advice: avg {sd['avg']:+.2f}%, median {sd['median']:+.2f}% (n={sd['n']})")
+            logger.info(
+                f"~7 days after advice: avg {sd['avg']:+.2f}%, median {sd['median']:+.2f}% (n={sd['n']})")
         for name, buckets in stats["buckets"].items():
             if not buckets:
                 continue
@@ -181,19 +202,22 @@ class LearnStats:
                 if s.get("insufficient"):
                     logger.info(f"  {key:16} n={s['n']}  insufficient data")
                 else:
-                    logger.info(f"  {key:16} n={s['n']:<3} win {s['winRate']:5.1f}%  "
-                          f"avg {s['avg']:+7.2f}%  median {s['median']:+7.2f}%")
+                    logger.info(
+                        f"  {key:16} n={s['n']:<3} win {s['winRate']:5.1f}%  "
+                        f"avg {s['avg']:+7.2f}%  median {s['median']:+7.2f}%")
+
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--count-only", action="store_true")
     args = parser.parse_args()
-    
+
     ls = LearnStats()
     stats = ls.collect()
-    
+
     if args.count_only:
         logger.info(str(stats["measurableOutcomes"]))
     elif args.json:
@@ -201,6 +225,6 @@ def main():
     else:
         ls.print_human(stats)
 
+
 if __name__ == "__main__":
     main()
-

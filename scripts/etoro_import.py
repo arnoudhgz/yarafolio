@@ -13,7 +13,6 @@ merge also writes data/portfolio.json, the full holdings snapshot for the dashbo
 import json
 import os
 import sys
-import urllib.request
 import uuid
 import logging
 from datetime import date
@@ -27,16 +26,19 @@ logger.setLevel(logging.INFO)
 logger.handlers = []
 
 fh = logging.FileHandler(os.path.join(ROOT, "logs", "app.log"))
-fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+fh.setFormatter(logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 logger.addHandler(fh)
 
 ch = logging.StreamHandler(sys.stdout)
 ch.setFormatter(logging.Formatter('%(message)s'))
 logger.addHandler(ch)
 
+
 def get_env(key):
     v = os.environ.get(key)
-    if v is not None: return v
+    if v is not None:
+        return v
     try:
         with open(os.path.join(ROOT, ".env")) as f:
             for line in f:
@@ -52,10 +54,13 @@ class EtoroImport:
     def __init__(self):
         is_demo = get_env("DEMO_MODE") == "1"
         self.subdir = "sample" if is_demo else "private"
-        self.log_file = os.path.join(ROOT, "data", self.subdir, "advice-log.json")
-        self.portfolio_file = os.path.join(ROOT, "data", self.subdir, "portfolio.json")
+        self.log_file = os.path.join(
+            ROOT, "data", self.subdir, "advice-log.json")
+        self.portfolio_file = os.path.join(
+            ROOT, "data", self.subdir, "portfolio.json")
         self.instruments_cache = os.path.join(ROOT, "data", "instruments.json")
-        self.preview_file = os.path.join(ROOT, "tmp", "etoro-import-preview.json")
+        self.preview_file = os.path.join(
+            ROOT, "tmp", "etoro-import-preview.json")
 
     def credentials(self):
         creds = {}
@@ -70,13 +75,14 @@ class EtoroImport:
                     key = key.removeprefix("export ").strip()
                     creds[key] = value.strip().strip("\"'")
         except OSError as exc:
-            raise RuntimeError(f"Cannot read project environment file {env_file}: {exc}") from exc
+            raise RuntimeError(
+                f"Cannot read project environment file {env_file}: {exc}") from exc
 
         suffix = os.environ.get("ETORO_SUFFIX", "")
-        
+
         if "ETORO_API_KEY" in os.environ:
             creds["ETORO_API_KEY"] = os.environ["ETORO_API_KEY"]
-            
+
         user_key_name = f"ETORO_USER_KEY_{suffix}" if suffix else "ETORO_USER_KEY"
         if user_key_name in os.environ:
             creds["ETORO_USER_KEY"] = os.environ[user_key_name]
@@ -87,7 +93,7 @@ class EtoroImport:
             raise RuntimeError(f"Missing ETORO_API_KEY in {env_file}")
         if not creds.get("ETORO_USER_KEY"):
             raise RuntimeError(f"Missing {user_key_name} in {env_file}")
-                
+
         return creds
 
     def get(self, path, creds):
@@ -104,7 +110,8 @@ class EtoroImport:
                 return json.loads(res.read())
         except urllib.error.HTTPError as exc:
             if exc.code in (401, 403):
-                sys.exit(f"eToro Authentication Failed ({exc.code}): Please check your ETORO_API_KEY and ETORO_USER_KEY in .env")
+                sys.exit(
+                    f"eToro Authentication Failed ({exc.code}): Please check your ETORO_API_KEY and ETORO_USER_KEY in .env")
             else:
                 sys.exit(f"eToro API Error ({exc.code}): {exc.reason}")
 
@@ -122,10 +129,13 @@ class EtoroImport:
 
     def fetch_industries(self, creds):
         try:
-            rows = self.get("/market-data/stocks-industries", creds)["stocksIndustries"]
+            rows = self.get(
+                "/market-data/stocks-industries",
+                creds)["stocksIndustries"]
             return {r["industryID"]: r["industryName"] for r in rows}
         except Exception as exc:
-            logger.warning(f"warning: industries fetch failed ({exc}), sectors left unknown")
+            logger.warning(
+                f"warning: industries fetch failed ({exc}), sectors left unknown")
             return None
 
     def sector_for(self, meta_record, industries):
@@ -133,7 +143,9 @@ class EtoroImport:
             return None
         if meta_record.get("instrumentTypeID") != 5:
             return "ETF / Other"
-        return industries.get(meta_record.get("stocksIndustryID"), "ETF / Other")
+        return industries.get(
+            meta_record.get("stocksIndustryID"),
+            "ETF / Other")
 
     def fetch_preview(self):
         creds = self.credentials()
@@ -149,9 +161,13 @@ class EtoroImport:
         meta, rates = {}, {}
         for chunk in self.chunked(ids):
             param = ",".join(map(str, chunk))
-            for m in self.get(f"/market-data/instruments?instrumentIds={param}", creds)["instrumentDisplayDatas"]:
+            for m in self.get(
+                f"/market-data/instruments?instrumentIds={param}",
+                    creds)["instrumentDisplayDatas"]:
                 meta[m["instrumentID"]] = m
-            for r in self.get(f"/market-data/instruments/rates?instrumentIds={param}", creds)["rates"]:
+            for r in self.get(
+                f"/market-data/instruments/rates?instrumentIds={param}",
+                    creds)["rates"]:
                 rates[r["instrumentID"]] = r
 
         entries = []
@@ -164,8 +180,11 @@ class EtoroImport:
             m = meta.get(iid, {})
             rate = rates.get(iid, {})
             current = rate.get("lastExecution") or rate.get("bid")
-            pl_dollar = round(units * current - invested, 2) if current else None
-            pl_pct = round(pl_dollar / invested * 100, 2) if pl_dollar is not None and invested else None
+            pl_dollar = round(
+                units * current - invested,
+                2) if current else None
+            pl_pct = round(pl_dollar / invested * 100,
+                           2) if pl_dollar is not None and invested else None
             entries.append({
                 "ticker": m.get("symbolFull", f"ID{iid}"),
                 "name": m.get("instrumentDisplayName", ""),
@@ -206,7 +225,7 @@ class EtoroImport:
         self.atomic_write(self.instruments_cache, cache)
 
         logger.info(f"{len(entries)} instruments, {len(positions)} positions, "
-              f"${sum(e['invested'] for e in entries):,.2f} invested")
+                    f"${sum(e['invested'] for e in entries):,.2f} invested")
         logger.info(f"Preview written to {self.preview_file}")
 
     def write_portfolio(self, preview, today):
@@ -235,22 +254,27 @@ class EtoroImport:
             live[lot["positionID"]] = lot
         current = item.get("currentPrice") if item else None
         lots = entry.setdefault("lots", [])
-        have = {l["positionID"]: l for l in lots}
+        have = {lot["positionID"]: lot for lot in lots}
         for pid, lot in live.items():
             if pid not in have:
-                lots.append({"positionID": pid, "openDate": lot["openDate"], "openRate": lot["openRate"],
-                             "units": lot["units"], "lastPrice": current or lot["openRate"],
-                             "tslEnabled": bool(lot.get("tslEnabled")), "soldAt": None, "exitEstimated": False})
+                lots.append({"positionID": pid,
+                             "openDate": lot["openDate"],
+                             "openRate": lot["openRate"],
+                             "units": lot["units"],
+                             "lastPrice": current or lot["openRate"],
+                             "tslEnabled": bool(lot.get("tslEnabled")),
+                             "soldAt": None,
+                             "exitEstimated": False})
             elif have[pid].get("soldAt") is None:
                 have[pid]["tslEnabled"] = bool(lot.get("tslEnabled"))
                 if current:
                     have[pid]["lastPrice"] = current
         closed = 0
-        for l in lots:
-            if l.get("soldAt") is None and l["positionID"] not in live:
-                l["soldAt"] = l.get("lastPrice") or l["openRate"]
-                l["exitEstimated"] = True
-                l["closedDate"] = today
+        for lot in lots:
+            if lot.get("soldAt") is None and lot["positionID"] not in live:
+                lot["soldAt"] = lot.get("lastPrice") or lot["openRate"]
+                lot["exitEstimated"] = True
+                lot["closedDate"] = today
                 closed += 1
         if closed:
             entry.setdefault("notes", []).append({
@@ -263,34 +287,36 @@ class EtoroImport:
 
     def rollup_entry(self, entry, current_price):
         lots = entry["lots"]
-        open_lots = [l for l in lots if l.get("soldAt") is None]
-        total_units = sum(l["units"] for l in lots) or 1
-        entry["boughtAt"] = round(sum(l["openRate"] * l["units"] for l in lots) / total_units, 4)
+        open_lots = [lot for lot in lots if lot.get("soldAt") is None]
+        total_units = sum(lot["units"] for lot in lots) or 1
+        entry["boughtAt"] = round(sum(lot["openRate"] * lot["units"]
+                                  for lot in lots) / total_units, 4)
         if open_lots:
             entry["status"] = "bought"
-            entry["units"] = round(sum(l["units"] for l in open_lots), 6)
+            entry["units"] = round(sum(lot["units"] for lot in open_lots), 6)
             entry["soldAt"] = None
-            entry["tslSet"] = any(l.get("tslEnabled") for l in open_lots)
+            entry["tslSet"] = any(lot.get("tslEnabled") for lot in open_lots)
             entry.pop("exitEstimated", None)
         else:
             entry["status"] = "sold"
-            entry["units"] = round(sum(l["units"] for l in lots), 6)
-            entry["soldAt"] = round(sum((l.get("soldAt") or 0) * l["units"] for l in lots) / total_units, 4)
-            entry["exitEstimated"] = any(l.get("exitEstimated") for l in lots)
+            entry["units"] = round(sum(lot["units"] for lot in lots), 6)
+            entry["soldAt"] = round(
+                sum((lot.get("soldAt") or 0) * lot["units"] for lot in lots) / total_units, 4)
+            entry["exitEstimated"] = any(lot.get("exitEstimated") for lot in lots)
         if current_price:
             hist = entry.setdefault("priceHistory", [])
             from datetime import datetime
             now = datetime.now()
             now_str = now.strftime("%Y-%m-%d %H:%M")
             today_str = now.strftime("%Y-%m-%d")
-            
+
             if hist and hist[-1]["price"] == current_price:
                 pass
             elif hist and hist[-1]["date"] == now_str:
                 hist[-1]["price"] = current_price
             else:
                 hist.append({"date": now_str, "price": current_price})
-                
+
             new_hist = []
             for i, point in enumerate(hist):
                 date_str = point["date"][:10]
@@ -298,10 +324,12 @@ class EtoroImport:
                     new_hist.append(point)
                 else:
                     is_last = True
-                    if i + 1 < len(hist) and hist[i+1]["date"][:10] == date_str:
+                    if i + \
+                            1 < len(hist) and hist[i + 1]["date"][:10] == date_str:
                         is_last = False
                     if is_last:
-                        new_hist.append({"date": date_str, "price": point["price"]})
+                        new_hist.append(
+                            {"date": date_str, "price": point["price"]})
             entry["priceHistory"] = new_hist
 
     def merge(self):
@@ -314,30 +342,39 @@ class EtoroImport:
         self.write_portfolio(preview, today)
 
         by_ticker = {item["ticker"]: item for item in preview}
-        
+
         closed_lots = 0
         for e in data["entries"]:
             if e.get("source") != "import":
-                closed_lots += self.reconcile_lots(e, by_ticker.get(e["ticker"]), today)
+                closed_lots += self.reconcile_lots(e,
+                                                   by_ticker.get(e["ticker"]), today)
 
-        import_by_ticker = {e["ticker"]: e for e in data["entries"] if e.get("source") == "import"}
-        advised_tickers = {e["ticker"] for e in data["entries"] if e.get("source") != "import"}
+        import_by_ticker = {
+            e["ticker"]: e for e in data["entries"] if e.get("source") == "import"}
+        advised_tickers = {e["ticker"]
+                           for e in data["entries"] if e.get("source") != "import"}
 
         added = merged = 0
         for item in preview:
             if item["ticker"] in advised_tickers:
                 continue
-            
+
             existing_e = import_by_ticker.get(item["ticker"])
             if not item["boughtAt"]:
                 item["boughtAt"] = item["currentPrice"]
-            price_point = {"date": today, "price": item["currentPrice"] or item["boughtAt"]}
+            price_point = {
+                "date": today,
+                "price": item["currentPrice"] or item["boughtAt"]}
             if existing_e is not None:
                 import copy
                 original = copy.deepcopy(existing_e)
-                
-                existing_e.update(status="bought", boughtAt=item["boughtAt"], units=item["units"])
-                existing_e["tslSet"] = item.get("tslEnabled", existing_e.get("tslSet"))
+
+                existing_e.update(
+                    status="bought",
+                    boughtAt=item["boughtAt"],
+                    units=item["units"])
+                existing_e["tslSet"] = item.get(
+                    "tslEnabled", existing_e.get("tslSet"))
                 if item["sector"] is not None:
                     existing_e["sector"] = item["sector"]
                 if not existing_e["priceHistory"]:
@@ -348,7 +385,7 @@ class EtoroImport:
                     existing_e["priceHistory"][-1]["price"] = price_point["price"]
                 else:
                     existing_e["priceHistory"].append(price_point)
-                
+
                 if original != existing_e:
                     merged += 1
             else:
@@ -380,13 +417,17 @@ class EtoroImport:
 
         data["lastUpdated"] = today
         self.atomic_write(self.log_file, data)
-        
+
         parts = []
-        if added: parts.append(f"{added} new")
-        if merged: parts.append(f"{merged} updated")
-        if backfilled: parts.append(f"{backfilled} sectors backfilled")
-        if closed_lots: parts.append(f"{closed_lots} auto-closed")
-        
+        if added:
+            parts.append(f"{added} new")
+        if merged:
+            parts.append(f"{merged} updated")
+        if backfilled:
+            parts.append(f"{backfilled} sectors backfilled")
+        if closed_lots:
+            parts.append(f"{closed_lots} auto-closed")
+
         summary = ", ".join(parts) if parts else "0 changes"
         logger.info(f"Merged: {summary}")
 
@@ -395,7 +436,7 @@ def main():
     if get_env("DEMO_MODE") == "1":
         logger.info("Demo Mode Enabled: Skipping eToro API import.")
         sys.exit(0)
-        
+
     mode = sys.argv[1] if len(sys.argv) > 1 else "preview"
     app = EtoroImport()
     if mode == "preview":
@@ -404,6 +445,7 @@ def main():
         app.merge()
     else:
         sys.exit(f"Unknown mode: {mode}")
+
 
 if __name__ == "__main__":
     main()

@@ -19,16 +19,19 @@ logger.setLevel(logging.INFO)
 logger.handlers = []
 
 fh = logging.FileHandler(os.path.join(ROOT, "logs", "app.log"))
-fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+fh.setFormatter(logging.Formatter(
+    '%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 logger.addHandler(fh)
 
 ch = logging.StreamHandler(sys.stdout)
 ch.setFormatter(logging.Formatter('%(message)s'))
 logger.addHandler(ch)
 
+
 def get_env(key):
     v = os.environ.get(key)
-    if v is not None: return v
+    if v is not None:
+        return v
     try:
         with open(os.path.join(ROOT, ".env")) as f:
             for line in f:
@@ -39,17 +42,28 @@ def get_env(key):
         pass
     return None
 
+
 class AdviceLog:
-    SECTORS = ("Basic Materials", "Conglomerates", "Consumer Goods", "Financial",
-               "Healthcare", "Industrial Goods", "Services", "Technology",
-               "Utilities", "ETF / Other")
+    SECTORS = (
+        "Basic Materials",
+        "Conglomerates",
+        "Consumer Goods",
+        "Financial",
+        "Healthcare",
+        "Industrial Goods",
+        "Services",
+        "Technology",
+        "Utilities",
+        "ETF / Other")
     NEW_PICK_SOURCES = ("advice", "premarket", "diversify")
 
     def __init__(self):
         is_demo = get_env("DEMO_MODE") == "1"
         self.subdir = "sample" if is_demo else "private"
-        self.log_file = os.path.join(ROOT, "data", self.subdir, "advice-log.json")
-        self.portfolio_file = os.path.join(ROOT, "data", self.subdir, "portfolio.json")
+        self.log_file = os.path.join(
+            ROOT, "data", self.subdir, "advice-log.json")
+        self.portfolio_file = os.path.join(
+            ROOT, "data", self.subdir, "portfolio.json")
 
     def load_log(self):
         with open(self.log_file) as f:
@@ -88,21 +102,22 @@ class AdviceLog:
         return e
 
     def latest_price(self, e):
-        return e["priceHistory"][-1]["price"] if e["priceHistory"] else e.get("priceAtAdvice")
+        return e["priceHistory"][-1]["price"] if e["priceHistory"] else e.get(
+            "priceAtAdvice")
 
     def push_history(self, e, price):
         now = datetime.now()
         now_str = now.strftime("%Y-%m-%d %H:%M")
         today_str = now.strftime("%Y-%m-%d")
-        
+
         hist = e.setdefault("priceHistory", [])
         if hist and hist[-1]["price"] == price:
-            pass # Skip adding extra entry if price is identical
+            pass  # Skip adding extra entry if price is identical
         elif hist and hist[-1]["date"] == now_str:
             hist[-1]["price"] = price
         else:
             hist.append({"date": now_str, "price": price})
-            
+
         # Prune historical intraday points to prevent bloat
         new_hist = []
         for i, point in enumerate(hist):
@@ -111,38 +126,55 @@ class AdviceLog:
                 new_hist.append(point)
             else:
                 is_last = True
-                if i + 1 < len(hist) and hist[i+1]["date"][:10] == date_str:
+                if i + 1 < len(hist) and hist[i + 1]["date"][:10] == date_str:
                     is_last = False
                 if is_last:
-                    new_hist.append({"date": date_str, "price": point["price"]})
+                    new_hist.append(
+                        {"date": date_str, "price": point["price"]})
         e["priceHistory"] = new_hist
 
     def push_note(self, e, text):
-        e.setdefault("notes", []).append({"date": date.today().isoformat(), "text": text})
+        e.setdefault("notes", []).append(
+            {"date": date.today().isoformat(), "text": text})
 
     def cmd_add_pick(self, args):
         data = self.load_log()
         today = date.today().isoformat()
-        
+
         e = None
         for x in data["entries"]:
-            if x["ticker"] == args.ticker and x.get("firstAdvised") == today and x.get("source") != "import":
+            if x["ticker"] == args.ticker and x.get(
+                    "firstAdvised") == today and x.get("source") != "import":
                 e = x
                 break
 
         if e is None:
             if not args.source:
-                sys.exit(f"{args.ticker} is new: --source ({'|'.join(self.NEW_PICK_SOURCES)}) is required")
-            count = sum(1 for x in data["entries"] if x["ticker"] == args.ticker) + 1
+                sys.exit(
+                    f"{args.ticker} is new: --source ({'|'.join(self.NEW_PICK_SOURCES)}) is required")
+            count = sum(1 for x in data["entries"]
+                        if x["ticker"] == args.ticker) + 1
             e = {
                 "id": f"{args.ticker}-{count:04d}",
-                "ticker": args.ticker, "name": args.name or "",
-                "firstAdvised": date.today().isoformat(), "source": args.source,
-                "rating": None, "rsiAtAdvice": None, "priceAtAdvice": args.price,
-                "reason": None, "risk": None, "sector": None,
-                "buyBelow": None, "dropBelow": None, "dropAbove": None,
-                "status": "watching", "boughtAt": None, "soldAt": None,
-                "units": None, "priceHistory": [], "notes": [],
+                "ticker": args.ticker,
+                "name": args.name or "",
+                "firstAdvised": date.today().isoformat(),
+                "source": args.source,
+                "rating": None,
+                "rsiAtAdvice": None,
+                "priceAtAdvice": args.price,
+                "reason": None,
+                "risk": None,
+                "sector": None,
+                "buyBelow": None,
+                "dropBelow": None,
+                "dropAbove": None,
+                "status": "watching",
+                "boughtAt": None,
+                "soldAt": None,
+                "units": None,
+                "priceHistory": [],
+                "notes": [],
             }
             data["entries"].append(e)
             action = "added"
@@ -214,20 +246,21 @@ class AdviceLog:
             else:
                 skipped.append(ticker)
                 continue
-            
+
             found_any = False
             for e in data["entries"]:
-                if e["ticker"] == ticker and e["status"] in ("watching", "bought"):
+                if e["ticker"] == ticker and e["status"] in (
+                        "watching", "bought"):
                     self.push_history(e, float(price))
                     if earnings_date and earnings_date not in ("", "-"):
                         e["earningsDate"] = earnings_date
                     found_any = True
-                    
+
             if found_any:
                 touched.append(ticker)
             else:
                 skipped.append(ticker)
-                
+
         if touched:
             self.save_log(data)
         msg = f"touched {len(touched)}: {', '.join(touched) or '-'}"
@@ -258,7 +291,7 @@ class AdviceLog:
         e = self.require(data, args.ticker)
         e["tslSet"] = not args.off
         self.push_note(e, "Trailing stop loss removed on eToro" if args.off
-                  else "Trailing stop loss set on eToro")
+                       else "Trailing stop loss set on eToro")
         self.save_log(data)
         logger.info(f"{args.ticker}: tslSet = {e['tslSet']}")
 
@@ -267,29 +300,35 @@ class AdviceLog:
         today = date.today()
         rows = []
         for e in data["entries"]:
-            est_lots = [l for l in e.get("lots", []) if l.get("exitEstimated")]
+            est_lots = [lot for lot in e.get("lots", []) if lot.get("exitEstimated")]
             if est_lots:
-                rows.append((0, 0.0,
-                             f"{e['ticker']}: {len(est_lots)} lot(s) auto-closed at estimated exit, "
-                             f"confirm the real price (dashboard Confirm, or set-status sold --price X)"))
+                rows.append(
+                    (0, 0.0, f"{e['ticker']}: {len(est_lots)} lot(s) auto-closed at estimated exit, "
+                     f"confirm the real price (dashboard Confirm, or set-status sold --price X)"))
             if e["status"] == "watching":
                 price = self.latest_price(e)
-                if e.get("dropAbove") and price is not None and price >= e["dropAbove"]:
-                    rows.append((0, -price,
-                                 f"{e['ticker']}: now ${price} >= drop-above ${e['dropAbove']}, "
-                                 f"the oversold bounce already ran - drop it?"))
+                if e.get(
+                        "dropAbove") and price is not None and price >= e["dropAbove"]:
+                    rows.append(
+                        (0, -price, f"{e['ticker']}: now ${price} >= drop-above ${e['dropAbove']}, "
+                         f"the oversold bounce already ran - drop it?"))
                 else:
-                    age = (today - datetime.strptime(e["firstAdvised"], "%Y-%m-%d").date()).days
+                    age = (
+                        today -
+                        datetime.strptime(
+                            e["firstAdvised"],
+                            "%Y-%m-%d").date()).days
                     if age > 7:
-                        rows.append((1, -age,
-                                     f"{e['ticker']}: watching {age}d, advised @ ${e['priceAtAdvice']}, "
-                                     f"now ${self.latest_price(e)}"))
+                        rows.append(
+                            (1, -age, f"{e['ticker']}: watching {age}d, advised @ ${e['priceAtAdvice']}, "
+                             f"now ${self.latest_price(e)}"))
             elif e["status"] == "bought" and e.get("boughtAt") and not e.get("tslSet"):
-                pct = (self.latest_price(e) - e["boughtAt"]) / e["boughtAt"] * 100
+                pct = (self.latest_price(e) -
+                       e["boughtAt"]) / e["boughtAt"] * 100
                 if pct >= 5:
-                    rows.append((0, -pct,
-                                 f"{e['ticker']}: bought @ ${e['boughtAt']}, now ${self.latest_price(e)} "
-                                 f"({pct:+.1f}%) - trailing stop territory"))
+                    rows.append(
+                        (0, -pct, f"{e['ticker']}: bought @ ${e['boughtAt']}, now ${self.latest_price(e)} "
+                         f"({pct:+.1f}%) - trailing stop territory"))
         if not rows:
             logger.info("No check-in candidates.")
             return
@@ -312,31 +351,38 @@ class AdviceLog:
             return
         for e, h in hits:
             pl = f"{h['plPct']:+.1f}%" if h.get("plPct") is not None else "?"
-            logger.info(f"{e['ticker']}: advised @ ${e['priceAtAdvice']} ({e['firstAdvised']}), "
-                  f"entry ${h['avgOpen']}, now ${h['currentPrice']} ({pl})")
+            logger.info(
+                f"{e['ticker']}: advised @ ${e['priceAtAdvice']} ({e['firstAdvised']}), "
+                f"entry ${h['avgOpen']}, now ${h['currentPrice']} ({pl})")
 
     def cmd_sector_gaps(self, args):
         portfolio = self.load_portfolio()
-        total = portfolio.get("totalInvested") or sum(h["invested"] for h in portfolio["holdings"])
+        total = portfolio.get("totalInvested") or sum(
+            h["invested"] for h in portfolio["holdings"])
         by_sector = {}
         for h in portfolio["holdings"]:
             by_sector[h.get("sector") or "ETF / Other"] = \
                 by_sector.get(h.get("sector") or "ETF / Other", 0.0) + h["invested"]
-        logger.info(f"Invested: ${total:,.2f} across {len(portfolio['holdings'])} holdings\n")
+        logger.info(
+            f"Invested: ${total:,.2f} across {len(portfolio['holdings'])} holdings\n")
         for sector in self.SECTORS:
             invested = by_sector.get(sector, 0.0)
             pct = invested / total * 100 if total else 0.0
             logger.info(f"{sector:18} ${invested:>10,.2f}  {pct:5.1f}%")
         unknown = by_sector.get("Unknown", 0.0)
         if unknown:
-            logger.info(f"{'Unknown':18} ${unknown:>10,.2f}  {unknown / total * 100:5.1f}%")
+            logger.info(
+                f"{'Unknown':18} ${unknown:>10,.2f}  {unknown / total * 100:5.1f}%")
         under = [s for s in self.SECTORS if s != "ETF / Other"
                  and (by_sector.get(s, 0.0) / total * 100 if total else 0.0) < 5.0]
-        logger.info(f"\nUnderweight (<5% of invested): {', '.join(under) if under else 'none'}")
+        logger.info(
+            f"\nUnderweight (<5% of invested): {', '.join(under) if under else 'none'}")
+
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
 
     app = AdviceLog()
@@ -350,12 +396,16 @@ def main():
     p.add_argument("--sector", choices=app.SECTORS)
     p.add_argument("--buy-below", type=float)
     p.add_argument("--drop-below", type=float)
-    p.add_argument("--drop-above", type=float,
-                   help="ceiling: above this the oversold bounce already ran, drop the watch")
+    p.add_argument(
+        "--drop-above",
+        type=float,
+        help="ceiling: above this the oversold bounce already ran, drop the watch")
     p.add_argument("--name")
     p.add_argument("--reason")
     p.add_argument("--risk")
-    p.add_argument("--note", help="dated commentary for the notes history (news, what happened)")
+    p.add_argument(
+        "--note",
+        help="dated commentary for the notes history (news, what happened)")
     p.set_defaults(func=app.cmd_add_pick)
 
     p = sub.add_parser("touch", help="append a price point")
@@ -363,10 +413,14 @@ def main():
     p.add_argument("--price", type=float, required=True)
     p.set_defaults(func=app.cmd_touch)
 
-    p = sub.add_parser("touch-many", help='batch price update from a {"TICKER": price} JSON map on stdin')
+    p = sub.add_parser(
+        "touch-many",
+        help='batch price update from a {"TICKER": price} JSON map on stdin')
     p.set_defaults(func=app.cmd_touch_many)
 
-    p = sub.add_parser("add-note", help="append dated commentary to a tracked ticker")
+    p = sub.add_parser(
+        "add-note",
+        help="append dated commentary to a tracked ticker")
     p.add_argument("ticker")
     p.add_argument("--text", required=True)
     p.set_defaults(func=app.cmd_add_note)
@@ -375,7 +429,9 @@ def main():
     peod.add_argument("--summary", required=True)
     peod.set_defaults(func=app.cmd_add_eod)
 
-    pnews = sub.add_parser("add-news-summary", help="append an AI news summary")
+    pnews = sub.add_parser(
+        "add-news-summary",
+        help="append an AI news summary")
     pnews.add_argument("--summary", required=True)
     pnews.set_defaults(func=app.cmd_add_news_summary)
 
@@ -385,22 +441,31 @@ def main():
     p.add_argument("--price", type=float)
     p.set_defaults(func=app.cmd_set_status)
 
-    p = sub.add_parser("set-tsl", help="mark trailing stop loss active on eToro")
+    p = sub.add_parser(
+        "set-tsl",
+        help="mark trailing stop loss active on eToro")
     p.add_argument("ticker")
     p.add_argument("--off", action="store_true")
     p.set_defaults(func=app.cmd_set_tsl)
 
-    p = sub.add_parser("checkin-candidates", help="tickers due for the keep/drop check-in")
+    p = sub.add_parser(
+        "checkin-candidates",
+        help="tickers due for the keep/drop check-in")
     p.set_defaults(func=app.cmd_checkin_candidates)
 
-    p = sub.add_parser("compare", help="advised picks vs current eToro holdings")
+    p = sub.add_parser(
+        "compare",
+        help="advised picks vs current eToro holdings")
     p.set_defaults(func=app.cmd_compare)
 
-    p = sub.add_parser("sector-gaps", help="portfolio sector split + underweight sectors")
+    p = sub.add_parser(
+        "sector-gaps",
+        help="portfolio sector split + underweight sectors")
     p.set_defaults(func=app.cmd_sector_gaps)
 
     args = parser.parse_args()
     args.func(args)
+
 
 if __name__ == "__main__":
     main()

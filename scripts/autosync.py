@@ -25,6 +25,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("autosync")
 
+
 class AutoSync:
     def __init__(self, data_dir=DATA_DIR, paths=None):
         self.data_dir = data_dir
@@ -32,7 +33,8 @@ class AutoSync:
 
     def get_env(self, key):
         v = os.environ.get(key)
-        if v is not None: return v
+        if v is not None:
+            return v
         try:
             with open(os.path.join(ROOT, ".env")) as f:
                 for line in f:
@@ -46,46 +48,54 @@ class AutoSync:
     def git(self, *args, cwd=None):
         if cwd is None:
             cwd = self.data_dir
-        return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
+        return subprocess.run(["git", *args], cwd=cwd,
+                              capture_output=True, text=True)
 
     def sync(self, reason="data update"):
         if self.get_env("DEMO_MODE") == "1":
             return
-            
+
         private_repo = self.get_env("PRIVATE_DATA_REPO")
         if not private_repo:
-            return  # Silently keep data local if no private repo is configured.
-            
+            # Silently keep data local if no private repo is configured.
+            return
+
         os.makedirs(self.data_dir, exist_ok=True)
-        
+
         if not os.path.exists(os.path.join(self.data_dir, ".git")):
             self.git("init")
             self.git("remote", "add", "origin", private_repo)
             self.git("branch", "-M", "main")
-        
-        present = [p for p in self.paths if os.path.exists(os.path.join(self.data_dir, p))]
+
+        present = [
+            p for p in self.paths if os.path.exists(
+                os.path.join(
+                    self.data_dir, p))]
         if not present:
             return
-            
+
         self.git("add", "--", *present)
         if self.git("diff", "--cached", "--quiet").returncode == 0:
             return  # nothing changed
-            
+
         msg = f"chore(data): {reason} ({datetime.now().strftime('%Y-%m-%d %H:%M')})"
         if self.git("commit", "-m", msg).returncode != 0:
             logger.error("autosync: commit failed")
             return
-            
+
         push = self.git("push", "-u", "origin", "main")
         if push.returncode != 0:
-            logger.error(f"autosync: committed locally, push failed (offline?): {push.stderr.strip()[-200:]}")
+            logger.error(
+                f"autosync: committed locally, push failed (offline?): {push.stderr.strip()[-200:]}")
         else:
             logger.info(f"autosync: {msg}")
+
 
 def main():
     reason = sys.argv[1] if len(sys.argv) > 1 else "data update"
     syncer = AutoSync()
     syncer.sync(reason)
+
 
 if __name__ == "__main__":
     main()
