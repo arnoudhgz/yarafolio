@@ -14,7 +14,7 @@ Instead of jumping between different apps, YaraFolio acts as a single local dash
 ## 📚 Documentation
 
 - 🛠️ [**Installation & Setup**](docs/SETUP.md): How to clone, configure your API keys, and run YaraFolio.
-- 🖥️ [**Dashboard Screens**](docs/SCREENS.md): An explanation of the different tabs (Advice, Positions, Analytics) and features.
+- 🖥️ [**User Manual**](docs/MANUAL.md): An explanation of the different tabs (Advice, Positions, Analytics) and features.
 - 🔒 [**Demo Mode & Privacy**](docs/DEMO_MODE.md): How YaraFolio uses JSON to keep your data 100% private and sync it to a separate private repository.
 
 ---
