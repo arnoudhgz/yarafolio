@@ -8,6 +8,7 @@ YaraFolio features a local web interface that completely replaces complex spread
 This is the core of the dashboard. It tracks all the stocks the AI has recommended.
 - **Dynamic Tracking**: Automatically highlights whether an AI-advised stock has hit your custom "Buy Zone" (Green line) or dropped below your Stop-Loss line (Red line).
 - **Deep-Dive Modals**: Click on any stock row to instantly view the AI's full research thesis, known risks, and an embedded price chart.
+- **Upcoming Events**: If a tracked stock has an impending market event (like earnings), the ticker will pulse <span style="color:#f59e0b;font-weight:600">Orange</span> to alert you.
 
 ## 2. Positions Tab
 ![Positions Tab Screenshot](images/positions_tab.png)
@@ -15,6 +16,7 @@ This is the core of the dashboard. It tracks all the stocks the AI has recommend
 Once you actually buy a stock on eToro, the `import` script (CLI or Resync button) detects it and moves it here. 
 - Tracks your **Realized** and **Unrealized (Open)** P/L specifically for AI-advised lots.
 - Preserves the history of every single lot forever.
+- **Action Required Badges**: A red notification dot (e.g., 🔴 1) on the tab indicates an auto-closed lot that requires your manual exit confirmation.
 
 ## 3. Portfolio Tab
 ![Portfolio Tab Screenshot](images/portfolio_tab.png)
@@ -62,6 +64,8 @@ Keeps you informed of large-scale market events.
 
 Monitors newly listed and upcoming initial public offerings.
 - Helps identify fresh market opportunities before they hit the mainstream.
+- **Market Entry**: Tickers with an IPO scheduled for today will blink <span style="color:#10b981;font-weight:600">Green</span> so you don't miss the listing.
+- **Noise Filtering**: You can drop an IPO from the tracker if you verify eToro won't list it. The "Listed / Likely" tab uses this to filter out noise and only show actionable IPOs.
 
 ## Features Available on Every Screen
 - **Global Search:** Type any ticker or name to instantly filter the current view.
