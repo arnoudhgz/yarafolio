@@ -12,7 +12,7 @@ This is the core of the dashboard. It tracks all the stocks the AI has recommend
 ## 2. Positions Tab
 ![Positions Tab Screenshot](images/positions_tab.png)
 
-Once you actually buy a stock on eToro, the `import` script detects it and moves it here. 
+Once you actually buy a stock on eToro, the `import` script (CLI or Resync button) detects it and moves it here. 
 - Tracks your **Realized** and **Unrealized (Open)** P/L specifically for AI-advised lots.
 - Preserves the history of every single lot forever.
 

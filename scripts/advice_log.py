@@ -204,7 +204,7 @@ class AdviceLog:
     def cmd_add_eod(self, args):
         data = self.load_log()
         data.setdefault("eodReports", []).append({
-            "date": date.today().isoformat(),
+            "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "summary": args.summary
         })
         self.save_log(data)

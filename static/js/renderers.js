@@ -578,8 +578,15 @@ export function renderEOD() {
   } else {
     empty.style.display = 'none';
     eodList.innerHTML = reports.map(r => {
-      let htmlContent = esc(r.summary).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/###\s*(.*?)(\n|$)/g, '<h3>$1</h3>').replace(/\n/g, '<br>');
-      let linkedSummary = htmlContent.replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
+      let contentStr = r.summary || '';
+      let title = 'EOD Report';
+      const titleMatch = contentStr.match(/^###\s*(.*?)(\n|$)/);
+      if (titleMatch) {
+        title = esc(titleMatch[1]);
+        contentStr = contentStr.replace(/^###\s*(.*?)(\n|$)/, '');
+      }
+
+      let linkedSummary = contentStr.replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
         const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
         const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
         if (isAdvised || isHolding) {
@@ -587,10 +594,18 @@ export function renderEOD() {
         }
         return match;
       });
-      return '<div class="eod-card">' +
-        '<div style="color: var(--muted); font-size: 12px; margin-bottom: 8px;">' + esc(r.date) + '</div>' +
-        '<div style="line-height: 1.5; font-size: 14px; color: var(--text);">' + linkedSummary + '</div>' +
-      '</div>';
+
+      let content = marked.parse(linkedSummary.trim());
+
+      return `
+        <div class="ai-article">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+            <h3 style="margin:0; font-size:16px;">${title}</h3>
+            <span style="font-size:12px; color:var(--muted);">${esc(r.date || '')}</span>
+          </div>
+          <div style="line-height: 1.6; font-size: 14px;" class="article-content news-markdown">${content}</div>
+        </div>
+      `;
     }).join('');
   }
 }

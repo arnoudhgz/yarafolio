@@ -1,7 +1,7 @@
 # 🛠️ Installation & Setup
 
 ## Prerequisites
-Before you begin, ensure that your system has **Python 3** installed. You can check this by running `python3 --version` in your terminal. All background tasks and local API endpoints rely on Python.
+Before you begin, ensure that your system has **Python 3** installed (minimum version 3.9). You can check this by running `python3 --version` in your terminal. All background tasks and local API endpoints rely on Python.
 
 ## Clone or Fork the repository
 - **To just check it out:** Clone my repository directly to test it in demo mode.
