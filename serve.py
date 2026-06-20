@@ -428,97 +428,115 @@ class Handler(SimpleHTTPRequestHandler):
         pass  # keep the terminal quiet
 
 
-def read_pid():
-    try:
-        with open(PID_FILE) as f:
-            return int(f.read().strip())
-    except (OSError, ValueError):
-        return None
+import logging
 
+os.makedirs(os.path.join(ROOT, "logs"), exist_ok=True)
+logger = logging.getLogger("serve")
+logger.setLevel(logging.INFO)
+logger.handlers = []
 
-def process_exists(pid):
-    try:
-        os.kill(pid, 0)
-        return True
-    except ProcessLookupError:
-        return False
-    except PermissionError:
-        return True
+fh = logging.FileHandler(os.path.join(ROOT, "logs", "app.log"))
+fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+logger.addHandler(fh)
 
+ch = logging.StreamHandler(sys.stdout)
+ch.setFormatter(logging.Formatter('%(message)s'))
+logger.addHandler(ch)
 
-def stop_server():
-    pid = read_pid()
-    if not pid or not process_exists(pid):
+class DashboardServer:
+    def read_pid(self):
         try:
-            os.unlink(PID_FILE)
-        except FileNotFoundError:
-            pass
-        print("Dashboard is not running (no active PID file).")
-        return False
-    os.kill(pid, signal.SIGTERM)
-    for _ in range(50):
-        if not process_exists(pid):
-            print(f"Stopped dashboard process {pid}.")
+            with open(PID_FILE) as f:
+                return int(f.read().strip())
+        except (OSError, ValueError):
+            return None
+
+
+    def process_exists(self, pid):
+        try:
+            os.kill(pid, 0)
             return True
-        time.sleep(0.1)
-    sys.exit(f"Dashboard process {pid} did not stop within 5 seconds.")
+        except ProcessLookupError:
+            return False
+        except PermissionError:
+            return True
 
 
-def parse_args():
-    args = sys.argv[1:]
-    stop = "--stop" in args
-    restart = "--restart" in args
-    unknown = [arg for arg in args if arg.startswith("--") and arg not in ("--stop", "--restart")]
-    if unknown:
-        sys.exit(f"Unknown option: {unknown[0]}")
-    ports = [arg for arg in args if not arg.startswith("--")]
-    if len(ports) > 1:
-        sys.exit("Usage: python3 serve.py [--stop | --restart] [port]")
-    try:
-        port = int(ports[0]) if ports else DEFAULT_PORT
-    except ValueError:
-        sys.exit(f"Invalid port: {ports[0]}")
-    return stop, restart, port
+    def stop_server(self):
+        pid = self.read_pid()
+        if not pid or not self.process_exists(pid):
+            try:
+                os.unlink(PID_FILE)
+            except FileNotFoundError:
+                pass
+            logger.info("Dashboard is not running (no active PID file).")
+            return False
+        os.kill(pid, signal.SIGTERM)
+        for _ in range(50):
+            if not self.process_exists(pid):
+                logger.info(f"Stopped dashboard process {pid}.")
+                return True
+            time.sleep(0.1)
+        sys.exit(f"Dashboard process {pid} did not stop within 5 seconds.")
 
 
-def main():
-    stop, restart, port = parse_args()
-    if stop:
-        stop_server()
-        return
-    if restart:
-        stop_server()
+    def parse_args(self):
+        args = sys.argv[1:]
+        stop = "--stop" in args
+        restart = "--restart" in args
+        unknown = [arg for arg in args if arg.startswith("--") and arg not in ("--stop", "--restart")]
+        if unknown:
+            sys.exit(f"Unknown option: {unknown[0]}")
+        ports = [arg for arg in args if not arg.startswith("--")]
+        if len(ports) > 1:
+            sys.exit("Usage: python3 serve.py [--stop | --restart] [port]")
+        try:
+            port = int(ports[0]) if ports else DEFAULT_PORT
+        except ValueError:
+            sys.exit(f"Invalid port: {ports[0]}")
+        return stop, restart, port
 
-    os.makedirs(os.path.dirname(PID_FILE), exist_ok=True)
-    os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
-    try:
-        server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    except OSError as exc:
-        if exc.errno == 48:
-            sys.exit(f"Port {port} is already in use. Run `python3 serve.py --restart {port}` "
-                     "if it is this dashboard, or choose another port.")
-        raise
 
-    with open(PID_FILE, "w") as f:
-        f.write(f"{os.getpid()}\n")
+    def main(self):
+        stop, restart, port = self.parse_args()
+        if stop:
+            self.stop_server()
+            return
+        if restart:
+            self.stop_server()
 
-    def request_shutdown(_signum, _frame):
-        threading.Thread(target=server.shutdown, daemon=True).start()
+        os.makedirs(os.path.dirname(PID_FILE), exist_ok=True)
+        os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
+        try:
+            server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
+        except OSError as exc:
+            if exc.errno == 48:
+                sys.exit(f"Port {port} is already in use. Run `python3 serve.py --restart {port}` "
+                         "if it is this dashboard, or choose another port.")
+            raise
 
-    signal.signal(signal.SIGTERM, request_shutdown)
-    url = f"http://127.0.0.1:{port}/dashboard.html"
-    threading.Timer(0.3, webbrowser.open, [url]).start()
-    print(f"Dashboard on {url} (Ctrl+C to stop)")
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        print()
-    finally:
-        server.server_close()
-        if read_pid() == os.getpid():
-            os.unlink(PID_FILE)
-        print("Stopped.")
+        with open(PID_FILE, "w") as f:
+            f.write(f"{os.getpid()}\n")
+
+        def request_shutdown(_signum, _frame):
+            threading.Thread(target=server.shutdown, daemon=True).start()
+
+        signal.signal(signal.SIGTERM, request_shutdown)
+        url = f"http://127.0.0.1:{port}/dashboard.html"
+        threading.Timer(0.3, webbrowser.open, [url]).start()
+        logger.info(f"Dashboard on {url} (Ctrl+C to stop)")
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            logger.info("")
+        finally:
+            server.server_close()
+            if self.read_pid() == os.getpid():
+                os.unlink(PID_FILE)
+            logger.info("Stopped.")
 
 
 if __name__ == "__main__":
-    main()
+    app = DashboardServer()
+    app.main()
+

@@ -9,8 +9,9 @@ import screen
 
 class ParseQuoteTest(unittest.TestCase):
     def parse(self, markup):
-        with patch.object(screen, "fetch_symbol", return_value=markup):
-            return screen.parse_quote("TEST")
+        with patch.object(screen.Screen, "fetch_symbol", return_value=markup):
+            app = screen.Screen()
+            return app.parse_quote("TEST")
 
     def test_regular_quote(self):
         quote = self.parse(
