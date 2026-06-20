@@ -6,8 +6,8 @@ Before you begin, ensure that your system has **Python 3** installed. You can ch
 1. **Clone or Fork the repository**:
    - **To just check it out:** Clone my repository directly to test it in demo mode.
      ```bash
-     git clone git@github.com:arnoudhgz/assisted-stock-advice.git
-     cd assisted-stock-advice
+     git clone git@github.com:arnoudhgz/yarafolio.git
+     cd yarafolio
      ```
    - **To really use it:** Click the **Fork** button on GitHub first to create your own copy of the repository. Then clone your forked version so you can customize the AI instructions (`GEMINI.md`, `CLAUDE.md`) to fit your own trading style!
 
@@ -31,14 +31,14 @@ Before you begin, ensure that your system has **Python 3** installed. You can ch
 4. **Provide mock data (Optional, for testing)**:
    If you don't want to start with a blank slate, you can set `DEMO_MODE=1` in your `.env` file. This tells the system to automatically load the provided sample data from the `data/sample/` directory instead of using your personal data in `data/private/`.
 
-5. **Run the Dashboard**:
-   Start the local python server:
+5. **Run YaraFolio**:
+   Start YaraFolio:
    ```bash
-   python3 serve.py
+   python3 yarafolio.py
    ```
    The dashboard will automatically open in your default browser at `http://127.0.0.1:8742/dashboard.html`.
 
-   *Note: The port defaults to 8742. You can configure this by adding `PORT=8080` to your `.env` file.*
+   *Note: The port defaults to 8742. You can configure this by adding `PORT=<PORTNUMBER>` to your `.env` file.*
 
 6. **Stop or Restart**:
-   To stop the server, go back to your terminal and press `Ctrl+C`. To restart, simply run `python3 serve.py` again.
+   To stop YaraFolio, go back to your terminal and press `Ctrl+C`. To restart, simply run `python3 yarafolio.py` again.

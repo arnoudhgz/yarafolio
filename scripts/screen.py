@@ -425,7 +425,7 @@ def main():
     p = sub.add_parser("quote", help="price + key stats per ticker")
     p.add_argument("tickers", nargs="+")
     p.add_argument("--json", action="store_true",
-                   help="emit {ticker: {price, ...}} JSON (used by serve.py /api/refresh)")
+                   help="emit {ticker: {price, ...}} JSON (used by yarafolio.py /api/refresh)")
     p.set_defaults(func=app.cmd_quote)
 
     p = sub.add_parser("forecast", help="analyst consensus + price targets per ticker")

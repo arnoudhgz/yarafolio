@@ -1,25 +1,24 @@
 // @ts-check
-import { DATA, PORTFOLIO, currentFilter, posFilter, activeTab, portfolioViewMode, LEARN, analyticsCharts, canSave, SECTORS, SECTOR_COLORS, sortState, setSectorChart, setSectorCoverageChart, sectorChart, sectorCoverageChart } from './state.js';
-import { today, advised, latestPrice, changePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, realizedPL, unrealizedPL } from './utils.js';
+import { DATA, PORTFOLIO, currentFilter, posFilter, activeTab, portfolioViewMode, LEARN, analyticsCharts, canSave, SECTORS, SECTOR_COLORS, sortState, setSectorChart, setSectorCoverageChart, sectorChart, sectorCoverageChart, setPortfolioRendered, Chart, marked } from './state.js';
+import { advised, latestPrice, changePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows } from './utils.js';
 import { markSortedHeader, setSearchCount } from './ui.js';
 
-function renderAll() {
+export function renderAll() {
   const entries = advised();
   /** @type {HTMLElement} */ (document.getElementById('lastUpdated')).textContent =
     'Last updated: ' + DATA.lastUpdated + ' · ' + entries.length + ' advised picks · ' +
     PORTFOLIO.holdings.length + ' holdings';
-  /** @type {HTMLElement} */ (document.getElementById('cTracked')).textContent = entries.length;
-  /** @type {HTMLElement} */ (document.getElementById('cOpen')).textContent = entries.filter(e => e.status === 'bought').length;
-  /** @type {HTMLElement} */ (document.getElementById('cWatching')).textContent = entries.filter(e => e.status === 'watching').length;
+  /** @type {HTMLElement} */ (document.getElementById('cTracked')).textContent = String(entries.length);
+  /** @type {HTMLElement} */ (document.getElementById('cOpen')).textContent = String(entries.filter(e => e.status === 'bought').length);
+  /** @type {HTMLElement} */ (document.getElementById('cWatching')).textContent = String(entries.filter(e => e.status === 'watching').length);
   renderTable();
   renderArchive();
   renderPositions();
   if (activeTab === 'portfolio') renderPortfolio();
-  else portfolioRendered = false;
   if (activeTab === 'analytics' && LEARN) renderAnalytics();
 }
 
-function adviceRows() {
+export function adviceRows() {
   return advised().map(e => {
     const priceNow = e.status === 'sold' && e.soldAt ? e.soldAt : latestPrice(e);
     return {
@@ -41,7 +40,7 @@ function adviceRows() {
   });
 }
 
-function tippingFlags(r) {
+export function tippingFlags(r) {
   const p = latestPrice(r.e);
   const dropHit = r.dropBelow != null && p <= r.dropBelow && (r.status === 'watching' || r.status === 'bought');
   const buyHit = !dropHit && r.status === 'watching' && r.buyBelow != null && p <= r.buyBelow;
@@ -50,7 +49,7 @@ function tippingFlags(r) {
   return { dropHit, buyHit, missedHit };
 }
 
-function sparkline(canvas, e) {
+export function sparkline(canvas, e) {
   // anchor the line at the advised price so it starts where the advice did, and color it by the
   // same baseline as the Change % column (advised -> now), so trend colour always matches Change
   const hist = e.priceHistory || [];
@@ -82,7 +81,7 @@ function sparkline(canvas, e) {
   });
 }
 
-function actionButtons(e) {
+export function actionButtons(e) {
   // positions come from the eToro import now; the watchlist only needs Drop
   if (!canSave) return '';
   if (e.status === 'watching') {
@@ -95,7 +94,7 @@ function actionButtons(e) {
   return '';
 }
 
-function sectorPctMap() {
+export function sectorPctMap() {
   const total = PORTFOLIO.holdings.reduce((s, h) => s + (h.invested || 0), 0);
   if (!total) return null;
   const invested = {};
@@ -109,7 +108,7 @@ function sectorPctMap() {
 }
 
 // 'gap' when the pick's sector is 0% of the portfolio, 'under' when below 5%; same rule as the diversify view
-function sectorFlag(secPct, sector) {
+export function sectorFlag(secPct, sector) {
   if (!secPct || !sector || sector === 'ETF / Other') return '';
   const p = secPct[sector];
   if (p === 0) return 'gap';
@@ -117,7 +116,7 @@ function sectorFlag(secPct, sector) {
   return '';
 }
 
-function renderTable() {
+export function renderTable() {
   const tbody = /** @type {HTMLElement} */ (document.querySelector('#adviceTable tbody'));
   tbody.innerHTML = '';
   const secPct = sectorPctMap();
@@ -169,7 +168,7 @@ function renderTable() {
   });
 }
 
-function renderArchive() {
+export function renderArchive() {
   const tbody = /** @type {HTMLElement} */ (document.querySelector('#archiveTable tbody'));
   tbody.innerHTML = '';
   const rows = sortRows(
@@ -204,7 +203,7 @@ function renderArchive() {
   });
 }
 
-function findLot(positionID) {
+export function findLot(positionID) {
   for (const e of DATA.entries) {
     for (const lot of (e.lots || [])) {
       if (String(lot.positionID) === String(positionID)) return { e, lot };
@@ -213,7 +212,7 @@ function findLot(positionID) {
   return null;
 }
 
-function positionLotRows() {
+export function positionLotRows() {
   const rows = [];
   advised().forEach(e => (e.lots || []).forEach(lot => {
     const closed = lot.soldAt != null;
@@ -239,7 +238,7 @@ function positionLotRows() {
   return rows;
 }
 
-function renderPositions() {
+export function renderPositions() {
   const all = positionLotRows();
   const closed = all.filter(r => r.status === 'sold');
   const openRows = all.filter(r => r.status === 'bought');
@@ -302,14 +301,14 @@ function renderPositions() {
   });
 }
 
-function renderPortfolio() {
+export function renderPortfolio() {
   renderSectorCoverage();
   renderSectorChart();
   renderPortfolioTable();
-  portfolioRendered = true;
+  setPortfolioRendered(true);
 }
 
-function renderPortfolioTable() {
+export function renderPortfolioTable() {
   let holdings = PORTFOLIO.holdings.filter(h => matchesSearch([h.ticker, h.name, h.sector]));
   
   if (portfolioViewMode === 'split') {
@@ -405,7 +404,7 @@ function renderSectorChart() {
   }));
 }
 
-function renderSectorCoverage() {
+export function renderSectorCoverage() {
   if (sectorCoverageChart) { sectorCoverageChart.destroy(); setSectorCoverageChart(null); }
   const invested = {};
   const total = PORTFOLIO.holdings.reduce((s, h) => s + (h.invested || 0), 0);
@@ -450,7 +449,9 @@ function renderSectorCoverage() {
   }));
 }
 
-function renderAnalytics() {
+let analyticsRendered = false;
+
+export function renderAnalytics() {
   analyticsRendered = true;
   const empty = /** @type {HTMLElement} */ (document.getElementById('analyticsEmpty'));
   if (!LEARN) {
@@ -458,7 +459,7 @@ function renderAnalytics() {
     /** @type {HTMLElement} */ (document.getElementById('sevenDayBox')).innerHTML = '';
     ['chartRating', 'chartRsiBand', 'chartSector', 'chartSource'].forEach(id => renderBucketChart(id, {}));
     empty.textContent = canSave ? 'No stats available yet. Run /learn to generate outcomes.'
-      : 'Analytics needs the server. Start it with: python3 serve.py';
+      : 'Analytics needs the server. Start it with: python3 yarafolio.py';
     empty.style.display = 'block';
     return;
   }
@@ -480,7 +481,7 @@ function renderAnalytics() {
   empty.style.display = LEARN.measurableOutcomes ? 'none' : 'block';
 }
 
-function renderBucketChart(canvasId, buckets) {
+export function renderBucketChart(canvasId, buckets) {
   if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
   buckets = buckets || {};
   const note = document.getElementById(canvasId + 'Note');
@@ -535,7 +536,7 @@ function renderBucketChart(canvasId, buckets) {
   });
 }
 
-function renderAINews() {
+export function renderAINews() {
   const summaryContainer = /** @type {HTMLElement} */ (document.getElementById('newsSummary'));
   if (DATA.newsSummaries && DATA.newsSummaries.length > 0) {
     let html = '';
@@ -567,7 +568,7 @@ function renderAINews() {
   }
 }
 
-function renderEOD() {
+export function renderEOD() {
   const eodList = /** @type {HTMLElement} */ (document.getElementById('eodList'));
   const empty = /** @type {HTMLElement} */ (document.getElementById('eodEmpty'));
   const reports = [...(DATA.eodReports || [])].reverse();

@@ -24,24 +24,24 @@ export async function applyChange(mutate) {
     banner('');
   } catch (err) {
     // @ts-ignore
-    banner('Save failed (' + err.message + '). Is serve.py still running?');
+    banner('Save failed (' + err.message + '). Is yarafolio.py still running?');
   }
   renderAll();
 }
 
-async function loadLearn() {
+export async function loadLearn() {
   if (LEARN) return;
   for (const url of ['/api/stats', 'data/learn-stats.json']) {
     try {
       const res = await fetch(url, { cache: 'no-store' });
-      if (res.ok) { LEARN = await res.json(); return; }
+      if (res.ok) { setLEARN(await res.json()); return; }
     } catch (err) { /* try next source */ }
   }
-  LEARN = null;
+  setLEARN(null);
 }
 
-async function fetchMacro() {
-  const btn = /** @type {HTMLElement} */ (document.getElementById('refreshMacroBtn'));
+export async function fetchMacro() {
+  const btn = /** @type {HTMLButtonElement} */ (document.getElementById('refreshMacroBtn'));
   const loading = /** @type {HTMLElement} */ (document.getElementById('macroLoading'));
   const list = /** @type {HTMLElement} */ (document.getElementById('macroList'));
   const empty = /** @type {HTMLElement} */ (document.getElementById('macroEmpty'));
@@ -75,8 +75,8 @@ async function fetchMacro() {
         // Format MM-DD-YYYY to DD MMM YYYY if possible
         const parts = displayDate.split('-');
         if (parts.length === 3) {
-          const dateObj = new Date(parts[2], parts[0] - 1, parts[1]);
-          if (!isNaN(dateObj)) {
+          const dateObj = new Date(Number(parts[2]), Number(parts[0]) - 1, Number(parts[1]));
+          if (!isNaN(dateObj.getTime())) {
             displayDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -118,7 +118,7 @@ async function fetchMacro() {
         empty.style.display = 'block';
       }
     }
-    window.macroLoaded = true;
+    /** @type {any} */ (window).macroLoaded = true;
   } catch (err) {
     /** @type {HTMLElement} */ (document.getElementById('macroList')).innerHTML = '<tr><td colspan="7" class="insufficient">Failed to fetch macro calendar.</td></tr>';
   } finally {
@@ -142,6 +142,10 @@ export async function fetchIpos(force = false) {
     const now = new Date();
     const tomorrow = new Date(); tomorrow.setDate(now.getDate() + 1);
     
+    /**
+     * @param {string} t
+     * @returns {boolean}
+     */
     const isNotListed = (t) => DATA.entries.some(e => e.ticker === t && e.status === 'avoid' && e.reason && e.reason.includes('eToro'));
 
     if (data.upcoming && data.upcoming.length > 0) {
@@ -156,9 +160,9 @@ export async function fetchIpos(force = false) {
         html += `<tr data-ipostatus="${status}" style="${avoided ? 'opacity:0.6' : ''}"><td>${row.date}</td><td class="sym">${tLink}</td><td>${row.name}</td><td>-</td><td>${likely}</td><td class="actions" style="text-align:center">${action}</td></tr>`;
         
         if (!avoided) {
-          const d = new Date(row.date);
-          if (d && !isNaN(d)) {
-            if (d.toDateString() === now.toDateString() || d.toDateString() === tomorrow.toDateString()) {
+          const date = new Date(row.date);
+          if (date && !isNaN(date.getTime())) {
+            if (date.toDateString() === now.toDateString() || date.toDateString() === tomorrow.toDateString()) {
               hasNearIpo = true;
             }
           }
@@ -191,12 +195,13 @@ export async function fetchIpos(force = false) {
     // apply current filter
     const activeFilter = /** @type {HTMLElement} */ (document.querySelector('#ipoFilters button.active'))?.dataset.ipofilter || 'listed';
     document.querySelectorAll('#iposBody tr').forEach(tr => {
-      if (tr.children.length === 1) return;
-      const st = tr.getAttribute('data-ipostatus');
+      const trEl = /** @type {HTMLElement} */ (tr);
+      if (trEl.children.length === 1) return;
+      const st = trEl.getAttribute('data-ipostatus');
       let show = true;
       if (activeFilter === 'listed') show = (st !== 'dropped');
       if (activeFilter === 'dropped') show = (st === 'dropped');
-      tr.style.display = show ? '' : 'none';
+      trEl.style.display = show ? '' : 'none';
     });
 
   } catch (err) {

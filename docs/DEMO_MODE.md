@@ -19,7 +19,7 @@ When Demo Mode is activated, the dashboard completely ignores your actual eToro 
 **How to activate Demo Mode:**
 1. Open your `.env` file.
 2. Add or change the line to say: `DEMO_MODE=1`
-3. Restart the python server (`python3 serve.py`).
+3. Restart the python server (`python3 yarafolio.py`).
 
 *Tip: When you are taking screenshots or recording videos of YaraFolio to share online (e.g. on LinkedIn), always turn on Demo Mode first to prevent leaking your real account balance or open trades!*
 

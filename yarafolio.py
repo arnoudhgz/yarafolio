@@ -2,8 +2,8 @@
 """Serve the stock advice dashboard with save and import support.
 
 Usage:
-  python3 serve.py [port]
-  python3 serve.py --stop
+  python3 yarafolio.py [port]
+  python3 yarafolio.py --stop
 
 Opens http://127.0.0.1:8742/dashboard.html in the browser.
 POST /api/save    - dashboard buttons write data/advice-log.json
@@ -442,7 +442,7 @@ ch = logging.StreamHandler(sys.stdout)
 ch.setFormatter(logging.Formatter('%(message)s'))
 logger.addHandler(ch)
 
-class DashboardServer:
+class YaraFolioApp:
     def read_pid(self):
         try:
             with open(PID_FILE) as f:
@@ -468,15 +468,15 @@ class DashboardServer:
                 os.unlink(PID_FILE)
             except FileNotFoundError:
                 pass
-            logger.info("Dashboard is not running (no active PID file).")
+            logger.info("YaraFolio is not running (no active PID file).")
             return False
         os.kill(pid, signal.SIGTERM)
         for _ in range(50):
             if not self.process_exists(pid):
-                logger.info(f"Stopped dashboard process {pid}.")
+                logger.info(f"Stopped YaraFolio process {pid}.")
                 return True
             time.sleep(0.1)
-        sys.exit(f"Dashboard process {pid} did not stop within 5 seconds.")
+        sys.exit(f"YaraFolio process {pid} did not stop within 5 seconds.")
 
 
     def parse_args(self):
@@ -488,7 +488,7 @@ class DashboardServer:
             sys.exit(f"Unknown option: {unknown[0]}")
         ports = [arg for arg in args if not arg.startswith("--")]
         if len(ports) > 1:
-            sys.exit("Usage: python3 serve.py [--stop] [port]")
+            sys.exit("Usage: python3 yarafolio.py [--stop] [port]")
         try:
             port = int(ports[0]) if ports else DEFAULT_PORT
         except ValueError:
@@ -524,7 +524,7 @@ class DashboardServer:
         signal.signal(signal.SIGTERM, request_shutdown)
         url = f"http://127.0.0.1:{port}/dashboard.html"
         threading.Timer(0.3, webbrowser.open, [url]).start()
-        logger.info(f"Dashboard on {url} (Ctrl+C to stop)")
+        logger.info(f"YaraFolio on {url} (Ctrl+C to stop)")
         try:
             server.serve_forever()
         except KeyboardInterrupt:
@@ -537,6 +537,6 @@ class DashboardServer:
 
 
 if __name__ == "__main__":
-    app = DashboardServer()
+    app = YaraFolioApp()
     app.main()
 

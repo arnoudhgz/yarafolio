@@ -15,7 +15,7 @@ async function load() {
     setDATA(await logRes.json());
     setPORTFOLIO(pfRes.ok ? await pfRes.json() : { lastUpdated: null, totalInvested: 0, holdings: [] });
     setCanSave(location.protocol.startsWith('http'));
-    if (!canSave) banner('Opened as a local file: buttons are disabled. Start with: python3 serve.py');
+    if (!canSave) banner('Opened as a local file: buttons are disabled. Start with: python3 yarafolio.py');
     /** @type {HTMLElement} */ (document.getElementById('syncBtn')).style.display = canSave ? 'block' : 'none';
     if (canSave) {
       fetch('/api/locations').then(r => r.json()).then(data => {
@@ -37,7 +37,7 @@ async function load() {
     setInterval(updateTimer, 1000);
     updateTimer();
   } catch (err) {
-    banner('Could not load data/advice-log.json. Start the dashboard with: python3 serve.py');
+    banner('Could not load data/advice-log.json. Start the dashboard with: python3 yarafolio.py');
   }
   setPortfolioRendered(false);
   /* analyticsRendered handled in renderers */;
@@ -339,7 +339,7 @@ const adviceClickHandler = (ev) => {
     await load();
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    banner('Sync failed (' + message + '). Is serve.py still running?');
+    banner('Sync failed (' + message + '). Is yarafolio.py still running?');
   } finally {
     btn.textContent = label;
     document.body.classList.remove('syncing');

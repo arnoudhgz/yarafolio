@@ -10,7 +10,7 @@ Instead of jumping between different apps, YaraFolio acts as a single local dash
 
 ## 📚 Documentation
 
-- 🛠️ [**Installation & Setup**](docs/SETUP.md): How to clone, configure your API keys, and run the server.
+- 🛠️ [**Installation & Setup**](docs/SETUP.md): How to clone, configure your API keys, and run YaraFolio.
 - 🖥️ [**Dashboard Screens**](docs/SCREENS.md): An explanation of the different tabs (Advice, Positions, Analytics) and features.
 - 🔒 [**Demo Mode & Privacy**](docs/DEMO_MODE.md): How YaraFolio uses JSON to keep your data 100% private and sync it to a separate private repository.
 
@@ -52,7 +52,7 @@ It is important to understand that the quality, accuracy, and depth of the stock
 - **Your AI Subscription & Provider**: Free-tier models may provide shallower analysis or hallucinate more often compared to premium, state-of-the-art models (like the latest iterations of Claude Opus, Gemini Pro, or OpenAI's frontier models).
 - **The Chosen Model**: Different models have different reasoning capabilities, training cutoffs, and context windows.
 - **Your Prompts & Skill Tuning**: The AI's performance is directly tied to the quality of the instructions in your local skill files. If you find the advice lacking, consider refining the rules in `GEMINI.md` or `CLAUDE.md` to be more explicit about your exact trading strategy and risk tolerance!
-- **Your AI CLI Tool**: Whether you use Google Antigravity, Claude Code, or OpenAI's Codex CLI, ensure the tool is configured to properly read and execute the local `.gemini/` or `.claude/` skill instructions in this repository.
+- **Your AI CLI Tool**: Whether you use Google Antigravity, Claude Code, OpenAI's Codex CLI, or any other AI CLI tool, ensure the tool is configured to properly read and execute the local `.gemini/` or `.claude/` skill instructions in this repository. Or let it transform it to that specific CLI tool's instructions.
 
 ---
 
