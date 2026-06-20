@@ -23,9 +23,9 @@
   <div id="banner"></div>
 
   <div class="cards">
-    <div class="card"><div class="label">Advised picks</div><div class="value" id="cTracked">0</div></div>
-    <div class="card"><div class="label">Open positions</div><div class="value" id="cOpen">0</div></div>
-    <div class="card"><div class="label">Watching</div><div class="value" id="cWatching">0</div></div>
+    <div class="card"><div class="label">Advised picks<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('infoAdvisedPicks').hidden=false" title="What are Advised Picks?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cTracked">0</div></div>
+    <div class="card"><div class="label">Open positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('infoOpenPositions').hidden=false" title="What are Open Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cOpen">0</div></div>
+    <div class="card"><div class="label">Watching<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('infoWatching').hidden=false" title="What does Watching mean?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cWatching">0</div></div>
   </div>
 
   <div class="search-row">
@@ -114,9 +114,9 @@
 
   <section id="tab-positions" class="tab-section">
     <div class="cards">
-      <div class="card"><div class="label">Win rate (closed)</div><div class="value" id="pWinRate">-</div></div>
-      <div class="card"><div class="label">Realized P/L</div><div class="value" id="pRealized">-</div></div>
-      <div class="card"><div class="label">Open P/L (unrealized)</div><div class="value" id="pOpen">-</div></div>
+      <div class="card"><div class="label">Win rate (closed)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('infoWinRate').hidden=false" title="What is Win Rate?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pWinRate">-</div></div>
+      <div class="card"><div class="label">Realized P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('infoRealized').hidden=false" title="What is Realized P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pRealized">-</div></div>
+      <div class="card"><div class="label">Open P/L (unrealized)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('infoOpenPL').hidden=false" title="What is Open P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pOpen">-</div></div>
     </div>
     
     <div class="panel">
@@ -484,6 +484,54 @@
     <div class="modal-card" style="width: auto; height: auto; padding: 24px; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; border: none; box-shadow: none; display: flex; flex-direction: column; align-items: center; z-index: 10;" onclick="event.stopPropagation()">
       <button class="modal-close" onclick="document.getElementById('yaraModal').hidden=true" aria-label="Close" style="background: var(--card); border-radius: 50%; width: 32px; height: 32px; right: 0; top: 0;">&times;</button>
       <img src="static/img/yara-logo-large.png" alt="Yara (Princess)" style="width: min(600px, 90vw); height: auto; border-radius: 50%; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
+    </div>
+  </div>
+
+  <div id="infoAdvisedPicks" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoAdvisedPicks').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Advised picks</h2>
+      <p style="margin-bottom:0;">The total number of unique stock recommendations generated by Yara (the AI) via advice commands. It does not include positions manually imported without prior AI advice.</p>
+    </div>
+  </div>
+
+  <div id="infoOpenPositions" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoOpenPositions').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Open positions</h2>
+      <p style="margin-bottom:0;">The number of currently active eToro positions (lots) derived from Yara's advised picks.</p>
+    </div>
+  </div>
+
+  <div id="infoWatching" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoWatching').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Watching</h2>
+      <p style="margin-bottom:0;">The number of advised picks that you are actively tracking but have not necessarily bought or dropped yet.</p>
+    </div>
+  </div>
+
+  <div id="infoWinRate" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoWinRate').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Win rate (closed)</h2>
+      <p style="margin-bottom:0;">The percentage of closed positions that ended with a positive return (profit).</p>
+    </div>
+  </div>
+
+  <div id="infoRealized" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoRealized').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Realized P/L</h2>
+      <p style="margin-bottom:0;">The total cumulative Profit/Loss in dollars from all closed positions.</p>
+    </div>
+  </div>
+
+  <div id="infoOpenPL" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoOpenPL').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Open P/L (unrealized)</h2>
+      <p style="margin-bottom:0;">The total current floating Profit/Loss in dollars from all active open positions.</p>
     </div>
   </div>
 </body>
