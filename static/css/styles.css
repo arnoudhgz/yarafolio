@@ -257,6 +257,7 @@
   .article-content ul, .article-content ol { margin: 0 0 14px 0; padding-left: 24px; }
   .article-content li { margin-bottom: 8px; }
   .article-content strong { color: #fff; }
+  .article-content a strong, .news-markdown a strong { color: inherit; }
   
   #newsSummary, #eodList {
     display: grid;
