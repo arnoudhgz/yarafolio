@@ -74,9 +74,8 @@ class EtoroImport:
                     key, value = line.split("=", 1)
                     key = key.removeprefix("export ").strip()
                     creds[key] = value.strip().strip("\"'")
-        except OSError as exc:
-            raise RuntimeError(
-                f"Cannot read project environment file {env_file}: {exc}") from exc
+        except OSError:
+            pass
 
         suffix = os.environ.get("ETORO_SUFFIX", "")
 
@@ -90,9 +89,9 @@ class EtoroImport:
             creds["ETORO_USER_KEY"] = creds[user_key_name]
 
         if not creds.get("ETORO_API_KEY"):
-            raise RuntimeError(f"Missing ETORO_API_KEY in {env_file}")
+            raise RuntimeError(f"Missing ETORO_API_KEY (checked environment and {env_file})")
         if not creds.get("ETORO_USER_KEY"):
-            raise RuntimeError(f"Missing {user_key_name} in {env_file}")
+            raise RuntimeError(f"Missing {user_key_name} (checked environment and {env_file})")
 
         return creds
 
