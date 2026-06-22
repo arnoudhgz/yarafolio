@@ -375,7 +375,7 @@
     box-shadow: 0 0 4px #fff, 0 0 8px #88ccff;
   }
 
-  @keyframes blink {
+  @keyframes sparkle-blink {
     0%   { opacity: 0; transform: scale(0.5); }
     50%  { opacity: 0.6; transform: scale(1.2); }
     100% { opacity: 0; transform: scale(0.5); }
