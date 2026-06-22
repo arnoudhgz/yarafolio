@@ -518,5 +518,10 @@
     "ticker": "ACN",
     "name": "Accenture Plc",
     "sector": "Services"
+  },
+  "8678": {
+    "ticker": "SAP",
+    "name": "SAP SE ADR",
+    "sector": "Technology"
   }
 }
