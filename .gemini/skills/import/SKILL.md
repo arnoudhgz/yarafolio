@@ -20,7 +20,7 @@ Imported-only positions (source `import`) stay in the log for check-ins and the 
 
 ## Input forms (in order of preference)
 
-1. **eToro API (read-only)** - the default. Credentials live in `~/.config/etoro/credentials` (`ETORO_API_KEY`, `ETORO_USER_KEY`), deliberately OUTSIDE the project because yarafolio.py serves this whole directory. Never copy keys into the repo or into chat output.
+1. **eToro API (read-only)** - the default. Credentials live in `.env` (`ETORO_API_KEY`, `ETORO_USER_KEY`). Never copy keys into the repo or into chat output.
 2. eToro account statement export (.xlsx/.csv).
 3. Screenshot(s) of the portfolio page. Columns: Asset, Price, Units, Avg. Open, P/L($), P/L(%), Net Value, Daily P/L, Fees.
 4. Pasted text with the same data.
@@ -28,7 +28,7 @@ Imported-only positions (source `import`) stay in the log for check-ins and the 
 ## Step 1a: Fetch via API (preferred)
 
 ```bash
-source ~/.config/etoro/credentials && curl -s \
+source .env && curl -s \
   -H "x-api-key: $ETORO_API_KEY" \
   -H "x-user-key: $ETORO_USER_KEY" \
   -H "x-request-id: $(uuidgen)" \
