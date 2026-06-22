@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The dashboard now displays the current local version in the footer.
 - The backend checks for newer releases on GitHub during the initial startup sync and displays an update notification in the footer if a newer version is available.
 - Active sub-filters (Advice, Positions, News, IPO) and table sorting states are now persisted across page reloads and tab switches.
+- Optimized the ticker details chart to reduce visual clutter. Data points from previous weeks are now intelligently combined into weekly data points (labeled "Wk X"), while intraday data points for the current week are filtered to keep the opening, closing, and points at least 2 hours apart.
 
 ### Fixed
 - Renamed the new `blink` CSS keyframes to `sparkle-blink` to stop it from breaking the 30-minute stale indicator animation.

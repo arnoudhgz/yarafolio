@@ -214,6 +214,86 @@ export function drawModalChart(e) {
       hist.unshift({ date: e.firstAdvised + ' (Added)', price: e.priceAtAdvice });
     }
   }
+
+  // Helper for ISO week info
+  function getWeekInfo(dateStr) {
+    const d = new Date(dateStr.slice(0, 10));
+    if (isNaN(d.getTime())) return null;
+    d.setHours(0,0,0,0);
+    const day = d.getDay() || 7;
+    d.setDate(d.getDate() + 4 - day);
+    const year = d.getFullYear();
+    const yearStart = new Date(year, 0, 1);
+    const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+    return { year, week: weekNo };
+  }
+
+  const now = new Date();
+  const currentWeekInfo = getWeekInfo(now.toISOString());
+
+  let groupedHist = [];
+  let currentGroup = null;
+
+  for (let i = 0; i < hist.length; i++) {
+    const current = hist[i];
+    const info = getWeekInfo(current.date);
+    const isAdded = current.date.includes('(Added)');
+    
+    if (isAdded) {
+      groupedHist.push(current);
+      continue;
+    }
+
+    if (info && currentWeekInfo && (info.year < currentWeekInfo.year || (info.year === currentWeekInfo.year && info.week < currentWeekInfo.week))) {
+      // It's a previous week
+      const groupKey = info.year + '-W' + info.week;
+      if (!currentGroup || currentGroup.key !== groupKey) {
+        if (currentGroup) groupedHist.push(currentGroup.point);
+        currentGroup = { key: groupKey, point: { ...current, _isWeek: true, _weekNum: info.week } };
+      } else {
+        currentGroup.point = { ...current, _isWeek: true, _weekNum: info.week };
+      }
+    } else {
+      // Current week
+      if (currentGroup) {
+        groupedHist.push(currentGroup.point);
+        currentGroup = null;
+      }
+      groupedHist.push(current);
+    }
+  }
+  if (currentGroup) groupedHist.push(currentGroup.point);
+
+  // Optimize intraday data points
+  let optimizedHist = [];
+  let lastKeptTime = 0;
+  for (let i = 0; i < groupedHist.length; i++) {
+    const current = groupedHist[i];
+    if (current._isWeek || current.date.includes('(Added)')) {
+      optimizedHist.push(current);
+      continue;
+    }
+    const currentDay = current.date.slice(0, 10);
+    const prev = i > 0 ? groupedHist[i-1] : null;
+    const next = i < groupedHist.length - 1 ? groupedHist[i+1] : null;
+    const isFirstOfDay = i === 0 || prev.date.slice(0, 10) !== currentDay || prev._isWeek || prev.date.includes('(Added)');
+    const isLastOfDay = i === groupedHist.length - 1 || next.date.slice(0, 10) !== currentDay || next._isWeek;
+    
+    let ts = 0;
+    if (current.date.length >= 16) {
+      ts = new Date(current.date.slice(0, 16).replace(' ', 'T')).getTime();
+    }
+    
+    if (isFirstOfDay || isLastOfDay) {
+      optimizedHist.push(current);
+      lastKeptTime = ts;
+    } else if (ts && ts - lastKeptTime >= 2 * 60 * 60 * 1000) {
+      optimizedHist.push(current);
+      lastKeptTime = ts;
+    }
+  }
+  // Remove sequential duplicates if any
+  hist = optimizedHist.filter((item, pos, ary) => pos === 0 || item !== ary[pos - 1]);
   const canvas = /** @type {HTMLElement} */ (document.getElementById('modalChartCanvas'));
   if (!canvas || hist.length < 1) return;
   const t = today();
@@ -224,7 +304,9 @@ export function drawModalChart(e) {
     if (isAdded) dStr = dStr.replace(' (Added)', '');
     
     let label = '';
-    if (dStr.length > 10) {
+    if (h._isWeek) {
+      label = 'Wk ' + h._weekNum;
+    } else if (dStr.length > 10) {
       label = dStr.slice(11, 16);
     } else {
       label = dStr;
