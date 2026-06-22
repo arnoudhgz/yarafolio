@@ -80,3 +80,13 @@ The Advice tab shows advised picks only; imported-only holdings live on Portfoli
 The data lives in a private GitHub repo (`assisted-stock-advice`); `scripts/autosync.py` commits + pushes the data + generated files (`data/*.json`, `LEARNINGS.md`, never code) on every change. It runs from yarafolio.py after each dashboard save/import/refresh (background, best-effort) and as the last step of `/advice`, `/premarket`, `/aftermarket`, `/check`, `/diversify`, `/import`, `/learn`.
 
 **On by default**, via the project-local `.env` file (`STOCKS_AUTOSYNC=1`), which is gitignored so it stays out of the repo and a fresh clone is off. The `STOCKS_AUTOSYNC` env var **overrides** the file: set `STOCKS_AUTOSYNC=0` to force it off, which is exactly what dev/testing must do before running yarafolio.py or the scripts so test data never gets pushed. Best-effort: if the push fails (offline), the data is still committed locally and the next sync catches up. Code/skill changes are committed by hand, not by autosync.
+
+## Development
+
+- **Testing:** Always run `python3 -m unittest discover tests` before making any code commits to ensure existing functionality is not broken.
+
+## Changelog Rule
+Always update the `CHANGELOG.md` file when making code changes and before making git commits.
+
+## Sync Rule
+If you ever make changes to this file, you MUST immediately mirror those exact changes into `GEMINI.md` to keep the AI contexts perfectly in sync.

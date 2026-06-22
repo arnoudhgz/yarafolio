@@ -3,6 +3,7 @@ import { DATA, searchQuery } from './state.js';
 
 /** @returns {string} */
 export const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
+export const nowStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
 
 /** @returns {import('./state.js').AdviceEntry[]} */
 export const advised = () => DATA.entries.filter(e => e.source !== 'import');

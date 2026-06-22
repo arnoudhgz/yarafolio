@@ -77,22 +77,8 @@ def autosync(reason):
 
 
 def is_refreshable_quote(quote, market_today):
-    """Accept today's quotes, plus yesterday's after-hours quote before today's feed appears."""
-    if not isinstance(
-            quote, dict) or not isinstance(
-            quote.get("price"), (int, float)):
-        return False
-    market_date = quote.get("marketDate")
-    if market_date == market_today:
-        return True
-    if quote.get("session") != "after-hours" or not market_date:
-        return False
-    try:
-        quote_date = datetime.strptime(market_date, "%Y-%m-%d").date()
-        today = datetime.strptime(market_today, "%Y-%m-%d").date()
-    except ValueError:
-        return False
-    return quote_date == today - timedelta(days=1)
+    """Accept any quote with a valid price. The scraper fetches the latest available (avoids weekend/date-parsing rejects)."""
+    return isinstance(quote, dict) and isinstance(quote.get("price"), (int, float))
 
 
 class Handler(SimpleHTTPRequestHandler):
@@ -609,8 +595,62 @@ class YaraFolioApp:
 
         signal.signal(signal.SIGTERM, request_shutdown)
         url = f"http://127.0.0.1:{port}/dashboard.html"
-        threading.Timer(0.3, webbrowser.open, [url]).start()
+
+        def initial_sync():
+            import urllib.request, urllib.error, json, re
+            
+            locations = []
+            try:
+                with open(os.path.join(ROOT, ".env")) as f:
+                    content = f.read()
+                    if "ETORO_USER_KEY=" in content:
+                        locations.append("")
+                    for m in re.finditer(r"ETORO_USER_KEY_([A-Z0-9_]+)=", content):
+                        if m.group(1) not in locations:
+                            locations.append(m.group(1))
+            except OSError: pass
+            if not locations:
+                locations = [""]
+
+            # 1. Refresh quotes
+            try:
+                req = urllib.request.Request(f"http://127.0.0.1:{port}/api/refresh", data=b"{}")
+                req.add_header("Content-Type", "application/json")
+                urllib.request.urlopen(req, timeout=120)
+            except urllib.error.HTTPError as e:
+                try:
+                    err_body = json.loads(e.read().decode())
+                    err_msg = err_body.get("error", "").strip().split('\n')[-1]
+                    if err_msg: logger.info(f"Initial refresh sync skipped: {err_msg}")
+                except Exception: pass
+            except Exception: pass
+
+            # 2. Import from eToro (try locations until one succeeds)
+            for loc in locations:
+                try:
+                    payload = json.dumps({"location": loc}).encode()
+                    req = urllib.request.Request(f"http://127.0.0.1:{port}/api/import", data=payload)
+                    req.add_header("Content-Type", "application/json")
+                    res = urllib.request.urlopen(req, timeout=120)
+                    if res.status == 200:
+                        break  # Success, stop trying other locations
+                except urllib.error.HTTPError as e:
+                    try:
+                        err_body = json.loads(e.read().decode())
+                        err_msg = err_body.get("error", "").strip().split('\n')[-1]
+                        if err_msg:
+                            loc_name = loc if loc else "default"
+                            logger.info(f"Initial import sync (location '{loc_name}') skipped: {err_msg}")
+                    except Exception: pass
+                except Exception: pass
+
+            logger.info("Initial sync complete. Opening dashboard...")
+            webbrowser.open(url)
+
+        threading.Thread(target=initial_sync, daemon=True).start()
+
         logger.info(f"YaraFolio on {url} (Ctrl+C to stop)")
+        logger.info("Running initial sync, dashboard will open shortly...")
         try:
             server.serve_forever()
         except KeyboardInterrupt:
