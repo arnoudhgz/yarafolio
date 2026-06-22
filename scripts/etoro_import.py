@@ -179,7 +179,7 @@ class EtoroImport:
             first_open = min(p["openDateTime"] for p in plist)[:10]
             m = meta.get(iid, {})
             rate = rates.get(iid, {})
-            current = rate.get("lastExecution") or rate.get("bid")
+            current = rate.get("bid") or rate.get("lastExecution")
             pl_dollar = round(
                 units * current - invested,
                 2) if current else None
