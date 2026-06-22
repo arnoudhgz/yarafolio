@@ -10,10 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - The dashboard now displays the current local version in the footer.
 - The backend checks for newer releases on GitHub during the initial startup sync and displays an update notification in the footer if a newer version is available.
+- Active sub-filters (Advice, Positions, News, IPO) and table sorting states are now persisted across page reloads and tab switches.
 
 ### Fixed
 - Renamed the new `blink` CSS keyframes to `sparkle-blink` to stop it from breaking the 30-minute stale indicator animation.
 - Fixed vertical alignment and optical sizing of the GitHub icon in the footer menu.
+- Fixed an issue where the `estimated exit` badge would fail to display correctly for multiple positions/lots.
+- Fixed chart background fill colors for reference lines in the drilldown modal.
+- Fixed typescript evaluation errors in macro event timers.
 
 ## [0.4.0] - 2026-06-22
 

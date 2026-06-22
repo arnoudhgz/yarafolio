@@ -114,13 +114,21 @@ export const SECTORS = ['Basic Materials', 'Conglomerates', 'Consumer Goods', 'F
 export let portfolioViewMode = localStorage.getItem('portfolioViewMode') || 'collapsed';
 
 const savedSortState = localStorage.getItem('sortState');
-/** @type {Record<string, {key: string, dir: number}>} */
-export const sortState = savedSortState ? JSON.parse(savedSortState) : {
+const defaultSortState = {
   advice: { key: 'buyProx', dir: 1 },
   archive: { key: 'firstAdvised', dir: -1 },
   positions: { key: 'firstAdvised', dir: -1 },
   portfolio: { key: 'plPct', dir: -1 },
 };
+let initialSortState = defaultSortState;
+try {
+  if (savedSortState) {
+    initialSortState = { ...defaultSortState, ...JSON.parse(savedSortState) };
+  }
+} catch (e) {}
+
+/** @type {Record<string, {key: string, dir: number}>} */
+export const sortState = initialSortState;
 
 /** @param {AppData} val */
 export function setDATA(val) { DATA = val; }
@@ -155,4 +163,4 @@ export function setSearchTimer(val) { searchTimer = val; }
 /** @param {any} val */
 export function setModalChart(val) { modalChart = val; }
 /** @param {string} val */
-export function setPortfolioViewMode(val) { portfolioViewMode = val; }
+export function setPortfolioViewMode(val) { portfolioViewMode = val; localStorage.setItem('portfolioViewMode', val); }

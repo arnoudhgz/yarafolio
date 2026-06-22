@@ -72,7 +72,14 @@ async function load() {
   }
 }
 
-setPortfolioViewMode('collapsed');
+if (portfolioViewMode === 'split') {
+  /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.add('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.remove('active');
+} else {
+  /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.add('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.remove('active');
+}
+
 /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).addEventListener('click', () => {
   setPortfolioViewMode('collapsed');
   /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.add('active');
@@ -201,6 +208,7 @@ function headerSortHandler(tableId, stateKey, render) {
     const key = th.getAttribute('data-key');
     if (state.key === key) state.dir = -state.dir;
     else { state.key = key; state.dir = -1; }
+    localStorage.setItem('sortState', JSON.stringify(sortState));
     render();
   });
 }
