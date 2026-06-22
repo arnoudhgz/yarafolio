@@ -64,7 +64,7 @@ class EtoroImport:
 
     def credentials(self):
         creds = {}
-        env_file = os.path.join(ROOT, ".env")
+        env_file = os.path.expanduser("~/.config/etoro/credentials")
         try:
             with open(env_file) as f:
                 for line in f:

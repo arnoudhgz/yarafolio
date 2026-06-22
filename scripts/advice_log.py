@@ -144,7 +144,7 @@ class AdviceLog:
         e = None
         for x in data["entries"]:
             if x["ticker"] == args.ticker and x.get(
-                    "firstAdvised") == today and x.get("source") != "import":
+                    "status") == "watching" and x.get("source") != "import":
                 e = x
                 break
 
