@@ -84,3 +84,6 @@ The data lives in a private GitHub repo (`assisted-stock-advice`); `scripts/auto
 ## Development
 
 - **Testing:** Always run `python3 -m unittest discover tests` before making any code commits to ensure existing functionality is not broken.
+
+## Changelog Rule
+Always update the `CHANGELOG.md` file when making code changes and before making git commits.
