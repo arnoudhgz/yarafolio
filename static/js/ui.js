@@ -160,7 +160,7 @@ export function openModal(id) {
         (e.dropAbove != null ? '<span>drop above ' + fmtPrice(e.dropAbove) + '</span>' : '') +
         (realizedPL(e) != null ? '<span>realized <span class="' + (realizedPL(e) >= 0 ? 'pos' : 'neg') + '">' + fmtPL(realizedPL(e)) + '</span></span>' : '') +
         (unrealizedPL(e) != null ? '<span>open P/L <span class="' + (unrealizedPL(e) >= 0 ? 'pos' : 'neg') + '">' + fmtPL(unrealizedPL(e)) + '</span></span>' : '') +
-        (e.exitEstimated ? '<span class="badge est">estimated exit</span>' : '') +
+        (Array.isArray(e.lots) && e.lots.some(l => l.exitEstimated) ? '<span class="badge est">estimated exit</span>' : '') +
       '</div>' +
       (e.reason ? '<h4>Thesis</h4><div>' + esc(e.reason) + '</div>' : '') +
       (e.risk ? '<h4>Risk</h4><div>' + esc(e.risk) + '</div>' : '') +
@@ -235,19 +235,27 @@ export function drawModalChart(e) {
     borderColor: '#3b82f6', borderWidth: 3, pointRadius: 3, tension: 0.4,
     fill: true, backgroundColor: 'rgba(59, 130, 246, 0.1)',
     pointBackgroundColor: '#3b82f6', pointBorderColor: '#fff', pointBorderWidth: 1 }];
+  const extraDatasetProps = {
+    tension: 0,
+    fill: false,
+    backgroundColor: 'transparent',
+    pointBackgroundColor: '#fff',
+    pointBorderColor: '#fff',
+    pointBorderWidth: 1
+  };
   if (e.buyBelow != null) datasets.push({ label: 'Buy below', data: labels.map(() => e.buyBelow),
-    borderColor: '#2ecc71', borderDash: [5, 5], borderWidth: 1, pointRadius: 0 });
+    borderColor: '#2ecc71', borderDash: [5, 5], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
   if (e.dropBelow != null) datasets.push({ label: 'Drop below', data: labels.map(() => e.dropBelow),
-    borderColor: '#e74c3c', borderDash: [5, 5], borderWidth: 1, pointRadius: 0 });
+    borderColor: '#e74c3c', borderDash: [5, 5], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
   if (e.dropAbove != null) datasets.push({ label: 'Drop above', data: labels.map(() => e.dropAbove),
-    borderColor: '#8b98a5', borderDash: [5, 5], borderWidth: 1, pointRadius: 0 });
+    borderColor: '#8b98a5', borderDash: [5, 5], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
 
   if (e.boughtAt && e.status === 'bought') {
     datasets.push({ label: 'Bought', data: labels.map(() => e.boughtAt),
-      borderColor: '#3498db', borderDash: [2, 2], borderWidth: 1, pointRadius: 0 });
+      borderColor: '#3498db', borderDash: [2, 2], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
     
     datasets.push({ label: 'TSL Target (+5%)', data: labels.map(() => e.boughtAt * 1.05),
-      borderColor: '#f1c40f', borderDash: [2, 2], borderWidth: 1, pointRadius: 0 });
+      borderColor: '#f1c40f', borderDash: [2, 2], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
   }
 
   // @ts-ignore
@@ -288,7 +296,8 @@ export function closeModal() {
  */
 export function updateMacroTimers(nyDate) {
   document.querySelectorAll('.macro-timer').forEach(el => {
-    const timeStr = /** @type {HTMLElement} */ (el).dataset.time;
+    const element = /** @type {HTMLElement} */ (el);
+    const timeStr = element.dataset.time;
     if (!timeStr) return;
     
     const match = timeStr.match(/(\d+):(\d+)(am|pm)/i);
@@ -302,20 +311,20 @@ export function updateMacroTimers(nyDate) {
     const eventTime = new Date(nyDate);
     eventTime.setHours(h, m, 0, 0);
     
-    const diffMs = eventTime - nyDate;
+    const diffMs = eventTime.getTime() - nyDate.getTime();
     if (diffMs < 0) {
-      el.textContent = " (Passed)";
-      el.style.color = "var(--muted)";
+      element.textContent = " (Passed)";
+      element.style.color = "var(--muted)";
     } else {
       const diffS = Math.floor(diffMs / 1000);
       const hrs = Math.floor(diffS / 3600);
       const mins = Math.floor((diffS % 3600) / 60);
       const secs = String(diffS % 60).padStart(2, '0');
       if (hrs > 0) {
-        el.textContent = ` (in ${hrs}h ${mins}m)`;
+        element.textContent = ` (in ${hrs}h ${mins}m)`;
       } else {
-        el.textContent = ` (in ${mins}m ${secs}s)`;
-        el.style.color = "var(--orange)";
+        element.textContent = ` (in ${mins}m ${secs}s)`;
+        element.style.color = "var(--orange)";
       }
     }
   });

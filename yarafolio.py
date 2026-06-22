@@ -61,6 +61,7 @@ DEFAULT_PORT = int(get_env("PORT") or 8742)
 DATA_LOCK = threading.Lock()
 IMPORT_RUNNING = threading.Lock()   # non-blocking guard against double imports
 REFRESH_RUNNING = threading.Lock()  # non-blocking guard against double refreshes
+VERSION_INFO = {"local": "unknown", "remote": "unknown"}
 SYNC_LOCK = threading.Lock()        # serialises background git autosyncs
 
 
@@ -141,6 +142,9 @@ class Handler(SimpleHTTPRequestHandler):
                 self.respond_json(500, {"error": e.stderr})
         elif self.path == "/api/locations":
             self.handle_locations()
+        elif self.path == "/api/version":
+            self.respond_json(200, VERSION_INFO)
+            return
         else:
             super().do_GET()
 
@@ -598,6 +602,25 @@ class YaraFolioApp:
 
         def initial_sync():
             import urllib.request, urllib.error, json, re
+            
+            # 0. Check versions
+            try:
+                with open(os.path.join(ROOT, "CHANGELOG.md")) as f:
+                    for line in f:
+                        if line.startswith("## [") and "Unreleased" not in line:
+                            VERSION_INFO["local"] = line.split("[")[1].split("]")[0]
+                            break
+            except Exception: pass
+            try:
+                req = urllib.request.Request("https://api.github.com/repos/arnoudhgz/yarafolio/releases/latest")
+                req.add_header("User-Agent", "YaraFolio")
+                with urllib.request.urlopen(req, timeout=5) as res:
+                    data = json.loads(res.read().decode())
+                    tag = data.get("tag_name", "")
+                    if tag.startswith("v"):
+                        tag = tag[1:]
+                    VERSION_INFO["remote"] = tag
+            except Exception: pass
             
             locations = []
             try:

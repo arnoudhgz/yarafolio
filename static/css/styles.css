@@ -257,6 +257,7 @@
   .article-content ul, .article-content ol { margin: 0 0 14px 0; padding-left: 24px; }
   .article-content li { margin-bottom: 8px; }
   .article-content strong { color: #fff; }
+  .article-content a strong, .news-markdown a strong { color: inherit; }
   
   #newsSummary, #eodList {
     display: grid;
@@ -375,7 +376,7 @@
     box-shadow: 0 0 4px #fff, 0 0 8px #88ccff;
   }
 
-  @keyframes blink {
+  @keyframes sparkle-blink {
     0%   { opacity: 0; transform: scale(0.5); }
     50%  { opacity: 0.6; transform: scale(1.2); }
     100% { opacity: 0; transform: scale(0.5); }

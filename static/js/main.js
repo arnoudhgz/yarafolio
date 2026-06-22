@@ -1,5 +1,5 @@
 // @ts-check
-import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
+import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
 import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
@@ -47,6 +47,19 @@ async function load() {
   /* analyticsRendered handled in renderers */;
   setLEARN(null);  // refetch stats after data changes
   renderAll();
+  // Restore sub-button filter states in UI
+  const setFilterActive = (selector, value) => {
+    const btn = document.querySelector(`${selector} [data-filter="${value}"], ${selector} [data-posfilter="${value}"], ${selector} [data-newsfilter="${value}"], ${selector} [data-ipofilter="${value}"]`);
+    if (btn) {
+      document.querySelectorAll(`${selector} button`).forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  };
+  setFilterActive('#filters', currentFilter);
+  setFilterActive('#posFilters', posFilter);
+  setFilterActive('#rawNewsFilters', newsFilter);
+  setFilterActive('#ipoFilters', ipoFilter);
+
   const savedTab = localStorage.getItem('activeTab');
   if (savedTab && savedTab !== 'advice') {
     const tabBtn = document.querySelector(`.tabs button[data-tab="${savedTab}"]`);
@@ -59,7 +72,14 @@ async function load() {
   }
 }
 
-setPortfolioViewMode('collapsed');
+if (portfolioViewMode === 'split') {
+  /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.add('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.remove('active');
+} else {
+  /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.add('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.remove('active');
+}
+
 /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).addEventListener('click', () => {
   setPortfolioViewMode('collapsed');
   /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.add('active');
@@ -188,6 +208,7 @@ function headerSortHandler(tableId, stateKey, render) {
     const key = th.getAttribute('data-key');
     if (state.key === key) state.dir = -state.dir;
     else { state.key = key; state.dir = -1; }
+    localStorage.setItem('sortState', JSON.stringify(sortState));
     render();
   });
 }
@@ -244,6 +265,7 @@ const adviceClickHandler = (ev) => {
   document.querySelectorAll('#rawNewsFilters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const filter = btn.dataset.newsfilter;
+  setNewsFilter(filter);
   document.querySelectorAll('.news-card').forEach(card => {
     const cardEl = /** @type {HTMLElement} */ (card);
     if (filter === 'all') cardEl.style.display = 'block';
@@ -259,6 +281,7 @@ const adviceClickHandler = (ev) => {
   document.querySelectorAll('#ipoFilters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const filter = btn.dataset.ipofilter;
+  setIpoFilter(filter);
   document.querySelectorAll('#iposBody tr').forEach(tr => {
     const row = /** @type {HTMLElement} */ (tr);
     if (row.children.length === 1) return; // header row
@@ -452,3 +475,11 @@ function updateTimer() {
 
 load();
 
+fetch('/api/version').then(r => r.json()).then(data => {
+  let vHTML = `v${data.local}`;
+  if (data.remote && data.remote !== "unknown" && data.remote !== data.local) {
+    vHTML += ` <a href="https://github.com/arnoudhgz/yarafolio/releases/latest" target="_blank" style="color: var(--orange); margin-left: 8px; text-decoration: none;" title="A newer version is available on GitHub!">(Update available: v${data.remote})</a>`;
+  }
+  const el = document.getElementById('version-info');
+  if (el) el.innerHTML = vHTML;
+}).catch(e => console.error("Failed to fetch version", e));
