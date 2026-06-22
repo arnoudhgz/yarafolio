@@ -84,3 +84,6 @@ The data lives in a private GitHub repo (`assisted-stock-advice`); `scripts/auto
 ## Development
 
 - **Testing:** Always run `python3 -m unittest discover tests` before making any code commits to ensure existing functionality is not broken.
+
+## Sync Rule
+If you ever make changes to this file, you MUST immediately mirror those exact changes into `CLAUDE.md` to keep the AI contexts perfectly in sync.

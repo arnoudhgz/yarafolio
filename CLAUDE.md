@@ -87,3 +87,6 @@ The data lives in a private GitHub repo (`assisted-stock-advice`); `scripts/auto
 
 ## Changelog Rule
 Always update the `CHANGELOG.md` file when making code changes and before making git commits.
+
+## Sync Rule
+If you ever make changes to this file, you MUST immediately mirror those exact changes into `GEMINI.md` to keep the AI contexts perfectly in sync.
