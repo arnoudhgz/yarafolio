@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- The dashboard now displays the current local version in the footer.
+- The backend checks for newer releases on GitHub during the initial startup sync and displays an update notification in the footer if a newer version is available.
+
 ### Fixed
 - Renamed the new `blink` CSS keyframes to `sparkle-blink` to stop it from breaking the 30-minute stale indicator animation.
 - Fixed vertical alignment and optical sizing of the GitHub icon in the footer menu.

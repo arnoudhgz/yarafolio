@@ -452,3 +452,11 @@ function updateTimer() {
 
 load();
 
+fetch('/api/version').then(r => r.json()).then(data => {
+  let vHTML = `v${data.local}`;
+  if (data.remote && data.remote !== "unknown" && data.remote !== data.local) {
+    vHTML += ` <a href="https://github.com/arnoudhgz/yarafolio/releases/latest" target="_blank" style="color: var(--orange); margin-left: 8px; text-decoration: none;" title="A newer version is available on GitHub!">(Update available: v${data.remote})</a>`;
+  }
+  const el = document.getElementById('version-info');
+  if (el) el.innerHTML = vHTML;
+}).catch(e => console.error("Failed to fetch version", e));
