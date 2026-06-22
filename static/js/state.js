@@ -63,13 +63,19 @@ export let sectorChart = null;
 export let sectorCoverageChart = null;
 
 /** @type {string} */
-export let currentFilter = 'watching';
+export let currentFilter = localStorage.getItem('currentFilter') || 'watching';
 
 /** @type {string} */
-export let posFilter = 'open';
+export let posFilter = localStorage.getItem('posFilter') || 'open';
 
 /** @type {string} */
-export let activeTab = 'advice';
+export let newsFilter = localStorage.getItem('newsFilter') || 'all';
+
+/** @type {string} */
+export let ipoFilter = localStorage.getItem('ipoFilter') || 'listed';
+
+/** @type {string} */
+export let activeTab = localStorage.getItem('activeTab') || 'advice';
 
 /** @type {boolean} */
 export let portfolioRendered = false;
@@ -105,10 +111,11 @@ export const SECTORS = ['Basic Materials', 'Conglomerates', 'Consumer Goods', 'F
   'Industrial Goods', 'Services', 'Technology', 'Utilities', 'ETF / Other'];
 
 /** @type {string} */
-export let portfolioViewMode = 'collapsed';
+export let portfolioViewMode = localStorage.getItem('portfolioViewMode') || 'collapsed';
 
+const savedSortState = localStorage.getItem('sortState');
 /** @type {Record<string, {key: string, dir: number}>} */
-export const sortState = {
+export const sortState = savedSortState ? JSON.parse(savedSortState) : {
   advice: { key: 'buyProx', dir: 1 },
   archive: { key: 'firstAdvised', dir: -1 },
   positions: { key: 'firstAdvised', dir: -1 },
@@ -124,11 +131,15 @@ export function setSectorChart(val) { sectorChart = val; }
 /** @param {any} val */
 export function setSectorCoverageChart(val) { sectorCoverageChart = val; }
 /** @param {string} val */
-export function setCurrentFilter(val) { currentFilter = val; }
+export function setCurrentFilter(val) { currentFilter = val; localStorage.setItem('currentFilter', val); }
 /** @param {string} val */
-export function setPosFilter(val) { posFilter = val; }
+export function setPosFilter(val) { posFilter = val; localStorage.setItem('posFilter', val); }
 /** @param {string} val */
-export function setActiveTab(val) { activeTab = val; }
+export function setNewsFilter(val) { newsFilter = val; localStorage.setItem('newsFilter', val); }
+/** @param {string} val */
+export function setIpoFilter(val) { ipoFilter = val; localStorage.setItem('ipoFilter', val); }
+/** @param {string} val */
+export function setActiveTab(val) { activeTab = val; localStorage.setItem('activeTab', val); }
 /** @param {boolean} val */
 export function setPortfolioRendered(val) { portfolioRendered = val; }
 /** @param {boolean} val */

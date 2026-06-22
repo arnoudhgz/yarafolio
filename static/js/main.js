@@ -1,5 +1,5 @@
 // @ts-check
-import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
+import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
 import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
@@ -47,6 +47,19 @@ async function load() {
   /* analyticsRendered handled in renderers */;
   setLEARN(null);  // refetch stats after data changes
   renderAll();
+  // Restore sub-button filter states in UI
+  const setFilterActive = (selector, value) => {
+    const btn = document.querySelector(`${selector} [data-filter="${value}"], ${selector} [data-posfilter="${value}"], ${selector} [data-newsfilter="${value}"], ${selector} [data-ipofilter="${value}"]`);
+    if (btn) {
+      document.querySelectorAll(`${selector} button`).forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  };
+  setFilterActive('#filters', currentFilter);
+  setFilterActive('#posFilters', posFilter);
+  setFilterActive('#rawNewsFilters', newsFilter);
+  setFilterActive('#ipoFilters', ipoFilter);
+
   const savedTab = localStorage.getItem('activeTab');
   if (savedTab && savedTab !== 'advice') {
     const tabBtn = document.querySelector(`.tabs button[data-tab="${savedTab}"]`);
@@ -244,6 +257,7 @@ const adviceClickHandler = (ev) => {
   document.querySelectorAll('#rawNewsFilters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const filter = btn.dataset.newsfilter;
+  setNewsFilter(filter);
   document.querySelectorAll('.news-card').forEach(card => {
     const cardEl = /** @type {HTMLElement} */ (card);
     if (filter === 'all') cardEl.style.display = 'block';
@@ -259,6 +273,7 @@ const adviceClickHandler = (ev) => {
   document.querySelectorAll('#ipoFilters button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const filter = btn.dataset.ipofilter;
+  setIpoFilter(filter);
   document.querySelectorAll('#iposBody tr').forEach(tr => {
     const row = /** @type {HTMLElement} */ (tr);
     if (row.children.length === 1) return; // header row
