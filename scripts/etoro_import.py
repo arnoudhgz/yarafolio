@@ -97,6 +97,7 @@ class EtoroImport:
         return creds
 
     def get(self, path, creds):
+        import urllib.request
         import urllib.error
         req = urllib.request.Request(BASE + path, headers={
             "x-api-key": creds["ETORO_API_KEY"],
