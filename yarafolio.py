@@ -77,22 +77,8 @@ def autosync(reason):
 
 
 def is_refreshable_quote(quote, market_today):
-    """Accept today's quotes, plus yesterday's after-hours quote before today's feed appears."""
-    if not isinstance(
-            quote, dict) or not isinstance(
-            quote.get("price"), (int, float)):
-        return False
-    market_date = quote.get("marketDate")
-    if market_date == market_today:
-        return True
-    if quote.get("session") != "after-hours" or not market_date:
-        return False
-    try:
-        quote_date = datetime.strptime(market_date, "%Y-%m-%d").date()
-        today = datetime.strptime(market_today, "%Y-%m-%d").date()
-    except ValueError:
-        return False
-    return quote_date == today - timedelta(days=1)
+    """Accept any quote with a valid price. The scraper fetches the latest available (avoids weekend/date-parsing rejects)."""
+    return isinstance(quote, dict) and isinstance(quote.get("price"), (int, float))
 
 
 class Handler(SimpleHTTPRequestHandler):

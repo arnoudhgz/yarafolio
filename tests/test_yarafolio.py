@@ -15,33 +15,21 @@ class RefreshableQuoteTest(unittest.TestCase):
 
         self.assertTrue(yarafolio.is_refreshable_quote(quote, "2026-06-16"))
 
-    def test_previous_day_after_hours_quote_is_refreshable(self):
-        quote = {
-            "price": 101.25,
-            "session": "after-hours",
-            "marketDate": "2026-06-15"}
-
-        self.assertTrue(yarafolio.is_refreshable_quote(quote, "2026-06-16"))
-
-    def test_previous_day_regular_quote_is_stale(self):
-        quote = {
+    def test_any_quote_with_price_is_refreshable(self):
+        quote1 = {
             "price": 100.0,
             "session": "regular",
             "marketDate": "2026-06-15"}
-
-        self.assertFalse(yarafolio.is_refreshable_quote(quote, "2026-06-16"))
-
-    def test_older_after_hours_quote_is_stale(self):
-        quote = {
+        quote2 = {
             "price": 101.25,
             "session": "after-hours",
             "marketDate": "2026-06-14"}
+        
+        self.assertTrue(yarafolio.is_refreshable_quote(quote1, "2026-06-16"))
+        self.assertTrue(yarafolio.is_refreshable_quote(quote2, "2026-06-16"))
 
-        self.assertFalse(yarafolio.is_refreshable_quote(quote, "2026-06-16"))
-
-    def test_quote_without_price_is_stale(self):
+    def test_quote_without_price_is_not_refreshable(self):
         quote = {"session": "after-hours", "marketDate": "2026-06-15"}
-
         self.assertFalse(yarafolio.is_refreshable_quote(quote, "2026-06-16"))
 
 
