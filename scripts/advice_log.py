@@ -111,9 +111,7 @@ class AdviceLog:
         today_str = now.strftime("%Y-%m-%d")
 
         hist = e.setdefault("priceHistory", [])
-        if hist and hist[-1]["price"] == price and hist[-1]["date"][:10] == today_str:
-            hist[-1]["date"] = now_str  # Update time but don't append duplicate point today
-        elif hist and hist[-1]["date"] == now_str:
+        if hist and hist[-1]["date"] == now_str:
             hist[-1]["price"] = price
         else:
             hist.append({"date": now_str, "price": price})

@@ -1,5 +1,6 @@
 import sys
 import unittest
+import unittest.mock
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
@@ -48,6 +49,54 @@ class AdviceLogTest(unittest.TestCase):
             "priceHistory": []
         }
         self.assertEqual(self.app.latest_price(entry), 100.0)
+
+    @unittest.mock.patch('advice_log.datetime')
+    def test_push_history_prunes_past_intraday_points_and_appends(self, mock_dt):
+        mock_dt.now.return_value = unittest.mock.Mock(
+            strftime=lambda fmt: "2026-06-16 15:30" if "%H" in fmt else "2026-06-16"
+        )
+        entry = {
+            "priceHistory": [
+                {"date": "2026-06-15 10:00", "price": 105.0},
+                {"date": "2026-06-15 12:00", "price": 106.5},
+            ]
+        }
+        self.app.push_history(entry, 107.0)
+        hist = entry["priceHistory"]
+        self.assertEqual(len(hist), 2)
+        self.assertEqual(hist[0], {"date": "2026-06-15", "price": 106.5})
+        self.assertEqual(hist[1], {"date": "2026-06-16 15:30", "price": 107.0})
+
+    @unittest.mock.patch('advice_log.datetime')
+    def test_push_history_updates_price_if_same_minute(self, mock_dt):
+        mock_dt.now.return_value = unittest.mock.Mock(
+            strftime=lambda fmt: "2026-06-16 15:30" if "%H" in fmt else "2026-06-16"
+        )
+        entry = {
+            "priceHistory": [
+                {"date": "2026-06-16 15:30", "price": 105.0},
+            ]
+        }
+        self.app.push_history(entry, 107.0)
+        hist = entry["priceHistory"]
+        self.assertEqual(len(hist), 1)
+        self.assertEqual(hist[0], {"date": "2026-06-16 15:30", "price": 107.0})
+
+    @unittest.mock.patch('advice_log.datetime')
+    def test_push_history_appends_same_price_different_time(self, mock_dt):
+        mock_dt.now.return_value = unittest.mock.Mock(
+            strftime=lambda fmt: "2026-06-16 15:35" if "%H" in fmt else "2026-06-16"
+        )
+        entry = {
+            "priceHistory": [
+                {"date": "2026-06-16 15:30", "price": 105.0},
+            ]
+        }
+        self.app.push_history(entry, 105.0)
+        hist = entry["priceHistory"]
+        self.assertEqual(len(hist), 2)
+        self.assertEqual(hist[0], {"date": "2026-06-16 15:30", "price": 105.0})
+        self.assertEqual(hist[1], {"date": "2026-06-16 15:35", "price": 105.0})
 
 
 if __name__ == "__main__":
