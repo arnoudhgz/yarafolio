@@ -70,7 +70,7 @@ class AdviceLog:
             return json.load(f)
 
     def save_log(self, data):
-        data["lastUpdated"] = date.today().isoformat()
+        data["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         tmp = self.log_file + ".tmp"
         with open(tmp, "w") as f:
             json.dump(data, f, indent=2)
@@ -111,6 +111,12 @@ class AdviceLog:
         today_str = now.strftime("%Y-%m-%d")
 
         hist = e.setdefault("priceHistory", [])
+        if hist:
+            last_point = hist[-1]
+            if last_point["date"][:10] == today_str and last_point["price"] == price:
+                # Same day, same price as the last point: skip to avoid duplicate flatline points
+                return
+
         if hist and hist[-1]["date"] == now_str:
             hist[-1]["price"] = price
         else:

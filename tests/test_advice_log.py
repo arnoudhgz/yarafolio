@@ -83,7 +83,7 @@ class AdviceLogTest(unittest.TestCase):
         self.assertEqual(hist[0], {"date": "2026-06-16 15:30", "price": 107.0})
 
     @unittest.mock.patch('advice_log.datetime')
-    def test_push_history_appends_same_price_different_time(self, mock_dt):
+    def test_push_history_skips_same_price_on_same_day(self, mock_dt):
         mock_dt.now.return_value = unittest.mock.Mock(
             strftime=lambda fmt: "2026-06-16 15:35" if "%H" in fmt else "2026-06-16"
         )
@@ -94,9 +94,24 @@ class AdviceLogTest(unittest.TestCase):
         }
         self.app.push_history(entry, 105.0)
         hist = entry["priceHistory"]
-        self.assertEqual(len(hist), 2)
+        self.assertEqual(len(hist), 1)
         self.assertEqual(hist[0], {"date": "2026-06-16 15:30", "price": 105.0})
-        self.assertEqual(hist[1], {"date": "2026-06-16 15:35", "price": 105.0})
+
+    @unittest.mock.patch('advice_log.datetime')
+    def test_push_history_appends_same_price_different_day(self, mock_dt):
+        mock_dt.now.return_value = unittest.mock.Mock(
+            strftime=lambda fmt: "2026-06-17 10:00" if "%H" in fmt else "2026-06-17"
+        )
+        entry = {
+            "priceHistory": [
+                {"date": "2026-06-16 15:30", "price": 105.0},
+            ]
+        }
+        self.app.push_history(entry, 105.0)
+        hist = entry["priceHistory"]
+        self.assertEqual(len(hist), 2)
+        self.assertEqual(hist[0], {"date": "2026-06-16", "price": 105.0})
+        self.assertEqual(hist[1], {"date": "2026-06-17 10:00", "price": 105.0})
 
 
 if __name__ == "__main__":

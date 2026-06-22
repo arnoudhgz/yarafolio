@@ -1,11 +1,11 @@
 // @ts-check
 import { DATA, setDATA, PORTFOLIO, setPORTFOLIO, setCanSave, LEARN, setLEARN } from './state.js';
 import { banner } from './ui.js';
-import { today, tickerLink, esc } from './utils.js';
+import { today, nowStr, tickerLink, esc } from './utils.js';
 import { renderAll } from './renderers.js';
 
 async function save() {
-  DATA.lastUpdated = today();
+  DATA.lastUpdated = nowStr();
   const res = await fetch('/api/save', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

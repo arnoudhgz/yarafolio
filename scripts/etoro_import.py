@@ -15,7 +15,7 @@ import os
 import sys
 import uuid
 import logging
-from datetime import date
+from datetime import date, datetime
 
 BASE = "https://public-api.etoro.com/api/v1"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -230,7 +230,7 @@ class EtoroImport:
 
     def write_portfolio(self, preview, today):
         self.atomic_write(self.portfolio_file, {
-            "lastUpdated": today,
+            "lastUpdated": datetime.now().strftime("%Y-%m-%d %H:%M"),
             "totalInvested": round(sum(i["invested"] for i in preview), 2),
             "holdings": [{
                 "ticker": i["ticker"], "name": i["name"], "instrumentID": i["instrumentID"],
@@ -415,7 +415,7 @@ class EtoroImport:
                     entry["sector"] = sector_by_ticker[entry["ticker"]]
                     backfilled += 1
 
-        data["lastUpdated"] = today
+        data["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         self.atomic_write(self.log_file, data)
 
         parts = []
