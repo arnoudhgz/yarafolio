@@ -205,7 +205,7 @@
 
   <section id="tab-macro" class="tab-section">
     <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div style="display:flex; justify-content:flex-start; align-items:center; margin-bottom:16px; gap:16px;">
         <h2 style="margin:0; display:flex; align-items:center; gap:8px;">
           This Week's Macro Economic Events
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('macroInfoModal').hidden=false" title="About Macro events"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
@@ -218,6 +218,7 @@
             <th class="sortable" data-sort="date" style="width:100px;">Date &#x21c5;</th>
             <th class="sortable" data-sort="time" style="width:80px;">Time &#x21c5;</th>
             <th class="sortable" data-sort="country" style="width:60px;">Cur &#x21c5;</th>
+            <th class="sortable" data-sort="impact" style="width:80px;">Impact &#x21c5;</th>
             <th class="sortable" data-sort="title">Event &#x21c5;</th>
             <th class="sortable" data-sort="previous">Previous &#x21c5;</th>
             <th class="sortable" data-sort="forecast">Forecast &#x21c5;</th>
@@ -262,9 +263,9 @@
 
   <section id="tab-ipos" class="tab-section" style="display:none">
     <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h2 style="display:flex; align-items:center; gap:8px; margin:0;">
-          IPO Tracker
+      <div style="display:flex; justify-content:flex-start; align-items:center; margin-bottom:16px; gap:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">
+          Initial Public Offerings (IPOs)
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" style="cursor:pointer; color:var(--muted);" onclick="document.getElementById('iposInfoModal').hidden=false" title="How this works"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         </h2>
         <button id="refreshIposBtn" class="refresh-btn">&#x21bb; Refresh IPOs</button>
