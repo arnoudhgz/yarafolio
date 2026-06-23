@@ -18,13 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `/check` reads tracked entries via `advice_log.py get-entry` and `/check` can add a brand-new ticker with full `/advice` rigor (all entry/exit levels), not a partial entry.
 - `/diversify` describes the correct 10-sector taxonomy (underweight computed over the 9 investable sectors).
 - Skills genericized for open source: US session times stated in ET (dropped the Netherlands/CEST local times), a hardcoded absolute path removed, and the eToro credential docs corrected to the project `.env` to match the code. Every skill now carries uniform frontmatter and the `.claude` / `.gemini` skill trees are back in sync.
+- Extracted the shared price-history pruning into `scripts/price_history.py` and entry normalization into `scripts/entries.py`, and the dashboard market-holiday calendar into `static/js/holidays.js`, so the duplicated/date logic can't drift out of sync.
+- The market timer names the holiday when the market is closed for one (e.g. "MARKET CLOSED (Christmas)").
 
 ### Fixed
+- The dashboard market-status timer used a hardcoded 2026 holiday list, so it would have shown the market as open on every 2027+ holiday. Holidays are now computed per year following NYSE rules (Good Friday via Computus, the Saturday/Sunday observance shifts, and the New-Year-on-Saturday exception).
 - `scripts/etoro_import.py` no longer drops a price point when a new day's price matches the previous day's last price. Its price-history bookkeeping now matches `advice_log.py` exactly.
 - The scripts no longer crash on legacy entries missing `priceHistory`, `status`, or `firstAdvised`. Entries are normalized on load and the hot paths (`find`, `latest_price`, check-in candidates, learn stats) read defensively.
-
-### Changed
-- Extracted the shared price-history pruning into `scripts/price_history.py` and entry normalization into `scripts/entries.py`, so `advice_log.py` and `etoro_import.py` can't drift out of sync.
 
 ## [0.7.0]
 
