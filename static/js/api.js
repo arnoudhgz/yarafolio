@@ -40,7 +40,7 @@ export async function loadLearn() {
   setLEARN(null);
 }
 
-export async function fetchMacro() {
+export async function fetchMacro(force = false) {
   const btn = /** @type {HTMLButtonElement} */ (document.getElementById('refreshMacroBtn'));
   const loading = /** @type {HTMLElement} */ (document.getElementById('macroLoading'));
   const list = /** @type {HTMLElement} */ (document.getElementById('macroList'));
@@ -52,7 +52,8 @@ export async function fetchMacro() {
   empty.style.display = 'none';
   
   try {
-    const res = await fetch('/api/macro');
+    const url = force ? '/api/macro?force=1' : '/api/macro';
+    const res = await fetch(url);
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
     

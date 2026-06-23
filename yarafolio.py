@@ -400,9 +400,10 @@ class Handler(SimpleHTTPRequestHandler):
         import os
         import time
 
+        force = "force=1" in self.path
         cache_file = os.path.join(ROOT, "data", "macro_cache.json")
         try:
-            if os.path.exists(cache_file):
+            if os.path.exists(cache_file) and not force:
                 cache_time = os.path.getmtime(cache_file)
                 age = time.time() - cache_time
                 if age < 2 * 3600:
