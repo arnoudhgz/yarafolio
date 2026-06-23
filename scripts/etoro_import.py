@@ -242,7 +242,9 @@ class EtoroImport:
             } for i in preview],
         })
 
-    def reconcile_lots(self, entry, item, today):
+    def reconcile_lots(self, entry, item, today, claimed_lots=None):
+        if claimed_lots is None:
+            claimed_lots = set()
         first = entry.get("firstAdvised") or ""
         dropped = entry.get("droppedDate")
         live = {}
@@ -255,8 +257,15 @@ class EtoroImport:
         current = item.get("currentPrice") if item else None
         lots = entry.setdefault("lots", [])
         have = {lot["positionID"]: lot for lot in lots}
+        
+        # Pre-claim lots we already own
+        for pid in have:
+            claimed_lots.add(pid)
+            
         for pid, lot in live.items():
             if pid not in have:
+                if pid in claimed_lots:
+                    continue
                 lots.append({"positionID": pid,
                              "openDate": lot["openDate"],
                              "openRate": lot["openRate"],
@@ -265,6 +274,7 @@ class EtoroImport:
                              "tslEnabled": bool(lot.get("tslEnabled")),
                              "soldAt": None,
                              "exitEstimated": False})
+                claimed_lots.add(pid)
             elif have[pid].get("soldAt") is None:
                 have[pid]["tslEnabled"] = bool(lot.get("tslEnabled"))
                 if current:
@@ -344,10 +354,13 @@ class EtoroImport:
         by_ticker = {item["ticker"]: item for item in preview}
 
         closed_lots = 0
-        for e in data["entries"]:
-            if e.get("source") != "import":
-                closed_lots += self.reconcile_lots(e,
-                                                   by_ticker.get(e["ticker"]), today)
+        claimed_lots = set()
+        
+        advised_entries = [e for e in data["entries"] if e.get("source") != "import"]
+        advised_entries.sort(key=lambda x: x.get("firstAdvised", ""), reverse=True)
+        
+        for e in advised_entries:
+            closed_lots += self.reconcile_lots(e, by_ticker.get(e["ticker"]), today, claimed_lots)
 
         import_by_ticker = {
             e["ticker"]: e for e in data["entries"] if e.get("source") == "import"}

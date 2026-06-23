@@ -201,7 +201,7 @@ document.querySelectorAll('.tabs button').forEach(b => {
 });
 
 /** @type {HTMLElement} */ (document.getElementById('refreshIposBtn')).addEventListener('click', () => fetchIpos(true));
-/** @type {HTMLElement} */ (document.getElementById('refreshMacroBtn')).addEventListener('click', fetchMacro);
+/** @type {HTMLElement} */ (document.getElementById('refreshMacroBtn')).addEventListener('click', () => fetchMacro(true));
 
 function headerSortHandler(tableId, stateKey, render) {
   document.querySelector('#' + tableId + ' thead').addEventListener('click', (ev) => {

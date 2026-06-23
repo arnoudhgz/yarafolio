@@ -40,7 +40,7 @@ export async function loadLearn() {
   setLEARN(null);
 }
 
-export async function fetchMacro() {
+export async function fetchMacro(force = false) {
   const btn = /** @type {HTMLButtonElement} */ (document.getElementById('refreshMacroBtn'));
   const loading = /** @type {HTMLElement} */ (document.getElementById('macroLoading'));
   const list = /** @type {HTMLElement} */ (document.getElementById('macroList'));
@@ -52,7 +52,8 @@ export async function fetchMacro() {
   empty.style.display = 'none';
   
   try {
-    const res = await fetch('/api/macro');
+    const url = force ? '/api/macro?force=1' : '/api/macro';
+    const res = await fetch(url);
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
     
@@ -92,24 +93,24 @@ export async function fetchMacro() {
         
         let displayTime = esc(e.time);
         if (isToday && e.time && e.time !== 'All Day' && e.time !== 'Tentative' && !isPast) {
-          displayTime += ` <span class="macro-timer" data-time="${esc(e.time)}" style="color:var(--blue); font-size:11px; white-space:nowrap;"></span>`;
+          displayTime += ` <span class="macro-timer" data-time="${esc(e.time)}" style="color:var(--blue); font-size:11px; white-space:nowrap; font-variant-numeric:tabular-nums; display:inline-block; min-width:80px;"></span>`;
         }
         
         const jsDate = esc(displayDate).replace(/&#39;/g, "\\'");
         const jsTitle = esc(e.title).replace(/&#39;/g, "\\'");
         const jsImpact = esc(e.impact).replace(/&#39;/g, "\\'");
-        const jsForecast = esc(e.forecast).replace(/&#39;/g, "\\'");
-        const jsPrev = esc(e.previous).replace(/&#39;/g, "\\'");
-        const jsCountry = esc(e.country).replace(/&#39;/g, "\\'");
+        const jsForecast = esc(e.forecast || '').replace(/&#39;/g, "\\'");
+        const jsPrev = esc(e.previous || '').replace(/&#39;/g, "\\'");
+        const jsCountry = esc(e.country || '').replace(/&#39;/g, "\\'");
         
-        html += `<tr style="${rowStyle}" onclick="openMacroModal('${jsTitle}', '${jsImpact}', '${jsForecast}', '${jsPrev}', '${jsCountry}', '${jsDate}')">
+        html += `<tr style="${rowStyle}" onclick="openMacroModal('${jsTitle}', '${jsImpact}', '${jsPrev}', '${jsForecast}', '${jsCountry}', '${jsDate}')">
           <td style="white-space: nowrap;">${displayDate}</td>
           <td>${displayTime}</td>
-          <td style="font-weight:bold">${esc(e.country)}</td>
-          <td style="color:${impactColor}">${esc(e.impact)}</td>
-          <td>${esc(e.title)}</td>
-          <td>${esc(e.forecast)}</td>
-          <td>${esc(e.previous)}</td>
+          <td style="font-weight:bold">${esc(e.country || '')}</td>
+          <td style="color:${impactColor}">${esc(e.impact || '')}</td>
+          <td>${esc(e.title || '')}</td>
+          <td>${esc(e.forecast || '')}</td>
+          <td>${esc(e.previous || '')}</td>
         </tr>`;
       }
       list.innerHTML = html;

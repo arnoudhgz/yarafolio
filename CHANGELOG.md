@@ -5,17 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.7.0]
+
+### Added
+- The 'Refresh Calendar' button now bypasses the cache and forces an immediate fresh fetch of the macro events.
+
+### Fixed
+- Fixed a bug in `scripts/advice_log.py` that caused the `/aftermarket` and `/check` skills to fail when tracking new picks. Added `"aftermarket"` and `"manual"` to the `NEW_PICK_SOURCES` whitelist.
+- Fixed an issue in `etoro_import.py` where a single eToro lot could be falsely attributed to multiple advice entries if a ticker was advised multiple times.
+- Removed an erroneous `display: none` CSS rule that inadvertently hid the 'Refresh Calendar' macro button.
+- Restored the correct `Forecast` and `Previous` column order in the macro table and prevented the `Time` column and countdown timer from wrapping to multiple lines.
+- Disabled caching in the `yarafolio.py` dev server to prevent stale UI bugs during local development.
+
+### Changed
+- Changed macro calendar caching logic: the cache is now invalidated if 2 hours have passed or immediately if an economic event was scheduled to occur since the data was last fetched.
+
+## [0.6.0] - 2026-06-23
 
 ### Changed
 - Updated the dashboard logo to feature Yara's ear overlapping the circular border. Replaced `border-radius: 50%` with `drop-shadow` filters in `dashboard.html` to prevent clipping the transparent overlapping elements.
 
 ### Added
+- Optimized the ticker details chart to reduce visual clutter. Data points from previous weeks are now intelligently combined into weekly data points (labeled "Wk X"), while intraday data points for the current week are filtered to keep the opening, closing, and points at least 2 hours apart.
+- The successful API key from the startup check is now automatically selected as the default API key in the UI.
+
+## [0.5.0] - 2026-06-23
+
+### Added
 - The dashboard now displays the current local version in the footer.
 - The backend checks for newer releases on GitHub during the initial startup sync and displays an update notification in the footer if a newer version is available.
 - Active sub-filters (Advice, Positions, News, IPO) and table sorting states are now persisted across page reloads and tab switches.
-- Optimized the ticker details chart to reduce visual clutter. Data points from previous weeks are now intelligently combined into weekly data points (labeled "Wk X"), while intraday data points for the current week are filtered to keep the opening, closing, and points at least 2 hours apart.
-- The successful API key from the startup check is now automatically selected as the default API key in the UI.
 
 ### Fixed
 - Renamed the new `blink` CSS keyframes to `sparkle-blink` to stop it from breaking the 30-minute stale indicator animation.

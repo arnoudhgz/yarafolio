@@ -88,6 +88,7 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ROOT, **kwargs)
 
+
     def do_POST(self):
         if self.path == "/api/save":
             self.handle_save()
@@ -400,14 +401,37 @@ class Handler(SimpleHTTPRequestHandler):
         import os
         import time
 
+        force = "force=1" in self.path
         cache_file = os.path.join(ROOT, "data", "macro_cache.json")
         try:
-            if os.path.exists(cache_file):
-                age = time.time() - os.path.getmtime(cache_file)
-                if age < 4 * 3600:
+            if os.path.exists(cache_file) and not force:
+                cache_time = os.path.getmtime(cache_file)
+                age = time.time() - cache_time
+                if age < 2 * 3600:
                     with open(cache_file) as f:
+                        cached_events = json.load(f)
+                    
+                    import datetime
+                    now_ts = time.time()
+                    event_passed = False
+                    for ev in cached_events:
+                        if not ev.get("time") or ev["time"] in ("All Day", "Tentative"):
+                            continue
+                        try:
+                            dt_naive = datetime.datetime.strptime(f"{ev['date']} {ev['time']}", "%m-%d-%Y %I:%M%p")
+                            m, d = dt_naive.month, dt_naive.day
+                            dst = (3 < m < 11) or (m == 3 and d > 14) or (m == 11 and d < 7)
+                            ev_ts = (dt_naive - datetime.timedelta(hours=-4 if dst else -5)).replace(tzinfo=datetime.timezone.utc).timestamp()
+                            
+                            if cache_time <= ev_ts <= now_ts:
+                                event_passed = True
+                                break
+                        except Exception:
+                            pass
+                    
+                    if not event_passed:
                         return self.respond_json(
-                            200, {"ok": True, "events": json.load(f), "cached": True})
+                            200, {"ok": True, "events": cached_events, "cached": True})
 
             req = urllib.request.Request(
                 "https://nfs.faireconomy.media/ff_calendar_thisweek.xml",
@@ -428,7 +452,8 @@ class Handler(SimpleHTTPRequestHandler):
                     'time',
                     'impact',
                     'forecast',
-                        'previous']:
+                    'previous',
+                    'actual']:
                     m = re.search(
                         fr'<{key}>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</{key}>',
                         event_str,
