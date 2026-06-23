@@ -428,7 +428,8 @@ class Handler(SimpleHTTPRequestHandler):
                     'time',
                     'impact',
                     'forecast',
-                        'previous']:
+                    'previous',
+                    'actual']:
                     m = re.search(
                         fr'<{key}>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</{key}>',
                         event_str,

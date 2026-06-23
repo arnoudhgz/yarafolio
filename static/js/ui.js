@@ -105,12 +105,13 @@ function getMacroContext(title, forecast, previous) {
 /**
  * @param {string} title
  * @param {string} impact
- * @param {string} forecast
  * @param {string} previous
+ * @param {string} forecast
+ * @param {string} actual
  * @param {string} country
  * @param {string} date
  */
-export function openMacroModal(title, impact, forecast, previous, country, date) {
+export function openMacroModal(title, impact, previous, forecast, actual, country, date) {
   const scenarioHTML = getMacroScenario(title);
   const contextHTML = getMacroContext(title, forecast, previous);
   const safeTitle = esc(title);
@@ -122,8 +123,9 @@ export function openMacroModal(title, impact, forecast, previous, country, date)
         '<span>' + esc(date) + '</span>' +
         '<span>' + esc(country) + '</span>' +
         '<span style="color: ' + (impact === 'High' ? 'var(--red)' : 'var(--orange)') + '; font-weight: bold;">' + esc(impact) + ' Impact</span>' +
-        (forecast ? '<span>| Forecast: ' + esc(forecast) + '</span>' : '') +
         (previous ? '<span>| Previous: ' + esc(previous) + '</span>' : '') +
+        (forecast ? '<span>| Forecast: ' + esc(forecast) + '</span>' : '') +
+        (actual ? '<span>| Actual: <strong style="color:var(--text);">' + esc(actual) + '</strong></span>' : '') +
       '</div>' +
       contextHTML +
       '<div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">' +
