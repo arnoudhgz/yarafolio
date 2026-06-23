@@ -63,6 +63,8 @@ IMPORT_RUNNING = threading.Lock()   # non-blocking guard against double imports
 REFRESH_RUNNING = threading.Lock()  # non-blocking guard against double refreshes
 VERSION_INFO = {"local": "unknown", "remote": "unknown"}
 SYNC_LOCK = threading.Lock()        # serialises background git autosyncs
+ACTIVE_LOCATION = None
+
 
 
 def autosync(reason):
@@ -495,7 +497,7 @@ class Handler(SimpleHTTPRequestHandler):
                             suffixes.append(suffix)
         except OSError:
             pass
-        self.respond_json(200, {"prefixes": sorted(list(set(suffixes)))})
+        self.respond_json(200, {"prefixes": sorted(list(set(suffixes))), "active": ACTIVE_LOCATION})
 
     def end_headers(self):
         self.send_header("Cache-Control", "no-store")
@@ -656,6 +658,8 @@ class YaraFolioApp:
                     req.add_header("Content-Type", "application/json")
                     res = urllib.request.urlopen(req, timeout=120)
                     if res.status == 200:
+                        global ACTIVE_LOCATION
+                        ACTIVE_LOCATION = loc
                         break  # Success, stop trying other locations
                 except urllib.error.HTTPError as e:
                     try:
