@@ -65,6 +65,22 @@ QUOTE_FIELDS = (
 RED_FLAG_TERMS = "lawsuit OR investigation OR fraud OR SEC OR \"class action\" OR bankruptcy OR \"chapter 11\" OR default"
 
 
+def quote_session_note(data):
+    """Human-readable session tag for a parsed quote.
+
+    Returns '' for a regular-session quote, otherwise something like
+    'pre-market, as of Jun 15, 2026, 4:05 AM EDT' so a researcher reading the
+    embedded quote row knows which session the price belongs to.
+    """
+    session = data.get("session", "regular")
+    if session == "regular":
+        return ""
+    note = session
+    if data.get("asOf"):
+        note += f", as of {data['asOf']}"
+    return note
+
+
 class Screen:
     def fetch(self, path_or_url, retries=2):
         url = path_or_url if path_or_url.startswith(
@@ -256,7 +272,14 @@ class Screen:
                 logger.info(f"{ticker}: fetch failed ({data['error']})")
                 continue
             price = data.get("price")
-            stats = [f"price {price}" if price is not None else "price ?"]
+            note = quote_session_note(data)
+            price_label = f"price {price}" if price is not None else "price ?"
+            if note:
+                price_label += f" ({note})"
+            stats = [price_label]
+            regular_price = data.get("regularPrice")
+            if note and regular_price is not None and regular_price != price:
+                stats.append(f"regular close {regular_price}")
             stats += [f"{label} {data[label]}" for label in QUOTE_FIELDS if label in data]
 
             if price is not None and "52-Week Range" in data:
