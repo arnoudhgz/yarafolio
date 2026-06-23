@@ -145,6 +145,10 @@ class Screen:
 
     def cmd_oversold(self, args):
         headers, rows = self.parse_table(self.fetch("/list/oversold-stocks/"))
+        if not rows:
+            logger.warning(
+                "oversold screen parsed 0 rows - stockanalysis.com markup likely "
+                "changed; fall back to the WebFetch sources in the skill")
         cols = {name: idx for idx, name in enumerate(headers)}
         sym = next((cols[c] for c in cols if "Symbol" in c), 1)
         name = next((cols[c] for c in cols if "Name" in c), 2)

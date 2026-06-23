@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Dashboard sparklines now use the theme's `--green`/`--red` (they were rendering a different hardcoded green/red), and the repeated info-icon inline styles collapsed into one `.info-icon` class.
+- The oversold screen logs a clear warning when it parses zero rows (stockanalysis.com markup changed) instead of silently returning no candidates.
 - The mandatory litigation/fraud red-flag gate is now present and identically worded across all five advice skills (it was missing in `/aftermarket` and `/check`).
 - `/premarket` and `/aftermarket` now trust the session-tagged quote price; `/aftermarket` and `/diversify` now flag earnings-gap risk like `/premarket` already did.
 - `/check` reads tracked entries via `advice_log.py get-entry` and `/check` can add a brand-new ticker with full `/advice` rigor (all entry/exit levels), not a partial entry.
