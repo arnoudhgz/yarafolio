@@ -1,6 +1,14 @@
 // @ts-check
 import { DATA, searchQuery } from './state.js';
 
+/**
+ * Read a CSS custom property off :root, so JS-side colors (charts, sparklines) stay in
+ * sync with the one palette defined in styles.css instead of duplicating hex values.
+ * @param {string} name e.g. '--green'
+ * @returns {string}
+ */
+export const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
 /** @returns {string} */
 export const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
 export const nowStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };

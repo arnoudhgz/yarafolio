@@ -269,15 +269,15 @@ export function drawModalChart(e) {
   let lastKeptTime = 0;
   for (let i = 0; i < groupedHist.length; i++) {
     const current = groupedHist[i];
-    if (current._isWeek || current.date.includes('(Added)')) {
+    if (/** @type {any} */ (current)._isWeek || current.date.includes('(Added)')) {
       optimizedHist.push(current);
       continue;
     }
     const currentDay = current.date.slice(0, 10);
     const prev = i > 0 ? groupedHist[i-1] : null;
     const next = i < groupedHist.length - 1 ? groupedHist[i+1] : null;
-    const isFirstOfDay = i === 0 || prev.date.slice(0, 10) !== currentDay || prev._isWeek || prev.date.includes('(Added)');
-    const isLastOfDay = i === groupedHist.length - 1 || next.date.slice(0, 10) !== currentDay || next._isWeek;
+    const isFirstOfDay = i === 0 || prev.date.slice(0, 10) !== currentDay || /** @type {any} */ (prev)._isWeek || prev.date.includes('(Added)');
+    const isLastOfDay = i === groupedHist.length - 1 || next.date.slice(0, 10) !== currentDay || /** @type {any} */ (next)._isWeek;
     
     let ts = 0;
     if (current.date.length >= 16) {
@@ -304,8 +304,8 @@ export function drawModalChart(e) {
     if (isAdded) dStr = dStr.replace(' (Added)', '');
     
     let label = '';
-    if (h._isWeek) {
-      label = 'Wk ' + h._weekNum;
+    if (/** @type {any} */ (h)._isWeek) {
+      label = 'Wk ' + /** @type {any} */ (h)._weekNum;
     } else if (dStr.length > 10) {
       label = dStr.slice(11, 16);
     } else {
