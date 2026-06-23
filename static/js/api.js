@@ -98,20 +98,20 @@ export async function fetchMacro() {
         const jsDate = esc(displayDate).replace(/&#39;/g, "\\'");
         const jsTitle = esc(e.title).replace(/&#39;/g, "\\'");
         const jsImpact = esc(e.impact).replace(/&#39;/g, "\\'");
-        const jsForecast = esc(e.forecast).replace(/&#39;/g, "\\'");
-        const jsPrev = esc(e.previous).replace(/&#39;/g, "\\'");
-        const jsActual = esc(e.actual).replace(/&#39;/g, "\\'");
-        const jsCountry = esc(e.country).replace(/&#39;/g, "\\'");
+        const jsForecast = esc(e.forecast || '').replace(/&#39;/g, "\\'");
+        const jsPrev = esc(e.previous || '').replace(/&#39;/g, "\\'");
+        const jsActual = esc(e.actual || '').replace(/&#39;/g, "\\'");
+        const jsCountry = esc(e.country || '').replace(/&#39;/g, "\\'");
         
         html += `<tr style="${rowStyle}" onclick="openMacroModal('${jsTitle}', '${jsImpact}', '${jsPrev}', '${jsForecast}', '${jsActual}', '${jsCountry}', '${jsDate}')">
           <td style="white-space: nowrap;">${displayDate}</td>
           <td>${displayTime}</td>
-          <td style="font-weight:bold">${esc(e.country)}</td>
-          <td style="color:${impactColor}">${esc(e.impact)}</td>
-          <td>${esc(e.title)}</td>
-          <td>${esc(e.previous)}</td>
-          <td>${esc(e.forecast)}</td>
-          <td style="font-weight:bold">${esc(e.actual)}</td>
+          <td style="font-weight:bold">${esc(e.country || '')}</td>
+          <td style="color:${impactColor}">${esc(e.impact || '')}</td>
+          <td>${esc(e.title || '')}</td>
+          <td>${esc(e.previous || '')}</td>
+          <td>${esc(e.forecast || '')}</td>
+          <td style="font-weight:bold">${esc(e.actual || '')}</td>
         </tr>`;
       }
       list.innerHTML = html;
