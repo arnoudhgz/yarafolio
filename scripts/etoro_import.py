@@ -17,6 +17,8 @@ import uuid
 import logging
 from datetime import date, datetime
 
+import price_history
+
 BASE = "https://public-api.etoro.com/api/v1"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -315,32 +317,7 @@ class EtoroImport:
             entry["exitEstimated"] = any(lot.get("exitEstimated") for lot in lots)
         if current_price:
             hist = entry.setdefault("priceHistory", [])
-            from datetime import datetime
-            now = datetime.now()
-            now_str = now.strftime("%Y-%m-%d %H:%M")
-            today_str = now.strftime("%Y-%m-%d")
-
-            if hist and hist[-1]["price"] == current_price:
-                pass
-            elif hist and hist[-1]["date"] == now_str:
-                hist[-1]["price"] = current_price
-            else:
-                hist.append({"date": now_str, "price": current_price})
-
-            new_hist = []
-            for i, point in enumerate(hist):
-                date_str = point["date"][:10]
-                if date_str == today_str:
-                    new_hist.append(point)
-                else:
-                    is_last = True
-                    if i + \
-                            1 < len(hist) and hist[i + 1]["date"][:10] == date_str:
-                        is_last = False
-                    if is_last:
-                        new_hist.append(
-                            {"date": date_str, "price": point["price"]})
-            entry["priceHistory"] = new_hist
+            price_history.push_price_point(hist, current_price, now=datetime.now())
 
     def merge(self):
         with open(self.preview_file) as f:

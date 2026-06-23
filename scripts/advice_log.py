@@ -11,6 +11,9 @@ import sys
 import logging
 from datetime import date, datetime
 
+import price_history
+import entries
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 os.makedirs(os.path.join(ROOT, "logs"), exist_ok=True)
@@ -67,7 +70,7 @@ class AdviceLog:
 
     def load_log(self):
         with open(self.log_file) as f:
-            return json.load(f)
+            return entries.normalize_entries(json.load(f))
 
     def save_log(self, data):
         data["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -79,7 +82,7 @@ class AdviceLog:
 
     def find(self, data, ticker):
         for e in data["entries"]:
-            if e["ticker"] == ticker and e["status"] in ("watching", "bought"):
+            if e.get("ticker") == ticker and e.get("status") in ("watching", "bought"):
                 return e
         return None
 
@@ -102,40 +105,12 @@ class AdviceLog:
         return e
 
     def latest_price(self, e):
-        return e["priceHistory"][-1]["price"] if e["priceHistory"] else e.get(
-            "priceAtAdvice")
+        hist = e.get("priceHistory") or []
+        return hist[-1]["price"] if hist else e.get("priceAtAdvice")
 
     def push_history(self, e, price):
-        now = datetime.now()
-        now_str = now.strftime("%Y-%m-%d %H:%M")
-        today_str = now.strftime("%Y-%m-%d")
-
         hist = e.setdefault("priceHistory", [])
-        if hist:
-            last_point = hist[-1]
-            if last_point["date"][:10] == today_str and last_point["price"] == price:
-                # Same day, same price as the last point: skip to avoid duplicate flatline points
-                return
-
-        if hist and hist[-1]["date"] == now_str:
-            hist[-1]["price"] = price
-        else:
-            hist.append({"date": now_str, "price": price})
-
-        # Prune historical intraday points to prevent bloat
-        new_hist = []
-        for i, point in enumerate(hist):
-            date_str = point["date"][:10]
-            if date_str == today_str:
-                new_hist.append(point)
-            else:
-                is_last = True
-                if i + 1 < len(hist) and hist[i + 1]["date"][:10] == date_str:
-                    is_last = False
-                if is_last:
-                    new_hist.append(
-                        {"date": date_str, "price": point["price"]})
-        e["priceHistory"] = new_hist
+        price_history.push_price_point(hist, price, now=datetime.now())
 
     def push_note(self, e, text):
         e.setdefault("notes", []).append(
@@ -309,14 +284,14 @@ class AdviceLog:
                 rows.append(
                     (0, 0.0, f"{e['ticker']}: {len(est_lots)} lot(s) auto-closed at estimated exit, "
                      f"confirm the real price (dashboard Confirm, or set-status sold --price X)"))
-            if e["status"] == "watching":
+            if e.get("status") == "watching":
                 price = self.latest_price(e)
                 if e.get(
                         "dropAbove") and price is not None and price >= e["dropAbove"]:
                     rows.append(
                         (0, -price, f"{e['ticker']}: now ${price} >= drop-above ${e['dropAbove']}, "
                          f"the oversold bounce already ran - drop it?"))
-                else:
+                elif e.get("firstAdvised"):
                     age = (
                         today -
                         datetime.strptime(
@@ -324,9 +299,9 @@ class AdviceLog:
                             "%Y-%m-%d").date()).days
                     if age > 7:
                         rows.append(
-                            (1, -age, f"{e['ticker']}: watching {age}d, advised @ ${e['priceAtAdvice']}, "
+                            (1, -age, f"{e['ticker']}: watching {age}d, advised @ ${e.get('priceAtAdvice')}, "
                              f"now ${self.latest_price(e)}"))
-            elif e["status"] == "bought" and e.get("boughtAt") and not e.get("tslSet"):
+            elif e.get("status") == "bought" and e.get("boughtAt") and not e.get("tslSet"):
                 pct = (self.latest_price(e) -
                        e["boughtAt"]) / e["boughtAt"] * 100
                 if pct >= 5:

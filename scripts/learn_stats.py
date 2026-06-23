@@ -74,12 +74,13 @@ class LearnStats:
     def outcome(self, e, today):
         """Return (kind, pct_change, measurable) for one advised entry."""
         latest = self.latest_price(e)
-        status = e["status"]
+        status = e.get("status")
+        first_advised = e.get("firstAdvised")
         if status == "sold" and e.get("boughtAt") and e.get("soldAt"):
             return "realized", (e["soldAt"] - e["boughtAt"]
                                 ) / e["boughtAt"] * 100, True
         if status == "bought" and e.get("boughtAt") and latest is not None:
-            age = (today - self.parse_date(e["firstAdvised"])).days
+            age = (today - self.parse_date(first_advised)).days if first_advised else 0
             return "unrealized", (latest -
                                   e["boughtAt"]) / e["boughtAt"] * 100, age >= 7
         if status == "dropped" and e.get(
@@ -105,7 +106,7 @@ class LearnStats:
         """% change ~7 days after advice, from the nearest priceHistory point (tolerance 3 days)."""
         base = e.get("priceAtAdvice")
         hist = e.get("priceHistory") or []
-        if not base or not hist:
+        if not base or not hist or not e.get("firstAdvised"):
             return None
         target = self.parse_date(e["firstAdvised"]) + timedelta(days=7)
         best, best_off = None, 99

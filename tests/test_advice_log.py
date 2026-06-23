@@ -114,5 +114,15 @@ class AdviceLogTest(unittest.TestCase):
         self.assertEqual(hist[1], {"date": "2026-06-17 10:00", "price": 105.0})
 
 
+    def test_latest_price_missing_history_key(self):
+        entry = {"priceAtAdvice": 100.0}
+        self.assertEqual(self.app.latest_price(entry), 100.0)
+
+    def test_find_ignores_entry_without_status(self):
+        data = {"entries": [{"ticker": "AAPL"}, {"ticker": "MSFT", "status": "watching"}]}
+        self.assertIsNone(self.app.find(data, "AAPL"))
+        self.assertIsNotNone(self.app.find(data, "MSFT"))
+
+
 if __name__ == "__main__":
     unittest.main()
