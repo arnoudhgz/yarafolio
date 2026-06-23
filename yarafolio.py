@@ -437,6 +437,51 @@ class Handler(SimpleHTTPRequestHandler):
                     event[key] = m.group(1).strip() if m else ''
                 events.append(event)
 
+            # Optional FMP enhancement for 'actual' data
+            fmp_api_key = os.environ.get("FMP_API_KEY")
+            if not fmp_api_key:
+                try:
+                    with open(os.path.join(ROOT, ".env")) as f:
+                        for line in f:
+                            if line.startswith("FMP_API_KEY="):
+                                fmp_api_key = line.strip().split("=", 1)[1]
+                                break
+                except Exception:
+                    pass
+            
+            if fmp_api_key:
+                try:
+                    import datetime
+                    now = datetime.datetime.now()
+                    start_of_week = now - datetime.timedelta(days=now.weekday())
+                    end_of_week = start_of_week + datetime.timedelta(days=6)
+                    fmp_url = f"https://financialmodelingprep.com/api/v3/economic_calendar?from={start_of_week.strftime('%Y-%m-%d')}&to={end_of_week.strftime('%Y-%m-%d')}&apikey={fmp_api_key}"
+                    fmp_req = urllib.request.Request(fmp_url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(fmp_req, timeout=10) as res:
+                        fmp_data = json.loads(res.read().decode())
+                        
+                    for event in events:
+                        if not event.get('actual'):
+                            try:
+                                dt = datetime.datetime.strptime(event['date'], "%m-%d-%Y")
+                                date_str = dt.strftime("%Y-%m-%d")
+                                ff_words = set(re.findall(r'\w+', event['title'].lower()))
+                                
+                                best_match = None
+                                for fmp_ev in fmp_data:
+                                    if fmp_ev.get("date", "").startswith(date_str) and fmp_ev.get("currency") == event["country"]:
+                                        fmp_words = set(re.findall(r'\w+', fmp_ev.get('event', '').lower()))
+                                        overlap = len(ff_words.intersection(fmp_words))
+                                        if overlap >= min(2, len(ff_words)):
+                                            best_match = fmp_ev
+                                            break
+                                if best_match and best_match.get("actual") is not None:
+                                    event["actual"] = str(best_match["actual"])
+                            except Exception:
+                                pass
+                except Exception as e:
+                    print("Failed to fetch FMP enhancement:", e)
+
             with open(cache_file, "w") as f:
                 json.dump(events, f)
 

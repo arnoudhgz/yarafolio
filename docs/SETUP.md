@@ -22,6 +22,11 @@ cp .env.sample .env
 - **Read-Only**: YaraFolio only provides advice and insights; it does not execute trades. When generating your eToro API Key, **always create it in Read-Only mode** for maximum security.
 - **IP Addresses**: While not strictly required, it is **strongly recommended** to bind your eToro User Keys to specific IP addresses for security. If you do this and use the dashboard from different locations (e.g., Home vs. Office), you should generate separate User Keys for each IP. You can specify these in your `.env` file with suffixes like `ETORO_USER_KEY_HOME` and `ETORO_USER_KEY_OFFICE`, which will automatically enable a location-switcher dropdown in the dashboard!
 
+## Enhance Macro Events with Actuals (Optional)
+The default macroeconomic calendar uses a free, open feed that does not provide "actual" historical numbers for past events. If you want to see actuals in the calendar, you can optionally supply a free API key from Financial Modeling Prep (FMP).
+1. Sign up for a free developer account at [Financial Modeling Prep](https://site.financialmodelingprep.com/developer/docs).
+2. Set your `FMP_API_KEY` in the `.env` file.
+
 ## Configure Auto-Sync for your Private Data (Highly Recommended)
 By default, your logs and portfolio snapshots are saved locally to `data/private/*.json`. To prevent data loss, the dashboard includes a fire-and-forget auto-sync script. 
 - Create a separate, new GitHub repository to store your data and set the SSH URL as `PRIVATE_DATA_REPO` in your `.env` file.

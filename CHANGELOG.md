@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Added the 'Actual' value column to the Macro Economic Events calendar and reordered the columns to Previous, Forecast, Actual.
+- Added optional Financial Modeling Prep (FMP) API integration to retrieve real 'actual' macro values when `FMP_API_KEY` is provided in `.env`.
 
 ## [0.6.0] - 2026-06-23
 
