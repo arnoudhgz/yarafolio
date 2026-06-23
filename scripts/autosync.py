@@ -7,6 +7,8 @@ Only data files are synced. One commit per call.
 
 Usage: python3 scripts/autosync.py "reason for the sync"
 """
+from __future__ import annotations
+
 import logging
 import os
 import subprocess
@@ -27,11 +29,11 @@ logger = logging.getLogger("autosync")
 
 
 class AutoSync:
-    def __init__(self, data_dir=DATA_DIR, paths=None):
+    def __init__(self, data_dir: str = DATA_DIR, paths: list[str] | None = None) -> None:
         self.data_dir = data_dir
         self.paths = paths if paths is not None else PATHS
 
-    def get_env(self, key):
+    def get_env(self, key: str) -> str | None:
         v = os.environ.get(key)
         if v is not None:
             return v
@@ -45,13 +47,13 @@ class AutoSync:
             pass
         return None
 
-    def git(self, *args, cwd=None):
+    def git(self, *args: str, cwd: str | None = None) -> subprocess.CompletedProcess:
         if cwd is None:
             cwd = self.data_dir
         return subprocess.run(["git", *args], cwd=cwd,
                               capture_output=True, text=True)
 
-    def sync(self, reason="data update"):
+    def sync(self, reason: str = "data update") -> None:
         if self.get_env("DEMO_MODE") == "1":
             return
 

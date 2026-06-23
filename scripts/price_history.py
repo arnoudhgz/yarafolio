@@ -4,10 +4,12 @@
 Keeps a single canonical implementation of how an intraday price point is
 appended and how older points are pruned, so the two callers can't drift.
 """
+from __future__ import annotations
+
 from datetime import datetime
 
 
-def push_price_point(hist, price, now=None):
+def push_price_point(hist: list[dict], price: float, now: datetime | None = None) -> list[dict]:
     """Append (or update) today's price point in ``hist`` and prune old intraday points.
 
     ``hist`` is the priceHistory list of ``{"date", "price"}`` dicts; it's mutated

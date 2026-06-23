@@ -13,6 +13,8 @@ An outcome is "measurable" when the advice had time to play out: sold and
 dropped entries always, bought entries once the advice is 7+ days old.
 Watching entries are shown but never measurable.
 """
+from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -38,7 +40,7 @@ ch.setFormatter(logging.Formatter('%(message)s'))
 logger.addHandler(ch)
 
 
-def get_env(key):
+def get_env(key: str) -> str | None:
     v = os.environ.get(key)
     if v is not None:
         return v
@@ -64,14 +66,14 @@ class LearnStats:
         self.log_file = os.path.join(ROOT, "data", subdir, "advice-log.json")
         self.out_file = os.path.join(ROOT, "data", subdir, "learn-stats.json")
 
-    def parse_date(self, s):
+    def parse_date(self, s: str) -> date:
         return datetime.strptime(s[:10], "%Y-%m-%d").date()
 
-    def latest_price(self, e):
+    def latest_price(self, e: dict) -> float | None:
         hist = e.get("priceHistory") or []
         return hist[-1]["price"] if hist else None
 
-    def outcome(self, e, today):
+    def outcome(self, e: dict, today: date) -> tuple[str | None, float | None, bool]:
         """Return (kind, pct_change, measurable) for one advised entry."""
         latest = self.latest_price(e)
         status = e.get("status")
@@ -94,7 +96,7 @@ class LearnStats:
                 e["priceAtAdvice"] * 100, False
         return None, None, False
 
-    def rsi_band(self, rsi):
+    def rsi_band(self, rsi: float | None) -> str | None:
         if rsi is None:
             return None
         for label, lo, hi in self.RSI_BANDS:
@@ -102,7 +104,7 @@ class LearnStats:
                 return label
         return None
 
-    def seven_day_pct(self, e):
+    def seven_day_pct(self, e: dict) -> float | None:
         """% change ~7 days after advice, from the nearest priceHistory point (tolerance 3 days)."""
         base = e.get("priceAtAdvice")
         hist = e.get("priceHistory") or []
@@ -118,7 +120,7 @@ class LearnStats:
             return None
         return (best["price"] - base) / base * 100
 
-    def bucket_stats(self, rows):
+    def bucket_stats(self, rows: list[tuple]) -> dict:
         """rows = [(bucket_key, pct)] -> {bucket: {n, winRate, avg, median} | insufficient}"""
         grouped = {}
         for key, pct in rows:
@@ -136,7 +138,7 @@ class LearnStats:
                 }
         return out
 
-    def collect(self):
+    def collect(self) -> dict:
         with open(self.log_file) as f:
             data = json.load(f)
         today = date.today()
@@ -187,7 +189,7 @@ class LearnStats:
             },
         }
 
-    def print_human(self, stats):
+    def print_human(self, stats: dict) -> None:
         logger.info(f"Advised entries: {stats['advisedEntries']} "
                     f"(measurable outcomes: {stats['measurableOutcomes']}, "
                     f"watching: {stats['watchingNow']})")

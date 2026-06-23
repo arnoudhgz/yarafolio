@@ -10,6 +10,8 @@ variables override values from the file.
 Read-only: only GET requests, never the trading/order endpoints.
 merge also writes data/portfolio.json, the full holdings snapshot for the dashboard.
 """
+from __future__ import annotations
+
 import json
 import os
 import sys
@@ -37,7 +39,7 @@ ch.setFormatter(logging.Formatter('%(message)s'))
 logger.addHandler(ch)
 
 
-def get_env(key):
+def get_env(key: str) -> str | None:
     v = os.environ.get(key)
     if v is not None:
         return v
@@ -64,7 +66,7 @@ class EtoroImport:
         self.preview_file = os.path.join(
             ROOT, "tmp", "etoro-import-preview.json")
 
-    def credentials(self):
+    def credentials(self) -> dict:
         creds = {}
         env_file = os.path.join(ROOT, ".env")
         try:
@@ -140,7 +142,7 @@ class EtoroImport:
                 f"warning: industries fetch failed ({exc}), sectors left unknown")
             return None
 
-    def sector_for(self, meta_record, industries):
+    def sector_for(self, meta_record: dict, industries: dict) -> str:
         if not meta_record or industries is None:
             return None
         if meta_record.get("instrumentTypeID") != 5:
@@ -297,7 +299,7 @@ class EtoroImport:
             self.rollup_entry(entry, current)
         return closed
 
-    def rollup_entry(self, entry, current_price):
+    def rollup_entry(self, entry: dict, current_price: float | None) -> None:
         lots = entry["lots"]
         open_lots = [lot for lot in lots if lot.get("soldAt") is None]
         total_units = sum(lot["units"] for lot in lots) or 1

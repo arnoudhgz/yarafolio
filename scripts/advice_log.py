@@ -4,6 +4,8 @@
 All deterministic log work goes through this CLI so skills don't hand-edit JSON.
 Every mutating command bumps lastUpdated.
 """
+from __future__ import annotations
+
 import argparse
 import json
 import os
@@ -31,7 +33,7 @@ ch.setFormatter(logging.Formatter('%(message)s'))
 logger.addHandler(ch)
 
 
-def get_env(key):
+def get_env(key: str) -> str | None:
     v = os.environ.get(key)
     if v is not None:
         return v
@@ -68,11 +70,11 @@ class AdviceLog:
         self.portfolio_file = os.path.join(
             ROOT, "data", self.subdir, "portfolio.json")
 
-    def load_log(self):
+    def load_log(self) -> dict:
         with open(self.log_file) as f:
             return entries.normalize_entries(json.load(f))
 
-    def save_log(self, data):
+    def save_log(self, data: dict) -> None:
         data["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         tmp = self.log_file + ".tmp"
         with open(tmp, "w") as f:
@@ -80,13 +82,13 @@ class AdviceLog:
             f.write("\n")
         os.replace(tmp, self.log_file)
 
-    def find(self, data, ticker):
+    def find(self, data: dict, ticker: str) -> dict | None:
         for e in data["entries"]:
             if e.get("ticker") == ticker and e.get("status") in ("watching", "bought"):
                 return e
         return None
 
-    def get_entry(self, data, ticker):
+    def get_entry(self, data: dict, ticker: str) -> dict | None:
         ticker = ticker.upper()
         for e in data["entries"]:
             if (e.get("ticker") or "").upper() == ticker:
@@ -111,19 +113,19 @@ class AdviceLog:
             sys.exit(f"{ticker} is not tracked")
         return e
 
-    def latest_price(self, e):
+    def latest_price(self, e: dict) -> float | None:
         hist = e.get("priceHistory") or []
         return hist[-1]["price"] if hist else e.get("priceAtAdvice")
 
-    def push_history(self, e, price):
+    def push_history(self, e: dict, price: float) -> None:
         hist = e.setdefault("priceHistory", [])
         price_history.push_price_point(hist, price, now=datetime.now())
 
-    def push_note(self, e, text):
+    def push_note(self, e: dict, text: str) -> None:
         e.setdefault("notes", []).append(
             {"date": date.today().isoformat(), "text": text})
 
-    def cmd_add_pick(self, args):
+    def cmd_add_pick(self, args: argparse.Namespace):
         data = self.load_log()
         today = date.today().isoformat()
 
@@ -180,14 +182,14 @@ class AdviceLog:
         self.save_log(data)
         logger.info(f"{action} {args.ticker} ({e['status']}) @ ${args.price}")
 
-    def cmd_add_note(self, args):
+    def cmd_add_note(self, args: argparse.Namespace):
         data = self.load_log()
         e = self.require(data, args.ticker)
         self.push_note(e, args.text)
         self.save_log(data)
         logger.info(f"{args.ticker}: note added ({len(e['notes'])} total)")
 
-    def cmd_add_eod(self, args):
+    def cmd_add_eod(self, args: argparse.Namespace):
         data = self.load_log()
         data.setdefault("eodReports", []).append({
             "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -196,7 +198,7 @@ class AdviceLog:
         self.save_log(data)
         logger.info("EOD report added.")
 
-    def cmd_add_news_summary(self, args):
+    def cmd_add_news_summary(self, args: argparse.Namespace):
         data = self.load_log()
         data.setdefault("newsSummaries", []).append({
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -206,14 +208,14 @@ class AdviceLog:
         self.save_log(data)
         logger.info("News summary added.")
 
-    def cmd_touch(self, args):
+    def cmd_touch(self, args: argparse.Namespace):
         data = self.load_log()
         e = self.require(data, args.ticker)
         self.push_history(e, args.price)
         self.save_log(data)
         logger.info(f"{args.ticker}: price point ${args.price} added")
 
-    def cmd_touch_many(self, args):
+    def cmd_touch_many(self, args: argparse.Namespace):
         try:
             prices = json.load(sys.stdin)
         except json.JSONDecodeError as exc:
@@ -254,7 +256,7 @@ class AdviceLog:
             msg += f" (skipped untracked: {', '.join(skipped)})"
         logger.info(msg)
 
-    def cmd_set_status(self, args):
+    def cmd_set_status(self, args: argparse.Namespace):
         data = self.load_log()
         e = self.require(data, args.ticker)
         price = args.price if args.price is not None else self.latest_price(e)
@@ -272,7 +274,7 @@ class AdviceLog:
         self.save_log(data)
         logger.info(f"{args.ticker}: {args.status} @ ${price}")
 
-    def cmd_set_tsl(self, args):
+    def cmd_set_tsl(self, args: argparse.Namespace):
         data = self.load_log()
         e = self.require(data, args.ticker)
         e["tslSet"] = not args.off
@@ -281,7 +283,7 @@ class AdviceLog:
         self.save_log(data)
         logger.info(f"{args.ticker}: tslSet = {e['tslSet']}")
 
-    def cmd_checkin_candidates(self, args):
+    def cmd_checkin_candidates(self, args: argparse.Namespace):
         data = self.load_log()
         today = date.today()
         rows = []
@@ -321,13 +323,13 @@ class AdviceLog:
         for _, _, line in sorted(rows):
             logger.info(line)
 
-    def load_portfolio(self):
+    def load_portfolio(self) -> dict:
         if not os.path.exists(self.portfolio_file):
             sys.exit("data/portfolio.json missing: run the eToro import first")
         with open(self.portfolio_file) as f:
             return json.load(f)
 
-    def cmd_compare(self, args):
+    def cmd_compare(self, args: argparse.Namespace):
         data = self.load_log()
         held = {h["ticker"]: h for h in self.load_portfolio()["holdings"]}
         hits = [(e, held[e["ticker"]]) for e in data["entries"]
@@ -341,7 +343,7 @@ class AdviceLog:
                 f"{e['ticker']}: advised @ ${e['priceAtAdvice']} ({e['firstAdvised']}), "
                 f"entry ${h['avgOpen']}, now ${h['currentPrice']} ({pl})")
 
-    def cmd_sector_gaps(self, args):
+    def cmd_sector_gaps(self, args: argparse.Namespace):
         portfolio = self.load_portfolio()
         total = portfolio.get("totalInvested") or sum(
             h["invested"] for h in portfolio["holdings"])
@@ -365,7 +367,7 @@ class AdviceLog:
             f"\nUnderweight (<5% of invested): {', '.join(under) if under else 'none'}")
 
 
-    def cmd_get_entry(self, args):
+    def cmd_get_entry(self, args: argparse.Namespace):
         data = self.load_log()
         entry = self.get_entry(data, args.ticker)
         if entry is None:

@@ -8,7 +8,7 @@ on load keeps readers from KeyError-ing on iteration/indexing of those fields.
 LIST_FIELDS = ("priceHistory", "notes", "lots")
 
 
-def normalize_entry(e):
+def normalize_entry(e: dict) -> dict:
     """Ensure the structural list fields exist as lists. Mutates and returns ``e``."""
     for field in LIST_FIELDS:
         if not isinstance(e.get(field), list):
@@ -16,7 +16,7 @@ def normalize_entry(e):
     return e
 
 
-def normalize_entries(data):
+def normalize_entries(data: dict) -> dict:
     """Normalize every entry in a loaded advice-log dict. Returns ``data``."""
     for e in data.get("entries", []):
         normalize_entry(e)
