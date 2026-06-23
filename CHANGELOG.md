@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.0]
+
+### Added
+- `scripts/screen.py quote` now tags the session on its human-readable output (pre-market / after-hours, with the as-of time and the regular-session close), so the advice researchers can read the correct session price straight from the row instead of re-searching for it.
+- New `scripts/advice_log.py get-entry TICKER [--json]` command that reads a single tracked entry of any status, so `/check` no longer hand-parses `advice-log.json`.
+
+### Fixed
+- `scripts/etoro_import.py` no longer drops a price point when a new day's price matches the previous day's last price. Its price-history bookkeeping now matches `advice_log.py` exactly.
+- The scripts no longer crash on legacy entries missing `priceHistory`, `status`, or `firstAdvised`. Entries are normalized on load and the hot paths (`find`, `latest_price`, check-in candidates, learn stats) read defensively.
+
+### Changed
+- Extracted the shared price-history pruning into `scripts/price_history.py` and entry normalization into `scripts/entries.py`, so `advice_log.py` and `etoro_import.py` can't drift out of sync.
+
 ## [0.7.0]
 
 ### Added

@@ -114,6 +114,21 @@ class AdviceLogTest(unittest.TestCase):
         self.assertEqual(hist[1], {"date": "2026-06-17 10:00", "price": 105.0})
 
 
+    def test_get_entry_found_any_status(self):
+        data = {"entries": [
+            {"ticker": "AAPL", "status": "dropped"},
+            {"ticker": "MSFT", "status": "watching"},
+        ]}
+        self.assertEqual(self.app.get_entry(data, "AAPL")["status"], "dropped")
+
+    def test_get_entry_case_insensitive(self):
+        data = {"entries": [{"ticker": "AAPL", "status": "watching"}]}
+        self.assertIsNotNone(self.app.get_entry(data, "aapl"))
+
+    def test_get_entry_not_found(self):
+        data = {"entries": [{"ticker": "AAPL", "status": "watching"}]}
+        self.assertIsNone(self.app.get_entry(data, "TSLA"))
+
     def test_latest_price_missing_history_key(self):
         entry = {"priceAtAdvice": 100.0}
         self.assertEqual(self.app.latest_price(entry), 100.0)

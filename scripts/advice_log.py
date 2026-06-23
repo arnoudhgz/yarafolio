@@ -86,6 +86,13 @@ class AdviceLog:
                 return e
         return None
 
+    def get_entry(self, data, ticker):
+        ticker = ticker.upper()
+        for e in data["entries"]:
+            if (e.get("ticker") or "").upper() == ticker:
+                return e
+        return None
+
     def find_by_id(self, data, id):
         for e in data["entries"]:
             if e.get("id") == id:
@@ -358,6 +365,28 @@ class AdviceLog:
             f"\nUnderweight (<5% of invested): {', '.join(under) if under else 'none'}")
 
 
+    def cmd_get_entry(self, args):
+        data = self.load_log()
+        entry = self.get_entry(data, args.ticker)
+        if entry is None:
+            if args.json:
+                logger.info("null")
+            else:
+                logger.info(f"{args.ticker.upper()} is not tracked")
+            return
+        if args.json:
+            logger.info(json.dumps(entry))
+            return
+        logger.info(
+            f"{entry.get('ticker')} ({entry.get('status')}): advised @ "
+            f"${entry.get('priceAtAdvice')} on {entry.get('firstAdvised')}, "
+            f"now ${self.latest_price(entry)}, sector {entry.get('sector')}")
+        if entry.get("reason"):
+            logger.info(f"  thesis: {entry['reason']}")
+        if entry.get("risk"):
+            logger.info(f"  risk:   {entry['risk']}")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -441,6 +470,13 @@ def main():
         "sector-gaps",
         help="portfolio sector split + underweight sectors")
     p.set_defaults(func=app.cmd_sector_gaps)
+
+    p = sub.add_parser(
+        "get-entry",
+        help="read a single tracked entry (any status) by ticker")
+    p.add_argument("ticker")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=app.cmd_get_entry)
 
     args = parser.parse_args()
     args.func(args)
