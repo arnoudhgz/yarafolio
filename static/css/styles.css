@@ -31,6 +31,7 @@
     padding: 6px 12px; font-weight: 600; color: var(--blue);
     background: transparent; border: 1px solid rgba(52,152,219,0.4);
     border-radius: 6px; cursor: pointer; font-size: 13px;
+    flex-shrink: 0;
   }
   .refresh-btn:hover { background: rgba(52,152,219,0.1); }
   .header-row { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
@@ -128,6 +129,7 @@
   }
   .filters button.active { background: var(--blue); border-color: var(--blue); color: #fff; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .table-container { overflow-x: auto; width: 100%; }
   th, td { text-align: left; padding: 8px 4px; border-bottom: 1px solid var(--border); }
   th { color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
   th[data-key] { cursor: pointer; user-select: none; }

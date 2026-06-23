@@ -122,8 +122,8 @@ export function openMacroModal(title, impact, previous, forecast, country, date)
         '<span>' + esc(date) + '</span>' +
         '<span>' + esc(country) + '</span>' +
         '<span style="color: ' + (impact === 'High' ? 'var(--red)' : 'var(--orange)') + '; font-weight: bold;">' + esc(impact) + ' Impact</span>' +
-        (previous ? '<span>| Previous: ' + esc(previous) + '</span>' : '') +
         (forecast ? '<span>| Forecast: ' + esc(forecast) + '</span>' : '') +
+        (previous ? '<span>| Previous: ' + esc(previous) + '</span>' : '') +
       '</div>' +
       contextHTML +
       '<div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: 8px; border: 1px solid var(--border);">' +

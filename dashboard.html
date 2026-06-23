@@ -212,20 +212,22 @@
         </h2>
         <button id="refreshMacroBtn" class="refresh-btn">&#x21bb; Refresh Calendar</button>
       </div>
-      <table id="macroTable">
-        <thead>
-          <tr>
-            <th style="width:100px;">Date</th>
-            <th style="width:80px;">Time</th>
-            <th style="width:60px;">Cur</th>
-            <th style="width:80px;">Impact</th>
-            <th>Event</th>
-            <th>Previous</th>
-            <th>Forecast</th>
-          </tr>
-        </thead>
-        <tbody id="macroList"></tbody>
-      </table>
+      <div style="overflow-x: auto; width: 100%;">
+        <table id="macroTable">
+          <thead>
+            <tr>
+              <th style="width:100px;">Date</th>
+              <th style="min-width:90px; white-space:nowrap;">Time</th>
+              <th style="width:60px;">Cur</th>
+              <th style="width:80px;">Impact</th>
+              <th>Event</th>
+              <th>Forecast</th>
+              <th>Previous</th>
+            </tr>
+          </thead>
+          <tbody id="macroList"></tbody>
+        </table>
+      </div>
       <div id="macroLoading" style="display:none; color:var(--muted); margin: 10px 0;">Loading economic calendar...</div>
       <div class="empty" id="macroEmpty" style="display:none">No major USD/EUR events found.</div>
     </div>

@@ -109,8 +109,8 @@ export async function fetchMacro(force = false) {
           <td style="font-weight:bold">${esc(e.country || '')}</td>
           <td style="color:${impactColor}">${esc(e.impact || '')}</td>
           <td>${esc(e.title || '')}</td>
-          <td>${esc(e.previous || '')}</td>
           <td>${esc(e.forecast || '')}</td>
+          <td>${esc(e.previous || '')}</td>
         </tr>`;
       }
       list.innerHTML = html;
