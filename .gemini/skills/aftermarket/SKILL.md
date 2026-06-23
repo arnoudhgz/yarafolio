@@ -4,12 +4,12 @@ description: After-market advice run. Use when the user types /aftermarket or as
 license: Apache-2.0
 metadata:
   version: v1
-  publisher: user
+  publisher: arnoudhgz
 ---
 
 # After-market advice
 
-Full `/advice` variant built on after-market and earnings data. The user is in the Netherlands; US market closes at 22:00 CEST, and after-hours runs until 02:00 CEST. Everything must use TODAY's after-market data and focus on stocks that overreacted to news or earnings.
+Full `/advice` variant built on after-market and earnings data. The US market closes at 16:00 ET and after-hours runs until 20:00 ET. Everything must use TODAY's after-market data and focus on stocks that overreacted to news or earnings.
 
 The advice itself is market-driven only: candidates come from the screens, researcher prompts get market context only, never portfolio info. The portfolio enters AFTER the table (step 5), as a comparison.
 
@@ -30,7 +30,9 @@ Declare a posture at the top of the output: **earnings-reaction day** or **macro
 
 ## Step 3: Per-ticker research (parallel)
 
-Pre-fetch per-candidate data, one call per command for ALL candidates: `python3 scripts/screen.py quote T1 T2 ...`, `... forecast T1 T2 ...`, `... news T1 T2 ...` and `... news T1 T2 ... --days 14 --red-flags`. Then spawn one `stock-researcher` agent per candidate. The quote price must reflect the `after-hours` session! The researchers must determine if the after-hours drop is an overreaction or a structural breakdown. Drop any pick with genuine fraud/litigation that invalidates the bounce thesis.
+Pre-fetch per-candidate data, one call per command for ALL candidates: `python3 scripts/screen.py quote T1 T2 ...`, `... forecast T1 T2 ...`, `... news T1 T2 ...` and `... news T1 T2 ... --days 14 --red-flags`. Then spawn one `stock-researcher` agent per candidate. The `quote` rows are session-tagged: confirm the price shows the `after-hours` session (the parser prefers it automatically); if a row still shows the regular close, the after-hours print hadn't posted yet, so note that. The researchers must determine if the after-hours drop is an overreaction or a structural breakdown, and drop or clearly mark any pick with another earnings or guidance event still pending before the next open (further gap risk).
+
+**Final-pick red-flag gate (mandatory, finals only):** for each of the picks that will appear in the table, run exactly one targeted `WebSearch "TICKER lawsuit OR SEC investigation OR fraud OR class action [month year]"`. Unconditional, even when the researcher returned `RED FLAG: no` or `unconfirmed`: the keyword screen can miss a real problem phrased outside its terms (the ZTS lesson). A genuine SEC investigation, restatement, or executive departure under a cloud drops the pick or gets marked in Risk; law-firm fishing press releases are noise. One search per final pick, never per candidate.
 
 ## Step 4: Output
 

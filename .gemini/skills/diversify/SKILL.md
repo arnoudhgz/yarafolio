@@ -4,7 +4,7 @@ description: Sector-gap diversification advice. Use when the user types /diversi
 license: Apache-2.0
 metadata:
   version: v1
-  publisher: user
+  publisher: arnoudhgz
 ---
 
 # Diversify
@@ -21,7 +21,7 @@ Diversification is not bounce hunting: candidates do NOT need to be oversold. Qu
 
 ## Step 1: Sector gaps
 
-`python3 scripts/advice_log.py sector-gaps` - prints the invested-$ split across eToro's 9 sectors plus the underweight list (<5% of invested). Pick the 3-4 most underweight sectors as targets. Also note over-concentration (any sector above ~30%) in the output summary.
+`python3 scripts/advice_log.py sector-gaps` - prints the invested-$ split across eToro's full 10-sector taxonomy plus the underweight list (<5% of invested, computed over the 9 investable sectors; "ETF / Other" is shown but never a diversification target). Pick the 3-4 most underweight sectors as targets. Also note over-concentration (any sector above ~30%) in the output summary.
 
 ## Step 2: Candidates
 
@@ -33,7 +33,7 @@ Per target sector, gather 3-4 candidates from quality screens (WebSearch: sector
 
 ## Step 3: Per-ticker research (parallel)
 
-Pre-fetch per-candidate data, one call per command for ALL candidates: `python3 scripts/screen.py quote T1 T2 ...`, `... forecast T1 T2 ...`, `... news T1 T2 ...` and `... news T1 T2 ... --days 14 --red-flags`. Then one `stock-researcher` agent per candidate, in parallel, prompt includes the target sector plus that candidate's quote row, forecast line and headline lists (the agent spends its searches on judgment, not data collection). Litigation/fraud red flags drop the pick or get marked clearly, same as /advice.
+Pre-fetch per-candidate data, one call per command for ALL candidates: `python3 scripts/screen.py quote T1 T2 ...`, `... forecast T1 T2 ...`, `... news T1 T2 ...` and `... news T1 T2 ... --days 14 --red-flags`. Then one `stock-researcher` agent per candidate, in parallel, prompt includes the target sector plus that candidate's quote row, forecast line and headline lists (the agent spends its searches on judgment, not data collection). Litigation/fraud red flags drop the pick or get marked clearly, same as /advice. Mark any candidate with earnings within 2 trading days in the Risk column (gap risk on a fresh buy).
 
 **Final-pick red-flag gate (mandatory, finals only):** for each of the ~10 picks that will appear in the table, run exactly one targeted `WebSearch "TICKER lawsuit OR SEC investigation OR fraud OR class action [month year]"`, unconditional even when the researcher returned `RED FLAG: no` or `unconfirmed` (the keyword screen can miss a real problem phrased outside its terms). A genuine SEC investigation, restatement, or executive departure under a cloud drops the pick or gets marked in Risk; law-firm fishing press releases are noise. One search per final pick, never per candidate.
 

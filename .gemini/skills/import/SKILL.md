@@ -4,7 +4,7 @@ description: Import eToro portfolio positions into the advice tracker. Use when 
 license: Apache-2.0
 metadata:
   version: v1
-  publisher: user
+  publisher: arnoudhgz
 ---
 
 # Import eToro positions
@@ -20,7 +20,7 @@ Imported-only positions (source `import`) stay in the log for check-ins and the 
 
 ## Input forms (in order of preference)
 
-1. **eToro API (read-only)** - the default. Credentials live in `.env` (`ETORO_API_KEY`, `ETORO_USER_KEY`). Never copy keys into the repo or into chat output.
+1. **eToro API (read-only)** - the default. Credentials live in the project `.env` (`ETORO_API_KEY`, `ETORO_USER_KEY`); `.env` is gitignored, so keys stay out of the repo. Never copy keys into the repo or into chat output.
 2. eToro account statement export (.xlsx/.csv).
 3. Screenshot(s) of the portfolio page. Columns: Asset, Price, Units, Avg. Open, P/L($), P/L(%), Net Value, Daily P/L, Fees.
 4. Pasted text with the same data.

@@ -1,15 +1,15 @@
 ---
 name: premarket
-description: Premarket advice run. Use when the user types /premarket or asks for advice before the US market opens (futures, premarket movers, earnings today). Produces the standard 10-pick advice table built on premarket data, logs picks to the advice tracker, and runs the keep/drop check-in.
+description: Premarket advice run. Use when the user types /premarket or asks for advice before the US market opens (futures, premarket movers, earnings today). Produces the standard max-10-pick advice table built on premarket data, logs picks to the advice tracker, and runs the keep/drop check-in.
 license: Apache-2.0
 metadata:
   version: v1
-  publisher: user
+  publisher: arnoudhgz
 ---
 
 # Premarket advice
 
-Full `/advice` variant built on premarket data. The user is in the Netherlands; US premarket runs 10:00-15:30 NL time, the open is 15:30 CEST. Everything must use TODAY's premarket data, not yesterday's close commentary.
+Full `/advice` variant built on premarket data. US premarket runs 04:00-09:30 ET, the open is 09:30 ET. Everything must use TODAY's premarket data, not yesterday's close commentary.
 
 The advice itself is market-driven only: candidates come from the screens, researcher prompts get market context only, never portfolio info. The portfolio enters AFTER the table (step 5), as a comparison. (`/diversify` is the one deliberate exception to the market-only rule.)
 
@@ -27,26 +27,27 @@ Declare a posture at the top of the output: **oversold-bounce day** or **defensi
 ## Step 2: Candidate gathering
 
 - `python3 scripts/screen.py oversold` (scrapes the stockanalysis oversold list, $20 floor built in). Fallback when it errors: WebFetch the [stockanalysis oversold list](https://stockanalysis.com/list/oversold-stocks/) and the [MarketBeat RSI screen](https://www.marketbeat.com/market-data/oversold-stocks-rsi/), and mention the breakage.
-- Premarket losers/gainers pages on stockanalysis.com for gap context (WebFetch; the script returns regular-session quotes, NOT premarket prices).
+- Premarket losers/gainers pages on stockanalysis.com for gap context (WebFetch). The `quote` pre-fetch in step 3 already returns the premarket price, session-tagged with the regular close, so no separate price lookup is needed.
+- IPO check: `python3 scripts/screen.py ipos --json`. Look at upcoming and recent IPOs; ignore any marked avoided / Not listed in the advice log. If a highly anticipated IPO is hitting today/tomorrow, or a recent IPO is showing a great entry point, add up to 2 of them to the candidate list.
 
 Filter: listed on eToro-likely exchanges (NYSE/Nasdaq large/mid caps). On a defensive day, weight staples, healthcare, utilities, defense.
 
 ## Step 3: Per-ticker research (parallel)
 
-Pre-fetch per-candidate data, one call per command for ALL candidates: `python3 scripts/screen.py quote T1 T2 ...`, `... forecast T1 T2 ...`, `... news T1 T2 ...` and `... news T1 T2 ... --days 14 --red-flags`. Then spawn one `stock-researcher` agent per candidate (12-14 candidates so 10 survive the red-flag filter), embedding that candidate's screen RSI, quote row, forecast line and headline lists in its prompt: the agent spends its searches on judgment instead of data collection. The quote price is the regular session: the researcher must still confirm TODAY's premarket price. They run in parallel, see `.claude/agents/stock-researcher.md`; they return sector and buy-below/drop-below/drop-above levels alongside the usual fields. Drop or clearly mark any pick with pending litigation/fraud investigations or earnings due today before open (gap risk).
+Pre-fetch per-candidate data, one call per command for ALL candidates: `python3 scripts/screen.py quote T1 T2 ...`, `... forecast T1 T2 ...`, `... news T1 T2 ...` and `... news T1 T2 ... --days 14 --red-flags`. Then spawn one `stock-researcher` agent per candidate (12-14 candidates so 10 survive the red-flag filter), embedding that candidate's screen RSI, quote row, forecast line and headline lists in its prompt: the agent spends its searches on judgment instead of data collection. The `quote` rows are session-tagged and already carry the premarket price (with the regular close); the researcher reports that and only re-confirms by search if a row still shows the regular session. They run in parallel, see `.claude/agents/stock-researcher.md`; they return sector and buy-below/drop-below/drop-above levels alongside the usual fields. Drop or clearly mark any pick with pending litigation/fraud investigations or earnings due today before open (gap risk).
 
 **Final-pick red-flag gate (mandatory, finals only):** for each of the ~10 picks that will appear in the table, run exactly one targeted `WebSearch "TICKER lawsuit OR SEC investigation OR fraud OR class action [month year]"`. Unconditional, even when the researcher returned `RED FLAG: no` or `unconfirmed`: the keyword screen can miss a real problem phrased outside its terms (the ZTS lesson). A genuine SEC investigation, restatement, or executive departure under a cloud drops the pick or gets marked in Risk; law-firm fishing press releases are noise. One search per final pick, never per candidate.
 
 ## Step 4: Output
 
-One markdown table, 10 picks:
+One markdown table, max 10 picks:
 
 | Ticker | Premarket price | Rating | RSI | Why oversold / thesis | Buy below | Drop below | Drop above | Risk | Open note |
 |---|---|---|---|---|---|---|---|---|---|
 
 - Rating: my read on bounce quality (A/B/C with +/-), falling knives marked.
 - Buy below / Drop below / Drop above: entry trigger, thesis-invalidation floor, and opportunity-gone ceiling (the bounce already ran) from the researcher.
-- Open note: "gap may fill, wait for open" where the premarket move could reverse at 15:30.
+- Open note: "gap may fill, wait for open" where the premarket move could reverse at the 09:30 ET open.
 - Sources as hyperlinks below the table.
 - Remind: $600 batch, trailing stop from +5%.
 

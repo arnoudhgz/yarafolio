@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `scripts/screen.py quote` now tags the session on its human-readable output (pre-market / after-hours, with the as-of time and the regular-session close), so the advice researchers can read the correct session price straight from the row instead of re-searching for it.
 - New `scripts/advice_log.py get-entry TICKER [--json]` command that reads a single tracked entry of any status, so `/check` no longer hand-parses `advice-log.json`.
+- `/premarket` now runs the IPO screen step (`screen.py ipos`) that was documented but never wired into the skill.
+
+### Changed
+- The mandatory litigation/fraud red-flag gate is now present and identically worded across all five advice skills (it was missing in `/aftermarket` and `/check`).
+- `/premarket` and `/aftermarket` now trust the session-tagged quote price; `/aftermarket` and `/diversify` now flag earnings-gap risk like `/premarket` already did.
+- `/check` reads tracked entries via `advice_log.py get-entry` and `/check` can add a brand-new ticker with full `/advice` rigor (all entry/exit levels), not a partial entry.
+- `/diversify` describes the correct 10-sector taxonomy (underweight computed over the 9 investable sectors).
+- Skills genericized for open source: US session times stated in ET (dropped the Netherlands/CEST local times), a hardcoded absolute path removed, and the eToro credential docs corrected to the project `.env` to match the code. Every skill now carries uniform frontmatter and the `.claude` / `.gemini` skill trees are back in sync.
 
 ### Fixed
 - `scripts/etoro_import.py` no longer drops a price point when a new day's price matches the previous day's last price. Its price-history bookkeeping now matches `advice_log.py` exactly.

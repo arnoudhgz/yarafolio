@@ -4,7 +4,7 @@ description: Run the primary eToro stock advice workflow (picks with upward pote
 license: Apache-2.0
 metadata:
   version: v1
-  publisher: user
+  publisher: arnoudhgz
 ---
 
 # Advice Workflow

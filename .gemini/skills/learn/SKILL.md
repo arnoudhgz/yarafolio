@@ -4,7 +4,7 @@ description: Self-learning pass over advice outcomes. Use when the user types /l
 license: Apache-2.0
 metadata:
   version: v1
-  publisher: user
+  publisher: arnoudhgz
 ---
 
 # Learn from advice outcomes

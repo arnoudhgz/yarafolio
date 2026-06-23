@@ -4,7 +4,7 @@ description: Re-check a single stock pick. Use when the user types /check TICKER
 license: Apache-2.0
 metadata:
   version: v1
-  publisher: user
+  publisher: arnoudhgz
 ---
 
 # Check a pick
@@ -26,9 +26,11 @@ Script-first (one Bash call covers all four):
 
 Then judgment, via WebSearch/WebFetch only where needed: open the article behind any headline whose severity is unclear (law firm press releases fishing for plaintiffs are common noise; an actual SEC investigation or restatement is not), search for today's analyst moves when the forecast line looks stale, and find RSI (the quote page has no RSI; use `screen.py oversold` when the ticker is on it, otherwise a quick search). If the user gave a URL: fetch it and weigh how serious the source is.
 
+**Red-flag gate (mandatory):** run exactly one targeted `WebSearch "TICKER lawsuit OR SEC investigation OR fraud OR class action [month year]"`, unconditional even when the `--red-flags` headlines looked clean: the keyword screen can miss a real problem phrased outside its terms (the ZTS lesson). A genuine SEC investigation, restatement, or executive departure under a cloud flips the verdict toward exit/avoid; law-firm fishing press releases are noise.
+
 ## Step 2: Compare against the tracker
 
-Read `data/advice-log.json`. If the ticker is tracked: price at advice vs now, status, whether the original thesis still holds.
+Read the tracked entry via `python3 scripts/advice_log.py get-entry TICKER --json` (returns `null` when not tracked, so no hand-parsing the JSON). If tracked: price at advice vs now, status, whether the original thesis still holds.
 
 ## Step 3: Verdict
 
@@ -43,23 +45,22 @@ Remember the strategy: trailing stop from +5% does the selling on winners; the r
 
 ## Step 4: Update tracker (CLI only, never hand-edit the JSON)
 
-If the ticker is tracked (or if the user asked about a specific stock and it's a good opportunity), update/add it in one call. 
+If the ticker is tracked (or if the user asked about a specific stock and it turns out to be a good opportunity), update or add it in one call.
 
-**CRITICAL RIGOR RULE:** When adding a *new* stock after a user inquiry, you MUST use the exact same rigor as the `/advice` skill. Do NOT omit fields. You must provide:
+**Rigor rule:** when adding a *new* stock after a user inquiry, use the exact same rigor as the `/advice` skill. Do NOT omit fields:
 - `--price`
 - `--source manual`
-- `--rating` (A, B, C, etc., based on conviction)
-- `--rsi` (Fetch it or look it up)
-- `--buy-below` (Support level or gap-fill)
-- `--drop-below` (Thesis invalidation level)
-- `--drop-above` (Opportunity-gone ceiling)
+- `--rating` (A/B/C with +/-, based on conviction)
+- `--rsi` (fetch it or look it up)
+- `--buy-below` (support level or gap-fill)
+- `--drop-below` (thesis-invalidation floor)
+- `--drop-above` (opportunity-gone ceiling)
 - `--sector`
-- `--note` (Verdict + 1-2 sentence rationale)
+- `--note` (verdict + 1-2 sentence rationale)
 
-Example for a new pick:
-`python3 scripts/advice_log.py add-pick TICKER --source manual --price <now> --rating <grade> --rsi <fresh> --buy-below <X> --drop-below <Y> --drop-above <Z> --sector "<sector>" --note "<verdict>: <key news>"`
+Example: `python3 scripts/advice_log.py add-pick TICKER --source manual --price <now> --rating <grade> --rsi <fresh> --buy-below <X> --drop-below <Y> --drop-above <Z> --sector "<sector>" --note "<verdict>: <key news>"`
 
-If updating an existing tracked ticker, you don't need `--source`, but refresh the key levels and append a note.
+Updating an existing tracked ticker: drop `--source`, just refresh the levels and append a `--note`. The CLI appends today's price point, refreshes the fields (including a sector backfill on older entries), and the note lands in the dated notes history shown on the dashboard.
 
 If the user decides (keep/sell/drop), apply it: `python3 scripts/advice_log.py set-status TICKER bought|sold|dropped [--price X]` (logs an automatic note), or `set-tsl TICKER` when they set a trailing stop. If the verdict is exit/avoid and the user hasn't reacted, ask once via AskUserQuestion what to do with the tracked status.
 
