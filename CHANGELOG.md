@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - The 'Refresh Calendar' button now bypasses the cache and forces an immediate fresh fetch of the macro events.
 
+### Fixed
+- Fixed an issue in `etoro_import.py` where a single eToro lot could be falsely attributed to multiple advice entries if a ticker was advised multiple times.
+
 ### Changed
 - Changed macro calendar caching logic: the cache is now invalidated if 2 hours have passed or immediately if an economic event was scheduled to occur since the data was last fetched.
 
