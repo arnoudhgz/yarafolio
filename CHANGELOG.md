@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added the 'Actual' value column to the Macro Economic Events calendar and reordered the columns to Previous, Forecast, Actual.
 - Added optional Financial Modeling Prep (FMP) API integration to retrieve real 'actual' macro values when `FMP_API_KEY` is provided in `.env`.
 
+### Changed
+- Changed macro calendar caching logic: the cache is now invalidated if 2 hours have passed or immediately if an economic event was scheduled to occur since the data was last fetched.
+
 ## [0.6.0] - 2026-06-23
 
 ### Changed
