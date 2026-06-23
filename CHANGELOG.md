@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Updated the dashboard logo to feature Yara's ear overlapping the circular border. Replaced `border-radius: 50%` with `drop-shadow` filters in `dashboard.html` to prevent clipping the transparent overlapping elements.
+
 ### Added
 - The dashboard now displays the current local version in the footer.
 - The backend checks for newer releases on GitHub during the initial startup sync and displays an update notification in the footer if a newer version is available.
