@@ -523,5 +523,10 @@
     "ticker": "SAP",
     "name": "SAP SE ADR",
     "sector": "Technology"
+  },
+  "1679": {
+    "ticker": "CTSH",
+    "name": "Cognizant Technology Solutions Corp",
+    "sector": "Technology"
   }
 }
