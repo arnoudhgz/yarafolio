@@ -405,7 +405,8 @@ export function updateMacroTimers(nyDate) {
       if (hrs > 0) {
         element.textContent = ` (in ${hrs}h ${mins}m)`;
       } else {
-        element.textContent = ` (in ${mins}m ${secs}s)`;
+        const pMins = String(mins).padStart(2, '0');
+        element.textContent = ` (in ${pMins}m ${secs}s)`;
         element.style.color = "var(--orange)";
       }
     }

@@ -93,7 +93,7 @@ export async function fetchMacro(force = false) {
         
         let displayTime = esc(e.time);
         if (isToday && e.time && e.time !== 'All Day' && e.time !== 'Tentative' && !isPast) {
-          displayTime += ` <span class="macro-timer" data-time="${esc(e.time)}" style="color:var(--blue); font-size:11px; white-space:nowrap;"></span>`;
+          displayTime += `<br><span class="macro-timer" data-time="${esc(e.time)}" style="color:var(--blue); font-size:11px; white-space:nowrap; font-variant-numeric:tabular-nums; display:inline-block; min-width:80px;"></span>`;
         }
         
         const jsDate = esc(displayDate).replace(/&#39;/g, "\\'");
