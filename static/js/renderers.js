@@ -563,7 +563,7 @@ export function renderAINews() {
       }
 
       let content = marked.parse(contentStr.trim());
-      content = content.replace(/<strong>([A-Z]{2,5}(?:\.[A-Z]+)?)<\/strong>/g, '<a href="#" onclick="openModal(\'$1\'); return false;" class="tlink"><strong>$1</strong></a>');
+      content = content.replace(/<strong>([A-Z]{2,5}(?:\.[A-Z]+)?)<\/strong>/g, (match, ticker) => tickerLink(ticker));
       
       html += `
         <div class="ai-article">
@@ -600,7 +600,7 @@ export function renderEOD() {
       }
 
       let content = marked.parse(contentStr.trim());
-      content = content.replace(/<strong>([A-Z]{2,5}(?:\.[A-Z]+)?)<\/strong>/g, '<a href="#" onclick="openModal(\'$1\'); return false;" class="tlink"><strong>$1</strong></a>');
+      content = content.replace(/<strong>([A-Z]{2,5}(?:\.[A-Z]+)?)<\/strong>/g, (match, ticker) => tickerLink(ticker));
 
       return `
         <div class="ai-article">
