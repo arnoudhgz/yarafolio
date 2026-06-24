@@ -528,5 +528,20 @@
     "ticker": "CTSH",
     "name": "Cognizant Technology Solutions Corp",
     "sector": "Technology"
+  },
+  "1138": {
+    "ticker": "FDX",
+    "name": "FedEx Corporation",
+    "sector": "Services"
+  },
+  "3226": {
+    "ticker": "SOXL",
+    "name": "Direxion Daily Semiconductor Bull 3X ETF",
+    "sector": "ETF / Other"
+  },
+  "1922": {
+    "ticker": "WLK",
+    "name": "Westlake Chemical Corp",
+    "sector": "Basic Materials"
   }
 }
