@@ -9,6 +9,7 @@
     --red: #ef4444;
     --blue: #3b82f6;
     --orange: #f59e0b;
+    --bg: rgba(255, 255, 255, 0.03);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -199,6 +200,14 @@
   .actions button.buy  { border-color: var(--green); color: var(--green); }
   .actions button.sell { border-color: var(--orange); color: var(--orange); }
   .actions button.drop { border-color: var(--border); color: var(--muted); }
+  .retry-btn {
+    margin-left: 6px; padding: 2px 10px; font-size: 11px;
+    background: var(--bg); color: var(--text);
+    border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+  }
+  .retry-btn:hover { border-color: var(--blue); color: var(--blue); }
+  .info-icon { cursor: pointer; color: var(--muted); }
+  .info-icon.am { margin-left: 6px; vertical-align: -2px; }
   .actions button.ok   { border-color: var(--green); color: var(--green); }
   .actions button.cancel { border-color: var(--border); color: var(--muted); }
   .actions input {
@@ -309,10 +318,6 @@
     animation: blink 2s infinite;
     margin-left: 6px;
     vertical-align: middle;
-  }
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
   }
   .modal-backdrop {
     position: fixed; inset: 0; background: rgba(0,0,0,0.6);

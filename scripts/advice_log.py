@@ -4,12 +4,17 @@
 All deterministic log work goes through this CLI so skills don't hand-edit JSON.
 Every mutating command bumps lastUpdated.
 """
+from __future__ import annotations
+
 import argparse
 import json
 import os
 import sys
 import logging
 from datetime import date, datetime
+
+import price_history
+import entries
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -28,7 +33,7 @@ ch.setFormatter(logging.Formatter('%(message)s'))
 logger.addHandler(ch)
 
 
-def get_env(key):
+def get_env(key: str) -> str | None:
     v = os.environ.get(key)
     if v is not None:
         return v
@@ -65,11 +70,11 @@ class AdviceLog:
         self.portfolio_file = os.path.join(
             ROOT, "data", self.subdir, "portfolio.json")
 
-    def load_log(self):
+    def load_log(self) -> dict:
         with open(self.log_file) as f:
-            return json.load(f)
+            return entries.normalize_entries(json.load(f))
 
-    def save_log(self, data):
+    def save_log(self, data: dict) -> None:
         data["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M")
         tmp = self.log_file + ".tmp"
         with open(tmp, "w") as f:
@@ -77,9 +82,16 @@ class AdviceLog:
             f.write("\n")
         os.replace(tmp, self.log_file)
 
-    def find(self, data, ticker):
+    def find(self, data: dict, ticker: str) -> dict | None:
         for e in data["entries"]:
-            if e["ticker"] == ticker and e["status"] in ("watching", "bought"):
+            if e.get("ticker") == ticker and e.get("status") in ("watching", "bought"):
+                return e
+        return None
+
+    def get_entry(self, data: dict, ticker: str) -> dict | None:
+        ticker = ticker.upper()
+        for e in data["entries"]:
+            if (e.get("ticker") or "").upper() == ticker:
                 return e
         return None
 
@@ -101,54 +113,26 @@ class AdviceLog:
             sys.exit(f"{ticker} is not tracked")
         return e
 
-    def latest_price(self, e):
-        return e["priceHistory"][-1]["price"] if e["priceHistory"] else e.get(
-            "priceAtAdvice")
+    def latest_price(self, e: dict) -> float | None:
+        hist = e.get("priceHistory") or []
+        return hist[-1]["price"] if hist else e.get("priceAtAdvice")
 
-    def push_history(self, e, price):
-        now = datetime.now()
-        now_str = now.strftime("%Y-%m-%d %H:%M")
-        today_str = now.strftime("%Y-%m-%d")
-
+    def push_history(self, e: dict, price: float) -> None:
         hist = e.setdefault("priceHistory", [])
-        if hist:
-            last_point = hist[-1]
-            if last_point["date"][:10] == today_str and last_point["price"] == price:
-                # Same day, same price as the last point: skip to avoid duplicate flatline points
-                return
+        price_history.push_price_point(hist, price, now=datetime.now())
 
-        if hist and hist[-1]["date"] == now_str:
-            hist[-1]["price"] = price
-        else:
-            hist.append({"date": now_str, "price": price})
-
-        # Prune historical intraday points to prevent bloat
-        new_hist = []
-        for i, point in enumerate(hist):
-            date_str = point["date"][:10]
-            if date_str == today_str:
-                new_hist.append(point)
-            else:
-                is_last = True
-                if i + 1 < len(hist) and hist[i + 1]["date"][:10] == date_str:
-                    is_last = False
-                if is_last:
-                    new_hist.append(
-                        {"date": date_str, "price": point["price"]})
-        e["priceHistory"] = new_hist
-
-    def push_note(self, e, text):
+    def push_note(self, e: dict, text: str) -> None:
         e.setdefault("notes", []).append(
             {"date": date.today().isoformat(), "text": text})
 
-    def cmd_add_pick(self, args):
+    def cmd_add_pick(self, args: argparse.Namespace):
         data = self.load_log()
         today = date.today().isoformat()
 
         e = None
         for x in data["entries"]:
             if x["ticker"] == args.ticker and x.get(
-                    "status") == "watching" and x.get("source") != "import":
+                    "status") in ("watching", "bought") and x.get("source") != "import":
                 e = x
                 break
 
@@ -182,10 +166,19 @@ class AdviceLog:
             }
             data["entries"].append(e)
             action = "added"
-            if args.reason:
-                self.push_note(e, f"Advised ({args.source}): {args.reason}")
         else:
             action = "updated"
+        # Track each advice (date + price) so the Positions view can show which
+        # advice prompted each lot, and at what price (matched by buy date).
+        e.pop("adviceDates", None)  # superseded by adviceEvents
+        events = e.get("adviceEvents")
+        if events is None:
+            events = ([{"date": e["firstAdvised"], "price": e.get("priceAtAdvice")}]
+                      if e.get("firstAdvised") else [])
+        if not any(ev.get("date") == today for ev in events):
+            events.append({"date": today, "price": args.price})
+        events.sort(key=lambda ev: ev["date"])
+        e["adviceEvents"] = events
         self.push_history(e, args.price)
         for field, value in (("rating", args.rating), ("rsiAtAdvice", args.rsi),
                              ("sector", args.sector), ("buyBelow", args.buy_below),
@@ -193,19 +186,23 @@ class AdviceLog:
                              ("name", args.name), ("reason", args.reason), ("risk", args.risk)):
             if value is not None:
                 e[field] = value
+        if args.reason:
+            advised = f"Advised ({args.source or e.get('source')}): {args.reason}"
+            if not any(n.get("text") == advised for n in e.get("notes", [])):
+                self.push_note(e, advised)
         if args.note:
             self.push_note(e, args.note)
         self.save_log(data)
         logger.info(f"{action} {args.ticker} ({e['status']}) @ ${args.price}")
 
-    def cmd_add_note(self, args):
+    def cmd_add_note(self, args: argparse.Namespace):
         data = self.load_log()
         e = self.require(data, args.ticker)
         self.push_note(e, args.text)
         self.save_log(data)
         logger.info(f"{args.ticker}: note added ({len(e['notes'])} total)")
 
-    def cmd_add_eod(self, args):
+    def cmd_add_eod(self, args: argparse.Namespace):
         data = self.load_log()
         data.setdefault("eodReports", []).append({
             "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -214,7 +211,7 @@ class AdviceLog:
         self.save_log(data)
         logger.info("EOD report added.")
 
-    def cmd_add_news_summary(self, args):
+    def cmd_add_news_summary(self, args: argparse.Namespace):
         data = self.load_log()
         data.setdefault("newsSummaries", []).append({
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -224,14 +221,14 @@ class AdviceLog:
         self.save_log(data)
         logger.info("News summary added.")
 
-    def cmd_touch(self, args):
+    def cmd_touch(self, args: argparse.Namespace):
         data = self.load_log()
         e = self.require(data, args.ticker)
         self.push_history(e, args.price)
         self.save_log(data)
         logger.info(f"{args.ticker}: price point ${args.price} added")
 
-    def cmd_touch_many(self, args):
+    def cmd_touch_many(self, args: argparse.Namespace):
         try:
             prices = json.load(sys.stdin)
         except json.JSONDecodeError as exc:
@@ -272,7 +269,7 @@ class AdviceLog:
             msg += f" (skipped untracked: {', '.join(skipped)})"
         logger.info(msg)
 
-    def cmd_set_status(self, args):
+    def cmd_set_status(self, args: argparse.Namespace):
         data = self.load_log()
         e = self.require(data, args.ticker)
         price = args.price if args.price is not None else self.latest_price(e)
@@ -290,7 +287,7 @@ class AdviceLog:
         self.save_log(data)
         logger.info(f"{args.ticker}: {args.status} @ ${price}")
 
-    def cmd_set_tsl(self, args):
+    def cmd_set_tsl(self, args: argparse.Namespace):
         data = self.load_log()
         e = self.require(data, args.ticker)
         e["tslSet"] = not args.off
@@ -299,7 +296,7 @@ class AdviceLog:
         self.save_log(data)
         logger.info(f"{args.ticker}: tslSet = {e['tslSet']}")
 
-    def cmd_checkin_candidates(self, args):
+    def cmd_checkin_candidates(self, args: argparse.Namespace):
         data = self.load_log()
         today = date.today()
         rows = []
@@ -309,14 +306,14 @@ class AdviceLog:
                 rows.append(
                     (0, 0.0, f"{e['ticker']}: {len(est_lots)} lot(s) auto-closed at estimated exit, "
                      f"confirm the real price (dashboard Confirm, or set-status sold --price X)"))
-            if e["status"] == "watching":
+            if e.get("status") == "watching":
                 price = self.latest_price(e)
                 if e.get(
                         "dropAbove") and price is not None and price >= e["dropAbove"]:
                     rows.append(
                         (0, -price, f"{e['ticker']}: now ${price} >= drop-above ${e['dropAbove']}, "
                          f"the oversold bounce already ran - drop it?"))
-                else:
+                elif e.get("firstAdvised"):
                     age = (
                         today -
                         datetime.strptime(
@@ -324,9 +321,9 @@ class AdviceLog:
                             "%Y-%m-%d").date()).days
                     if age > 7:
                         rows.append(
-                            (1, -age, f"{e['ticker']}: watching {age}d, advised @ ${e['priceAtAdvice']}, "
+                            (1, -age, f"{e['ticker']}: watching {age}d, advised @ ${e.get('priceAtAdvice')}, "
                              f"now ${self.latest_price(e)}"))
-            elif e["status"] == "bought" and e.get("boughtAt") and not e.get("tslSet"):
+            elif e.get("status") == "bought" and e.get("boughtAt") and not e.get("tslSet"):
                 pct = (self.latest_price(e) -
                        e["boughtAt"]) / e["boughtAt"] * 100
                 if pct >= 5:
@@ -339,13 +336,13 @@ class AdviceLog:
         for _, _, line in sorted(rows):
             logger.info(line)
 
-    def load_portfolio(self):
+    def load_portfolio(self) -> dict:
         if not os.path.exists(self.portfolio_file):
             sys.exit("data/portfolio.json missing: run the eToro import first")
         with open(self.portfolio_file) as f:
             return json.load(f)
 
-    def cmd_compare(self, args):
+    def cmd_compare(self, args: argparse.Namespace):
         data = self.load_log()
         held = {h["ticker"]: h for h in self.load_portfolio()["holdings"]}
         hits = [(e, held[e["ticker"]]) for e in data["entries"]
@@ -359,7 +356,7 @@ class AdviceLog:
                 f"{e['ticker']}: advised @ ${e['priceAtAdvice']} ({e['firstAdvised']}), "
                 f"entry ${h['avgOpen']}, now ${h['currentPrice']} ({pl})")
 
-    def cmd_sector_gaps(self, args):
+    def cmd_sector_gaps(self, args: argparse.Namespace):
         portfolio = self.load_portfolio()
         total = portfolio.get("totalInvested") or sum(
             h["invested"] for h in portfolio["holdings"])
@@ -381,6 +378,40 @@ class AdviceLog:
                  and (by_sector.get(s, 0.0) / total * 100 if total else 0.0) < 5.0]
         logger.info(
             f"\nUnderweight (<5% of invested): {', '.join(under) if under else 'none'}")
+
+
+    def cmd_get_entry(self, args: argparse.Namespace):
+        data = self.load_log()
+        entry = self.get_entry(data, args.ticker)
+        if entry is None:
+            if args.json:
+                logger.info("null")
+            else:
+                logger.info(f"{args.ticker.upper()} is not tracked")
+            return
+        if args.json:
+            logger.info(json.dumps(entry))
+            return
+        logger.info(
+            f"{entry.get('ticker')} ({entry.get('status')}): advised @ "
+            f"${entry.get('priceAtAdvice')} on {entry.get('firstAdvised')}, "
+            f"now ${self.latest_price(entry)}, sector {entry.get('sector')}")
+        if entry.get("reason"):
+            logger.info(f"  thesis: {entry['reason']}")
+        if entry.get("risk"):
+            logger.info(f"  risk:   {entry['risk']}")
+
+    def cmd_remove(self, args: argparse.Namespace):
+        data = self.load_log()
+        e = self.require_by_id(data, args.id)
+        lots = e.get("lots") or []
+        if lots and not args.force:
+            sys.exit(
+                f"{args.id} ({e.get('ticker')}) has {len(lots)} eToro lot(s); "
+                "refusing to delete a tracked position without --force")
+        data["entries"] = [x for x in data["entries"] if x.get("id") != args.id]
+        self.save_log(data)
+        logger.info(f"removed {args.id} ({e.get('ticker')}, {e.get('status')})")
 
 
 def main():
@@ -466,6 +497,21 @@ def main():
         "sector-gaps",
         help="portfolio sector split + underweight sectors")
     p.set_defaults(func=app.cmd_sector_gaps)
+
+    p = sub.add_parser(
+        "get-entry",
+        help="read a single tracked entry (any status) by ticker")
+    p.add_argument("ticker")
+    p.add_argument("--json", action="store_true")
+    p.set_defaults(func=app.cmd_get_entry)
+
+    p = sub.add_parser(
+        "remove",
+        help="delete an entry by id (e.g. a duplicate); guarded for entries with lots")
+    p.add_argument("id")
+    p.add_argument("--force", action="store_true",
+                   help="remove even if the entry has attributed eToro lots")
+    p.set_defaults(func=app.cmd_remove)
 
     args = parser.parse_args()
     args.func(args)

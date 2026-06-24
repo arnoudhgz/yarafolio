@@ -4,6 +4,7 @@ import { today, esc, tickerLink } from './utils.js';
 import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
 import { applyChange, fetchMacro, fetchIpos, loadLearn } from './api.js';
+import { marketHolidays } from './holidays.js';
 
 async function load() {
   try {
@@ -303,7 +304,7 @@ const adviceClickHandler = (ev) => {
     const rowEl = /** @type {HTMLElement} */ (ev.target).closest('tr[data-id]');
     if (rowEl) {
       const row = /** @type {HTMLElement} */ (rowEl);
-      openModal(row.dataset.id);
+      openModal(row.dataset.id, row.dataset.pos);
     }
     return;
   }
@@ -418,14 +419,17 @@ function updateTimer() {
   const dd = String(nyDate.getDate()).padStart(2, '0');
   const dateStr = `${yyyy}-${mm}-${dd}`;
   
-  const holidays = [
-    "2026-01-01", "2026-01-19", "2026-02-16", "2026-04-03", "2026-05-25",
-    "2026-06-19", "2026-07-03", "2026-09-07", "2026-11-26", "2026-12-25"
-  ];
-  
-  let st = { status: "CLOSED", text: "MARKET CLOSED", color: "var(--muted)", blink: false };
-  
-  if (day === 0 || day === 6 || holidays.includes(dateStr)) {
+  const holidays = marketHolidays(yyyy);
+  const holidayName = holidays.get(dateStr);
+
+  let st = {
+    status: "CLOSED",
+    text: holidayName ? `MARKET CLOSED (${holidayName})` : "MARKET CLOSED",
+    color: "var(--muted)",
+    blink: false,
+  };
+
+  if (day === 0 || day === 6 || holidayName) {
     // Closed
   } else {
     const hours = nyDate.getHours();

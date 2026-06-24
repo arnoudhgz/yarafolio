@@ -57,5 +57,22 @@ class ParseQuoteTest(unittest.TestCase):
         self.assertEqual(quote["marketDate"], "2026-06-15")
 
 
+class QuoteSessionNoteTest(unittest.TestCase):
+    def test_regular_session_has_no_note(self):
+        self.assertEqual(screen.quote_session_note({"session": "regular"}), "")
+
+    def test_missing_session_has_no_note(self):
+        self.assertEqual(screen.quote_session_note({}), "")
+
+    def test_premarket_note_includes_session_and_as_of(self):
+        note = screen.quote_session_note(
+            {"session": "pre-market", "asOf": "Jun 15, 2026, 4:05 AM EDT"})
+        self.assertEqual(note, "pre-market, as of Jun 15, 2026, 4:05 AM EDT")
+
+    def test_after_hours_note_without_as_of(self):
+        self.assertEqual(
+            screen.quote_session_note({"session": "after-hours"}), "after-hours")
+
+
 if __name__ == "__main__":
     unittest.main()

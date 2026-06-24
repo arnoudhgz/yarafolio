@@ -1,9 +1,48 @@
 // @ts-check
 import { DATA, searchQuery } from './state.js';
 
+/**
+ * Read a CSS custom property off :root, so JS-side colors (charts, sparklines) stay in
+ * sync with the one palette defined in styles.css instead of duplicating hex values.
+ * @param {string} name e.g. '--green'
+ * @returns {string}
+ */
+export const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
 /** @returns {string} */
 export const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
 export const nowStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
+
+/**
+ * Render an ISO/UTC instant as a YYYY-MM-DD date in the viewer's own timezone.
+ * eToro stamps openDateTime in UTC; this shows the buy on the local calendar day.
+ * Falls back to the raw value (sliced to a date) when it can't be parsed.
+ * @param {string|null|undefined} iso
+ * @returns {string}
+ */
+export const localDate = (iso) => {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? String(iso).slice(0, 10) : d.toLocaleDateString('en-CA');
+};
+
+/**
+ * The advice that prompted a given lot: the latest adviceEvents entry (date + price)
+ * on/before the lot's buy date, falling back to the entry's first advice for legacy
+ * entries (no adviceEvents). Compares against the lot's buy date in the viewer's
+ * timezone (from openDateTime), so a buy that's the 24th locally matches a same-day
+ * advice even though its UTC openDate slice says the 23rd.
+ * @param {import('./state.js').AdviceEntry} e
+ * @param {{openDate?: string|null, openDateTime?: string|null}} lot
+ * @returns {{date: string|undefined, price: number|undefined}}
+ */
+export const advisedFor = (e, lot) => {
+  const events = e.adviceEvents || [];
+  const buy = lot && (lot.openDateTime ? localDate(lot.openDateTime) : lot.openDate);
+  const prior = buy ? events.filter(ev => ev.date <= buy) : events.slice();
+  if (prior.length) return prior[prior.length - 1];
+  return { date: e.firstAdvised, price: e.priceAtAdvice };
+};
 
 /** @returns {import('./state.js').AdviceEntry[]} */
 export const advised = () => DATA.entries.filter(e => e.source !== 'import');

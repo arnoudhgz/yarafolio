@@ -121,7 +121,9 @@ export async function fetchMacro(force = false) {
     }
     /** @type {any} */ (window).macroLoaded = true;
   } catch (err) {
-    /** @type {HTMLElement} */ (document.getElementById('macroList')).innerHTML = '<tr><td colspan="7" class="insufficient">Failed to fetch macro calendar.</td></tr>';
+    const macroList = /** @type {HTMLElement} */ (document.getElementById('macroList'));
+    macroList.innerHTML = '<tr><td colspan="7" class="insufficient">Failed to fetch macro calendar. <button type="button" class="retry-btn">Retry</button></td></tr>';
+    macroList.querySelector('.retry-btn')?.addEventListener('click', () => fetchMacro(true));
   } finally {
     /** @type {HTMLElement} */ (document.getElementById('macroLoading')).style.display = 'none';
     btn.disabled = false;
@@ -206,7 +208,9 @@ export async function fetchIpos(force = false) {
     });
 
   } catch (err) {
-    /** @type {HTMLElement} */ (document.getElementById('iposBody')).innerHTML = '<tr><td colspan="6" class="empty" style="color:var(--red)">Failed to fetch IPOs.</td></tr>';
+    const iposBody = /** @type {HTMLElement} */ (document.getElementById('iposBody'));
+    iposBody.innerHTML = '<tr><td colspan="6" class="empty" style="color:var(--red)">Failed to fetch IPOs. <button type="button" class="retry-btn">Retry</button></td></tr>';
+    iposBody.querySelector('.retry-btn')?.addEventListener('click', () => fetchIpos());
   } finally {
     /** @type {HTMLElement} */ (document.getElementById('iposLoading')).style.display = 'none';
   }

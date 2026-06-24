@@ -10,12 +10,16 @@ variables override values from the file.
 Read-only: only GET requests, never the trading/order endpoints.
 merge also writes data/portfolio.json, the full holdings snapshot for the dashboard.
 """
+from __future__ import annotations
+
 import json
 import os
 import sys
 import uuid
 import logging
 from datetime import date, datetime
+
+import price_history
 
 BASE = "https://public-api.etoro.com/api/v1"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -35,7 +39,7 @@ ch.setFormatter(logging.Formatter('%(message)s'))
 logger.addHandler(ch)
 
 
-def get_env(key):
+def get_env(key: str) -> str | None:
     v = os.environ.get(key)
     if v is not None:
         return v
@@ -62,7 +66,7 @@ class EtoroImport:
         self.preview_file = os.path.join(
             ROOT, "tmp", "etoro-import-preview.json")
 
-    def credentials(self):
+    def credentials(self) -> dict:
         creds = {}
         env_file = os.path.join(ROOT, ".env")
         try:
@@ -138,7 +142,7 @@ class EtoroImport:
                 f"warning: industries fetch failed ({exc}), sectors left unknown")
             return None
 
-    def sector_for(self, meta_record, industries):
+    def sector_for(self, meta_record: dict, industries: dict) -> str:
         if not meta_record or industries is None:
             return None
         if meta_record.get("instrumentTypeID") != 5:
@@ -202,6 +206,7 @@ class EtoroImport:
                 "lots": [{
                     "positionID": p["positionID"],
                     "openDate": p["openDateTime"][:10],
+                    "openDateTime": p["openDateTime"],
                     "openRate": round(p["openRate"], 4),
                     "units": round(p["units"], 6),
                     "tslEnabled": bool(p.get("isTslEnabled")),
@@ -268,6 +273,7 @@ class EtoroImport:
                     continue
                 lots.append({"positionID": pid,
                              "openDate": lot["openDate"],
+                             "openDateTime": lot.get("openDateTime"),
                              "openRate": lot["openRate"],
                              "units": lot["units"],
                              "lastPrice": current or lot["openRate"],
@@ -277,6 +283,8 @@ class EtoroImport:
                 claimed_lots.add(pid)
             elif have[pid].get("soldAt") is None:
                 have[pid]["tslEnabled"] = bool(lot.get("tslEnabled"))
+                if not have[pid].get("openDateTime") and lot.get("openDateTime"):
+                    have[pid]["openDateTime"] = lot["openDateTime"]
                 if current:
                     have[pid]["lastPrice"] = current
         closed = 0
@@ -295,7 +303,7 @@ class EtoroImport:
             self.rollup_entry(entry, current)
         return closed
 
-    def rollup_entry(self, entry, current_price):
+    def rollup_entry(self, entry: dict, current_price: float | None) -> None:
         lots = entry["lots"]
         open_lots = [lot for lot in lots if lot.get("soldAt") is None]
         total_units = sum(lot["units"] for lot in lots) or 1
@@ -315,32 +323,7 @@ class EtoroImport:
             entry["exitEstimated"] = any(lot.get("exitEstimated") for lot in lots)
         if current_price:
             hist = entry.setdefault("priceHistory", [])
-            from datetime import datetime
-            now = datetime.now()
-            now_str = now.strftime("%Y-%m-%d %H:%M")
-            today_str = now.strftime("%Y-%m-%d")
-
-            if hist and hist[-1]["price"] == current_price:
-                pass
-            elif hist and hist[-1]["date"] == now_str:
-                hist[-1]["price"] = current_price
-            else:
-                hist.append({"date": now_str, "price": current_price})
-
-            new_hist = []
-            for i, point in enumerate(hist):
-                date_str = point["date"][:10]
-                if date_str == today_str:
-                    new_hist.append(point)
-                else:
-                    is_last = True
-                    if i + \
-                            1 < len(hist) and hist[i + 1]["date"][:10] == date_str:
-                        is_last = False
-                    if is_last:
-                        new_hist.append(
-                            {"date": date_str, "price": point["price"]})
-            entry["priceHistory"] = new_hist
+            price_history.push_price_point(hist, current_price, now=datetime.now())
 
     def merge(self):
         with open(self.preview_file) as f:

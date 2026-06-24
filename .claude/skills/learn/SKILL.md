@@ -1,6 +1,6 @@
 ---
 name: learn
-description: Self-learning pass over advice outcomes. Use when the user types /learn, asks "how good were your advices", "what should we change in the strategy", or after an advice run suggested it. Computes outcome stats, proposes concrete skill/agent/GEMINI.md improvements, applies them only after approval.
+description: Self-learning pass over advice outcomes. Use when the user types /learn, asks "how good were your advices", "what should we change in the strategy", or after an advice run suggested it. Computes outcome stats, proposes concrete skill/agent/CLAUDE.md improvements, applies them only after approval.
 license: Apache-2.0
 metadata:
   version: v1
@@ -24,7 +24,7 @@ Compare past advice against what actually happened, then improve the advice pipe
 
 ## Step 3: Propose (max 3 per run)
 
-For each proposal, show: the stat that triggered it (with n), the exact file, and the concrete before/after text. Targets: `.claude/commands/advice.md`, `.claude/skills/premarket/SKILL.md`, `.claude/skills/check/SKILL.md`, `.claude/skills/diversify/SKILL.md`, `.claude/agents/stock-researcher.md`, `GEMINI.md`. Keep proposals small and testable; one rule change per proposal.
+For each proposal, show: the stat that triggered it (with n), the exact file, and the concrete before/after text. Targets: `.claude/commands/advice.md`, `.claude/skills/premarket/SKILL.md`, `.claude/skills/check/SKILL.md`, `.claude/skills/diversify/SKILL.md`, `.claude/agents/stock-researcher.md`, `CLAUDE.md`. Keep proposals small and testable; one rule change per proposal.
 
 ## Step 4: Approval gate
 
@@ -46,4 +46,4 @@ The "Measurable outcomes" line is load-bearing: advice runs compare `learn_stats
 
 ## Step 6: Auto-backup
 
-Run `python3 scripts/autosync.py "learn pass"`. Commits + pushes `data/private/LEARNINGS.md` (and any data changes) to the private backup repo when `STOCKS_AUTOSYNC=1`, silent no-op otherwise. Accepted skill/GEMINI.md edits are code, not data, so commit those yourself.
+Run `python3 scripts/autosync.py "learn pass"`. Commits + pushes `data/private/LEARNINGS.md` (and any data changes) to the private backup repo when `STOCKS_AUTOSYNC=1`, silent no-op otherwise. Accepted skill/CLAUDE.md edits are code, not data, so commit those yourself.

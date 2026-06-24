@@ -17,6 +17,8 @@ Brittleness warning: this parses unofficial page markup. When a command
 prints nothing or errors, the markup probably changed: fall back to
 WebFetch/WebSearch in the skill and mention the breakage so the script gets fixed.
 """
+from __future__ import annotations
+
 import argparse
 import html as htmllib
 import json
@@ -63,6 +65,22 @@ QUOTE_FIELDS = (
     "Analysts",
     "Price Target")
 RED_FLAG_TERMS = "lawsuit OR investigation OR fraud OR SEC OR \"class action\" OR bankruptcy OR \"chapter 11\" OR default"
+
+
+def quote_session_note(data: dict) -> str:
+    """Human-readable session tag for a parsed quote.
+
+    Returns '' for a regular-session quote, otherwise something like
+    'pre-market, as of Jun 15, 2026, 4:05 AM EDT' so a researcher reading the
+    embedded quote row knows which session the price belongs to.
+    """
+    session = data.get("session", "regular")
+    if session == "regular":
+        return ""
+    note = session
+    if data.get("asOf"):
+        note += f", as of {data['asOf']}"
+    return note
 
 
 class Screen:
@@ -127,8 +145,12 @@ class Screen:
         m = re.search(label_pattern + r"((?:\s+\d+)+)", text)
         return m.group(1).split()[-1] if m else None
 
-    def cmd_oversold(self, args):
+    def cmd_oversold(self, args: argparse.Namespace):
         headers, rows = self.parse_table(self.fetch("/list/oversold-stocks/"))
+        if not rows:
+            logger.warning(
+                "oversold screen parsed 0 rows - stockanalysis.com markup likely "
+                "changed; fall back to the WebFetch sources in the skill")
         cols = {name: idx for idx, name in enumerate(headers)}
         sym = next((cols[c] for c in cols if "Symbol" in c), 1)
         name = next((cols[c] for c in cols if "Name" in c), 2)
@@ -170,7 +192,7 @@ class Screen:
                 line += " | " + " | ".join(extras)
             logger.info(line)
 
-    def parse_quote(self, ticker):
+    def parse_quote(self, ticker: str) -> dict:
         html_clean = re.sub(
             r"<!--.*?-->",
             "",
@@ -230,7 +252,7 @@ class Screen:
                 data[label] = pairs[label].strip()
         return data
 
-    def cmd_quote(self, args):
+    def cmd_quote(self, args: argparse.Namespace):
         results = {}
 
         def fetch_wrapper(ticker):
@@ -256,7 +278,14 @@ class Screen:
                 logger.info(f"{ticker}: fetch failed ({data['error']})")
                 continue
             price = data.get("price")
-            stats = [f"price {price}" if price is not None else "price ?"]
+            note = quote_session_note(data)
+            price_label = f"price {price}" if price is not None else "price ?"
+            if note:
+                price_label += f" ({note})"
+            stats = [price_label]
+            regular_price = data.get("regularPrice")
+            if note and regular_price is not None and regular_price != price:
+                stats.append(f"regular close {regular_price}")
             stats += [f"{label} {data[label]}" for label in QUOTE_FIELDS if label in data]
 
             if price is not None and "52-Week Range" in data:
@@ -302,7 +331,7 @@ class Screen:
 
             logger.info(f"{ticker}: " + " | ".join(stats))
 
-    def cmd_forecast(self, args):
+    def cmd_forecast(self, args: argparse.Namespace):
         results = {}
 
         def fetch_wrapper(ticker):
@@ -370,7 +399,7 @@ class Screen:
         for ticker in args.tickers:
             logger.info(results.get(ticker, f"{ticker}: not processed"))
 
-    def cmd_news(self, args):
+    def cmd_news(self, args: argparse.Namespace):
         results = {}
 
         def fetch_news(ticker):
@@ -430,7 +459,7 @@ class Screen:
                 for line in news_lines:
                     logger.info(line)
 
-    def cmd_ipos(self, args):
+    def cmd_ipos(self, args: argparse.Namespace):
         cutoff = datetime.today().date() - timedelta(days=60)
 
         recent_headers, recent_rows = [], []

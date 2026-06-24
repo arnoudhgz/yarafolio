@@ -5,6 +5,41 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Strategy update: lowered preferred RSI to < 25 and added an output warning for A-rated Tech stocks due to value trap risks (applied via `/learn`).
+
+## [0.8.0]
+
+### Added
+- `scripts/screen.py quote` now tags the session on its human-readable output (pre-market / after-hours, with the as-of time and the regular-session close), so the advice researchers can read the correct session price straight from the row instead of re-searching for it.
+- New `scripts/advice_log.py get-entry TICKER [--json]` command that reads a single tracked entry of any status, so `/check` no longer hand-parses `advice-log.json`.
+- `/premarket` now runs the IPO screen step (`screen.py ipos`) that was documented but never wired into the skill.
+- Retry buttons on the macro-calendar and IPO-tracker error states, so a failed fetch can be retried without reloading.
+- `scripts/advice_log.py remove ID` deletes a single entry by id (e.g. a stray duplicate). It refuses to delete an entry that still has eToro lots unless you pass `--force`, so you can't nuke a tracked position by accident.
+- The Positions tab now shows a per-lot "first advised" date AND "advised at" price: the advice that actually prompted each buy (the latest advice on/before the lot's open date, matched against the buy's local date), instead of repeating the pick's first-ever advice on every lot. Backed by a new `adviceEvents` list ({date, price}) that `add-pick` keeps per entry.
+- Opening the drill-down from a Positions row now scopes the chart to that specific lot: anchored at the advice that prompted it (date + price) with its own buy and trailing-stop lines, and the lot is flagged in the lots list. Opening from the Advice tab keeps the whole-pick chart.
+
+### Changed
+- Dashboard sparklines now use the theme's `--green`/`--red` (they were rendering a different hardcoded green/red), and the repeated info-icon inline styles collapsed into one `.info-icon` class.
+- The oversold screen logs a clear warning when it parses zero rows (stockanalysis.com markup changed) instead of silently returning no candidates.
+- The mandatory litigation/fraud red-flag gate is now present and identically worded across all five advice skills (it was missing in `/aftermarket` and `/check`).
+- `/premarket` and `/aftermarket` now trust the session-tagged quote price; `/aftermarket` and `/diversify` now flag earnings-gap risk like `/premarket` already did.
+- `/check` reads tracked entries via `advice_log.py get-entry` and `/check` can add a brand-new ticker with full `/advice` rigor (all entry/exit levels), not a partial entry.
+- `/diversify` describes the correct 10-sector taxonomy (underweight computed over the 9 investable sectors).
+- Skills genericized for open source: US session times stated in ET (dropped the Netherlands/CEST local times), a hardcoded absolute path removed, and the eToro credential docs corrected to the project `.env` to match the code. Every skill now carries uniform frontmatter and the `.claude` / `.gemini` skill trees are back in sync.
+- Extracted the shared price-history pruning into `scripts/price_history.py` and entry normalization into `scripts/entries.py`, and the dashboard market-holiday calendar into `static/js/holidays.js`, so the duplicated/date logic can't drift out of sync.
+- The market timer names the holiday when the market is closed for one (e.g. "MARKET CLOSED (Christmas)").
+- The dashboard shows each eToro buy's "Bought on" date in the viewer's own timezone. `etoro_import.py` now keeps the full UTC `openDateTime` on every lot and the dashboard converts it client-side, so a buy placed late in the evening local time no longer shows on the wrong calendar day (it was being sliced straight off eToro's UTC timestamp).
+
+### Fixed
+- `scripts/advice_log.py add-pick` no longer creates a lot-less duplicate when you re-advise a ticker you already hold. It used to only match `watching` entries, so a re-advised held name spawned a second `watching` entry that lingered in the Advice tab forever. It now upserts onto the held position (refreshing the thesis and adding a price point) instead.
+- The dashboard market-status timer used a hardcoded 2026 holiday list, so it would have shown the market as open on every 2027+ holiday. Holidays are now computed per year following NYSE rules (Good Friday via Computus, the Saturday/Sunday observance shifts, and the New-Year-on-Saturday exception).
+- `scripts/etoro_import.py` no longer drops a price point when a new day's price matches the previous day's last price. Its price-history bookkeeping now matches `advice_log.py` exactly.
+- The scripts no longer crash on legacy entries missing `priceHistory`, `status`, or `firstAdvised`. Entries are normalized on load and the hot paths (`find`, `latest_price`, check-in candidates, learn stats) read defensively.
+- Defined the missing `--bg` CSS variable (several inputs and buttons were silently falling back to transparent) and removed a duplicate `@keyframes blink`.
+
 ## [0.7.0]
 
 ### Added

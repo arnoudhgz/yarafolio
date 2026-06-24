@@ -1,6 +1,6 @@
 // @ts-check
 import { DATA, PORTFOLIO, modalChart, setModalChart, SECTOR_COLORS, SECTORS, searchQuery } from './state.js';
-import { fmtPrice, fmtPL, fmtPct, fmtMoney, tickerLink, esc, realizedPL, unrealizedPL, today } from './utils.js';
+import { fmtPrice, fmtPL, fmtPct, fmtMoney, tickerLink, esc, realizedPL, unrealizedPL, today, localDate, advisedFor } from './utils.js';
 
 /**
  * @param {HTMLElement} table
@@ -139,10 +139,13 @@ window.openMacroModal = openMacroModal;
 /**
  * @param {string} id
  */
-export function openModal(id) {
+export function openModal(id, positionID) {
   let e = DATA.entries.find(x => x.id === id);
   if (!e) e = DATA.entries.find(x => x.ticker === id);
   if (!e) return;
+  // Opened from a Positions row: scope the chart to that specific lot.
+  const lot = positionID != null
+    ? (e.lots || []).find(l => String(l.positionID) === String(positionID)) : null;
   const notes = e.notes || [];
   const links = Array.isArray(e.sources) ? e.sources : [];
   /** @type {HTMLElement} */ (document.getElementById('modalBody')).innerHTML =
@@ -169,10 +172,11 @@ export function openModal(id) {
           const closed = l.soldAt != null;
           const exit = closed ? l.soldAt : l.lastPrice;
           const pl = (exit - l.openRate) * l.units;
-          return '<li><span class="nd">' + l.openDate + '</span><span>' + l.units + ' @ ' +
+          const active = lot && String(l.positionID) === String(lot.positionID);
+          return '<li' + (active ? ' style="font-weight:600;"' : '') + '><span class="nd">' + (l.openDateTime ? localDate(l.openDateTime) : l.openDate) + '</span><span>' + l.units + ' @ ' +
             fmtPrice(l.openRate) + ' &rarr; ' + fmtPrice(exit) + ' <span class="' + (pl >= 0 ? 'pos' : 'neg') +
             '">' + fmtPL(pl) + '</span> ' + (closed ? '(closed' + (l.exitEstimated ? ', est' : '') + ')' : '(open)') +
-            '</span></li>';
+            (active ? ' &larr; chart' : '') + '</span></li>';
         }).join('') + '</ul>' : '') +
       (() => {
         const pfH = PORTFOLIO.holdings.find(h => h.ticker === e.ticker);
@@ -181,7 +185,7 @@ export function openModal(id) {
             pfH.lots.map(l => {
               const pl = (pfH.currentPrice - l.openRate) * l.units;
               const pct = (pfH.currentPrice - l.openRate) / l.openRate * 100;
-              return '<li><span class="nd">' + l.openDate + '</span><span>' + l.units + ' @ ' +
+              return '<li><span class="nd">' + (l.openDateTime ? localDate(l.openDateTime) : l.openDate) + '</span><span>' + l.units + ' @ ' +
                 fmtPrice(l.openRate) + ' <span class="' + (pl >= 0 ? 'pos' : 'neg') +
                 '">' + fmtPL(pl) + ' (' + fmtPct(pct) + ')</span></span></li>';
             }).join('') + '</ul>';
@@ -197,21 +201,26 @@ export function openModal(id) {
       '<div class="modal-chart" style="flex: 1; height: 100%; margin: 0;"><canvas id="modalChartCanvas"></canvas></div>' +
     '</div>';
   /** @type {HTMLElement} */ (document.getElementById('modal')).hidden = false;
-  drawModalChart(e);
+  drawModalChart(e, lot);
 }
 
 /**
  * @param {import('./state.js').AdviceEntry} e
+ * @param {any} [lot] when set, the chart is scoped to this lot: anchored at the
+ *   advice that prompted it (date + price) and its own buy/TSL lines.
  */
-export function drawModalChart(e) {
+export function drawModalChart(e, lot) {
   if (modalChart) { modalChart.destroy(); setModalChart(null); }
+  const adv = lot ? advisedFor(e, lot) : { date: e.firstAdvised, price: e.priceAtAdvice };
+  const anchorDate = adv.date;
+  const anchorPrice = adv.price;
   let hist = [...(e.priceHistory || [])];
-  if (e.firstAdvised) {
-    hist = hist.filter(h => h.date >= e.firstAdvised);
+  if (anchorDate) {
+    hist = hist.filter(h => h.date >= anchorDate);
   }
-  if (e.priceAtAdvice != null && e.firstAdvised) {
-    if (hist.length === 0 || hist[0].price !== e.priceAtAdvice || hist[0].date.indexOf(e.firstAdvised) !== 0) {
-      hist.unshift({ date: e.firstAdvised + ' (Added)', price: e.priceAtAdvice });
+  if (anchorPrice != null && anchorDate) {
+    if (hist.length === 0 || hist[0].price !== anchorPrice || hist[0].date.indexOf(anchorDate) !== 0) {
+      hist.unshift({ date: anchorDate + ' (Added)', price: anchorPrice });
     }
   }
 
@@ -269,15 +278,15 @@ export function drawModalChart(e) {
   let lastKeptTime = 0;
   for (let i = 0; i < groupedHist.length; i++) {
     const current = groupedHist[i];
-    if (current._isWeek || current.date.includes('(Added)')) {
+    if (/** @type {any} */ (current)._isWeek || current.date.includes('(Added)')) {
       optimizedHist.push(current);
       continue;
     }
     const currentDay = current.date.slice(0, 10);
     const prev = i > 0 ? groupedHist[i-1] : null;
     const next = i < groupedHist.length - 1 ? groupedHist[i+1] : null;
-    const isFirstOfDay = i === 0 || prev.date.slice(0, 10) !== currentDay || prev._isWeek || prev.date.includes('(Added)');
-    const isLastOfDay = i === groupedHist.length - 1 || next.date.slice(0, 10) !== currentDay || next._isWeek;
+    const isFirstOfDay = i === 0 || prev.date.slice(0, 10) !== currentDay || /** @type {any} */ (prev)._isWeek || prev.date.includes('(Added)');
+    const isLastOfDay = i === groupedHist.length - 1 || next.date.slice(0, 10) !== currentDay || /** @type {any} */ (next)._isWeek;
     
     let ts = 0;
     if (current.date.length >= 16) {
@@ -304,8 +313,8 @@ export function drawModalChart(e) {
     if (isAdded) dStr = dStr.replace(' (Added)', '');
     
     let label = '';
-    if (h._isWeek) {
-      label = 'Wk ' + h._weekNum;
+    if (/** @type {any} */ (h)._isWeek) {
+      label = 'Wk ' + /** @type {any} */ (h)._weekNum;
     } else if (dStr.length > 10) {
       label = dStr.slice(11, 16);
     } else {
@@ -332,11 +341,12 @@ export function drawModalChart(e) {
   if (e.dropAbove != null) datasets.push({ label: 'Drop above', data: labels.map(() => e.dropAbove),
     borderColor: '#8b98a5', borderDash: [5, 5], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
 
-  if (e.boughtAt && e.status === 'bought') {
-    datasets.push({ label: 'Bought', data: labels.map(() => e.boughtAt),
+  const buyPrice = lot ? lot.openRate : (e.status === 'bought' ? e.boughtAt : null);
+  if (buyPrice != null) {
+    datasets.push({ label: 'Bought', data: labels.map(() => buyPrice),
       borderColor: '#3498db', borderDash: [2, 2], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
-    
-    datasets.push({ label: 'TSL Target (+5%)', data: labels.map(() => e.boughtAt * 1.05),
+
+    datasets.push({ label: 'TSL Target (+5%)', data: labels.map(() => buyPrice * 1.05),
       borderColor: '#f1c40f', borderDash: [2, 2], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
   }
 
