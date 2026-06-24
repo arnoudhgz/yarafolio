@@ -283,7 +283,6 @@
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 24px;
-    white-space: pre-wrap;
   }
 
   .action-group { margin-bottom: 18px; }

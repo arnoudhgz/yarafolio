@@ -563,6 +563,7 @@ export function renderAINews() {
       }
 
       let content = marked.parse(contentStr.trim());
+      content = content.replace(/<strong>([A-Z]{2,5}(?:\.[A-Z]+)?)<\/strong>/g, '<a href="#" onclick="openModal(\'$1\'); return false;" class="tlink"><strong>$1</strong></a>');
       
       html += `
         <div class="ai-article">
@@ -598,16 +599,8 @@ export function renderEOD() {
         contentStr = contentStr.replace(/^###\s*(.*?)(\n|$)/, '');
       }
 
-      let linkedSummary = contentStr.replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
-        const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
-        const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
-        if (isAdvised || isHolding) {
-          return tickerLink(ticker);
-        }
-        return match;
-      });
-
-      let content = marked.parse(linkedSummary.trim());
+      let content = marked.parse(contentStr.trim());
+      content = content.replace(/<strong>([A-Z]{2,5}(?:\.[A-Z]+)?)<\/strong>/g, '<a href="#" onclick="openModal(\'$1\'); return false;" class="tlink"><strong>$1</strong></a>');
 
       return `
         <div class="ai-article">
