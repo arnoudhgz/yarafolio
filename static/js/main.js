@@ -8,12 +8,38 @@ import { marketHolidays } from './holidays.js';
 
 async function load() {
   try {
-    const [logRes, pfRes] = await Promise.all([
+    const [logRes, pfRes, eodRes, newsRes] = await Promise.all([
       fetch('data/advice-log.json', { cache: 'no-store' }),
       fetch('data/portfolio.json', { cache: 'no-store' }),
+      fetch('data/eod.md', { cache: 'no-store' }).catch(() => null),
+      fetch('data/news.md', { cache: 'no-store' }).catch(() => null)
     ]);
     if (!logRes.ok) throw new Error(logRes.statusText);
-    setDATA(await logRes.json());
+    const logData = await logRes.json();
+    
+    if (eodRes && eodRes.ok) {
+        const eodText = await eodRes.text();
+        logData.eodReports = eodText.split("\n---\n\n").filter(b => b.trim()).map(block => {
+            const lines = block.trim().split("\n");
+            if (lines[0].startsWith("# ")) {
+                return { date: lines[0].substring(2).trim(), summary: lines.slice(1).join("\n").trim() };
+            }
+            return { date: "", summary: block };
+        });
+    } else { logData.eodReports = []; }
+
+    if (newsRes && newsRes.ok) {
+        const newsText = await newsRes.text();
+        logData.newsSummaries = newsText.split("\n---\n\n").filter(b => b.trim()).map(block => {
+            const lines = block.trim().split("\n");
+            if (lines[0].startsWith("# ")) {
+                return { timestamp: lines[0].substring(2).trim(), summary: lines.slice(1).join("\n").trim() };
+            }
+            return { timestamp: "", summary: block };
+        });
+    } else { logData.newsSummaries = []; }
+
+    setDATA(logData);
     setPORTFOLIO(pfRes.ok ? await pfRes.json() : { lastUpdated: null, totalInvested: 0, holdings: [] });
     setCanSave(location.protocol.startsWith('http'));
     if (!canSave) banner('Opened as a local file: buttons are disabled. Start with: python3 yarafolio.py');

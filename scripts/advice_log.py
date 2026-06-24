@@ -202,23 +202,43 @@ class AdviceLog:
         self.save_log(data)
         logger.info(f"{args.ticker}: note added ({len(e['notes'])} total)")
 
-    def cmd_add_eod(self, args: argparse.Namespace):
+    def _append_to_md(self, basename: str, title_date: str, content: str):
+        subdir = "sample" if os.environ.get("DEMO_MODE") == "1" else "private"
+        md_file = os.path.join(ROOT, "data", subdir, basename)
+        
+        entry = f"# {title_date}\n\n{content.strip()}\n"
+        
+        if os.path.exists(md_file):
+            with open(md_file, "r") as f:
+                existing = f.read().strip()
+            
+            if existing:
+                blocks = existing.split("\n---\n\n")
+                blocks.append(entry)
+                # Keep last 10 entries max
+                if len(blocks) > 10:
+                    blocks = blocks[-10:]
+                new_content = "\n---\n\n".join(blocks)
+            else:
+                new_content = entry
+        else:
+            new_content = entry
+            
+        with open(md_file, "w") as f:
+            f.write(new_content)
+        
+        # We also need to bump lastUpdated on the main log to trigger autosync/refresh
         data = self.load_log()
-        data.setdefault("eodReports", []).append({
-            "date": datetime.now().strftime("%Y-%m-%d %H:%M"),
-            "summary": args.summary
-        })
         self.save_log(data)
+
+    def cmd_add_eod(self, args: argparse.Namespace):
+        date_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        self._append_to_md("eod.md", date_str, args.summary)
         logger.info("EOD report added.")
 
     def cmd_add_news_summary(self, args: argparse.Namespace):
-        data = self.load_log()
-        data.setdefault("newsSummaries", []).append({
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "summary": args.summary
-        })
-        data["newsSummaries"] = data["newsSummaries"][-5:]
-        self.save_log(data)
+        date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self._append_to_md("news.md", date_str, args.summary)
         logger.info("News summary added.")
 
     def cmd_touch(self, args: argparse.Namespace):

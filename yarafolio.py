@@ -100,7 +100,7 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_error(404)
 
     def do_GET(self):
-        if self.path in ("/data/advice-log.json", "/data/portfolio.json"):
+        if self.path in ("/data/advice-log.json", "/data/portfolio.json", "/data/eod.md", "/data/news.md"):
             self.path = self.path.replace("/data/", f"/data/{subdir}/")
 
         if self.path == "/api/status":
