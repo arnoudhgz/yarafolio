@@ -3,6 +3,7 @@ import sys
 import tempfile
 import unittest
 import unittest.mock
+from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -186,6 +187,88 @@ class AddPickTest(unittest.TestCase):
         self.assertEqual(entries[0]["rating"], "A-")
         # priceAtAdvice is the first-advice price; the new price lands in history
         self.assertEqual(entries[0]["priceAtAdvice"], 170.0)
+
+    def _seed(self, entries):
+        with open(self.tmp.name, "w") as f:
+            json.dump({"entries": entries, "lastUpdated": ""}, f)
+
+    def test_readvise_bought_ticker_upserts_not_duplicates(self):
+        # Re-advising a ticker you already hold must refresh the position, not
+        # spawn a lot-less 'watching' ghost that lingers in the Advice tab.
+        self._seed([{
+            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "advice",
+            "rating": "A-", "priceAtAdvice": 133.2,
+            "priceHistory": [{"date": "2026-06-18", "price": 133.2}],
+            "notes": [], "lots": [{"positionID": 1, "openRate": 126.0}],
+        }])
+        self.app.cmd_add_pick(_pick_args(
+            "ACN", 127.0, source="aftermarket", rating="B", reason="oversold flush"))
+        entries = self._entries()
+        self.assertEqual(len(entries), 1)
+        e = entries[0]
+        self.assertEqual(e["status"], "bought")       # stays a position
+        self.assertEqual(e["rating"], "B")            # refreshed to latest advice
+        self.assertEqual(len(e["lots"]), 1)           # lots untouched
+        self.assertEqual(len(e["priceHistory"]), 2)   # new price point appended
+        self.assertTrue(any("oversold flush" in n.get("text", "") for n in e["notes"]))
+
+    def test_readvise_does_not_merge_into_import_holding(self):
+        self._seed([{
+            "id": "ADBE-0001", "ticker": "ADBE", "status": "bought", "source": "import",
+            "priceHistory": [], "notes": [], "lots": [],
+        }])
+        self.app.cmd_add_pick(_pick_args("ADBE", 200.0, source="advice", rating="B"))
+        entries = self._entries()
+        self.assertEqual(len(entries), 2)             # import holding stays separate
+        new = [x for x in entries if x["id"] != "ADBE-0001"][0]
+        self.assertEqual(new["status"], "watching")
+
+    def test_remove_deletes_by_id(self):
+        self._seed([
+            {"id": "ACN-0001", "ticker": "ACN", "status": "bought", "lots": []},
+            {"id": "ACN-0002", "ticker": "ACN", "status": "watching", "lots": []},
+        ])
+        self.app.cmd_remove(SimpleNamespace(id="ACN-0002", force=False))
+        self.assertEqual([e["id"] for e in self._entries()], ["ACN-0001"])
+
+    def test_remove_guards_position_with_lots(self):
+        self._seed([{"id": "ACN-0001", "ticker": "ACN", "status": "bought",
+                     "lots": [{"positionID": 1}]}])
+        with self.assertRaises(SystemExit):
+            self.app.cmd_remove(SimpleNamespace(id="ACN-0001", force=False))
+        self.assertEqual(len(self._entries()), 1)     # guarded, not removed
+
+    def test_new_pick_seeds_adviceEvents_with_today(self):
+        self.app.cmd_add_pick(_pick_args("AAPL", 170.0))
+        self.assertEqual(self._entries()[0]["adviceEvents"],
+                         [{"date": date.today().isoformat(), "price": 170.0}])
+
+    def test_readvise_accumulates_adviceEvents(self):
+        # adviceEvents lets the Positions view show which advice (date + price)
+        # prompted each lot.
+        self._seed([{
+            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "advice",
+            "firstAdvised": "2026-01-01", "priceAtAdvice": 133.2,
+            "priceHistory": [], "notes": [], "lots": [],
+        }])
+        self.app.cmd_add_pick(_pick_args("ACN", 127.0, source="aftermarket"))
+        e = self._entries()[0]
+        self.assertEqual(e["adviceEvents"], [
+            {"date": "2026-01-01", "price": 133.2},
+            {"date": date.today().isoformat(), "price": 127.0},
+        ])
+
+    def test_readvise_migrates_legacy_adviceDates(self):
+        # An entry created before adviceEvents existed must not keep the dead field.
+        self._seed([{
+            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "advice",
+            "firstAdvised": "2026-01-01", "priceAtAdvice": 133.2, "adviceDates": ["2026-01-01"],
+            "priceHistory": [], "notes": [], "lots": [],
+        }])
+        self.app.cmd_add_pick(_pick_args("ACN", 127.0, source="aftermarket"))
+        e = self._entries()[0]
+        self.assertNotIn("adviceDates", e)
+        self.assertEqual(e["adviceEvents"][-1], {"date": date.today().isoformat(), "price": 127.0})
 
 
 if __name__ == "__main__":

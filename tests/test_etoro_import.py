@@ -62,6 +62,33 @@ class EtoroImportTest(unittest.TestCase):
         self.assertEqual(entry["units"], 1.0)
         self.assertTrue(entry["tslSet"])
 
+    def test_reconcile_lots_stores_openDateTime(self):
+        # Keep the full UTC instant so the dashboard can show the buy in the
+        # viewer's timezone instead of the UTC-sliced date.
+        app = etoro_import.EtoroImport()
+        entry = {"firstAdvised": "2026-06-01", "lots": []}
+        item = {"currentPrice": 130.0, "lots": [{
+            "positionID": 1, "openDate": "2026-06-18",
+            "openDateTime": "2026-06-18T20:30:00Z",
+            "openRate": 126.0, "units": 4.0,
+        }]}
+        app.reconcile_lots(entry, item, "2026-06-24")
+        self.assertEqual(entry["lots"][0]["openDateTime"], "2026-06-18T20:30:00Z")
+
+    def test_reconcile_lots_backfills_openDateTime(self):
+        app = etoro_import.EtoroImport()
+        entry = {"firstAdvised": "2026-06-01", "lots": [{
+            "positionID": 1, "openDate": "2026-06-18", "openRate": 126.0,
+            "units": 4.0, "lastPrice": 126.0, "soldAt": None,
+        }]}
+        item = {"currentPrice": 130.0, "lots": [{
+            "positionID": 1, "openDate": "2026-06-18",
+            "openDateTime": "2026-06-18T20:30:00Z",
+            "openRate": 126.0, "units": 4.0,
+        }]}
+        app.reconcile_lots(entry, item, "2026-06-24")
+        self.assertEqual(entry["lots"][0]["openDateTime"], "2026-06-18T20:30:00Z")
+
 
 if __name__ == "__main__":
     unittest.main()

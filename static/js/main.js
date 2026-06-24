@@ -304,7 +304,7 @@ const adviceClickHandler = (ev) => {
     const rowEl = /** @type {HTMLElement} */ (ev.target).closest('tr[data-id]');
     if (rowEl) {
       const row = /** @type {HTMLElement} */ (rowEl);
-      openModal(row.dataset.id);
+      openModal(row.dataset.id, row.dataset.pos);
     }
     return;
   }

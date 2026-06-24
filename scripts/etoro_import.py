@@ -206,6 +206,7 @@ class EtoroImport:
                 "lots": [{
                     "positionID": p["positionID"],
                     "openDate": p["openDateTime"][:10],
+                    "openDateTime": p["openDateTime"],
                     "openRate": round(p["openRate"], 4),
                     "units": round(p["units"], 6),
                     "tslEnabled": bool(p.get("isTslEnabled")),
@@ -272,6 +273,7 @@ class EtoroImport:
                     continue
                 lots.append({"positionID": pid,
                              "openDate": lot["openDate"],
+                             "openDateTime": lot.get("openDateTime"),
                              "openRate": lot["openRate"],
                              "units": lot["units"],
                              "lastPrice": current or lot["openRate"],
@@ -281,6 +283,8 @@ class EtoroImport:
                 claimed_lots.add(pid)
             elif have[pid].get("soldAt") is None:
                 have[pid]["tslEnabled"] = bool(lot.get("tslEnabled"))
+                if not have[pid].get("openDateTime") and lot.get("openDateTime"):
+                    have[pid]["openDateTime"] = lot["openDateTime"]
                 if current:
                     have[pid]["lastPrice"] = current
         closed = 0

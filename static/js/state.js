@@ -18,6 +18,7 @@ if (typeof window !== 'undefined') marked = /** @type {any} */ (window).marked;
  * @property {string} status
  * @property {string} [source]
  * @property {string} firstAdvised
+ * @property {{date: string, price: number}[]} [adviceEvents]
  * @property {number} priceAtAdvice
  * @property {PricePoint[]} priceHistory
  * @property {string} [droppedDate]

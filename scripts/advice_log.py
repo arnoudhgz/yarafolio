@@ -132,7 +132,7 @@ class AdviceLog:
         e = None
         for x in data["entries"]:
             if x["ticker"] == args.ticker and x.get(
-                    "status") == "watching" and x.get("source") != "import":
+                    "status") in ("watching", "bought") and x.get("source") != "import":
                 e = x
                 break
 
@@ -166,10 +166,19 @@ class AdviceLog:
             }
             data["entries"].append(e)
             action = "added"
-            if args.reason:
-                self.push_note(e, f"Advised ({args.source}): {args.reason}")
         else:
             action = "updated"
+        # Track each advice (date + price) so the Positions view can show which
+        # advice prompted each lot, and at what price (matched by buy date).
+        e.pop("adviceDates", None)  # superseded by adviceEvents
+        events = e.get("adviceEvents")
+        if events is None:
+            events = ([{"date": e["firstAdvised"], "price": e.get("priceAtAdvice")}]
+                      if e.get("firstAdvised") else [])
+        if not any(ev.get("date") == today for ev in events):
+            events.append({"date": today, "price": args.price})
+        events.sort(key=lambda ev: ev["date"])
+        e["adviceEvents"] = events
         self.push_history(e, args.price)
         for field, value in (("rating", args.rating), ("rsiAtAdvice", args.rsi),
                              ("sector", args.sector), ("buyBelow", args.buy_below),
@@ -177,6 +186,10 @@ class AdviceLog:
                              ("name", args.name), ("reason", args.reason), ("risk", args.risk)):
             if value is not None:
                 e[field] = value
+        if args.reason:
+            advised = f"Advised ({args.source or e.get('source')}): {args.reason}"
+            if not any(n.get("text") == advised for n in e.get("notes", [])):
+                self.push_note(e, advised)
         if args.note:
             self.push_note(e, args.note)
         self.save_log(data)
@@ -388,6 +401,18 @@ class AdviceLog:
         if entry.get("risk"):
             logger.info(f"  risk:   {entry['risk']}")
 
+    def cmd_remove(self, args: argparse.Namespace):
+        data = self.load_log()
+        e = self.require_by_id(data, args.id)
+        lots = e.get("lots") or []
+        if lots and not args.force:
+            sys.exit(
+                f"{args.id} ({e.get('ticker')}) has {len(lots)} eToro lot(s); "
+                "refusing to delete a tracked position without --force")
+        data["entries"] = [x for x in data["entries"] if x.get("id") != args.id]
+        self.save_log(data)
+        logger.info(f"removed {args.id} ({e.get('ticker')}, {e.get('status')})")
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -479,6 +504,14 @@ def main():
     p.add_argument("ticker")
     p.add_argument("--json", action="store_true")
     p.set_defaults(func=app.cmd_get_entry)
+
+    p = sub.add_parser(
+        "remove",
+        help="delete an entry by id (e.g. a duplicate); guarded for entries with lots")
+    p.add_argument("id")
+    p.add_argument("--force", action="store_true",
+                   help="remove even if the entry has attributed eToro lots")
+    p.set_defaults(func=app.cmd_remove)
 
     args = parser.parse_args()
     args.func(args)

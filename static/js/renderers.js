@@ -1,6 +1,6 @@
 // @ts-check
 import { DATA, PORTFOLIO, currentFilter, posFilter, activeTab, portfolioViewMode, LEARN, analyticsCharts, canSave, SECTORS, SECTOR_COLORS, sortState, setSectorChart, setSectorCoverageChart, sectorChart, sectorCoverageChart, setPortfolioRendered, Chart, marked, searchQuery } from './state.js';
-import { advised, latestPrice, changePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, cssVar } from './utils.js';
+import { advised, latestPrice, changePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, cssVar, localDate, advisedFor } from './utils.js';
 import { markSortedHeader, setSearchCount } from './ui.js';
 
 export function renderAll() {
@@ -201,13 +201,15 @@ export function positionLotRows() {
     const closed = lot.soldAt != null;
     const exit = closed ? lot.soldAt : lot.lastPrice;
     const open = lot.openRate;
+    const adv = advisedFor(e, lot);
     rows.push({
       e, positionID: lot.positionID,
-      firstAdvised: e.firstAdvised,
+      firstAdvised: adv.date,
       openDate: lot.openDate,
+      openDateTime: lot.openDateTime,
       closedDate: lot.closedDate,
       ticker: e.ticker,
-      priceAtAdvice: e.priceAtAdvice,
+      priceAtAdvice: adv.price != null ? adv.price : e.priceAtAdvice,
       boughtAt: open,                 // matches the Bought column's data-key
       units: lot.units,
       exitOrNow: exit,
@@ -272,13 +274,14 @@ export function renderPositions() {
   rows.forEach(r => {
     const tr = document.createElement('tr');
     tr.dataset.id = r.e.id;
+    tr.dataset.pos = String(r.positionID);
     const estBadge = r.exitEstimated ? '<span class="badge est">est</span>' : '';
     const tslBadge = (r.status === 'bought' && r.plPct >= 5 && !r.tslEnabled) ? '<span class="badge" style="background:rgba(231,76,60,0.15);color:var(--red);margin-left:4px;" title="Set a trailing stop loss on eToro!">⚠️ NO TSL</span>' : '';
     const confirmBtn = r.exitEstimated && canSave
       ? '<button class="sell" data-confirm="' + r.positionID + '">Confirm exit</button>' : '';
     tr.innerHTML =
-      '<td>' + r.firstAdvised + '</td>' +
-      '<td>' + (r.openDate || '-') + '</td>' +
+      '<td>' + (r.firstAdvised || '-') + '</td>' +
+      '<td>' + (r.openDateTime ? localDate(r.openDateTime) : (r.openDate || '-')) + '</td>' +
       '<td>' + (r.status === 'sold' && r.closedDate ? r.closedDate : '-') + '</td>' +
       '<td title="' + esc(r.e.reason || '') + '">' + tickerLink(r.ticker) +
         (r.e.name ? '<span class="sub">' + esc(r.e.name) + '</span>' : '') + '</td>' +
