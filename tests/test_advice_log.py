@@ -3,7 +3,7 @@ import sys
 import tempfile
 import unittest
 import unittest.mock
-from datetime import date
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -240,8 +240,10 @@ class AddPickTest(unittest.TestCase):
 
     def test_new_pick_seeds_adviceEvents_with_today(self):
         self.app.cmd_add_pick(_pick_args("AAPL", 170.0))
+        now = datetime.now()
+        market_date = (now.date() - timedelta(days=1)).isoformat() if now.hour < 6 else now.date().isoformat()
         self.assertEqual(self._entries()[0]["adviceEvents"],
-                         [{"date": date.today().isoformat(), "price": 170.0}])
+                         [{"date": market_date, "price": 170.0}])
 
     def test_readvise_accumulates_adviceEvents(self):
         # adviceEvents lets the Positions view show which advice (date + price)
@@ -253,9 +255,11 @@ class AddPickTest(unittest.TestCase):
         }])
         self.app.cmd_add_pick(_pick_args("ACN", 127.0, source="aftermarket"))
         e = self._entries()[0]
+        now = datetime.now()
+        market_date = (now.date() - timedelta(days=1)).isoformat() if now.hour < 6 else now.date().isoformat()
         self.assertEqual(e["adviceEvents"], [
             {"date": "2026-01-01", "price": 133.2},
-            {"date": date.today().isoformat(), "price": 127.0},
+            {"date": market_date, "price": 127.0},
         ])
 
     def test_readvise_migrates_legacy_adviceDates(self):
@@ -268,7 +272,9 @@ class AddPickTest(unittest.TestCase):
         self.app.cmd_add_pick(_pick_args("ACN", 127.0, source="aftermarket"))
         e = self._entries()[0]
         self.assertNotIn("adviceDates", e)
-        self.assertEqual(e["adviceEvents"][-1], {"date": date.today().isoformat(), "price": 127.0})
+        now = datetime.now()
+        market_date = (now.date() - timedelta(days=1)).isoformat() if now.hour < 6 else now.date().isoformat()
+        self.assertEqual(e["adviceEvents"][-1], {"date": market_date, "price": 127.0})
 
 
 if __name__ == "__main__":

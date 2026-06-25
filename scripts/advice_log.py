@@ -127,7 +127,12 @@ class AdviceLog:
 
     def cmd_add_pick(self, args: argparse.Namespace):
         data = self.load_log()
-        today = date.today().isoformat()
+        now = datetime.now()
+        if now.hour < 6:
+            from datetime import timedelta
+            today = (now.date() - timedelta(days=1)).isoformat()
+        else:
+            today = now.date().isoformat()
 
         e = None
         for x in data["entries"]:
@@ -146,7 +151,7 @@ class AdviceLog:
                 "id": f"{args.ticker}-{count:04d}",
                 "ticker": args.ticker,
                 "name": args.name or "",
-                "firstAdvised": date.today().isoformat(),
+                "firstAdvised": today,
                 "source": args.source,
                 "rating": None,
                 "rsiAtAdvice": None,

@@ -568,5 +568,20 @@
     "ticker": "MEOH",
     "name": "Methanex Corp",
     "sector": "Basic Materials"
+  },
+  "4430": {
+    "ticker": "SLV",
+    "name": "iShares Silver Trust",
+    "sector": "ETF / Other"
+  },
+  "1001": {
+    "ticker": "AAPL",
+    "name": "Apple",
+    "sector": "Consumer Goods"
+  },
+  "4397": {
+    "ticker": "ON",
+    "name": "ON Semiconductor Corp",
+    "sector": "Technology"
   }
 }
