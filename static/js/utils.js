@@ -11,7 +11,7 @@ export const cssVar = (name) => getComputedStyle(document.documentElement).getPr
 
 /** @returns {string} */
 export const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
-export const nowStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
+export const nowStr = () => new Date().toISOString();
 
 /**
  * Render an ISO/UTC instant as a YYYY-MM-DD date in the viewer's own timezone.
@@ -24,6 +24,18 @@ export const localDate = (iso) => {
   if (!iso) return '-';
   const d = new Date(iso);
   return isNaN(d.getTime()) ? String(iso).slice(0, 10) : d.toLocaleDateString('en-CA');
+};
+
+/**
+ * Render an ISO/UTC instant as a YYYY-MM-DD HH:MM string in local time.
+ * @param {string|null|undefined} iso
+ * @returns {string}
+ */
+export const localDateTime = (iso) => {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return String(iso);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
 };
 
 /**

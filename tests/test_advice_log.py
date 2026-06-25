@@ -62,10 +62,10 @@ class AdviceLogTest(unittest.TestCase):
         }
         self.assertEqual(self.app.latest_price(entry), 100.0)
 
-    @unittest.mock.patch('advice_log.datetime')
-    def test_push_history_prunes_past_intraday_points_and_appends(self, mock_dt):
-        mock_dt.now.return_value = unittest.mock.Mock(
-            strftime=lambda fmt: "2026-06-16 15:30" if "%H" in fmt else "2026-06-16"
+    @unittest.mock.patch('advice_log.nyse')
+    def test_push_history_prunes_past_intraday_points_and_appends(self, mock_nyse):
+        mock_nyse.nyse_now.return_value = unittest.mock.Mock(
+            isoformat=lambda *args: "2026-06-16T15:30", strftime=lambda fmt: "2026-06-16"
         )
         entry = {
             "priceHistory": [
@@ -77,53 +77,53 @@ class AdviceLogTest(unittest.TestCase):
         hist = entry["priceHistory"]
         self.assertEqual(len(hist), 2)
         self.assertEqual(hist[0], {"date": "2026-06-15", "price": 106.5})
-        self.assertEqual(hist[1], {"date": "2026-06-16 15:30", "price": 107.0})
+        self.assertEqual(hist[1], {"date": "2026-06-16T15:30", "price": 107.0})
 
-    @unittest.mock.patch('advice_log.datetime')
-    def test_push_history_updates_price_if_same_minute(self, mock_dt):
-        mock_dt.now.return_value = unittest.mock.Mock(
-            strftime=lambda fmt: "2026-06-16 15:30" if "%H" in fmt else "2026-06-16"
+    @unittest.mock.patch('advice_log.nyse')
+    def test_push_history_updates_price_if_same_minute(self, mock_nyse):
+        mock_nyse.nyse_now.return_value = unittest.mock.Mock(
+            isoformat=lambda *args: "2026-06-16T15:30", strftime=lambda fmt: "2026-06-16"
         )
         entry = {
             "priceHistory": [
-                {"date": "2026-06-16 15:30", "price": 105.0},
+                {"date": "2026-06-16T15:30", "price": 105.0},
             ]
         }
         self.app.push_history(entry, 107.0)
         hist = entry["priceHistory"]
         self.assertEqual(len(hist), 1)
-        self.assertEqual(hist[0], {"date": "2026-06-16 15:30", "price": 107.0})
+        self.assertEqual(hist[0], {"date": "2026-06-16T15:30", "price": 107.0})
 
-    @unittest.mock.patch('advice_log.datetime')
-    def test_push_history_skips_same_price_on_same_day(self, mock_dt):
-        mock_dt.now.return_value = unittest.mock.Mock(
-            strftime=lambda fmt: "2026-06-16 15:35" if "%H" in fmt else "2026-06-16"
+    @unittest.mock.patch('advice_log.nyse')
+    def test_push_history_skips_same_price_on_same_day(self, mock_nyse):
+        mock_nyse.nyse_now.return_value = unittest.mock.Mock(
+            isoformat=lambda *args: "2026-06-16T15:35", strftime=lambda fmt: "2026-06-16"
         )
         entry = {
             "priceHistory": [
-                {"date": "2026-06-16 15:30", "price": 105.0},
+                {"date": "2026-06-16T15:30", "price": 105.0},
             ]
         }
         self.app.push_history(entry, 105.0)
         hist = entry["priceHistory"]
         self.assertEqual(len(hist), 1)
-        self.assertEqual(hist[0], {"date": "2026-06-16 15:30", "price": 105.0})
+        self.assertEqual(hist[0], {"date": "2026-06-16T15:30", "price": 105.0})
 
-    @unittest.mock.patch('advice_log.datetime')
-    def test_push_history_appends_same_price_different_day(self, mock_dt):
-        mock_dt.now.return_value = unittest.mock.Mock(
-            strftime=lambda fmt: "2026-06-17 10:00" if "%H" in fmt else "2026-06-17"
+    @unittest.mock.patch('advice_log.nyse')
+    def test_push_history_appends_same_price_different_day(self, mock_nyse):
+        mock_nyse.nyse_now.return_value = unittest.mock.Mock(
+            isoformat=lambda *args: "2026-06-17T10:00", strftime=lambda fmt: "2026-06-17"
         )
         entry = {
             "priceHistory": [
-                {"date": "2026-06-16 15:30", "price": 105.0},
+                {"date": "2026-06-16T15:30", "price": 105.0},
             ]
         }
         self.app.push_history(entry, 105.0)
         hist = entry["priceHistory"]
         self.assertEqual(len(hist), 2)
         self.assertEqual(hist[0], {"date": "2026-06-16", "price": 105.0})
-        self.assertEqual(hist[1], {"date": "2026-06-17 10:00", "price": 105.0})
+        self.assertEqual(hist[1], {"date": "2026-06-17T10:00", "price": 105.0})
 
 
     def test_get_entry_found_any_status(self):
@@ -240,8 +240,8 @@ class AddPickTest(unittest.TestCase):
 
     def test_new_pick_seeds_adviceEvents_with_today(self):
         self.app.cmd_add_pick(_pick_args("AAPL", 170.0))
-        now = datetime.now()
-        market_date = (now.date() - timedelta(days=1)).isoformat() if now.hour < 6 else now.date().isoformat()
+        from nyse import nyse_today
+        market_date = nyse_today().isoformat()
         self.assertEqual(self._entries()[0]["adviceEvents"],
                          [{"date": market_date, "price": 170.0}])
 
@@ -255,8 +255,8 @@ class AddPickTest(unittest.TestCase):
         }])
         self.app.cmd_add_pick(_pick_args("ACN", 127.0, source="aftermarket"))
         e = self._entries()[0]
-        now = datetime.now()
-        market_date = (now.date() - timedelta(days=1)).isoformat() if now.hour < 6 else now.date().isoformat()
+        from nyse import nyse_today
+        market_date = nyse_today().isoformat()
         self.assertEqual(e["adviceEvents"], [
             {"date": "2026-01-01", "price": 133.2},
             {"date": market_date, "price": 127.0},
@@ -272,8 +272,8 @@ class AddPickTest(unittest.TestCase):
         self.app.cmd_add_pick(_pick_args("ACN", 127.0, source="aftermarket"))
         e = self._entries()[0]
         self.assertNotIn("adviceDates", e)
-        now = datetime.now()
-        market_date = (now.date() - timedelta(days=1)).isoformat() if now.hour < 6 else now.date().isoformat()
+        from nyse import nyse_today
+        market_date = nyse_today().isoformat()
         self.assertEqual(e["adviceEvents"][-1], {"date": market_date, "price": 127.0})
 
 

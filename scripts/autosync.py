@@ -80,7 +80,8 @@ class AutoSync:
         if self.git("diff", "--cached", "--quiet").returncode == 0:
             return  # nothing changed
 
-        msg = f"chore(data): {reason} ({datetime.now().strftime('%Y-%m-%d %H:%M')})"
+        import nyse
+        msg = f"chore(data): {reason} ({nyse.nyse_now().isoformat('T', 'minutes')})"
         if self.git("commit", "-m", msg).returncode != 0:
             logger.error("autosync: commit failed")
             return

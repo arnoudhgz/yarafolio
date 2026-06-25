@@ -1,12 +1,12 @@
 // @ts-check
 import { DATA, PORTFOLIO, currentFilter, posFilter, activeTab, portfolioViewMode, LEARN, analyticsCharts, canSave, SECTORS, SECTOR_COLORS, sortState, setSectorChart, setSectorCoverageChart, sectorChart, sectorCoverageChart, setPortfolioRendered, Chart, marked, searchQuery } from './state.js';
-import { advised, latestPrice, changePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, cssVar, localDate, advisedFor } from './utils.js';
+import { advised, latestPrice, changePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, cssVar, localDate, localDateTime, advisedFor } from './utils.js';
 import { markSortedHeader, setSearchCount } from './ui.js';
 
 export function renderAll() {
   const entries = advised();
   /** @type {HTMLElement} */ (document.getElementById('lastUpdated')).textContent =
-    'Last updated: ' + DATA.lastUpdated + ' · ' + entries.length + ' advised picks · ' +
+    'Last updated: ' + localDateTime(DATA.lastUpdated) + ' · ' + entries.length + ' advised picks · ' +
     PORTFOLIO.holdings.length + ' holdings';
   /** @type {HTMLElement} */ (document.getElementById('cTracked')).textContent = String(entries.length);
   /** @type {HTMLElement} */ (document.getElementById('cOpen')).textContent = String(entries.filter(e => e.status === 'bought').length);
@@ -577,7 +577,7 @@ export function renderAINews() {
         <div class="ai-article">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
             <h3 style="margin:0; font-size:16px;">${title}</h3>
-            <span style="font-size:12px; color:var(--muted);">${esc(s.timestamp || s.date || '')}</span>
+            <span style="font-size:12px; color:var(--muted);">${esc(s.timestamp ? localDateTime(s.timestamp) : (s.date ? localDateTime(s.date) : ''))}</span>
           </div>
           <div style="line-height: 1.6; font-size: 14px;" class="article-content news-markdown">${content}</div>
         </div>
@@ -622,7 +622,7 @@ export function renderEOD() {
         <div class="ai-article">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
             <h3 style="margin:0; font-size:16px;">${title}</h3>
-            <span style="font-size:12px; color:var(--muted);">${esc(r.date || '')}</span>
+            <span style="font-size:12px; color:var(--muted);">${esc(r.date ? localDateTime(r.date) : '')}</span>
           </div>
           <div style="line-height: 1.6; font-size: 14px;" class="article-content news-markdown">${content}</div>
         </div>

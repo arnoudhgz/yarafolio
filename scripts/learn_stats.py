@@ -141,7 +141,8 @@ class LearnStats:
     def collect(self) -> dict:
         with open(self.log_file) as f:
             data = json.load(f)
-        today = date.today()
+        import nyse
+        today = nyse.nyse_today()
         advised = [e for e in data["entries"] if e.get("source") != "import"]
 
         measurable = []

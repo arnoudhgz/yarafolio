@@ -20,6 +20,7 @@ import logging
 from datetime import date, datetime
 
 import price_history
+import nyse
 
 BASE = "https://public-api.etoro.com/api/v1"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -235,7 +236,7 @@ class EtoroImport:
 
     def write_portfolio(self, preview, today):
         self.atomic_write(self.portfolio_file, {
-            "lastUpdated": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "lastUpdated": nyse.nyse_now().isoformat("T", "minutes"),
             "totalInvested": round(sum(i["invested"] for i in preview), 2),
             "holdings": [{
                 "ticker": i["ticker"], "name": i["name"], "instrumentID": i["instrumentID"],
@@ -323,7 +324,7 @@ class EtoroImport:
             entry["exitEstimated"] = any(lot.get("exitEstimated") for lot in lots)
         if current_price:
             hist = entry.setdefault("priceHistory", [])
-            price_history.push_price_point(hist, current_price, now=datetime.now())
+            price_history.push_price_point(hist, current_price, now=nyse.nyse_now())
 
     def merge(self):
         with open(self.preview_file) as f:
@@ -331,7 +332,7 @@ class EtoroImport:
         with open(self.log_file) as f:
             data = json.load(f)
 
-        today = date.today().isoformat()
+        today = nyse.nyse_today().isoformat()
         self.write_portfolio(preview, today)
 
         by_ticker = {item["ticker"]: item for item in preview}
@@ -411,7 +412,7 @@ class EtoroImport:
                     entry["sector"] = sector_by_ticker[entry["ticker"]]
                     backfilled += 1
 
-        data["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        data["lastUpdated"] = nyse.nyse_now().isoformat("T", "minutes")
         self.atomic_write(self.log_file, data)
 
         parts = []

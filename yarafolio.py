@@ -290,8 +290,8 @@ class Handler(SimpleHTTPRequestHandler):
                 self.respond_json(502, {"ok": False, "step": "quote",
                                         "error": f"bad quote json: {exc}"})
                 return
-            market_today = datetime.now(
-                ZoneInfo("America/New_York")).date().isoformat()
+            import nyse
+            market_today = nyse.nyse_today().isoformat()
             price_map = {t: {"price": q["price"], "earningsDate": q.get("Earnings Date")}
                          for t, q in quotes.items()
                          if is_refreshable_quote(q, market_today)}

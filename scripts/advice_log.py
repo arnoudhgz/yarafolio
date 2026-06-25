@@ -15,6 +15,7 @@ from datetime import date, datetime
 
 import price_history
 import entries
+import nyse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -75,7 +76,7 @@ class AdviceLog:
             return entries.normalize_entries(json.load(f))
 
     def save_log(self, data: dict) -> None:
-        data["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        data["lastUpdated"] = nyse.nyse_now().isoformat("T", "minutes")
         tmp = self.log_file + ".tmp"
         with open(tmp, "w") as f:
             json.dump(data, f, indent=2)
@@ -119,20 +120,15 @@ class AdviceLog:
 
     def push_history(self, e: dict, price: float) -> None:
         hist = e.setdefault("priceHistory", [])
-        price_history.push_price_point(hist, price, now=datetime.now())
+        price_history.push_price_point(hist, price, now=nyse.nyse_now())
 
     def push_note(self, e: dict, text: str) -> None:
         e.setdefault("notes", []).append(
-            {"date": date.today().isoformat(), "text": text})
+            {"date": nyse.nyse_today().isoformat(), "text": text})
 
     def cmd_add_pick(self, args: argparse.Namespace):
         data = self.load_log()
-        now = datetime.now()
-        if now.hour < 6:
-            from datetime import timedelta
-            today = (now.date() - timedelta(days=1)).isoformat()
-        else:
-            today = now.date().isoformat()
+        today = nyse.nyse_today().isoformat()
 
         e = None
         for x in data["entries"]:
@@ -237,12 +233,12 @@ class AdviceLog:
         self.save_log(data)
 
     def cmd_add_eod(self, args: argparse.Namespace):
-        date_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        date_str = nyse.nyse_now().isoformat("T", "minutes")
         self._append_to_md("eod.md", date_str, args.summary)
         logger.info("EOD report added.")
 
     def cmd_add_news_summary(self, args: argparse.Namespace):
-        date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        date_str = nyse.nyse_now().isoformat("T", "seconds")
         self._append_to_md("news.md", date_str, args.summary)
         logger.info("News summary added.")
 
@@ -306,7 +302,7 @@ class AdviceLog:
             e["soldAt"] = price
             e.pop("exitEstimated", None)
         elif args.status == "dropped":
-            e["droppedDate"] = date.today().isoformat()
+            e["droppedDate"] = nyse.nyse_today().isoformat()
         e["status"] = args.status
         self.push_note(e, f"Status changed to {args.status} @ ${price}")
         self.save_log(data)
@@ -323,7 +319,7 @@ class AdviceLog:
 
     def cmd_checkin_candidates(self, args: argparse.Namespace):
         data = self.load_log()
-        today = date.today()
+        today = nyse.nyse_today()
         rows = []
         for e in data["entries"]:
             est_lots = [lot for lot in e.get("lots", []) if lot.get("exitEstimated")]
