@@ -241,12 +241,21 @@ export function renderPositions() {
   /** @type {HTMLElement} */ (document.getElementById('pWinRate')).textContent = closed.length ? Math.round(100 * wins / closed.length) + '%' : '-';
   const pRealized = /** @type {HTMLElement} */ (document.getElementById('pRealized'));
   const pOpen = /** @type {HTMLElement} */ (document.getElementById('pOpen'));
+  const pTotal = /** @type {HTMLElement} */ (document.getElementById('pTotal'));
   
   pRealized.innerHTML = closed.length ? fmtPL(realizedTotal) + ' <span style="font-size:13px;opacity:0.8;margin-left:4px">(' + (realizedPct > 0 ? '+' : '') + realizedPct.toFixed(2) + '%)</span>' : '-';
   pRealized.className = 'value ' + (closed.length && realizedTotal < 0 ? 'neg' : closed.length ? 'pos' : '');
   
   pOpen.innerHTML = openRows.length ? fmtPL(openTotal) + ' <span style="font-size:13px;opacity:0.8;margin-left:4px">(' + (openPct > 0 ? '+' : '') + openPct.toFixed(2) + '%)</span>' : '-';
   pOpen.className = 'value ' + (openRows.length && openTotal < 0 ? 'neg' : openRows.length ? 'pos' : '');
+
+  const totalSum = realizedTotal + openTotal;
+  const totalInv = realizedInv + openInv;
+  const totalPct = totalInv ? (totalSum / totalInv * 100) : 0;
+  const hasPositions = closed.length || openRows.length;
+
+  pTotal.innerHTML = hasPositions ? fmtPL(totalSum) + ' <span style="font-size:13px;opacity:0.8;margin-left:4px">(' + (totalPct > 0 ? '+' : '') + totalPct.toFixed(2) + '%)</span>' : '-';
+  pTotal.className = 'value ' + (hasPositions && totalSum < 0 ? 'neg' : hasPositions ? 'pos' : '');
 
   const rows = sortRows(all.filter(r => {
     if (!matchesSearch([r.ticker, r.e.name, r.e.reason, r.e.sector])) return false;
@@ -553,8 +562,17 @@ export function renderAINews() {
         contentStr = contentStr.replace(/^###\s*(.*?)(\n|$)/, '');
       }
 
-      let content = marked.parse(contentStr.trim());
-      
+      let linkedSummary = contentStr.replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
+        const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
+        const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
+        if (isAdvised || isHolding) {
+          return tickerLink(ticker);
+        }
+        return match;
+      });
+
+      let content = marked.parse(linkedSummary.trim());
+
       html += `
         <div class="ai-article">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">

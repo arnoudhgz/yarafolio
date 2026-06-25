@@ -17,7 +17,7 @@ from datetime import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data", "private")
-PATHS = ["advice-log.json", "portfolio.json", "LEARNINGS.md"]
+PATHS = ["advice-log.json", "portfolio.json", "LEARNINGS.md", "eod.md", "news.md"]
 
 os.makedirs(os.path.join(ROOT, "logs"), exist_ok=True)
 logging.basicConfig(

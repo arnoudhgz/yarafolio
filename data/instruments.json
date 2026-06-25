@@ -528,5 +528,45 @@
     "ticker": "CTSH",
     "name": "Cognizant Technology Solutions Corp",
     "sector": "Technology"
+  },
+  "1138": {
+    "ticker": "FDX",
+    "name": "FedEx Corporation",
+    "sector": "Services"
+  },
+  "3226": {
+    "ticker": "SOXL",
+    "name": "Direxion Daily Semiconductor Bull 3X ETF",
+    "sector": "ETF / Other"
+  },
+  "1922": {
+    "ticker": "WLK",
+    "name": "Westlake Chemical Corp",
+    "sector": "Basic Materials"
+  },
+  "1135": {
+    "ticker": "ORCL",
+    "name": "Oracle Corporation",
+    "sector": "Technology"
+  },
+  "1643": {
+    "ticker": "JEF",
+    "name": "Jefferies Financial Group Inc",
+    "sector": "Financial"
+  },
+  "1833": {
+    "ticker": "BAH",
+    "name": "Booz Allen Hamilton Holding Corp",
+    "sector": "Services"
+  },
+  "9580": {
+    "ticker": "AD",
+    "name": "Array Digital Infrastructure Inc",
+    "sector": "Services"
+  },
+  "15232": {
+    "ticker": "MEOH",
+    "name": "Methanex Corp",
+    "sector": "Basic Materials"
   }
 }

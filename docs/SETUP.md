@@ -21,6 +21,7 @@ cp .env.sample .env
 **Important eToro Setup Details:**
 - **Read-Only**: YaraFolio only provides advice and insights; it does not execute trades. When generating your eToro API Key, **always create it in Read-Only mode** for maximum security.
 - **IP Addresses**: While not strictly required, it is **strongly recommended** to bind your eToro User Keys to specific IP addresses for security. If you do this and use the dashboard from different locations (e.g., Home vs. Office), you should generate separate User Keys for each IP. You can specify these in your `.env` file with suffixes like `ETORO_USER_KEY_HOME` and `ETORO_USER_KEY_OFFICE`, which will automatically enable a location-switcher dropdown in the dashboard!
+  - **CLI Note**: The command-line scripts (like `scripts/etoro_import.py`) look for a default `ETORO_USER_KEY`. You must provide this default key in your `.env` file. If you want a script to use one of your suffix keys instead, you must set the environment variable in your terminal first (e.g., `export ETORO_SUFFIX=HOME`).
 
 ## Configure Auto-Sync for your Private Data (Highly Recommended)
 By default, your logs and portfolio snapshots are saved locally to `data/private/*.json`. To prevent data loss, the dashboard includes a fire-and-forget auto-sync script. 

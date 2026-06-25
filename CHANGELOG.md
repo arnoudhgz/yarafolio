@@ -5,9 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.8.0]
+## [0.9.0] - 2026-06-25
 
 ### Added
+- Added new stock instruments to the tracking dataset (`data/instruments.json`).
+- Added rule to `.agents/AGENTS.md` to prevent placeholder release notes.
+
+### Changed
+- Moved AI news and EOD data blobs from JSON to cleanly parsed Markdown files.
+- Stripped legacy HTML out of markdown files and shifted ticker auto-linking entirely to the frontend.
+- Updated ticker auto-linking in News and EOD markdown to use standard direct eToro ticker links.
+
+### Fixed
+- Removed excessive markdown list spacing in AI reports.
+- Restored intelligent bare-ticker regex linking for both EOD and News.
+
+## [0.8.0]
+
+### Fixed
+- The 'default' key (the global `ETORO_USER_KEY`) is no longer loaded into the startup `locations` sync or the dashboard dropdown when other location keys are present, as it is strictly meant for advices.
+- The dashboard IPO badge now only highlights IPOs happening today, rather than including tomorrow's IPOs.
+
+### Added
+- Added a "Total P/L" card to the dashboard and moved all financial performance cards (Win Rate, Realized P/L, Open P/L, Total P/L) from the Positions tab to the global header so they are always visible.
 - `scripts/screen.py quote` now tags the session on its human-readable output (pre-market / after-hours, with the as-of time and the regular-session close), so the advice researchers can read the correct session price straight from the row instead of re-searching for it.
 - New `scripts/advice_log.py get-entry TICKER [--json]` command that reads a single tracked entry of any status, so `/check` no longer hand-parses `advice-log.json`.
 - `/premarket` now runs the IPO screen step (`screen.py ipos`) that was documented but never wired into the skill.
@@ -18,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Strategy update: lowered preferred RSI to < 25 and added an output warning for A-rated Tech stocks due to value trap risks (applied via `/learn`).
+- Strategy update: Enforced a new rule to never add a ticker to the dashboard/advice list when there are already two open positions for it.
 - Dashboard sparklines now use the theme's `--green`/`--red` (they were rendering a different hardcoded green/red), and the repeated info-icon inline styles collapsed into one `.info-icon` class.
 - The oversold screen logs a clear warning when it parses zero rows (stockanalysis.com markup changed) instead of silently returning no candidates.
 - The mandatory litigation/fraud red-flag gate is now present and identically worded across all five advice skills (it was missing in `/aftermarket` and `/check`).

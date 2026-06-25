@@ -21,11 +21,16 @@
     <select id="locationSelect" style="display:none; padding: 6px 10px; border-radius: 8px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-size: 13px;"></select>
   </div>
   <div id="banner"></div>
-
-  <div class="cards">
+  <div class="cards" style="margin-bottom: 12px;">
     <div class="card"><div class="label">Advised picks<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoAdvisedPicks').hidden=false" title="What are Advised Picks?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cTracked">0</div></div>
     <div class="card"><div class="label">Open positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoOpenPositions').hidden=false" title="What are Open Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cOpen">0</div></div>
     <div class="card"><div class="label">Watching<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWatching').hidden=false" title="What does Watching mean?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cWatching">0</div></div>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="label">Win rate (closed)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWinRate').hidden=false" title="What is Win Rate?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pWinRate">-</div></div>
+    <div class="card"><div class="label">Realized P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoRealized').hidden=false" title="What is Realized P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pRealized">-</div></div>
+    <div class="card"><div class="label">Open P/L (unrealized)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoOpenPL').hidden=false" title="What is Open P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pOpen">-</div></div>
+    <div class="card"><div class="label">Total P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoTotalPL').hidden=false" title="What is Total P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pTotal">-</div></div>
   </div>
 
   <div class="search-row">
@@ -87,12 +92,7 @@
   </section>
 
   <section id="tab-positions" class="tab-section">
-    <div class="cards">
-      <div class="card"><div class="label">Win rate (closed)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWinRate').hidden=false" title="What is Win Rate?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pWinRate">-</div></div>
-      <div class="card"><div class="label">Realized P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoRealized').hidden=false" title="What is Realized P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pRealized">-</div></div>
-      <div class="card"><div class="label">Open P/L (unrealized)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoOpenPL').hidden=false" title="What is Open P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pOpen">-</div></div>
-    </div>
-    
+
     <div class="panel">
       <h2 style="display:flex; align-items:center; gap:8px;">
         Positions from advice (bought &amp; sold)
@@ -502,6 +502,14 @@
       <button class="modal-close" onclick="document.getElementById('infoOpenPL').hidden=true" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Open P/L (unrealized)</h2>
       <p style="margin-bottom:0;">The total current floating Profit/Loss in dollars from all active open positions.</p>
+    </div>
+  </div>
+
+  <div id="infoTotalPL" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoTotalPL').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Total P/L</h2>
+      <p style="margin-bottom:0;">The sum of Realized P/L and Open P/L, representing the total overall Profit/Loss from all positions.</p>
     </div>
   </div>
   <div id="infoSevenDays" class="modal-backdrop" hidden onclick="this.hidden=true">

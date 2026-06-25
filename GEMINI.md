@@ -38,6 +38,7 @@ Use Opus.
 - Flag falling-knife and value-trap risks explicitly in the Rating or Risk column (be especially skeptical of "A-rated" Tech stocks, which have historically underperformed).
 - Before listing any pick, run one targeted litigation/fraud search per final pick, unconditional, even when the pre-fetched red-flag headlines looked clean (I once almost bought ZTS during a securities fraud investigation; the keyword screen can miss a problem phrased outside its terms). A red flag means drop the pick or mark it clearly.
 - When I mention geopolitical events (war, tariffs, elections), shift the list toward defensive assets.
+- Never add a ticker to the dashboard/advice when we already have two open positions for it.
 
 ## Research workflow
 

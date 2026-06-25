@@ -165,7 +165,7 @@ export async function fetchIpos(force = false) {
         if (!avoided) {
           const date = new Date(row.date);
           if (date && !isNaN(date.getTime())) {
-            if (date.toDateString() === now.toDateString() || date.toDateString() === tomorrow.toDateString()) {
+            if (date.toDateString() === now.toDateString()) {
               hasNearIpo = true;
             }
           }
