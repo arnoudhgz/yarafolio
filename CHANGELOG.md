@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.8.0]
 
+### Fixed
+- The 'default' key (the global `ETORO_USER_KEY`) is no longer loaded into the startup `locations` sync or the dashboard dropdown when other location keys are present, as it is strictly meant for advices.
+- The dashboard IPO badge now only highlights IPOs happening today, rather than including tomorrow's IPOs.
+
 ### Added
 - Added a "Total P/L" card to the dashboard and moved all financial performance cards (Win Rate, Realized P/L, Open P/L, Total P/L) from the Positions tab to the global header so they are always visible.
 - `scripts/screen.py quote` now tags the session on its human-readable output (pre-market / after-hours, with the as-of time and the regular-session close), so the advice researchers can read the correct session price straight from the row instead of re-searching for it.

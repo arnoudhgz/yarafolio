@@ -518,7 +518,7 @@ class Handler(SimpleHTTPRequestHandler):
                         suffix = line.split("=")[0].replace(
                             "export ", "").replace(
                             "ETORO_USER_KEY_", "").strip()
-                        if suffix:
+                        if suffix and suffix.lower() != "default":
                             suffixes.append(suffix)
         except OSError:
             pass
@@ -653,11 +653,10 @@ class YaraFolioApp:
             try:
                 with open(os.path.join(ROOT, ".env")) as f:
                     content = f.read()
-                    if "ETORO_USER_KEY=" in content:
-                        locations.append("")
                     for m in re.finditer(r"ETORO_USER_KEY_([A-Z0-9_]+)=", content):
-                        if m.group(1) not in locations:
-                            locations.append(m.group(1))
+                        suffix = m.group(1)
+                        if suffix not in locations and suffix.lower() != "default":
+                            locations.append(suffix)
             except OSError: pass
             if not locations:
                 locations = [""]
