@@ -251,21 +251,10 @@ class EtoroImport:
         if claimed_lots is None:
             claimed_lots = set()
         first = entry.get("firstAdvised") or ""
-        
-        # Add a 1-day grace period for timezone / aftermarket midnight boundaries
-        grace_first = ""
-        if first:
-            from datetime import datetime, timedelta
-            try:
-                first_dt = datetime.strptime(first, "%Y-%m-%d").date()
-                grace_first = (first_dt - timedelta(days=1)).isoformat()
-            except ValueError:
-                grace_first = first
-
         dropped = entry.get("droppedDate")
         live = {}
         for lot in (item.get("lots", []) if item else []):
-            if lot["openDate"] < grace_first:
+            if lot["openDate"] < first:
                 continue
             if dropped and lot["openDate"] >= dropped:
                 continue
