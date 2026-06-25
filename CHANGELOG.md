@@ -8,7 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.9.0] - 2026-06-25
 
 ### Added
-- Added new tickers (ORCL, JEF, BAH, AD, MEOH) to `data/instruments.json`.
+- Added new stock instruments to the tracking dataset (`data/instruments.json`).
+- Added rule to `.agents/AGENTS.md` to prevent placeholder release notes.
+
+### Changed
+- Moved AI news and EOD data blobs from JSON to cleanly parsed Markdown files.
+- Stripped legacy HTML out of markdown files and shifted ticker auto-linking entirely to the frontend.
+- Updated ticker auto-linking in News and EOD markdown to use standard direct eToro ticker links.
+
+### Fixed
+- Removed excessive markdown list spacing in AI reports.
+- Restored intelligent bare-ticker regex linking for both EOD and News.
 
 ## [0.8.0]
 
