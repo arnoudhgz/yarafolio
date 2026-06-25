@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-06-26
+
+### Fixed
+- Fixed an edge case in `etoro_import.py` where aftermarket advice logs generated past midnight local time wouldn't match with eToro trades opened during the previous day's US market session, by introducing a 1-day timezone grace period.
+
 ## [0.9.0] - 2026-06-25
 
 ### Added
