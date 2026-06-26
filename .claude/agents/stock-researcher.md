@@ -27,4 +27,4 @@ Plus a `Sources:` line with 2-3 URLs.
 - DROP BELOW: thesis invalidation level. Below key support the "oversold bounce" is a confirmed downtrend; the pick should be dropped.
 - DROP ABOVE: opportunity-gone ceiling. Above this the oversold bounce has already played out (back near the pre-drop price, or the first real resistance), so there's no cheap entry left and a still-watched pick should be dropped. Set it above BUY BELOW; it only matters while watching, not once bought.
 
-Rating guide: A = clean overreaction, strong balance sheet, clear catalyst for recovery. B = decent bounce odds, some open questions. C = cheap for a reason, falling-knife risk. Mark earnings due within 2 trading days in the risk column. If price is under $20, say so - it gets filtered out.
+Rating guide: A = EXTREME CONVICTION ONLY (clean overreaction, pristine balance sheet, immediate clear catalyst). Default to B for most good setups. B = decent bounce odds, some open questions. C = cheap for a reason, falling-knife risk. Mark earnings due within 2 trading days in the risk column. If price is under $20, say so - it gets filtered out.
