@@ -470,6 +470,7 @@ export function renderAnalytics() {
     /** @type {HTMLElement} */ (document.getElementById('analyticsCards')).innerHTML = '';
     /** @type {HTMLElement} */ (document.getElementById('sevenDayBox')).innerHTML = '';
     ['chartRating', 'chartRsiBand', 'chartSector', 'chartSource'].forEach(id => renderBucketChart(id, {}));
+    if (analyticsCharts['chartGainVsDays']) { analyticsCharts['chartGainVsDays'].destroy(); delete analyticsCharts['chartGainVsDays']; }
     empty.textContent = canSave ? 'No stats available yet. Run /review to generate outcomes.'
       : 'Analytics needs the server. Start it with: python3 yarafolio.py';
     empty.style.display = 'block';
@@ -489,6 +490,7 @@ export function renderAnalytics() {
   renderBucketChart('chartRsiBand', b.rsiBand);
   renderBucketChart('chartSector', b.sector);
   renderBucketChart('chartSource', b.source);
+  renderGainVsDaysChart('chartGainVsDays', positionLotRows().filter(r => r.status === 'sold'));
   empty.textContent = 'Not enough finished advice yet to learn from. Outcomes appear once picks are sold, dropped, or 7+ days old.';
   empty.style.display = LEARN.measurableOutcomes ? 'none' : 'block';
 }
@@ -629,4 +631,89 @@ export function renderEOD() {
       `;
     }).join('');
   }
+}
+
+export function renderGainVsDaysChart(canvasId, rows) {
+  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const note = document.getElementById(canvasId + 'Note');
+  if (!rows || !rows.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No closed positions available for this chart yet.</div>';
+    return;
+  }
+  
+  const buckets = {};
+  rows.forEach(r => {
+    const d1 = new Date(r.openDate).getTime();
+    const d2 = new Date(r.closedDate).getTime();
+    let days = Math.round((d2 - d1) / (1000 * 3600 * 24));
+    if (isNaN(days)) return;
+    if (days < 0) days = 0;
+    if (!buckets[days]) buckets[days] = { sum: 0, count: 0, min: r.plPct, max: r.plPct };
+    buckets[days].sum += r.plPct;
+    buckets[days].count += 1;
+    if (r.plPct < buckets[days].min) buckets[days].min = r.plPct;
+    if (r.plPct > buckets[days].max) buckets[days].max = r.plPct;
+  });
+
+  const daysKeys = Object.keys(buckets).map(Number).sort((a,b) => a - b);
+  
+  if (!daysKeys.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No closed positions with valid dates yet.</div>';
+    return;
+  }
+
+  canvas.style.display = '';
+  if (note) note.innerHTML = '';
+
+  const labels = daysKeys.map(d => d + (d === 1 ? ' day' : ' days'));
+  const averages = daysKeys.map(d => buckets[d].sum / buckets[d].count);
+  const counts = daysKeys.map(d => buckets[d].count);
+  const highs = daysKeys.map(d => buckets[d].max);
+  const lows = daysKeys.map(d => buckets[d].min);
+  
+  analyticsCharts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Avg P/L %',
+        data: averages,
+        backgroundColor: averages.map(y => y >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)'),
+        borderRadius: 6,
+        maxBarThickness: 50
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const idx = ctx.dataIndex;
+              const y = ctx.raw;
+              const n = counts[idx];
+              const h = highs[idx];
+              const l = lows[idx];
+              const hStr = h > 0 ? '+' + h.toFixed(2) : h.toFixed(2);
+              const lStr = l > 0 ? '+' + l.toFixed(2) : l.toFixed(2);
+              return [
+                `Avg: ${y > 0 ? '+' : ''}${y.toFixed(2)}% (n=${n})`,
+                `High: ${hStr}%`,
+                `Low: ${lStr}%`
+              ];
+            }
+          }
+        }
+      },
+      scales: {
+        y: { title: { display: true, text: 'Avg P/L %' } }
+      }
+    }
+  });
 }

@@ -189,6 +189,7 @@
     <div class="panel"><h2>By RSI band <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRsi').hidden=false" title="About RSI band chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRsiBand"></canvas></div><div id="chartRsiBandNote"></div></div>
     <div class="panel"><h2>By sector <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSector').hidden=false" title="About sector chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div></div>
     <div class="panel"><h2>By source <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSource').hidden=false" title="About source chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div></div>
+    <div class="panel"><h2>Gain vs Days Held <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoGainVsDays').hidden=false" title="About gain vs days chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartGainVsDays"></canvas></div><div id="chartGainVsDaysNote"></div></div>
     <div class="empty" id="analyticsEmpty" style="display:none">Not enough finished advice yet to learn from. Outcomes appear once picks are sold, dropped, or 7+ days old.</div>
   </section>
 
@@ -549,6 +550,14 @@
       <button class="modal-close" onclick="document.getElementById('infoSource').hidden=true" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">By source</h2>
       <p style="margin-bottom:0;">Compares the performance between different types of runs (e.g., standard /advice vs. /premarket vs. /aftermarket vs. /diversify).</p>
+    </div>
+  </div>
+
+  <div id="infoGainVsDays" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoGainVsDays').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Gain vs Days Held</h2>
+      <p style="margin-bottom:0;">A bar chart showing the average percentage gain (or loss) of closed positions grouped by the number of days they were held.</p>
     </div>
   </div>
 
