@@ -375,7 +375,7 @@ class Handler(SimpleHTTPRequestHandler):
 
         try:
             proc = subprocess.run(
-                [sys.executable, SCREEN_SCRIPT, "news", "--json", *tickers[:20]],
+                [sys.executable, SCREEN_SCRIPT, "news", "--json", *tickers[:45]],
                 capture_output=True, text=True, timeout=60, cwd=ROOT)
         except subprocess.TimeoutExpired:
             self.respond_json(

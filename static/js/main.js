@@ -168,7 +168,15 @@ document.querySelectorAll('.tabs button').forEach(b => {
   content.innerHTML = '';
   
   try {
-    const tickers = (DATA.entries || []).filter(e => e.status === 'watching' || e.status === 'bought').map(e => e.ticker).join(',');
+    const activeEntries = (DATA.entries || []).filter(e => e.status === 'watching' || e.status === 'bought');
+    activeEntries.sort((a, b) => {
+      if (a.status === 'watching' && b.status !== 'watching') return -1;
+      if (b.status === 'watching' && a.status !== 'watching') return 1;
+      const tA = new Date(a.firstAdvised || 0).getTime();
+      const tB = new Date(b.firstAdvised || 0).getTime();
+      return (isNaN(tB) ? 0 : tB) - (isNaN(tA) ? 0 : tA);
+    });
+    const tickers = activeEntries.map(e => e.ticker).join(',');
     if (!tickers) throw new Error("No active tickers to fetch news for.");
     
     const res = await fetch('/api/news?tickers=' + encodeURIComponent(tickers));

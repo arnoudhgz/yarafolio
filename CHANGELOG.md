@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Days to Bounce vs RSI**: Bar chart showing the average days held for winning trades grouped by RSI band at advice.
 - Added a new "Gain vs Days Held" bar chart to the Analytics tab to visualize the average percentage gain of closed positions grouped by the number of days they were held. Tooltips include the sample size, maximum gain, and maximum loss for that specific holding period. (Also strips out any NaN dates).
 
+### Fixed
+- Fixed an issue in the News Feed where the "Advised" filter would only show a couple of tickers (like PTC and SR). This was caused by a backend 20-ticker fetch limit intersecting with an unsorted ticker list. Tickers are now prioritized (Watchlist first, then freshest eToro positions) and the limit was increased to 45 to ensure all active advice gets news coverage.
+
 ### Changed
 - Standardized all logged timestamps (`lastUpdated`, EOD/News dates, price history) to exclusively use the `America/New_York` timezone formatted as ISO 8601 strings with offsets (e.g. `YYYY-MM-DDTHH:MM-04:00`).
 - The frontend dashboard now automatically parses these ISO strings to correctly display dates in the user's local timezone.
