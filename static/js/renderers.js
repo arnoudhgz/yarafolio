@@ -470,7 +470,9 @@ export function renderAnalytics() {
     /** @type {HTMLElement} */ (document.getElementById('analyticsCards')).innerHTML = '';
     /** @type {HTMLElement} */ (document.getElementById('sevenDayBox')).innerHTML = '';
     ['chartRating', 'chartRsiBand', 'chartSector', 'chartSource'].forEach(id => renderBucketChart(id, {}));
-    if (analyticsCharts['chartGainVsDays']) { analyticsCharts['chartGainVsDays'].destroy(); delete analyticsCharts['chartGainVsDays']; }
+    ['chartGainVsDays', 'chartDayOfWeek', 'chartWinRateTrend', 'chartEntryDiscipline', 'chartDaysVsRsi'].forEach(id => {
+      if (analyticsCharts[id]) { analyticsCharts[id].destroy(); delete analyticsCharts[id]; }
+    });
     empty.textContent = canSave ? 'No stats available yet. Run /review to generate outcomes.'
       : 'Analytics needs the server. Start it with: python3 yarafolio.py';
     empty.style.display = 'block';
@@ -490,7 +492,13 @@ export function renderAnalytics() {
   renderBucketChart('chartRsiBand', b.rsiBand);
   renderBucketChart('chartSector', b.sector);
   renderBucketChart('chartSource', b.source);
-  renderGainVsDaysChart('chartGainVsDays', positionLotRows().filter(r => r.status === 'sold'));
+  
+  const soldLots = positionLotRows().filter(r => r.status === 'sold');
+  renderGainVsDaysChart('chartGainVsDays', soldLots);
+  renderDayOfWeekChart('chartDayOfWeek', soldLots);
+  renderWinRateTrendChart('chartWinRateTrend', soldLots);
+  renderEntryDisciplineChart('chartEntryDiscipline', soldLots);
+  renderDaysVsRsiChart('chartDaysVsRsi', soldLots);
   empty.textContent = 'Not enough finished advice yet to learn from. Outcomes appear once picks are sold, dropped, or 7+ days old.';
   empty.style.display = LEARN.measurableOutcomes ? 'none' : 'block';
 }
@@ -714,6 +722,295 @@ export function renderGainVsDaysChart(canvasId, rows) {
       scales: {
         y: { title: { display: true, text: 'Avg P/L %' } }
       }
+    }
+  });
+}
+
+export function renderDayOfWeekChart(canvasId, rows) {
+  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const note = document.getElementById(canvasId + 'Note');
+  if (!rows || !rows.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No closed positions available for this chart yet.</div>';
+    return;
+  }
+
+  const daysStr = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const buckets = [0,1,2,3,4,5,6].map(i => ({ sum: 0, count: 0, name: daysStr[i] }));
+  
+  rows.forEach(r => {
+    if (!r.firstAdvised) return;
+    const d = new Date(r.firstAdvised).getDay();
+    if (isNaN(d)) return;
+    buckets[d].sum += r.plPct;
+    buckets[d].count += 1;
+  });
+
+  const validBuckets = buckets.filter(b => b.count > 0);
+  if (!validBuckets.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No valid advice dates found.</div>';
+    return;
+  }
+  canvas.style.display = '';
+  if (note) note.innerHTML = '';
+
+  const labels = validBuckets.map(b => b.name);
+  const averages = validBuckets.map(b => b.sum / b.count);
+  const counts = validBuckets.map(b => b.count);
+
+  analyticsCharts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Avg P/L %',
+        data: averages,
+        backgroundColor: averages.map(y => y >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)'),
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const y = ctx.raw;
+              const n = counts[ctx.dataIndex];
+              return `Avg: ${y > 0 ? '+' : ''}${y.toFixed(2)}% (n=${n})`;
+            }
+          }
+        }
+      },
+      scales: { y: { title: { display: true, text: 'Avg P/L %' } } }
+    }
+  });
+}
+
+export function renderWinRateTrendChart(canvasId, rows) {
+  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const note = document.getElementById(canvasId + 'Note');
+  if (!rows || !rows.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No closed positions available for this chart yet.</div>';
+    return;
+  }
+
+  const buckets = {};
+  rows.forEach(r => {
+    if (!r.firstAdvised) return;
+    const d = new Date(r.firstAdvised);
+    if (isNaN(d.getTime())) return;
+    const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    if (!buckets[month]) buckets[month] = { wins: 0, total: 0 };
+    if (r.plPct > 0) buckets[month].wins += 1;
+    buckets[month].total += 1;
+  });
+
+  const sortedMonths = Object.keys(buckets).sort();
+  if (!sortedMonths.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No valid advice dates found.</div>';
+    return;
+  }
+  canvas.style.display = '';
+  if (note) note.innerHTML = '';
+
+  const labels = sortedMonths;
+  const winRates = sortedMonths.map(m => (buckets[m].wins / buckets[m].total) * 100);
+  const counts = sortedMonths.map(m => buckets[m].total);
+
+  analyticsCharts[canvasId] = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Win Rate %',
+        data: winRates,
+        borderColor: '#3498db',
+        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+        fill: true,
+        tension: 0.2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const y = ctx.raw;
+              const n = counts[ctx.dataIndex];
+              return `Win Rate: ${y.toFixed(1)}% (n=${n})`;
+            }
+          }
+        }
+      },
+      scales: { y: { title: { display: true, text: 'Win Rate %' }, min: 0, max: 100 } }
+    }
+  });
+}
+
+export function renderEntryDisciplineChart(canvasId, rows) {
+  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const note = document.getElementById(canvasId + 'Note');
+  if (!rows || !rows.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No closed positions available for this chart yet.</div>';
+    return;
+  }
+
+  const buckets = {
+    'In Buy Zone': { wins: 0, total: 0 },
+    'Chased (> Target)': { wins: 0, total: 0 }
+  };
+  
+  rows.forEach(r => {
+    const buyBelow = r.e.buyBelow;
+    if (buyBelow == null || !r.boughtAt) return;
+    
+    const category = r.boughtAt <= buyBelow + 0.01 ? 'In Buy Zone' : 'Chased (> Target)';
+    if (r.plPct > 0) buckets[category].wins += 1;
+    buckets[category].total += 1;
+  });
+
+  const labels = Object.keys(buckets).filter(k => buckets[k].total > 0);
+  if (!labels.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">Not enough buy target data available.</div>';
+    return;
+  }
+  
+  canvas.style.display = '';
+  if (note) note.innerHTML = '';
+
+  const winRates = labels.map(l => (buckets[l].wins / buckets[l].total) * 100);
+  const counts = labels.map(l => buckets[l].total);
+
+  analyticsCharts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Win Rate %',
+        data: winRates,
+        backgroundColor: labels.map(l => l === 'In Buy Zone' ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)'),
+        borderRadius: 6,
+        maxBarThickness: 60
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const y = ctx.raw;
+              const n = counts[ctx.dataIndex];
+              return `Win Rate: ${y.toFixed(1)}% (n=${n})`;
+            }
+          }
+        }
+      },
+      scales: { y: { title: { display: true, text: 'Win Rate %' }, min: 0, max: 100 } }
+    }
+  });
+}
+
+export function renderDaysVsRsiChart(canvasId, rows) {
+  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const note = document.getElementById(canvasId + 'Note');
+  
+  const winningRows = (rows || []).filter(r => r.plPct > 0);
+  if (!winningRows.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No winning trades available for this chart yet.</div>';
+    return;
+  }
+
+  const buckets = {};
+  winningRows.forEach(r => {
+    let rsiBand = 'Unknown';
+    if (r.e.rsiAtAdvice != null) {
+      const v = r.e.rsiAtAdvice;
+      if (v < 20) rsiBand = '< 20 (Deep)';
+      else if (v < 25) rsiBand = '20 - 25';
+      else if (v < 30) rsiBand = '25 - 30';
+      else if (v < 35) rsiBand = '30 - 35';
+      else if (v < 40) rsiBand = '35 - 40';
+      else rsiBand = '40+';
+    } else {
+      return;
+    }
+    
+    const d1 = new Date(r.openDate).getTime();
+    const d2 = new Date(r.closedDate).getTime();
+    let days = Math.round((d2 - d1) / (1000 * 3600 * 24));
+    if (isNaN(days)) return;
+    if (days < 0) days = 0;
+    
+    if (!buckets[rsiBand]) buckets[rsiBand] = { sum: 0, count: 0 };
+    buckets[rsiBand].sum += days;
+    buckets[rsiBand].count += 1;
+  });
+
+  const order = ['< 20 (Deep)', '20 - 25', '25 - 30', '30 - 35', '35 - 40', '40+'];
+  const labels = Object.keys(buckets).sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  
+  if (!labels.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No RSI data available for winning trades.</div>';
+    return;
+  }
+  
+  canvas.style.display = '';
+  if (note) note.innerHTML = '';
+
+  const averages = labels.map(l => buckets[l].sum / buckets[l].count);
+  const counts = labels.map(l => buckets[l].count);
+
+  analyticsCharts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Avg Days to Bounce',
+        data: averages,
+        backgroundColor: 'rgba(155, 89, 182, 0.8)',
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const y = ctx.raw;
+              const n = counts[ctx.dataIndex];
+              return `Avg: ${y.toFixed(1)} days (n=${n})`;
+            }
+          }
+        }
+      },
+      scales: { y: { title: { display: true, text: 'Avg Days Held' } } }
     }
   });
 }

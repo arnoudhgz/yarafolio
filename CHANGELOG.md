@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.10.0] - 2026-06-26
 
 ### Added
+- Added 4 new analytics charts to the dashboard for deep strategy insights:
+  - **Performance by Day of the Week**: Bar chart showing average P/L% by the day of the week a stock was advised.
+  - **Win Rate Over Time**: Line chart tracking the win rate % of advice generated each month.
+  - **Entry Discipline**: Bar chart comparing the win rate of stocks bought "In Buy Zone" (<= target) versus "Chased" (> target).
+  - **Days to Bounce vs RSI**: Bar chart showing the average days held for winning trades grouped by RSI band at advice.
 - Added a new "Gain vs Days Held" bar chart to the Analytics tab to visualize the average percentage gain of closed positions grouped by the number of days they were held. Tooltips include the sample size, maximum gain, and maximum loss for that specific holding period. (Also strips out any NaN dates).
 
 ### Changed

@@ -190,6 +190,10 @@
     <div class="panel"><h2>By sector <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSector').hidden=false" title="About sector chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div></div>
     <div class="panel"><h2>By source <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSource').hidden=false" title="About source chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div></div>
     <div class="panel"><h2>Gain vs Days Held <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoGainVsDays').hidden=false" title="About gain vs days chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartGainVsDays"></canvas></div><div id="chartGainVsDaysNote"></div></div>
+    <div class="panel"><h2>By Day of the Week <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDayOfWeek').hidden=false" title="About day of week chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartDayOfWeek"></canvas></div><div id="chartDayOfWeekNote"></div></div>
+    <div class="panel"><h2>Win Rate Over Time <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoWinRateTrend').hidden=false" title="About win rate trend chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartWinRateTrend"></canvas></div><div id="chartWinRateTrendNote"></div></div>
+    <div class="panel"><h2>Entry Discipline <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoEntryDiscipline').hidden=false" title="About entry discipline chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartEntryDiscipline"></canvas></div><div id="chartEntryDisciplineNote"></div></div>
+    <div class="panel"><h2>Days to Bounce vs RSI <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDaysVsRsi').hidden=false" title="About days vs rsi chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartDaysVsRsi"></canvas></div><div id="chartDaysVsRsiNote"></div></div>
     <div class="empty" id="analyticsEmpty" style="display:none">Not enough finished advice yet to learn from. Outcomes appear once picks are sold, dropped, or 7+ days old.</div>
   </section>
 
@@ -558,6 +562,38 @@
       <button class="modal-close" onclick="document.getElementById('infoGainVsDays').hidden=true" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Gain vs Days Held</h2>
       <p style="margin-bottom:0;">A bar chart showing the average percentage gain (or loss) of closed positions grouped by the number of days they were held.</p>
+    </div>
+  </div>
+
+  <div id="infoDayOfWeek" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoDayOfWeek').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">By Day of the Week</h2>
+      <p style="margin-bottom:0;">Average P/L% grouped by the day of the week a stock was initially advised. Helps reveal if weekend news affects Friday picks vs mid-week entries.</p>
+    </div>
+  </div>
+
+  <div id="infoWinRateTrend" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoWinRateTrend').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Win Rate Over Time</h2>
+      <p style="margin-bottom:0;">Line chart tracking the Win Rate % of advice generated per month. Highlights if the strategy is losing its edge in the current market regime.</p>
+    </div>
+  </div>
+
+  <div id="infoEntryDiscipline" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoEntryDiscipline').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Entry Discipline</h2>
+      <p style="margin-bottom:0;">Win Rate % comparing stocks bought strictly inside the "Buy Below" zone vs stocks where the entry was "Chased" above target.</p>
+    </div>
+  </div>
+
+  <div id="infoDaysVsRsi" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoDaysVsRsi').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Days to Bounce vs RSI</h2>
+      <p style="margin-bottom:0;">Average days held for WINNING trades, grouped by the RSI at the time of advice. Answers if deeply oversold stocks bounce faster.</p>
     </div>
   </div>
 
