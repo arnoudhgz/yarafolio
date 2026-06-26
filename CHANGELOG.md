@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.0] - 2026-06-26
 
+### Changed
+- Standardized all logged timestamps (`lastUpdated`, EOD/News dates, price history) to exclusively use the `America/New_York` timezone formatted as ISO 8601 strings with offsets (e.g. `YYYY-MM-DDTHH:MM-04:00`).
+- The frontend dashboard now automatically parses these ISO strings to correctly display dates in the user's local timezone.
+- Replaced timezone-hacky local `date.today()` calls with a dedicated `nyse_now()` and `nyse_today()` helper across all python scripts.
+
 ### Fixed
-- Fixed an edge case in `etoro_import.py` where aftermarket advice logs generated past midnight local time wouldn't match with eToro trades opened during the previous day's US market session, by introducing a 1-day timezone grace period.
+- Fixed an edge case where aftermarket advice logs generated past midnight local time wouldn't match with eToro trades opened during the previous day's US market session. This was achieved by accurately evaluating market sessions via the `America/New_York` timezone directly instead of brittle local hour comparisons.
 
 ## [0.9.0] - 2026-06-25
 
