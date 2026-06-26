@@ -58,6 +58,6 @@ Deterministic data work goes through the CLIs, never hand-edit the JSON.
 
 Run `python3 scripts/advice_log.py checkin-candidates`. If it prints candidates, ask ONE AskUserQuestion round covering at most 4 tickers. Apply answers via `advice_log.py set-status` / `set-tsl`. Skip silently when it says no candidates.
 
-Then the learn nudge: run `python3 scripts/learn_stats.py --count-only`.
+Then the review nudge: run `python3 scripts/review_stats.py --count-only`.
 
 Last step, auto-backup: run `python3 scripts/autosync.py "aftermarket run"`.

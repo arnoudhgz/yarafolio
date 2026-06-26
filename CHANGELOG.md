@@ -47,7 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Opening the drill-down from a Positions row now scopes the chart to that specific lot: anchored at the advice that prompted it (date + price) with its own buy and trailing-stop lines, and the lot is flagged in the lots list. Opening from the Advice tab keeps the whole-pick chart.
 
 ### Changed
-- Strategy update: lowered preferred RSI to < 25 and added an output warning for A-rated Tech stocks due to value trap risks (applied via `/learn`).
+- Strategy update: lowered preferred RSI to < 25 and added an output warning for A-rated Tech stocks due to value trap risks (applied via `/review`).
 - Strategy update: Enforced a new rule to never add a ticker to the dashboard/advice list when there are already two open positions for it.
 - Dashboard sparklines now use the theme's `--green`/`--red` (they were rendering a different hardcoded green/red), and the repeated info-icon inline styles collapsed into one `.info-icon` class.
 - The oversold screen logs a clear warning when it parses zero rows (stockanalysis.com markup changed) instead of silently returning no candidates.

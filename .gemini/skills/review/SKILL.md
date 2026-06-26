@@ -1,6 +1,6 @@
 ---
-name: learn
-description: Self-learning pass over advice outcomes. Use when the user types /learn, asks "how good were your advices", "what should we change in the strategy", or after an advice run suggested it. Computes outcome stats, proposes concrete skill/agent/GEMINI.md improvements, applies them only after approval.
+name: review
+description: Self-learning pass over advice outcomes. Use when the user types /review, asks "how good were your advices", "what should we change in the strategy", or after an advice run suggested it. Computes outcome stats, proposes concrete skill/agent/GEMINI.md improvements, applies them only after approval.
 license: Apache-2.0
 metadata:
   version: v1
@@ -13,8 +13,8 @@ Compare past advice against what actually happened, then improve the advice pipe
 
 ## Step 1: Gather
 
-- `python3 scripts/learn_stats.py` (and `--json` if you need exact numbers): win rate and avg/median move by rating, RSI band, sector, source, plus the ~7-day-after-advice stat and the measurable-outcome count.
-- Read `data/private/LEARNINGS.md`: what was already concluded and changed in earlier runs. Never re-propose something that was applied or explicitly rejected before.
+- `python3 scripts/review_stats.py` (and `--json` if you need exact numbers): win rate and avg/median move by rating, RSI band, sector, source, plus the ~7-day-after-advice stat and the measurable-outcome count.
+- Read `data/private/REVIEWS.md`: what was already concluded and changed in earlier runs. Never re-propose something that was applied or explicitly rejected before.
 
 ## Step 2: Interpret with discipline
 
@@ -32,7 +32,7 @@ One AskUserQuestion round listing the proposals (accept/reject each). Apply only
 
 ## Step 5: Record
 
-Append one entry to `data/private/LEARNINGS.md` (newest on top, below the header):
+Append one entry to `data/private/REVIEWS.md` (newest on top, below the header):
 
 ```markdown
 ## [YYYY-MM-DD]
@@ -42,8 +42,8 @@ Append one entry to `data/private/LEARNINGS.md` (newest on top, below the header
 - Proposed: short bullet per proposal, marked applied / rejected
 ```
 
-The "Measurable outcomes" line is load-bearing: advice runs compare `learn_stats.py --count-only` against the latest entry to decide when to nudge for the next /learn.
+The "Measurable outcomes" line is load-bearing: advice runs compare `review_stats.py --count-only` against the latest entry to decide when to nudge for the next /review.
 
 ## Step 6: Auto-backup
 
-Run `python3 scripts/autosync.py "learn pass"`. Commits + pushes `data/private/LEARNINGS.md` (and any data changes) to the private backup repo when `STOCKS_AUTOSYNC=1`, silent no-op otherwise. Accepted skill/GEMINI.md edits are code, not data, so commit those yourself.
+Run `python3 scripts/autosync.py "learn pass"`. Commits + pushes `data/private/REVIEWS.md` (and any data changes) to the private backup repo when `STOCKS_AUTOSYNC=1`, silent no-op otherwise. Accepted skill/GEMINI.md edits are code, not data, so commit those yourself.

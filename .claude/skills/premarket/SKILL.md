@@ -63,6 +63,6 @@ Deterministic data work goes through the CLIs, never hand-edit the JSON.
 
 Run `python3 scripts/advice_log.py checkin-candidates`. If it prints candidates, ask ONE AskUserQuestion round covering at most 4 tickers (its output is already ordered most urgent first) - bought it? still holding? drop from tracking? Apply answers via `advice_log.py set-status` / `set-tsl`. Auto-closed picks (gone from eToro, exit estimated) also surface here: confirm or correct the exit with `set-status sold --price <real>`. Skip silently when it says no candidates. The user can also handle these via the dashboard buttons (`python3 yarafolio.py`), so don't nag about tickers already updated there.
 
-Then the learn nudge: run `python3 scripts/learn_stats.py --count-only` and compare against the count in the latest data/private/LEARNINGS.md entry (0 if none). If 10+ new measurable outcomes, suggest `/learn` in one sentence. Never auto-run it.
+Then the review nudge: run `python3 scripts/review_stats.py --count-only` and compare against the count in the latest data/private/REVIEWS.md entry (0 if none). If 10+ new measurable outcomes, suggest `/review` in one sentence. Never auto-run it.
 
 Last step, auto-backup: run `python3 scripts/autosync.py "premarket run"`. Commits + pushes the data files to the private backup repo when `STOCKS_AUTOSYNC=1`, silent no-op otherwise, so always run it.

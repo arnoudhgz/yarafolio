@@ -470,7 +470,7 @@ export function renderAnalytics() {
     /** @type {HTMLElement} */ (document.getElementById('analyticsCards')).innerHTML = '';
     /** @type {HTMLElement} */ (document.getElementById('sevenDayBox')).innerHTML = '';
     ['chartRating', 'chartRsiBand', 'chartSector', 'chartSource'].forEach(id => renderBucketChart(id, {}));
-    empty.textContent = canSave ? 'No stats available yet. Run /learn to generate outcomes.'
+    empty.textContent = canSave ? 'No stats available yet. Run /review to generate outcomes.'
       : 'Analytics needs the server. Start it with: python3 yarafolio.py';
     empty.style.display = 'block';
     return;

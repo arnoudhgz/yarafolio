@@ -1,8 +1,8 @@
 # Advice log data
 
-`advice-log.json` is the source of truth for `dashboard.html`. Updated by `/advice`, `/premarket`, `/check`, `/import` and by the dashboard buttons (via `yarafolio.py`: `/api/save`, `/api/import`, `/api/refresh`; `/api/stats` reads `learn_stats.py`).
+`advice-log.json` is the source of truth for `dashboard.html`. Updated by `/advice`, `/premarket`, `/check`, `/import` and by the dashboard buttons (via `yarafolio.py`: `/api/save`, `/api/import`, `/api/refresh`; `/api/stats` reads `review_stats.py`).
 
-**Skills never hand-edit these JSON files.** All log mutations go through `scripts/advice_log.py` (add-pick, add-note, touch, touch-many, set-status, set-tsl, checkin-candidates, compare, sector-gaps). `touch-many` reads a `{"TICKER": price}` map on stdin and is how the dashboard's "Refresh quotes" button writes scraped prices back (yarafolio.py runs `screen.py quote --json` then pipes it to `touch-many`, so the web layer never touches the JSON). Stats come from `scripts/learn_stats.py`. Portfolio sync via `scripts/etoro_import.py`. Mechanical market data (oversold screen, quote stats) via `scripts/screen.py`.
+**Skills never hand-edit these JSON files.** All log mutations go through `scripts/advice_log.py` (add-pick, add-note, touch, touch-many, set-status, set-tsl, checkin-candidates, compare, sector-gaps). `touch-many` reads a `{"TICKER": price}` map on stdin and is how the dashboard's "Refresh quotes" button writes scraped prices back (yarafolio.py runs `screen.py quote --json` then pipes it to `touch-many`, so the web layer never touches the JSON). Stats come from `scripts/review_stats.py`. Portfolio sync via `scripts/etoro_import.py`. Mechanical market data (oversold screen, quote stats) via `scripts/screen.py`.
 
 Entry shape:
 

@@ -54,7 +54,7 @@ Here is the breakdown of the available tools:
    - `/diversify`: Scans your eToro portfolio for missing sectors and recommends quality stocks to fill the gaps.
    - `/eod`: End-of-Day check to secure small profits on low-conviction picks before the market closes.
    - `/import`: Parses a screenshot or text paste of your eToro portfolio and syncs it to the tracker.
-   - `/learn`: Does a self-learning pass over past advice outcomes to suggest improvements to the strategy.
+   - `/review`: Does a self-learning pass over past advice outcomes to suggest improvements to the strategy.
    - `/news`: Generates a quick AI management summary of the latest news for your active and watched tickers.
    - `/premarket`: Runs the advice workflow specifically using today's premarket data before the US open.
 

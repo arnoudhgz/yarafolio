@@ -31,7 +31,7 @@ export async function applyChange(mutate) {
 
 export async function loadLearn() {
   if (LEARN) return;
-  for (const url of ['/api/stats', 'data/learn-stats.json']) {
+  for (const url of ['/api/stats', 'data/review-stats.json']) {
     try {
       const res = await fetch(url, { cache: 'no-store' });
       if (res.ok) { setLEARN(await res.json()); return; }

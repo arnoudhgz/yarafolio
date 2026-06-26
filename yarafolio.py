@@ -12,7 +12,7 @@ POST /api/import  - runs scripts/etoro_import.py preview + merge (the "Update
 POST /api/refresh - scrapes live quotes for advised watching/bought tickers via
                     screen.py and writes them through advice_log.py touch-many
                     (the "Refresh quotes" button)
-GET  /api/stats   - learn_stats.py --json passthrough (the Analytics tab)
+GET  /api/stats   - review_stats.py --json passthrough (the Analytics tab)
 Stdlib only, no dependencies. Ctrl+C to stop.
 """
 import logging
@@ -52,7 +52,7 @@ DATA_FILE = os.path.join(ROOT, "data", subdir, "advice-log.json")
 IMPORT_SCRIPT = os.path.join(ROOT, "scripts", "etoro_import.py")
 SCREEN_SCRIPT = os.path.join(ROOT, "scripts", "screen.py")
 ADVICE_LOG_SCRIPT = os.path.join(ROOT, "scripts", "advice_log.py")
-LEARN_SCRIPT = os.path.join(ROOT, "scripts", "learn_stats.py")
+LEARN_SCRIPT = os.path.join(ROOT, "scripts", "review_stats.py")
 AUTOSYNC_SCRIPT = os.path.join(ROOT, "scripts", "autosync.py")
 PID_FILE = os.path.join(ROOT, "tmp", "serve.pid")
 DEFAULT_PORT = int(get_env("PORT") or 8742)
@@ -331,7 +331,7 @@ class Handler(SimpleHTTPRequestHandler):
     def handle_stats(self):
         if is_demo:
             try:
-                with open(os.path.join(ROOT, "data", "sample", "learn-stats.json")) as f:
+                with open(os.path.join(ROOT, "data", "sample", "review-stats.json")) as f:
                     self.respond_json(200, json.load(f))
                 return
             except OSError:

@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Outcome stats for the advice tracker. Read-only, used by /learn.
+"""Outcome stats for the advice tracker. Read-only, used by /review.
 
 Usage:
-  python3 scripts/learn_stats.py               # human-readable bucket tables
-  python3 scripts/learn_stats.py --json        # machine output
-  python3 scripts/learn_stats.py --count-only  # just the measurable-outcome count
+  python3 scripts/review_stats.py               # human-readable bucket tables
+  python3 scripts/review_stats.py --json        # machine output
+  python3 scripts/review_stats.py --count-only  # just the measurable-outcome count
 
 Import-source entries are excluded: they're holdings, not advice, so they say
 nothing about advice quality.
@@ -64,7 +64,7 @@ class LearnStats:
         is_demo = get_env("DEMO_MODE") == "1"
         subdir = "sample" if is_demo else "private"
         self.log_file = os.path.join(ROOT, "data", subdir, "advice-log.json")
-        self.out_file = os.path.join(ROOT, "data", subdir, "learn-stats.json")
+        self.out_file = os.path.join(ROOT, "data", subdir, "review-stats.json")
 
     def parse_date(self, s: str) -> date:
         return datetime.strptime(s[:10], "%Y-%m-%d").date()
