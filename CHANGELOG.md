@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Fixed an edge case where aftermarket advice logs generated past midnight local time wouldn't match with eToro trades opened during the previous day's US market session. This was achieved by accurately evaluating market sessions via the `America/New_York` timezone directly instead of brittle local hour comparisons.
+- Fixed `ModuleNotFoundError` for `nyse` in `yarafolio.py` by appending the `scripts` directory to `sys.path`.
 
 ## [0.9.0] - 2026-06-25
 
