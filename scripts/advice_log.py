@@ -447,7 +447,7 @@ def main():
     p.add_argument("ticker")
     p.add_argument("--price", type=float, required=True)
     p.add_argument("--source", choices=app.NEW_PICK_SOURCES)
-    p.add_argument("--rating")
+    p.add_argument("--rating", choices=["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-"])
     p.add_argument("--rsi", type=float)
     p.add_argument("--sector", choices=app.SECTORS)
     p.add_argument("--buy-below", type=float)
