@@ -34,6 +34,11 @@
       "status": "installed",
       "disabled": false,
       "error": null
+    },
+    "review": {
+      "status": "installed",
+      "disabled": false,
+      "error": null
     }
   }
 }
