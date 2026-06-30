@@ -316,7 +316,12 @@ export function drawModalChart(e, lot) {
     if (/** @type {any} */ (h)._isWeek) {
       label = 'Wk ' + /** @type {any} */ (h)._weekNum;
     } else if (dStr.length > 10) {
-      label = dStr.slice(11, 16);
+      const d = new Date(dStr.replace(' ', 'T'));
+      if (!isNaN(d.getTime())) {
+        label = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      } else {
+        label = dStr.slice(11, 16);
+      }
     } else {
       label = dStr;
     }
