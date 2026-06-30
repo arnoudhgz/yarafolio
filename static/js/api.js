@@ -79,8 +79,9 @@ export async function fetchMacro(force = false) {
           const dateObj = new Date(Number(parts[2]), Number(parts[0]) - 1, Number(parts[1]));
           if (!isNaN(dateObj.getTime())) {
             displayDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const nyStr = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
+            const nyDate = new Date(nyStr);
+            const today = new Date(nyDate.getFullYear(), nyDate.getMonth(), nyDate.getDate());
             if (dateObj < today) {
               isPast = true;
             } else if (dateObj.getTime() === today.getTime()) {
@@ -142,8 +143,10 @@ export async function fetchIpos(force = false) {
     
     let html = '';
     let hasNearIpo = false;
-    const now = new Date();
-    const tomorrow = new Date(); tomorrow.setDate(now.getDate() + 1);
+    const nyStr = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
+    const nyDate = new Date(nyStr);
+    const now = new Date(nyDate.getFullYear(), nyDate.getMonth(), nyDate.getDate());
+    const tomorrow = new Date(nyDate.getFullYear(), nyDate.getMonth(), nyDate.getDate() + 1);
     
     /**
      * @param {string} t
