@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added a new "Gain vs Days Held" bar chart to the Analytics tab to visualize the average percentage gain of closed positions grouped by the number of days they were held. Tooltips include the sample size, maximum gain, and maximum loss for that specific holding period. (Also strips out any NaN dates).
 
 ### Fixed
+- Fixed an issue where the location API key dropdown in the dashboard would incorrectly reset to the backend's startup location choice across page reloads and data syncs, rather than remembering the user's explicit selection.
 - Fixed an issue in the News Feed where the "Advised" filter would only show a couple of tickers (like PTC and SR). This was caused by a backend 20-ticker fetch limit intersecting with an unsorted ticker list. Tickers are now prioritized (Watchlist first, then freshest eToro positions) and the limit was increased to 45 to ensure all active advice gets news coverage.
 
 ### Changed

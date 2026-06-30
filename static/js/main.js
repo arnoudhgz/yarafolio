@@ -52,11 +52,11 @@ async function load() {
           sel.style.display = 'block';
           
           const saved = localStorage.getItem('etoroLocation');
-          if (data.active !== undefined && data.active !== null) {
+          if (saved && data.prefixes.includes(saved)) {
+            sel.value = saved;
+          } else if (data.active !== undefined && data.active !== null) {
             sel.value = data.active;
             localStorage.setItem('etoroLocation', data.active);
-          } else if (saved && data.prefixes.includes(saved)) {
-            sel.value = saved;
           }
           sel.addEventListener('change', () => {
             localStorage.setItem('etoroLocation', sel.value);
