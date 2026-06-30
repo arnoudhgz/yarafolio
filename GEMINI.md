@@ -14,7 +14,7 @@ Use Opus.
 | Batch size | $600 per position |
 | Trailing stop loss | Start around +5% profit |
 | Minimum stock price | $20 |
-| Focus | Oversold stocks with bounce potential (prefer RSI < 25) |
+| Focus | Oversold stocks with bounce potential (prefer RSI 20-25, strictly avoid RSI < 20) |
 | Bearish / geopolitical stress | Switch to defensive picks (staples, healthcare, utilities, defense) |
 
 ## Commands
@@ -35,7 +35,7 @@ Use Opus.
 - Every recommendation list goes in ONE markdown table. Columns: Ticker, Price, Rating, RSI, Why oversold / thesis, Risk. No prose blocks per stock.
 - Sources as hyperlinks below the table.
 - Data must be fresh: last 24 hours max, intraday when the market just opened. When I say the market opened minutes ago, use prices from today's session, not yesterday's close.
-- Flag falling-knife and value-trap risks explicitly in the Rating or Risk column. Tech stocks have heavily underperformed; require exceptional setups for Tech or mark them high-risk. Be highly skeptical of 'A-rated' stocks.
+- Flag falling-knife and value-trap risks explicitly in the Rating or Risk column. Tech stocks have heavily underperformed; require exceptional setups for Tech or mark them high-risk.
 - Before listing any pick, run one targeted litigation/fraud search per final pick, unconditional, even when the pre-fetched red-flag headlines looked clean (I once almost bought ZTS during a securities fraud investigation; the keyword screen can miss a problem phrased outside its terms). A red flag means drop the pick or mark it clearly.
 - When I mention geopolitical events (war, tariffs, elections), shift the list toward defensive assets.
 - Never add a ticker to the dashboard/advice when we already have two open positions for it.
