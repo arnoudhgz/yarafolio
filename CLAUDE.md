@@ -14,7 +14,7 @@ Use Opus.
 | Batch size | $600 per position |
 | Trailing stop loss | Start around +5% profit |
 | Minimum stock price | $20 |
-| Focus | Oversold stocks with bounce potential (prefer RSI 20-25, strictly avoid RSI < 20) |
+| Focus | Oversold stocks with bounce potential (prefer RSI 20-30, strictly avoid RSI < 20) |
 | Bearish / geopolitical stress | Switch to defensive picks (staples, healthcare, utilities, defense) |
 
 ## Commands
