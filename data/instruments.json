@@ -583,5 +583,25 @@
     "ticker": "ON",
     "name": "ON Semiconductor Corp",
     "sector": "Technology"
+  },
+  "4033": {
+    "ticker": "CME",
+    "name": "CME Group",
+    "sector": "Financial"
+  },
+  "4275": {
+    "ticker": "LYB",
+    "name": "LyondellBasell Industries NV",
+    "sector": "Basic Materials"
+  },
+  "9443": {
+    "ticker": "WFRD",
+    "name": "Weatherford International plc",
+    "sector": "Utilities"
+  },
+  "15555": {
+    "ticker": "LCLN",
+    "name": "Lincoln International Inc",
+    "sector": "Financial"
   }
 }
