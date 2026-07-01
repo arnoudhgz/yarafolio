@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.1] - 2026-07-01
 
+### Changed
+- Strategy update: Clarified in GEMINI.md/CLAUDE.md that B/C rated stocks historically outperform A-rated stocks in the oversold strategy.
+
 ### Fixed
 - Fixed an issue where the Macro Calendar and IPO Tracker would calculate the "current day" using the local timezone (e.g., European time) rather than New York market time, causing events from the next market day to be incorrectly flagged as happening "today" and prematurely shown as "Passed".
 
