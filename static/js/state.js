@@ -118,7 +118,10 @@ const savedSortState = localStorage.getItem('sortState');
 const defaultSortState = {
   advice: { key: 'buyProx', dir: 1 },
   archive: { key: 'firstAdvised', dir: -1 },
-  positions: { key: 'firstAdvised', dir: -1 },
+  positions_all: { key: 'firstAdvised', dir: -1 },
+  positions_open: { key: 'firstAdvised', dir: -1 },
+  positions_closed: { key: 'firstAdvised', dir: -1 },
+  positions_needsconfirm: { key: 'firstAdvised', dir: -1 },
   portfolio: { key: 'plPct', dir: -1 },
 };
 let initialSortState = defaultSortState;

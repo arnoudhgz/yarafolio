@@ -238,10 +238,12 @@ document.querySelectorAll('.tabs button').forEach(b => {
 /** @type {HTMLElement} */ (document.getElementById('refreshIposBtn')).addEventListener('click', () => fetchIpos(true));
 /** @type {HTMLElement} */ (document.getElementById('refreshMacroBtn')).addEventListener('click', () => fetchMacro(true));
 
-function headerSortHandler(tableId, stateKey, render) {
+function headerSortHandler(tableId, stateKeyOrFn, render) {
   document.querySelector('#' + tableId + ' thead').addEventListener('click', (ev) => {
     const th = /** @type {HTMLElement} */ (ev.target).closest('th[data-key]');
     if (!th) return;
+    const stateKey = typeof stateKeyOrFn === 'function' ? stateKeyOrFn() : stateKeyOrFn;
+    if (!sortState[stateKey]) sortState[stateKey] = { key: 'firstAdvised', dir: -1 };
     const state = sortState[stateKey];
     const key = th.getAttribute('data-key');
     if (state.key === key) state.dir = -state.dir;
@@ -252,7 +254,7 @@ function headerSortHandler(tableId, stateKey, render) {
 }
 headerSortHandler('adviceTable', 'advice', renderTable);
 
-headerSortHandler('positionsTable', 'positions', renderPositions);
+headerSortHandler('positionsTable', () => 'positions_' + posFilter, renderPositions);
 headerSortHandler('portfolioTable', 'portfolio', renderPortfolioTable);
 
 const adviceClickHandler = (ev) => {

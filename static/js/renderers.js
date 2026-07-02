@@ -205,7 +205,7 @@ export function positionLotRows() {
     rows.push({
       e, positionID: lot.positionID,
       firstAdvised: adv.date,
-      openDate: lot.openDate,
+      openDate: lot.openDateTime || lot.openDate,
       openDateTime: lot.openDateTime,
       closedDate: lot.closedDate,
       ticker: e.ticker,
@@ -257,15 +257,16 @@ export function renderPositions() {
   pTotal.innerHTML = hasPositions ? fmtPL(totalSum) + ' <span style="font-size:13px;opacity:0.8;margin-left:4px">(' + (totalPct > 0 ? '+' : '') + totalPct.toFixed(2) + '%)</span>' : '-';
   pTotal.className = 'value ' + (hasPositions && totalSum < 0 ? 'neg' : hasPositions ? 'pos' : '');
 
+  const activeSortState = sortState['positions_' + posFilter] || { key: 'firstAdvised', dir: -1 };
   const rows = sortRows(all.filter(r => {
     if (!matchesSearch([r.ticker, r.e.name, r.e.reason, r.e.sector])) return false;
     if (posFilter === 'open') return r.status === 'bought';
     if (posFilter === 'closed') return r.status === 'sold';
     if (posFilter === 'needsconfirm') return r.exitEstimated;
     return true;
-  }), sortState.positions);
+  }), activeSortState);
   if (activeTab === 'positions') setSearchCount(rows.length);
-  markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('positionsTable')), sortState.positions);
+  markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('positionsTable')), activeSortState);
   const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('positionsEmpty'));
   let msg = 'No open positions linked to advice yet.';
   if (posFilter === 'closed') msg = 'No closed positions yet.';

@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- Fixed date sorting so that identical local dates properly use their underlying timestamp for chronological sorting.
+- Separated column sorting states per Positions filter (Open, Closed, Needs Confirm, All) so that each tab remembers its own sort order independently.
+
 ## [0.10.1] - 2026-07-01
 
 ### Changed
