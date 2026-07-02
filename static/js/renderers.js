@@ -10,7 +10,9 @@ export function renderAll() {
     PORTFOLIO.holdings.length + ' holdings';
   /** @type {HTMLElement} */ (document.getElementById('cTracked')).textContent = String(entries.length);
   /** @type {HTMLElement} */ (document.getElementById('cOpen')).textContent = String(entries.filter(e => e.status === 'bought').length);
+  /** @type {HTMLElement} */ (document.getElementById('cClosed')).textContent = String(entries.filter(e => e.status === 'sold').length);
   /** @type {HTMLElement} */ (document.getElementById('cWatching')).textContent = String(entries.filter(e => e.status === 'watching').length);
+  /** @type {HTMLElement} */ (document.getElementById('cIgnored')).textContent = String(entries.filter(e => ['dropped', 'avoid', 'blacklisted'].includes(e.status)).length);
   renderTable();
   renderPositions();
   if (activeTab === 'portfolio') renderPortfolio();
@@ -84,9 +86,10 @@ export function actionButtons(e) {
   // positions come from the eToro import now; the watchlist only needs Drop
   if (!canSave) return '';
   if (e.status === 'watching') {
-    return '<button class="drop" data-act="drop" data-id="' + e.id + '">Drop</button>';
+    return '<button class="drop" data-act="drop" data-id="' + e.id + '">Drop</button>' +
+           '<button class="drop" data-act="blacklist" data-id="' + e.id + '">Blacklist</button>';
   }
-  if (e.status === 'dropped') {
+  if (e.status === 'dropped' || e.status === 'blacklisted') {
     return '<button class="buy" data-act="rewatch" data-id="' + e.id + '">Re-watch</button>' +
            '<button class="drop" data-act="remove" data-id="' + e.id + '">Remove</button>';
   }
@@ -123,6 +126,8 @@ export function renderTable() {
     adviceRows().filter(r => {
       if (currentFilter === 'dropped') {
         if (r.status !== 'dropped') return false;
+      } else if (currentFilter === 'blacklisted') {
+        if (r.status !== 'blacklisted') return false;
       } else {
         if (r.status !== 'watching') return false;
         if (r.e.lots && r.e.lots.length) return false;
@@ -142,6 +147,7 @@ export function renderTable() {
   
   let msg = 'No watched picks yet. Run /advice, /premarket or /import in the AI CLI to fill this in.';
   if (currentFilter === 'dropped') msg = 'No dropped picks yet.';
+  else if (currentFilter === 'blacklisted') msg = 'No blacklisted picks yet.';
   else if (currentFilter === 'buyzone') msg = 'No watched picks currently in the buy zone.';
   else if (currentFilter === 'drophit') msg = 'No watched picks have hit their drop alert level.';
   else if (currentFilter === 'missed') msg = 'No watched picks have hit their drop above level (missed).';
@@ -179,7 +185,7 @@ export function renderTable() {
       '<td>' + fmtPrice(r.dropBelow) + '</td>' +
       '<td class="' + (e.status === 'watching' && e.dropAbove && latestPrice(e) >= e.dropAbove ? 'sec-gap' : '') + '">' + fmtPrice(e.dropAbove) + '</td>' +
       '<td class="spark-col"><div style="width:70px; height:30px;"><canvas class="spark"></canvas></div></td>' +
-      '<td><span class="badge ' + r.status + '">' + r.status + '</span></td>' +
+      '<td><span class="badge ' + r.status + '" title="' + esc(r.status) + '">' + (r.status === 'blacklisted' && e.blacklistReason ? esc(e.blacklistReason) : r.status) + '</span></td>' +
       '<td class="actions">' + actionButtons(e) + '</td>';
     tbody.appendChild(tr);
     sparkline(tr.querySelector('canvas'), e);

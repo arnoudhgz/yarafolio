@@ -24,13 +24,15 @@
   <div class="cards" style="margin-bottom: 12px;">
     <div class="card"><div class="label">Advised picks<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoAdvisedPicks').hidden=false" title="What are Advised Picks?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cTracked">0</div></div>
     <div class="card"><div class="label">Open positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoOpenPositions').hidden=false" title="What are Open Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cOpen">0</div></div>
+    <div class="card"><div class="label">Closed positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoClosedPositions').hidden=false" title="What are Closed Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cClosed">0</div></div>
     <div class="card"><div class="label">Watching<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWatching').hidden=false" title="What does Watching mean?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cWatching">0</div></div>
+    <div class="card"><div class="label">Ignored positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoIgnoredPositions').hidden=false" title="What are Ignored Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cIgnored">0</div></div>
   </div>
   <div class="cards">
-    <div class="card"><div class="label">Win rate (closed)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWinRate').hidden=false" title="What is Win Rate?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pWinRate">-</div></div>
     <div class="card"><div class="label">Realized P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoRealized').hidden=false" title="What is Realized P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pRealized">-</div></div>
     <div class="card"><div class="label">Open P/L (unrealized)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoOpenPL').hidden=false" title="What is Open P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pOpen">-</div></div>
     <div class="card"><div class="label">Total P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoTotalPL').hidden=false" title="What is Total P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pTotal">-</div></div>
+    <div class="card"><div class="label">Win rate (closed)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWinRate').hidden=false" title="What is Win Rate?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pWinRate">-</div></div>
   </div>
 
   <div class="search-row">
@@ -56,6 +58,7 @@
       <h2 style="display:flex; align-items:center; gap:8px;">
         Watchlist (live advice)
         <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('adviceInfoModal').hidden=false" title="What do the ratings and levels mean?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <button id="btnManualBlacklist" class="refresh-btn" style="margin-left:auto;">+ Add to Blacklist</button>
       </h2>
       <div class="filters" id="filters">
         <button data-filter="watching" class="active">Watching</button>
@@ -65,6 +68,7 @@
         <button data-filter="gap">Sector gap</button>
         <button data-filter="under">Underweight</button>
         <button data-filter="dropped">Dropped</button>
+        <button data-filter="blacklisted">Blacklisted</button>
       </div>
       <table id="adviceTable">
         <thead>
@@ -478,6 +482,22 @@
     </div>
   </div>
 
+  <div id="infoClosedPositions" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoClosedPositions').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Closed positions</h2>
+      <p style="margin-bottom:0;">The number of eToro positions (lots) that have been successfully sold or closed.</p>
+    </div>
+  </div>
+
+  <div id="infoIgnoredPositions" class="modal-backdrop" hidden onclick="this.hidden=true">
+    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="document.getElementById('infoIgnoredPositions').hidden=true" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Ignored positions</h2>
+      <p style="margin-bottom:0;">The number of advised picks that were dropped, avoided, or blacklisted without being bought.</p>
+    </div>
+  </div>
+
   <div id="infoWatching" class="modal-backdrop" hidden onclick="this.hidden=true">
     <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
       <button class="modal-close" onclick="document.getElementById('infoWatching').hidden=true" aria-label="Close">&times;</button>
@@ -594,6 +614,30 @@
       <button class="modal-close" onclick="document.getElementById('infoDaysVsRsi').hidden=true" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Days to Bounce vs RSI</h2>
       <p style="margin-bottom:0;">Average days held for WINNING trades, grouped by the RSI at the time of advice. Answers if deeply oversold stocks bounce faster.</p>
+    </div>
+  </div>
+
+  <div id="blacklistModal" class="modal-backdrop" hidden onclick="closeBlacklistModal()">
+    <div class="modal-card" style="max-width: 400px; padding: 24px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeBlacklistModal()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:20px; font-size: 20px;" id="blacklistModalTitle">Blacklist Stock</h2>
+      
+      <div style="margin-bottom: 20px;" id="blacklistTickerGroup">
+        <label style="display:block; margin-bottom: 8px; font-weight: 600; color: var(--muted);">TICKER SYMBOL</label>
+        <input type="text" id="blacklistTickerInput" style="width:100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; text-transform: uppercase;" placeholder="e.g. AAPL">
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display:block; margin-bottom: 8px; font-weight: 600; color: var(--muted);">REASON</label>
+        <div id="blacklistTags" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+        </div>
+        <input type="text" id="blacklistNewReason" style="width:100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px;" placeholder="Or type a new reason..." autocomplete="off">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <button onclick="closeBlacklistModal()" style="padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-weight: 600; font-size: 13px;">Cancel</button>
+        <button onclick="submitBlacklist()" style="padding: 8px 16px; border-radius: 6px; border: none; background: var(--red); color: white; cursor: pointer; font-weight: 600; font-size: 13px;">Blacklist</button>
+      </div>
     </div>
   </div>
 

@@ -110,6 +110,94 @@ if (portfolioViewMode === 'split') {
   /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.remove('active');
 }
 
+let currentBlacklistEntryId = null;
+
+window.closeBlacklistModal = function() {
+  document.getElementById('blacklistModal').hidden = true;
+  document.getElementById('blacklistNewReason').value = '';
+};
+
+window.submitBlacklist = function() {
+  let ticker = document.getElementById('blacklistTickerInput').value.toUpperCase().trim();
+  const selectedTag = document.querySelector('.reason-tag.selected');
+  const newReason = document.getElementById('blacklistNewReason').value.trim();
+  let reason = newReason || (selectedTag ? selectedTag.textContent : '');
+  
+  if (!ticker) {
+    alert("Please provide a ticker symbol.");
+    return;
+  }
+  
+  let entry = currentBlacklistEntryId 
+    ? DATA.entries.find(e => e.id === currentBlacklistEntryId) 
+    : DATA.entries.find(e => e.ticker === ticker);
+
+  if (entry) {
+    applyChange(() => {
+      entry.status = 'blacklisted';
+      entry.droppedDate = today();
+      if (reason) entry.blacklistReason = reason;
+    });
+  } else {
+    applyChange(() => {
+      DATA.entries.push({
+        id: crypto.randomUUID(),
+        ticker: ticker,
+        status: 'blacklisted',
+        blacklistReason: reason,
+        source: 'manual',
+        firstAdvised: today(),
+        priceAtAdvice: 0,
+        priceHistory: []
+      });
+    });
+  }
+  closeBlacklistModal();
+};
+
+window.openBlacklistModal = function(entryId = null) {
+  currentBlacklistEntryId = entryId;
+  const modal = document.getElementById('blacklistModal');
+  const tickerInput = document.getElementById('blacklistTickerInput');
+  const tagsContainer = document.getElementById('blacklistTags');
+  const tickerGroup = document.getElementById('blacklistTickerGroup');
+  
+  let defaultReasons = new Set(['paused', 'not listed']);
+  DATA.entries.forEach(e => {
+    if (e.blacklistReason) defaultReasons.add(e.blacklistReason);
+  });
+  
+  tagsContainer.innerHTML = '';
+  defaultReasons.forEach(reason => {
+    const tag = document.createElement('div');
+    tag.className = 'reason-tag';
+    tag.textContent = reason;
+    tag.onclick = () => {
+      document.querySelectorAll('.reason-tag').forEach(t => t.classList.remove('selected'));
+      tag.classList.add('selected');
+      document.getElementById('blacklistNewReason').value = '';
+    };
+    tagsContainer.appendChild(tag);
+  });
+  
+  if (entryId) {
+    const entry = DATA.entries.find(e => e.id === entryId);
+    tickerGroup.style.display = 'block';
+    tickerInput.value = entry.ticker;
+    tickerInput.disabled = true;
+  } else {
+    tickerGroup.style.display = 'block';
+    tickerInput.value = '';
+    tickerInput.disabled = false;
+  }
+  
+  modal.hidden = false;
+};
+
+document.getElementById('btnManualBlacklist')?.addEventListener('click', () => {
+  openBlacklistModal();
+});
+
 /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).addEventListener('click', () => {
   setPortfolioViewMode('collapsed');
   /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.add('active');
@@ -269,6 +357,8 @@ const adviceClickHandler = (ev) => {
   if (btn.dataset.act === 'drop') {
     const entry = DATA.entries.find(e => e.id === btn.dataset.id);
     applyChange(() => { entry.status = 'dropped'; entry.droppedDate = today(); });
+  } else if (btn.dataset.act === 'blacklist') {
+    openBlacklistModal(btn.dataset.id);
   } else if (btn.dataset.act === 'rewatch') {
     const entry = DATA.entries.find(e => e.id === btn.dataset.id);
     applyChange(() => { entry.status = 'watching'; delete entry.droppedDate; });

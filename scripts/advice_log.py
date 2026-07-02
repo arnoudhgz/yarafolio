@@ -303,6 +303,10 @@ class AdviceLog:
             e.pop("exitEstimated", None)
         elif args.status == "dropped":
             e["droppedDate"] = nyse.nyse_today().isoformat()
+        elif args.status == "blacklisted":
+            e["droppedDate"] = nyse.nyse_today().isoformat()
+            if hasattr(args, "reason") and args.reason:
+                e["blacklistReason"] = args.reason
         e["status"] = args.status
         self.push_note(e, f"Status changed to {args.status} @ ${price}")
         self.save_log(data)
@@ -493,8 +497,9 @@ def main():
 
     p = sub.add_parser("set-status", help="change entry status")
     p.add_argument("ticker")
-    p.add_argument("status", choices=("watching", "bought", "sold", "dropped"))
+    p.add_argument("status", choices=("watching", "bought", "sold", "dropped", "blacklisted"))
     p.add_argument("--price", type=float)
+    p.add_argument("--reason", help="Reason for blacklisting (e.g. paused, not listed)")
     p.set_defaults(func=app.cmd_set_status)
 
     p = sub.add_parser(

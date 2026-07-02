@@ -38,7 +38,7 @@ Use Opus.
 - Flag falling-knife and value-trap risks explicitly in the Rating or Risk column. Tech stocks have heavily underperformed; require exceptional setups for Tech, mark them high-risk, and actively consider avoiding them entirely unless the oversold thesis is pristine. B-rated stocks historically outperform A-rated stocks; do not overly penalize minor flaws for B-rated stocks if the oversold thesis is strong. C-rated stocks have shown poor performance and should be penalized appropriately.
 - Before listing any pick, run one targeted litigation/fraud search per final pick, unconditional, even when the pre-fetched red-flag headlines looked clean (I once almost bought ZTS during a securities fraud investigation; the keyword screen can miss a problem phrased outside its terms). A red flag means drop the pick or mark it clearly.
 - When I mention geopolitical events (war, tariffs, elections), shift the list toward defensive assets.
-- Never add a ticker to the dashboard/advice when we already have two open positions for it.
+- Never add a ticker to the dashboard/advice when we already have two open positions for it, or when it is blacklisted in the advice log.
 
 ## Research workflow
 

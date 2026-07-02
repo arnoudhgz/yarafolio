@@ -163,7 +163,30 @@
   .badge.bought   { background: rgba(46,204,113,0.15); color: var(--green); }
   .badge.sold     { background: rgba(243,156,18,0.15); color: var(--orange); }
   .badge.dropped  { background: rgba(139,152,165,0.15); color: var(--muted); }
+  .badge.blacklisted { background: rgba(139,152,165,0.15); color: var(--muted); }
   .badge.est      { background: rgba(243,156,18,0.15); color: var(--orange); margin-left: 4px; }
+
+  .reason-tag {
+    background: var(--bg);
+    color: var(--muted);
+    padding: 6px 12px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .reason-tag:hover {
+    background: rgba(139,152,165,0.15);
+  }
+  .reason-tag.selected {
+    background: rgba(52,152,219,0.15);
+    color: var(--blue);
+    border-color: var(--blue);
+  }
+
   #posFilters button[data-posfilter="needsconfirm"] { color: var(--orange); border-color: rgba(243,156,18,0.4); }
   #posFilters button.active[data-posfilter="needsconfirm"] { background: var(--orange); border-color: var(--orange); color: #fff; }
   tr.hit-buy  td:first-child { box-shadow: inset 3px 0 0 var(--green); }
