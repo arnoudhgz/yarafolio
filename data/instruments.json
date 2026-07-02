@@ -648,5 +648,15 @@
     "ticker": "SBUX",
     "name": "Starbucks Corp",
     "sector": "Services"
+  },
+  "1531": {
+    "ticker": "HAL",
+    "name": "Halliburton Co",
+    "sector": "Basic Materials"
+  },
+  "4257": {
+    "ticker": "OXY",
+    "name": "Occidental Petroleum Corp",
+    "sector": "Basic Materials"
   }
 }
