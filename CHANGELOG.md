@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- Strategy update: Updated GEMINI.md/CLAUDE.md to advise actively avoiding Tech stocks unless the setup is pristine, due to significant underperformance.
+- Strategy update: Updated GEMINI.md/CLAUDE.md to remove C-rated stocks from the outperformance claim and flag them as falling-knife risks, due to poor performance.
+
 ### Fixed
 - Fixed date sorting so that identical local dates properly use their underlying timestamp for chronological sorting.
 - Separated column sorting states per Positions filter (Open, Closed, Needs Confirm, All) so that each tab remembers its own sort order independently.
