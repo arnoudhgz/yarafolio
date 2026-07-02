@@ -22,11 +22,11 @@
   </div>
   <div id="banner"></div>
   <div class="cards" style="margin-bottom: 12px;">
-    <div class="card"><div class="label">Advised picks<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoAdvisedPicks').hidden=false" title="What are Advised Picks?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cTracked">0</div></div>
     <div class="card"><div class="label">Open positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoOpenPositions').hidden=false" title="What are Open Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cOpen">0</div></div>
     <div class="card"><div class="label">Closed positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoClosedPositions').hidden=false" title="What are Closed Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cClosed">0</div></div>
     <div class="card"><div class="label">Watching<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWatching').hidden=false" title="What does Watching mean?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cWatching">0</div></div>
     <div class="card"><div class="label">Ignored positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoIgnoredPositions').hidden=false" title="What are Ignored Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cIgnored">0</div></div>
+    <div class="card"><div class="label">Advised picks<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoAdvisedPicks').hidden=false" title="What are Advised Picks?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cTracked">0</div></div>
   </div>
   <div class="cards">
     <div class="card"><div class="label">Realized P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoRealized').hidden=false" title="What is Realized P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pRealized">-</div></div>
@@ -115,6 +115,7 @@
             <th data-key="openDate">Bought on</th>
             <th data-key="closedDate">Closed on</th>
             <th data-key="ticker">Ticker</th>
+            <th data-key="rating">Rating</th>
             <th data-key="priceAtAdvice">Advised At</th>
             <th data-key="boughtAt">Bought</th>
             <th data-key="units">Units</th>
@@ -641,5 +642,19 @@
     </div>
   </div>
 
+  <div id="confirmModal" class="modal-backdrop" hidden onclick="closeConfirmModal()">
+    <div class="modal-card" style="max-width: 400px; padding: 24px;" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeConfirmModal()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px; font-size: 20px;" id="confirmModalTitle">Confirm Action</h2>
+      <p id="confirmModalMessage" style="margin-bottom: 24px; color: var(--text); line-height: 1.5;"></p>
+      <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <button onclick="closeConfirmModal()" style="padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-weight: 600; font-size: 13px;">Cancel</button>
+        <button id="confirmModalActionBtn" style="padding: 8px 16px; border-radius: 6px; border: none; background: var(--red); color: white; cursor: pointer; font-weight: 600; font-size: 13px;">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="static/js/api.js"></script>
+  <script src="static/js/main.js"></script>
 </body>
 </html>

@@ -224,25 +224,31 @@ export async function fetchIpos(force = false) {
  */
 // @ts-ignore
 window.markNotListed = async function(ticker) {
-  if (confirm(`Mark ${ticker} as permanently NOT listed on eToro?`)) {
-    const existing = DATA.entries.find(e => e.ticker === ticker);
-    if (existing) {
-      existing.status = 'avoid';
-      existing.reason = 'Not listed on eToro';
-    } else {
-      DATA.entries.push({
-        id: crypto.randomUUID(),
-        ticker: ticker,
-        status: 'avoid',
-        reason: 'Not listed on eToro',
-        source: 'manual',
-        firstAdvised: today(),
-        priceAtAdvice: 0,
-        priceHistory: []
-      });
+  openConfirmModal(
+    'Mark Not Listed',
+    `Mark ${ticker} as permanently NOT listed on eToro?`,
+    'Mark',
+    'red',
+    async () => {
+      const existing = DATA.entries.find(e => e.ticker === ticker);
+      if (existing) {
+        existing.status = 'avoid';
+        existing.reason = 'Not listed on eToro';
+      } else {
+        DATA.entries.push({
+          id: crypto.randomUUID(),
+          ticker: ticker,
+          status: 'avoid',
+          reason: 'Not listed on eToro',
+          source: 'manual',
+          firstAdvised: today(),
+          priceAtAdvice: 0,
+          priceHistory: []
+        });
+      }
+      await save();
+      fetchIpos(); // Re-render IPO tables
+      renderAll(); // Re-render other tabs if needed
     }
-    await save();
-    fetchIpos(); // Re-render IPO tables
-    renderAll(); // Re-render other tabs if needed
-  }
+  );
 };

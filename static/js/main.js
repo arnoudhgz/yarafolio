@@ -112,6 +112,32 @@ if (portfolioViewMode === 'split') {
 
 let currentBlacklistEntryId = null;
 
+let currentConfirmCallback = null;
+
+window.closeConfirmModal = function() {
+  document.getElementById('confirmModal').hidden = true;
+  currentConfirmCallback = null;
+};
+
+window.openConfirmModal = function(title, message, actionText, actionColor, callback) {
+  document.getElementById('confirmModalTitle').textContent = title;
+  document.getElementById('confirmModalMessage').textContent = message;
+  const btn = document.getElementById('confirmModalActionBtn');
+  btn.textContent = actionText;
+  btn.style.background = actionColor ? (actionColor.startsWith('var') ? actionColor : `var(--${actionColor})`) : 'var(--red)';
+  
+  currentConfirmCallback = callback;
+  btn.onclick = function() {
+    if (currentConfirmCallback) currentConfirmCallback();
+    closeConfirmModal();
+  };
+  
+  document.getElementById('confirmModal').hidden = false;
+  
+  // Set focus to the action button so the user can just hit Enter
+  setTimeout(() => btn.focus(), 0);
+};
+
 window.closeBlacklistModal = function() {
   document.getElementById('blacklistModal').hidden = true;
   document.getElementById('blacklistNewReason').value = '';
@@ -363,9 +389,17 @@ const adviceClickHandler = (ev) => {
     const entry = DATA.entries.find(e => e.id === btn.dataset.id);
     applyChange(() => { entry.status = 'watching'; delete entry.droppedDate; });
   } else if (btn.dataset.act === 'remove') {
-    if (confirm('Are you sure you want to completely remove ' + btn.dataset.id + ' from the log?')) {
-      applyChange(() => { DATA.entries = DATA.entries.filter(e => e.id !== btn.dataset.id); });
-    }
+    const entry = DATA.entries.find(e => e.id === btn.dataset.id);
+    const displayName = entry ? (entry.name ? `${entry.ticker} (${entry.name})` : entry.ticker) : btn.dataset.id;
+    openConfirmModal(
+      'Remove Entry',
+      `Are you sure you want to completely remove ${displayName} from the log?`,
+      'Remove',
+      'red',
+      () => {
+        applyChange(() => { DATA.entries = DATA.entries.filter(e => e.id !== btn.dataset.id); });
+      }
+    );
   }
 };
 /** @type {HTMLElement} */ (document.querySelector('#adviceTable tbody')).addEventListener('click', adviceClickHandler);

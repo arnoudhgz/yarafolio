@@ -215,6 +215,7 @@ export function positionLotRows() {
       openDateTime: lot.openDateTime,
       closedDate: lot.closedDate,
       ticker: e.ticker,
+      rating: e.rating,
       priceAtAdvice: adv.price != null ? adv.price : e.priceAtAdvice,
       boughtAt: open,                 // matches the Bought column's data-key
       units: lot.units,
@@ -301,6 +302,7 @@ export function renderPositions() {
       '<td>' + (r.status === 'sold' && r.closedDate ? r.closedDate : '-') + '</td>' +
       '<td title="' + esc(r.e.reason || '') + '">' + tickerLink(r.ticker) +
         (r.e.name ? '<span class="sub">' + esc(r.e.name) + '</span>' : '') + '</td>' +
+      '<td>' + (r.e.rating || '-') + '</td>' +
       '<td>' + fmtPrice(r.priceAtAdvice) + '</td>' +
       '<td>' + fmtPrice(r.boughtAt) + '</td>' +
       '<td>' + r.units + '</td>' +
