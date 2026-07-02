@@ -608,5 +608,45 @@
     "ticker": "QNT",
     "name": "Quant",
     "sector": "ETF / Other"
+  },
+  "9060": {
+    "ticker": "DOW",
+    "name": "Dow Inc.",
+    "sector": "Basic Materials"
+  },
+  "2193": {
+    "ticker": "ICE",
+    "name": "Intercontinental Exchange Inc",
+    "sector": "Financial"
+  },
+  "1035": {
+    "ticker": "WMT",
+    "name": "Walmart Inc.",
+    "sector": "Services"
+  },
+  "8698": {
+    "ticker": "BCE",
+    "name": "BCE Inc",
+    "sector": "Services"
+  },
+  "3025": {
+    "ticker": "GLD",
+    "name": "SPDR Gold",
+    "sector": "ETF / Other"
+  },
+  "4253": {
+    "ticker": "SLB",
+    "name": "SLB Ltd",
+    "sector": "Basic Materials"
+  },
+  "1155": {
+    "ticker": "BABA",
+    "name": "Alibaba-ADR",
+    "sector": "Services"
+  },
+  "1142": {
+    "ticker": "SBUX",
+    "name": "Starbucks Corp",
+    "sector": "Services"
   }
 }
