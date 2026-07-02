@@ -658,5 +658,40 @@
     "ticker": "OXY",
     "name": "Occidental Petroleum Corp",
     "sector": "Basic Materials"
+  },
+  "2467": {
+    "ticker": "RCI",
+    "name": "Rogers Communications Inc",
+    "sector": "Services"
+  },
+  "28": {
+    "ticker": "NSDQ100",
+    "name": "NASDAQ100 Index (Non Expiry)",
+    "sector": "ETF / Other"
+  },
+  "1111": {
+    "ticker": "TSLA",
+    "name": "Tesla Motors, Inc.",
+    "sector": "Consumer Goods"
+  },
+  "10462": {
+    "ticker": "FC",
+    "name": "Franklin Covey Co",
+    "sector": "Consumer Goods"
+  },
+  "6663": {
+    "ticker": "CWEN",
+    "name": "Clearway Energy Inc",
+    "sector": "Utilities"
+  },
+  "1012": {
+    "ticker": "CAT",
+    "name": "Caterpillar",
+    "sector": "Industrial Goods"
+  },
+  "4465": {
+    "ticker": "TQQQ",
+    "name": "ProShares UltraPro QQQ",
+    "sector": "ETF / Other"
   }
 }
