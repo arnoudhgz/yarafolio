@@ -879,17 +879,31 @@ export function renderEntryDisciplineChart(canvasId, rows) {
   }
 
   const buckets = {
-    'In Buy Zone': { wins: 0, total: 0 },
-    'Chased (> Target)': { wins: 0, total: 0 }
+    'Below Drop Below': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity },
+    'In Buy Zone': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity },
+    'Chased': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity },
+    'Above Drop Above': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity }
   };
   
   rows.forEach(r => {
     const buyBelow = r.e.buyBelow;
     if (buyBelow == null || !r.boughtAt) return;
     
-    const category = r.boughtAt <= buyBelow + 0.01 ? 'In Buy Zone' : 'Chased (> Target)';
-    if (r.plPct > 0) buckets[category].wins += 1;
+    let category = 'In Buy Zone';
+    if (r.e.dropBelow && r.boughtAt < r.e.dropBelow) {
+      category = 'Below Drop Below';
+    } else if (r.boughtAt <= buyBelow + 0.01) {
+      category = 'In Buy Zone';
+    } else if (r.e.dropAbove && r.boughtAt > r.e.dropAbove) {
+      category = 'Above Drop Above';
+    } else {
+      category = 'Chased';
+    }
+    
+    buckets[category].plSum += r.plPct;
     buckets[category].total += 1;
+    if (r.plPct < buckets[category].minPl) buckets[category].minPl = r.plPct;
+    if (r.plPct > buckets[category].maxPl) buckets[category].maxPl = r.plPct;
   });
 
   const labels = Object.keys(buckets).filter(k => buckets[k].total > 0);
@@ -902,17 +916,26 @@ export function renderEntryDisciplineChart(canvasId, rows) {
   canvas.style.display = '';
   if (note) note.innerHTML = '';
 
-  const winRates = labels.map(l => (buckets[l].wins / buckets[l].total) * 100);
+  const avgPls = labels.map(l => buckets[l].plSum / buckets[l].total);
   const counts = labels.map(l => buckets[l].total);
+  const mins = labels.map(l => buckets[l].minPl);
+  const maxes = labels.map(l => buckets[l].maxPl);
+
+  const colors = {
+    'Below Drop Below': 'rgba(231, 76, 60, 0.8)',
+    'In Buy Zone': 'rgba(46, 204, 113, 0.8)',
+    'Chased': 'rgba(243, 156, 18, 0.8)',
+    'Above Drop Above': 'rgba(231, 76, 60, 0.8)'
+  };
 
   analyticsCharts[canvasId] = new Chart(canvas, {
     type: 'bar',
     data: {
       labels: labels,
       datasets: [{
-        label: 'Win Rate %',
-        data: winRates,
-        backgroundColor: labels.map(l => l === 'In Buy Zone' ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)'),
+        label: 'Avg P/L %',
+        data: avgPls,
+        backgroundColor: labels.map(l => colors[l]),
         borderRadius: 6,
         maxBarThickness: 60
       }]
@@ -927,12 +950,17 @@ export function renderEntryDisciplineChart(canvasId, rows) {
             label: (ctx) => {
               const y = ctx.raw;
               const n = counts[ctx.dataIndex];
-              return `Win Rate: ${y.toFixed(1)}% (n=${n})`;
+              const min = mins[ctx.dataIndex];
+              const max = maxes[ctx.dataIndex];
+              return [
+                `Avg P/L: ${y > 0 ? '+' : ''}${y.toFixed(2)}% (n=${n})`,
+                `Range: ${min > 0 ? '+' : ''}${min.toFixed(2)}% to ${max > 0 ? '+' : ''}${max.toFixed(2)}%`
+              ];
             }
           }
         }
       },
-      scales: { y: { title: { display: true, text: 'Win Rate %' }, min: 0, max: 100 } }
+      scales: { y: { title: { display: true, text: 'Average P/L %' } } }
     }
   });
 }

@@ -87,4 +87,4 @@ If this project makes your day a little better, consider buying me a coffee or f
 
 - [Buy me a coffee on Ko-fi ☕](https://ko-fi.com/arnoudhgz) (Not required, never paywalled — purely optional)
 - [Follow me on eToro 📈](https://www.etoro.com/people/arnoudhgz)
-- [Join eToro 🤝](https://etoro.tw/46AcIfc)
+- [Join eToro 🤝](https://www.etoro.com/?ref=26106514)
