@@ -159,7 +159,13 @@ export function sortRows(rows, { key, dir }) {
     if (av == null && bv == null) return 0;
     if (av == null) return 1;
     if (bv == null) return -1;
-    return (typeof av === 'number' && typeof bv === 'number'
-      ? av - bv : String(av).localeCompare(String(bv))) * dir;
+    let cmp = (typeof av === 'number' && typeof bv === 'number')
+      ? (av - bv) * dir : String(av).localeCompare(String(bv)) * dir;
+    if (cmp === 0) {
+      const an = a.name || (a.e && a.e.name) || a.ticker || (a.e && a.e.ticker) || '';
+      const bn = b.name || (b.e && b.e.name) || b.ticker || (b.e && b.e.ticker) || '';
+      cmp = String(an).localeCompare(String(bn));
+    }
+    return cmp;
   });
 }
