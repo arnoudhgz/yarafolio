@@ -147,15 +147,18 @@ export const fmtPL = (v) => v == null ? '-' : (v >= 0 ? '+' : '-') + '$' + Math.
 export const matchesSearch = (fields) =>
   !searchQuery || fields.some(v => v && String(v).toLowerCase().includes(searchQuery));
 
-/** 
- * @template T 
- * @param {T[]} rows 
- * @param {{key: string, dir: number}} options 
- * @returns {T[]} 
+/**
+ * @template {Record<string, any>} T
+ * @param {T[]} rows
+ * @param {{key: string, dir: number}} options
+ * @returns {T[]}
  */
 export function sortRows(rows, { key, dir }) {
   return [...rows].sort((a, b) => {
-    const av = a[key], bv = b[key];
+    const aAny = /** @type {any} */ (a);
+    const bAny = /** @type {any} */ (b);
+    const av = aAny[key];
+    const bv = bAny[key];
     if (av == null && bv == null) return 0;
     if (av == null) return 1;
     if (bv == null) return -1;

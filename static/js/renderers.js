@@ -185,7 +185,7 @@ export function renderTable() {
       '<td>' + fmtPrice(r.dropBelow) + '</td>' +
       '<td class="' + (e.status === 'watching' && e.dropAbove && latestPrice(e) >= e.dropAbove ? 'sec-gap' : '') + '">' + fmtPrice(e.dropAbove) + '</td>' +
       '<td class="spark-col"><div style="width:70px; height:30px;"><canvas class="spark"></canvas></div></td>' +
-      '<td><span class="badge ' + r.status + '" title="' + esc(r.status) + '">' + (r.status === 'blacklisted' && e.blacklistReason ? esc(e.blacklistReason) : r.status) + '</span></td>' +
+      '<td><span class="badge ' + r.status + '" title="' + esc(r.status) + '">' + (r.status === 'blacklisted' && e['blacklistReason'] ? esc(e['blacklistReason']) : r.status) + '</span></td>' +
       '<td class="actions">' + actionButtons(e) + '</td>';
     tbody.appendChild(tr);
     sparkline(tr.querySelector('canvas'), e);

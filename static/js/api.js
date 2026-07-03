@@ -1,5 +1,5 @@
 // @ts-check
-import { DATA, setDATA, PORTFOLIO, setPORTFOLIO, setCanSave, LEARN, setLEARN } from './state.js';
+import { DATA, LEARN, setLEARN } from './state.js';
 import { banner } from './ui.js';
 import { today, nowStr, tickerLink, esc } from './utils.js';
 import { renderAll } from './renderers.js';
@@ -224,6 +224,7 @@ export async function fetchIpos(force = false) {
  */
 // @ts-ignore
 window.markNotListed = async function(ticker) {
+  const openConfirmModal = /** @type {any} */ (window).openConfirmModal;
   openConfirmModal(
     'Mark Not Listed',
     `Mark ${ticker} as permanently NOT listed on eToro?`,

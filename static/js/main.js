@@ -114,12 +114,19 @@ let currentBlacklistEntryId = null;
 
 let currentConfirmCallback = null;
 
-window.closeConfirmModal = function() {
+function closeConfirmModal() {
   document.getElementById('confirmModal').hidden = true;
   currentConfirmCallback = null;
-};
+}
 
-window.openConfirmModal = function(title, message, actionText, actionColor, callback) {
+/**
+ * @param {string} title
+ * @param {string} message
+ * @param {string} actionText
+ * @param {string} [actionColor]
+ * @param {() => void} [callback]
+ */
+function openConfirmModal(title, message, actionText, actionColor, callback) {
   document.getElementById('confirmModalTitle').textContent = title;
   document.getElementById('confirmModalMessage').textContent = message;
   const btn = document.getElementById('confirmModalActionBtn');
@@ -136,17 +143,25 @@ window.openConfirmModal = function(title, message, actionText, actionColor, call
   
   // Set focus to the action button so the user can just hit Enter
   setTimeout(() => btn.focus(), 0);
-};
+}
 
-window.closeBlacklistModal = function() {
-  document.getElementById('blacklistModal').hidden = true;
-  document.getElementById('blacklistNewReason').value = '';
-};
+window['closeConfirmModal'] = closeConfirmModal;
+window['openConfirmModal'] = openConfirmModal;
 
-window.submitBlacklist = function() {
-  let ticker = document.getElementById('blacklistTickerInput').value.toUpperCase().trim();
+function closeBlacklistModal() {
+  const modal = /** @type {HTMLElement|null} */ (document.getElementById('blacklistModal'));
+  if (modal) modal.hidden = true;
+  const newReasonInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistNewReason'));
+  if (newReasonInput) newReasonInput.value = '';
+}
+window['closeBlacklistModal'] = closeBlacklistModal;
+
+function submitBlacklist() {
+  const tickerInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistTickerInput'));
+  const newReasonInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistNewReason'));
+  let ticker = (tickerInput?.value || '').toUpperCase().trim();
   const selectedTag = document.querySelector('.reason-tag.selected');
-  const newReason = document.getElementById('blacklistNewReason').value.trim();
+  const newReason = (newReasonInput?.value || '').trim();
   let reason = newReason || (selectedTag ? selectedTag.textContent : '');
   
   if (!ticker) {
@@ -154,9 +169,9 @@ window.submitBlacklist = function() {
     return;
   }
   
-  let entry = currentBlacklistEntryId 
+  let entry = /** @type {any} */ (currentBlacklistEntryId 
     ? DATA.entries.find(e => e.id === currentBlacklistEntryId) 
-    : DATA.entries.find(e => e.ticker === ticker);
+    : DATA.entries.find(e => e.ticker === ticker));
 
   if (entry) {
     applyChange(() => {
@@ -166,7 +181,7 @@ window.submitBlacklist = function() {
     });
   } else {
     applyChange(() => {
-      DATA.entries.push({
+      DATA.entries.push(/** @type {any} */ ({
         id: crypto.randomUUID(),
         ticker: ticker,
         status: 'blacklisted',
@@ -175,22 +190,26 @@ window.submitBlacklist = function() {
         firstAdvised: today(),
         priceAtAdvice: 0,
         priceHistory: []
-      });
+      }));
     });
   }
   closeBlacklistModal();
-};
+}
+(/** @type {any} */ window)['submitBlacklist'] = submitBlacklist;
 
-window.openBlacklistModal = function(entryId = null) {
+function openBlacklistModal(entryId = null) {
   currentBlacklistEntryId = entryId;
-  const modal = document.getElementById('blacklistModal');
-  const tickerInput = document.getElementById('blacklistTickerInput');
-  const tagsContainer = document.getElementById('blacklistTags');
-  const tickerGroup = document.getElementById('blacklistTickerGroup');
+  const modal = /** @type {HTMLElement|null} */ (document.getElementById('blacklistModal'));
+  const tickerInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistTickerInput'));
+  const tagsContainer = /** @type {HTMLElement|null} */ (document.getElementById('blacklistTags'));
+  const tickerGroup = /** @type {HTMLElement|null} */ (document.getElementById('blacklistTickerGroup'));
   
+  if (!modal || !tickerInput || !tagsContainer || !tickerGroup) return;
+
   let defaultReasons = new Set(['paused', 'not listed']);
   DATA.entries.forEach(e => {
-    if (e.blacklistReason) defaultReasons.add(e.blacklistReason);
+    const blacklistReason = /** @type {any} */ (e).blacklistReason;
+    if (blacklistReason) defaultReasons.add(blacklistReason);
   });
   
   tagsContainer.innerHTML = '';
@@ -201,15 +220,16 @@ window.openBlacklistModal = function(entryId = null) {
     tag.onclick = () => {
       document.querySelectorAll('.reason-tag').forEach(t => t.classList.remove('selected'));
       tag.classList.add('selected');
-      document.getElementById('blacklistNewReason').value = '';
+      const newReasonInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistNewReason'));
+      if (newReasonInput) newReasonInput.value = '';
     };
     tagsContainer.appendChild(tag);
   });
   
   if (entryId) {
-    const entry = DATA.entries.find(e => e.id === entryId);
+    const entry = /** @type {any} */ (DATA.entries.find(e => e.id === entryId));
     tickerGroup.style.display = 'block';
-    tickerInput.value = entry.ticker;
+    if (entry) tickerInput.value = entry.ticker;
     tickerInput.disabled = true;
   } else {
     tickerGroup.style.display = 'block';
@@ -218,7 +238,8 @@ window.openBlacklistModal = function(entryId = null) {
   }
   
   modal.hidden = false;
-};
+}
+(/** @type {any} */ window)['openBlacklistModal'] = openBlacklistModal;
 
 document.getElementById('btnManualBlacklist')?.addEventListener('click', () => {
   openBlacklistModal();
