@@ -153,30 +153,49 @@ class Screen:
                 "changed; fall back to the WebFetch sources in the skill")
         cols = {name: idx for idx, name in enumerate(headers)}
         sym = next((cols[c] for c in cols if "Symbol" in c), 1)
-        name = next((cols[c] for c in cols if "Name" in c), 2)
+        name_idx = next((cols[c] for c in cols if "Name" in c), 2)
         rsi = next((cols[c] for c in cols if "RSI" in c), 3)
         price = next((cols[c] for c in cols if "Price" in c), 4)
+
+        exclude = set()
+        if args.exclude_held:
+            try:
+                with open(os.path.join(ROOT, "data", "private", "portfolio.json")) as f:
+                    port = json.load(f)
+                    for item in port.get("holdings", []):
+                        exclude.add(item.get("ticker", ""))
+            except Exception:
+                pass
+        
+        if args.exclude_advised:
+            try:
+                with open(os.path.join(ROOT, "data", "private", "advice-log.json")) as f:
+                    adv = json.load(f)
+                    for e in adv.get("entries", []):
+                        exclude.add(e.get("ticker", ""))
+            except Exception:
+                pass
 
         extra = [(label, next((cols[c] for c in cols if key in c), None)) for label, key in (
             ("PE", "PE"), ("VOL", "Volume"), ("MKTCAP", "Market Cap"), ("SECTOR", "Industry"))]
         extra = [(label, idx) for label, idx in extra if idx is not None]
         picked = []
         for cells in rows:
-            if len(cells) <= max(sym, name, rsi, price):
+            if len(cells) <= max(sym, name_idx, rsi, price):
+                continue
+            ticker = cells[sym]
+            if ticker in exclude:
                 continue
             p = self.to_float(cells[price])
             if p is None or p < args.min_price:
                 continue
+            r_val = self.to_float(cells[rsi]) or 0.0
+            if r_val < args.min_rsi:
+                continue
             extras = [
                 cells[idx] if idx < len(cells) else "" for _,
                 idx in extra] if args.full else []
-            picked.append(
-                (self.to_float(
-                    cells[rsi]) or 0.0,
-                    cells[sym],
-                    cells[name],
-                    p,
-                    extras))
+            picked.append((r_val, ticker, cells[name_idx], p, extras))
         if not picked:
             sys.exit(
                 "no rows parsed: stockanalysis markup may have changed, fall back to WebFetch")
@@ -572,6 +591,9 @@ def main():
         "oversold",
         help="oversold screen (RSI < 30), filtered candidates")
     p.add_argument("--min-price", type=float, default=20.0)
+    p.add_argument("--min-rsi", type=float, default=0.0, help="minimum RSI to include")
+    p.add_argument("--exclude-held", action="store_true", help="exclude tickers currently held in portfolio")
+    p.add_argument("--exclude-advised", action="store_true", help="exclude tickers present in advice log")
     p.add_argument("--max", type=int, default=25)
     p.add_argument(
         "--full",

@@ -45,7 +45,7 @@ Use Opus.
 | Step | What | Source |
 |---|---|---|
 | 1 | Market sentiment + futures | WebSearch "stock market today ..." |
-| 2 | Oversold screen | `python3 scripts/screen.py oversold` (add `--full` for PE/VOL/MKTCAP/SECTOR columns when the page has them); fallback on script breakage: [stockanalysis.com oversold list](https://stockanalysis.com/list/oversold-stocks/), [MarketBeat RSI screen](https://www.marketbeat.com/market-data/oversold-stocks-rsi/) |
+| 2 | Oversold screen | `python3 scripts/screen.py oversold --min-rsi 20 --exclude-held --exclude-advised` (add `--full` for PE/VOL/MKTCAP/SECTOR columns when the page has them); fallback on script breakage: [stockanalysis.com oversold list](https://stockanalysis.com/list/oversold-stocks/), [MarketBeat RSI screen](https://www.marketbeat.com/market-data/oversold-stocks-rsi/) |
 | 2b | IPO check | `python3 scripts/screen.py ipos --json`. Look at "upcoming" and "recent" IPOs. Ignore any that are marked as avoided/Not listed in your advice log. If there is a highly anticipated IPO hitting the market today/tomorrow or a recent IPO showing a great entry point, add up to 2 of them to your candidate list. |
 | 2c | Candidate data pre-fetch | `python3 scripts/screen.py quote / forecast / news / news --red-flags` (one call per command for all candidates, rows embedded in researcher prompts). `forecast` carries the SB/B/H/S/SS analyst distribution + as-of date; `news` carries each headline's article URL; `quote --json` feeds the dashboard refresh |
 | 3 | Premarket movers (premarket only) | stockanalysis.com premarket pages |

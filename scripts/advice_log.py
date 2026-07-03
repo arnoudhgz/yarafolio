@@ -290,6 +290,34 @@ class AdviceLog:
             msg += f" (skipped untracked: {', '.join(skipped)})"
         logger.info(msg)
 
+    def cmd_open_profits(self, args: argparse.Namespace):
+        data = self.load_log()
+        green = []
+        for e in data.get("entries", []):
+            if e.get("status") == "bought":
+                lots = e.get("lots", [])
+                if not lots:
+                    continue
+                open_lots = [l for l in lots if not l.get("exitEstimated")]
+                if not open_lots:
+                    continue
+                history = e.get("priceHistory", [])
+                current_price = history[-1].get("price", 0) if history else 0
+                if current_price <= 0:
+                    continue
+                total_invested = sum(l.get("openRate", 0) * l.get("units", 0) for l in open_lots)
+                total_value = sum(current_price * l.get("units", 0) for l in open_lots)
+                if total_invested > 0:
+                    pl_pct = ((total_value - total_invested) / total_invested) * 100
+                    if pl_pct > 0:
+                        green.append((e.get("ticker"), pl_pct, current_price, e.get("sector", "?")))
+        if not green:
+            logger.info("No open positions in profit.")
+            return
+        logger.info("Open positions currently in profit:")
+        for ticker, pl, p, sec in sorted(green, key=lambda x: x[1], reverse=True):
+            logger.info(f"- {ticker}: +{pl:.2f}% (Price: {p}, Sector: {sec})")
+
     def cmd_set_status(self, args: argparse.Namespace):
         data = self.load_log()
         e = self.require(data, args.ticker)
@@ -477,6 +505,9 @@ def main():
         "touch-many",
         help='batch price update from a {"TICKER": price} JSON map on stdin')
     p.set_defaults(func=app.cmd_touch_many)
+
+    p = sub.add_parser("open-profits", help="list open advice positions currently in profit")
+    p.set_defaults(func=app.cmd_open_profits)
 
     p = sub.add_parser(
         "add-note",
