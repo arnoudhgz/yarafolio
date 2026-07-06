@@ -123,8 +123,10 @@ class AdviceLog:
         price_history.push_price_point(hist, price, now=nyse.nyse_now())
 
     def push_note(self, e: dict, text: str) -> None:
-        e.setdefault("notes", []).append(
-            {"date": nyse.nyse_today().isoformat(), "text": text})
+        today_str = nyse.nyse_today().isoformat()
+        notes = e.setdefault("notes", [])
+        if not any(n.get("date") == today_str and n.get("text") == text for n in notes):
+            notes.append({"date": today_str, "text": text})
 
     def cmd_add_pick(self, args: argparse.Namespace):
         data = self.load_log()
