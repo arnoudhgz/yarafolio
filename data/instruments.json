@@ -693,5 +693,20 @@
     "ticker": "TQQQ",
     "name": "ProShares UltraPro QQQ",
     "sector": "ETF / Other"
+  },
+  "1026": {
+    "ticker": "MMM",
+    "name": "3M",
+    "sector": "Conglomerates"
+  },
+  "1578": {
+    "ticker": "SO",
+    "name": "Southern Co",
+    "sector": "Utilities"
+  },
+  "1594": {
+    "ticker": "NEE",
+    "name": "NextEra Energy Inc",
+    "sector": "Utilities"
   }
 }
