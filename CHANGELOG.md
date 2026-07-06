@@ -5,13 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.10.0] - 2026-06-26
 
 ### Added
 - Feature: Added support for blacklisting stocks. Blacklisted stocks can be added manually or flagged from the dashboard, are tagged with customizable reasons (e.g., 'not listed', 'paused'), and are automatically ignored by the advice workflow.
 - Dashboard: Added "Closed positions" and "Ignored positions" summary cards to the top bar layout.
 - CLI: Added `open-profits` command to `scripts/advice_log.py` to quickly list open positions currently in profit.
 - Pipeline: Added `--min-rsi`, `--exclude-held`, and `--exclude-advised` native filtering flags to `scripts/screen.py oversold`.
+- Added 4 new analytics charts to the dashboard for deep strategy insights:
+  - **Performance by Day of the Week**: Bar chart showing average P/L% by the day of the week a stock was advised.
+  - **Win Rate Over Time**: Line chart tracking the win rate % of advice generated each month.
+  - **Entry Discipline**: Bar chart comparing the win rate of stocks bought "In Buy Zone" (<= target) versus "Chased" (> target).
+  - **Days to Bounce vs RSI**: Bar chart showing the average days held for winning trades grouped by RSI band at advice.
+- Added a new "Gain vs Days Held" bar chart to the Analytics tab to visualize the average percentage gain of closed positions grouped by the number of days they were held. Tooltips include the sample size, maximum gain, and maximum loss for that specific holding period. (Also strips out any NaN dates).
 
 ### Changed
 - Analytics: Overhauled the "Entry Discipline" chart to show Average P/L % instead of Win Rate %, plotting positions across 4 distinct entry bounds ("Below Drop Below", "In Buy Zone", "Chased", "Above Drop Above") and tracking Min/Max range in tooltips.
@@ -22,34 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strategy update: Updated GEMINI.md/CLAUDE.md to advise actively avoiding Tech stocks unless the setup is pristine, due to significant underperformance.
 - Strategy update: Updated GEMINI.md/CLAUDE.md to remove C-rated stocks from the outperformance claim and flag them as falling-knife risks, due to poor performance.
 - Workflow update: Updated GEMINI.md/CLAUDE.md to utilize the new native filtering parameters for `screen.py oversold` instead of manual post-filtering.
-
-### Fixed
-- Fixed date sorting so that identical local dates properly use their underlying timestamp for chronological sorting.
-- Separated column sorting states per Positions filter (Open, Closed, Needs Confirm, All) so that each tab remembers its own sort order independently.
-
-## [0.10.1] - 2026-07-01
-
-### Changed
 - Strategy update: Clarified in GEMINI.md/CLAUDE.md that B/C rated stocks historically outperform A-rated stocks in the oversold strategy.
-
-### Fixed
-- Fixed an issue where the Macro Calendar and IPO Tracker would calculate the "current day" using the local timezone (e.g., European time) rather than New York market time, causing events from the next market day to be incorrectly flagged as happening "today" and prematurely shown as "Passed".
-
-## [0.10.0] - 2026-06-26
-
-### Added
-- Added 4 new analytics charts to the dashboard for deep strategy insights:
-  - **Performance by Day of the Week**: Bar chart showing average P/L% by the day of the week a stock was advised.
-  - **Win Rate Over Time**: Line chart tracking the win rate % of advice generated each month.
-  - **Entry Discipline**: Bar chart comparing the win rate of stocks bought "In Buy Zone" (<= target) versus "Chased" (> target).
-  - **Days to Bounce vs RSI**: Bar chart showing the average days held for winning trades grouped by RSI band at advice.
-- Added a new "Gain vs Days Held" bar chart to the Analytics tab to visualize the average percentage gain of closed positions grouped by the number of days they were held. Tooltips include the sample size, maximum gain, and maximum loss for that specific holding period. (Also strips out any NaN dates).
-
-### Fixed
-- Fixed an issue where the location API key dropdown in the dashboard would incorrectly reset to the backend's startup location choice across page reloads and data syncs, rather than remembering the user's explicit selection.
-- Fixed an issue in the News Feed where the "Advised" filter would only show a couple of tickers (like PTC and SR). This was caused by a backend 20-ticker fetch limit intersecting with an unsorted ticker list. Tickers are now prioritized (Watchlist first, then freshest eToro positions) and the limit was increased to 45 to ensure all active advice gets news coverage.
-
-### Changed
 - Standardized all logged timestamps (`lastUpdated`, EOD/News dates, price history) to exclusively use the `America/New_York` timezone formatted as ISO 8601 strings with offsets (e.g. `YYYY-MM-DDTHH:MM-04:00`).
 - The frontend dashboard now automatically parses these ISO strings to correctly display dates in the user's local timezone.
 - Replaced timezone-hacky local `date.today()` calls with a dedicated `nyse_now()` and `nyse_today()` helper across all python scripts.
@@ -58,6 +37,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Renamed the custom `/learn` strategy-evaluation command to `/review`** across all scripts (`review_stats.py`), skills, and log files (`REVIEWS.md`) to avoid naming collisions with Antigravity's built-in `/learn` slash command.
 
 ### Fixed
+- Fixed an issue where identical notes could be duplicated multiple times on the same day when a ticker was repeatedly re-advised.
+- Fixed date sorting so that identical local dates properly use their underlying timestamp for chronological sorting.
+- Separated column sorting states per Positions filter (Open, Closed, Needs Confirm, All) so that each tab remembers its own sort order independently.
+- Fixed an issue where the Macro Calendar and IPO Tracker would calculate the "current day" using the local timezone (e.g., European time) rather than New York market time, causing events from the next market day to be incorrectly flagged as happening "today" and prematurely shown as "Passed".
+- Fixed an issue where the location API key dropdown in the dashboard would incorrectly reset to the backend's startup location choice across page reloads and data syncs, rather than remembering the user's explicit selection.
+- Fixed an issue in the News Feed where the "Advised" filter would only show a couple of tickers (like PTC and SR). This was caused by a backend 20-ticker fetch limit intersecting with an unsorted ticker list. Tickers are now prioritized (Watchlist first, then freshest eToro positions) and the limit was increased to 45 to ensure all active advice gets news coverage.
 - Fixed an edge case where aftermarket advice logs generated past midnight local time wouldn't match with eToro trades opened during the previous day's US market session. This was achieved by accurately evaluating market sessions via the `America/New_York` timezone directly instead of brittle local hour comparisons.
 - Fixed `ModuleNotFoundError` for `nyse` in `yarafolio.py` by appending the `scripts` directory to `sys.path`.
 - Fixed an issue where invalid ratings (like "Buy") could be added to the advice log by enforcing strict A/B/C letter grade validation via argparse choices in `advice_log.py`.
