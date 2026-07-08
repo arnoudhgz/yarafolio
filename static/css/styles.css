@@ -63,18 +63,29 @@
   }
   #importBtn:hover { background: rgba(52,152,219,0.12); }
   #syncBtn {
-    padding: 8px 14px; font-weight: 600; color: var(--blue);
+    height: 32px; padding: 0 14px; font-weight: 600; color: var(--blue);
     background: transparent; border: 1px solid rgba(52,152,219,0.4);
     border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
   }
   #syncBtn:hover { background: rgba(52,152,219,0.12); }
   #themeToggle {
     display: flex; align-items: center; justify-content: center;
-    padding: 8px; font-weight: 600; color: var(--blue);
+    width: 32px; height: 32px; padding: 0; font-weight: 600; color: var(--blue);
     background: transparent; border: 1px solid rgba(52,152,219,0.4);
-    border-radius: 6px; cursor: pointer; font-size: 14px; transition: all 0.2s;
+    border-radius: 6px; cursor: pointer; font-size: 15px; transition: all 0.2s;
   }
   #themeToggle:hover { background: rgba(52,152,219,0.12); }
+  #locationSelect {
+    height: 32px; padding: 0 30px 0 10px; margin-left: 8px; font-weight: 600; color: var(--blue);
+    background: transparent; border: 1px solid rgba(52,152,219,0.4);
+    border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s;
+    appearance: none; -webkit-appearance: none; -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%233b82f6" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+  }
+  #locationSelect:hover { background-color: rgba(52,152,219,0.12); }
   body.syncing #syncBtn, body.importing #importBtn, body.importing .actions button { pointer-events: none; opacity: 0.45; }
   #banner {
     display: none;
