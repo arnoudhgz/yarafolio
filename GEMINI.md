@@ -8,14 +8,7 @@ Use Opus.
 
 ## Strategy parameters
 
-| Parameter | Value |
-|---|---|
-| Broker | eToro |
-| Batch size | $600 per position |
-| Trailing stop loss | Start around +5% profit |
-| Minimum stock price | $20 |
-| Focus | Oversold stocks with bounce potential (prefer RSI 20-30, strictly avoid RSI < 20) |
-| Bearish / geopolitical stress | Switch to defensive picks (staples, healthcare, utilities, defense) |
+Always read `data/private/STRATEGY.md` for the personal trading parameters (batch size, broker, trailing stop) and the learned output rules (sector biases, rating strictness). If that file doesn't exist, read `data/STRATEGY.sample.md` instead.
 
 ## Commands
 
@@ -35,10 +28,8 @@ Use Opus.
 - Every recommendation list goes in ONE markdown table. Columns: Ticker, Price, Rating, RSI, Why oversold / thesis, Risk. No prose blocks per stock.
 - Sources as hyperlinks below the table.
 - Data must be fresh: last 24 hours max, intraday when the market just opened. When I say the market opened minutes ago, use prices from today's session, not yesterday's close.
-- Flag falling-knife and value-trap risks explicitly in the Rating or Risk column. Tech stocks have heavily underperformed; require exceptional setups for Tech, mark them high-risk, and actively consider avoiding them entirely unless the oversold thesis is pristine. The Services sector has strongly outperformed; actively seek out Services setups. A-rated stocks are historically outperforming; prioritize high-quality A-rated setups and hold B-rated setups to a stricter standard. C-rated stocks have shown poor performance and should be penalized appropriately.
 - Before listing any pick, run one targeted litigation/fraud search per final pick, unconditional, even when the pre-fetched red-flag headlines looked clean (I once almost bought ZTS during a securities fraud investigation; the keyword screen can miss a problem phrased outside its terms). A red flag means drop the pick or mark it clearly.
 - When I mention geopolitical events (war, tariffs, elections), shift the list toward defensive assets.
-- Never add a ticker to the dashboard/advice when we already have two open positions for it, or when it is blacklisted in the advice log.
 
 ## Research workflow
 

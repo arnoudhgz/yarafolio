@@ -49,7 +49,7 @@ One markdown table, max 10 picks:
 - Buy below / Drop below / Drop above: entry trigger, thesis-invalidation floor, and opportunity-gone ceiling (the bounce already ran) from the researcher.
 - Open note: "gap may fill, wait for open" where the premarket move could reverse at the 09:30 ET open.
 - Sources as hyperlinks below the table.
-- Remind: $600 batch, trailing stop from +5%.
+- Remind the user of the entry parameters (batch size, trailing stop) defined in `data/private/STRATEGY.md`.
 
 ## Step 5: Portfolio comparison + tracking update (after the table)
 

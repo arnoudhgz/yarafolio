@@ -67,6 +67,12 @@ Monitors newly listed and upcoming initial public offerings.
 - **Market Entry**: Tickers with an IPO scheduled for today will blink <span style="color:#10b981;font-weight:600">Green</span> so you don't miss the listing.
 - **Noise Filtering**: You can drop an IPO from the tracker if you verify eToro won't list it. The "Listed / Likely" tab uses this to filter out noise and only show actionable IPOs.
 
+## 10. The Self-Learning Workflow (`/review`)
+The dashboard and CLI are deeply integrated with a self-learning loop. Once you have accumulated enough measurable outcomes, you can run the `/review` command. 
+- The AI will analyze the stats from the Analytics tab.
+- It will propose concrete strategy improvements (e.g., "Avoid Tech stocks" or "Be stricter on B-ratings").
+- If you approve the proposals, the AI will automatically update your `data/private/STRATEGY.md` file with the new rules, ensuring your personal trading edge stays private and out of the public source code.
+
 ## Features Available on Every Screen
 - **Global Search:** Type any ticker or name to instantly filter the current view.
 - **Live Market Timers**: A built-in countdown clock synced exactly to the New York Stock Exchange (NYSE) trading hours, tracking the Pre-Market, Open Session, and After-Hours.

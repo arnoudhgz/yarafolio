@@ -32,7 +32,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Standardized all logged timestamps (`lastUpdated`, EOD/News dates, price history) to exclusively use the `America/New_York` timezone formatted as ISO 8601 strings with offsets (e.g. `YYYY-MM-DDTHH:MM-04:00`).
 - The frontend dashboard now automatically parses these ISO strings to correctly display dates in the user's local timezone.
 - Replaced timezone-hacky local `date.today()` calls with a dedicated `nyse_now()` and `nyse_today()` helper across all python scripts.
-- Strategy update: Made 'A' rating much stricter in stock-researcher.md (extreme conviction only).
+- Extracted all personal strategy parameters (batch sizes, trailing stops) and learned trading rules out of the public repo files (`GEMINI.md`, `CLAUDE.md`, and skill files) into a git-ignored `data/private/STRATEGY.md` file. A generic `STRATEGY.sample.md` template is now provided for new users.
+- Updated the `/review` skill to strictly propose strategy updates to the private `data/private/STRATEGY.md` file rather than modifying the open-source instructions.
 - Strategy update: Broadened Tech warning in GEMINI.md/CLAUDE.md to require exceptional setups and marked 'A-rated' stocks as highly skeptical.
 - **Renamed the custom `/learn` strategy-evaluation command to `/review`** across all scripts (`review_stats.py`), skills, and log files (`REVIEWS.md`) to avoid naming collisions with Antigravity's built-in `/learn` slash command.
 - Strategy update: Updated GEMINI.md/CLAUDE.md to reverse the claim that B-rated stocks outperform A-rated stocks, as A-rated stocks have shown renewed strength and are now outperforming.

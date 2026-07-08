@@ -44,7 +44,7 @@ ONE markdown table, ~10 picks grouped by sector:
 | Ticker | Sector | Price | Rating | RSI | Thesis | Buy below | Drop below | Drop above | Risk |
 |---|---|---|---|---|---|---|---|---|---|
 
-Above the table: one line per target sector explaining the gap ("Healthcare is 3.1% of invested, target ~10%"). Sources as hyperlinks below the table. Remind: $600 batch, trailing stop from +5%.
+Above the table: one line per target sector explaining the gap ("Healthcare is 3.1% of invested, target ~10%"). Sources as hyperlinks below the table. Remind the user of the entry parameters (batch size, trailing stop) defined in `data/private/STRATEGY.md`.
 
 ## Step 5: Log picks
 

@@ -46,7 +46,7 @@ This project is driven by custom agent instructions. When you talk to the AI, it
 Out of the box, these instructions reflect my personal "oversold bounce" strategy. **You should absolutely tune these to your own liking.**
 
 Here is the breakdown of the available tools:
-1. **The Core Strategies**: Check out [`GEMINI.md`](GEMINI.md) and [`CLAUDE.md`](CLAUDE.md). This is where the overarching rules live (what defines a "buy", risk tolerance, sector preferences). 
+1. **The Core Strategies**: Check out [`GEMINI.md`](GEMINI.md) and [`CLAUDE.md`](CLAUDE.md), which instruct the AI to read your personal configuration from `data/private/STRATEGY.md`. This private file is where your overarching rules live (batch sizes, risk tolerance, sector preferences). 
 2. **The Specific Commands**: Look inside the `.gemini/skills/` and `.claude/skills/` directories. Each folder contains a `SKILL.md` file that teaches the AI how to execute a specific command. Here are the tools currently loaded:
    - `/advice`: Run the primary stock screening workflow (finds oversold stocks with bounce potential).
    - `/aftermarket`: Runs the advice workflow using after-hours data to catch earnings overreactions.

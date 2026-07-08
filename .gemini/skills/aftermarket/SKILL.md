@@ -44,7 +44,7 @@ One markdown table, max 10 picks:
 - Rating: my read on bounce quality (A/B/C with +/-), falling knives marked.
 - Open note: "buy in premarket" or "wait for market open to see if selloff continues".
 - Sources as hyperlinks below the table.
-- Remind: $600 batch, trailing stop from +5%.
+- Remind the user of the entry parameters (batch size, trailing stop) defined in `data/private/STRATEGY.md`.
 
 ## Step 5: Portfolio comparison + tracking update (after the table)
 

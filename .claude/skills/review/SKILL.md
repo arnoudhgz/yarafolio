@@ -24,7 +24,7 @@ Compare past advice against what actually happened, then improve the advice pipe
 
 ## Step 3: Propose (max 3 per run)
 
-For each proposal, show: the stat that triggered it (with n), the exact file, and the concrete before/after text. Targets: `.claude/commands/advice.md`, `.claude/skills/premarket/SKILL.md`, `.claude/skills/check/SKILL.md`, `.claude/skills/diversify/SKILL.md`, `.claude/agents/stock-researcher.md`, `CLAUDE.md`. Keep proposals small and testable; one rule change per proposal.
+For each proposal, show: the stat that triggered it (with n), the exact file, and the concrete before/after text. Targets: `.claude/commands/advice.md`, `.claude/skills/premarket/SKILL.md`, `.claude/skills/check/SKILL.md`, `.claude/skills/diversify/SKILL.md`, `.claude/agents/stock-researcher.md`, `data/private/STRATEGY.md`. Keep proposals small and testable; one rule change per proposal.
 
 ## Step 4: Approval gate
 
@@ -46,4 +46,4 @@ The "Measurable outcomes" line is load-bearing: advice runs compare `review_stat
 
 ## Step 6: Auto-backup
 
-Run `python3 scripts/autosync.py "learn pass"`. Commits + pushes `data/private/REVIEWS.md` (and any data changes) to the private backup repo when `STOCKS_AUTOSYNC=1`, silent no-op otherwise. Accepted skill/CLAUDE.md edits are code, not data, so commit those yourself.
+Run `python3 scripts/autosync.py "learn pass"`. Commits + pushes `data/private/REVIEWS.md` and `data/private/STRATEGY.md` (and any other data changes) to the private backup repo when `STOCKS_AUTOSYNC=1`, silent no-op otherwise. Accepted skill edits are code, not data, so commit those yourself.

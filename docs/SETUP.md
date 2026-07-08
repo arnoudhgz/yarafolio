@@ -9,7 +9,15 @@ Before you begin, ensure that your system has **Python 3** installed (minimum ve
   git clone git@github.com:arnoudhgz/yarafolio.git
   cd yarafolio
   ```
-- **To really use it:** Click the **Fork** button on GitHub first to create your own copy of the repository. Then clone your forked version so you can customize the AI instructions (`GEMINI.md`, `CLAUDE.md`) to fit your own trading style!
+- **To really use it:** Click the **Fork** button on GitHub first to create your own copy of the repository.
+
+## Configure Your Personal Strategy
+Your personal trading parameters (like batch sizes, trailing stop targets, and sector biases) are stored in a private file so they aren't accidentally pushed back to GitHub.
+Copy the sample template to get started:
+```bash
+cp data/STRATEGY.sample.md data/private/STRATEGY.md
+```
+Open `data/private/STRATEGY.md` and customize the parameters to fit your trading style!
 
 ## Set up your environment variables (eToro API)
 Create a `.env` file in the root of the project. Copy the `.env.sample` to get started:
