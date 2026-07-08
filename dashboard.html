@@ -550,7 +550,13 @@
     <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
       <button class="modal-close" onclick="document.getElementById('infoRating').hidden=true" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Win rate &amp; move by rating</h2>
-      <p style="margin-bottom:0;">Breaks down the success rate and average profit/loss depending on the conviction rating assigned by the AI (e.g., 'Strong Buy' vs 'Buy'). This helps visualize if higher-conviction picks perform better.</p>
+      <p style="margin-bottom:12px; line-height: 1.6;">Breaks down the success rate and average profit/loss depending on the conviction rating assigned by the AI. This helps visualize if higher-conviction picks perform better.</p>
+      <ul style="color:var(--muted); line-height:1.6; padding-left:20px; margin:0;">
+        <li style="margin-bottom:8px;"><strong>A</strong> = Extreme conviction: clean overreaction, pristine balance sheet, immediate clear catalyst.</li>
+        <li style="margin-bottom:8px;"><strong>B</strong> = Decent bounce odds, some open questions. Default for most good setups.</li>
+        <li style="margin-bottom:8px;"><strong>C</strong> = Cheap for a reason, falling-knife risk.</li>
+        <li style="margin-bottom:0;"><strong>+ / -</strong> modifiers shade quality within the grade.</li>
+      </ul>
     </div>
   </div>
 

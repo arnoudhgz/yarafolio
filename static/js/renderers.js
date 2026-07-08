@@ -517,7 +517,11 @@ export function renderBucketChart(canvasId, buckets) {
   buckets = buckets || {};
   const note = document.getElementById(canvasId + 'Note');
   const canvas = document.getElementById(canvasId);
-  const keys = Object.keys(buckets);
+  let keys = Object.keys(buckets);
+  if (canvasId === 'chartRating') {
+    const order = { 'A+': 1, 'A': 2, 'A-': 3, 'B+': 4, 'B': 5, 'B-': 6, 'C+': 7, 'C': 8, 'C-': 9 };
+    keys.sort((a, b) => (order[a] || 99) - (order[b] || 99));
+  }
   const ok = keys.filter(k => !buckets[k].insufficient);
   const weak = keys.filter(k => buckets[k].insufficient);
   if (note) note.innerHTML = weak.length

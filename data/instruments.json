@@ -708,5 +708,60 @@
     "ticker": "NEE",
     "name": "NextEra Energy Inc",
     "sector": "Utilities"
+  },
+  "9122": {
+    "ticker": "CRC",
+    "name": "California Resources Corporation",
+    "sector": "Services"
+  },
+  "9437": {
+    "ticker": "NE",
+    "name": "Noble Corporation Plc",
+    "sector": "Utilities"
+  },
+  "9477": {
+    "ticker": "MLI",
+    "name": "Mueller Industries Inc",
+    "sector": "Industrial Goods"
+  },
+  "8765": {
+    "ticker": "BAM",
+    "name": "Brookfield Asset Management Ltd",
+    "sector": "Financial"
+  },
+  "4287": {
+    "ticker": "BKR",
+    "name": "Baker Hughes Company",
+    "sector": "Basic Materials"
+  },
+  "1017": {
+    "ticker": "GE",
+    "name": "General Electric Co",
+    "sector": "Industrial Goods"
+  },
+  "1526": {
+    "ticker": "DE",
+    "name": "Deere & Co",
+    "sector": "Industrial Goods"
+  },
+  "1869": {
+    "ticker": "TDS",
+    "name": "Telephone And Data Systems Inc",
+    "sector": "Technology"
+  },
+  "1492": {
+    "ticker": "UNP",
+    "name": "Union Pacific Corp",
+    "sector": "Industrial Goods"
+  },
+  "1541": {
+    "ticker": "DUK",
+    "name": "Duke Energy Corp",
+    "sector": "Utilities"
+  },
+  "1725": {
+    "ticker": "CPB",
+    "name": "Campbell Soup Co",
+    "sector": "Consumer Goods"
   }
 }

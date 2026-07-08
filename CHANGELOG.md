@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Entry Discipline**: Bar chart comparing the win rate of stocks bought "In Buy Zone" (<= target) versus "Chased" (> target).
   - **Days to Bounce vs RSI**: Bar chart showing the average days held for winning trades grouped by RSI band at advice.
 - Added a new "Gain vs Days Held" bar chart to the Analytics tab to visualize the average percentage gain of closed positions grouped by the number of days they were held. Tooltips include the sample size, maximum gain, and maximum loss for that specific holding period. (Also strips out any NaN dates).
+- Added 11 new stock instruments to the tracking dataset (`data/instruments.json`).
 
 ### Changed
 - Analytics: Overhauled the "Entry Discipline" chart to show Average P/L % instead of Win Rate %, plotting positions across 4 distinct entry bounds ("Below Drop Below", "In Buy Zone", "Chased", "Above Drop Above") and tracking Min/Max range in tooltips.
@@ -38,6 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Renamed the custom `/learn` strategy-evaluation command to `/review`** across all scripts (`review_stats.py`), skills, and log files (`REVIEWS.md`) to avoid naming collisions with Antigravity's built-in `/learn` slash command.
 - Strategy update: Updated GEMINI.md/CLAUDE.md to reverse the claim that B-rated stocks outperform A-rated stocks, as A-rated stocks have shown renewed strength and are now outperforming.
 - Strategy update: Updated advice.md to require exceptionally strong conviction (stronger catalysts or deeper oversold indicators) before finalizing standard intraday picks, as intraday advice historically underperforms premarket and aftermarket runs.
+- Dashboard: Updated the Rating Info modal to explicitly explain the A/B/C rating taxonomy instead of outdated wording.
+- Dashboard: Fixed an issue where the Rating bucket chart in the Analytics tab sorted grades alphabetically (e.g. A, A+, A-, B...) rather than logically (A+, A, A-, B+, B...).
 
 ### Fixed
 - Fixed an issue where identical notes could be duplicated multiple times on the same day when a ticker was repeatedly re-advised.
