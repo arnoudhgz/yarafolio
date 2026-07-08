@@ -74,11 +74,10 @@
     width: 32px; height: 32px; padding: 0; font-weight: 600; color: var(--blue);
     background: transparent; border: 1px solid rgba(52,152,219,0.4);
     border-radius: 6px; cursor: pointer; font-size: 15px; transition: all 0.2s;
-    margin-left: 6px;
   }
   #themeToggle:hover { background: rgba(52,152,219,0.12); }
   #locationSelect {
-    height: 32px; padding: 0 30px 0 10px; margin-left: 6px; font-weight: 600; color: var(--blue);
+    height: 32px; padding: 0 30px 0 10px; font-weight: 600; color: var(--blue);
     background: transparent; border: 1px solid rgba(52,152,219,0.4);
     border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.2s;
     appearance: none; -webkit-appearance: none; -moz-appearance: none;
