@@ -14,12 +14,13 @@ Compare past advice against what actually happened, then improve the advice pipe
 ## Step 1: Gather
 
 - `python3 scripts/review_stats.py` (and `--json` if you need exact numbers): win rate and avg/median move by rating, RSI band, sector, source, plus the ~7-day-after-advice stat and the measurable-outcome count.
+- Run `python3 scripts/correlation.py` to generate the latest 30-day Pearson correlation matrix for the active portfolio, and read the output from `data/private/correlation.json` to identify overlapping systemic risks between current holdings.
 - Read `data/private/REVIEWS.md`: what was already concluded and changed in earlier runs. Never re-propose something that was applied or explicitly rejected before.
 
 ## Step 2: Interpret with discipline
 
 - Small-n caveats are mandatory. Buckets the script marks "insufficient data" support no conclusions.
-- Look for actionable patterns, for example: a rating grade that consistently loses (tighten the rating guide or drop the grade from advice), an RSI band that underperforms (falling knives live under some threshold, adjust the screen floor), a sector where theses keep breaking, a source (/advice vs /premarket vs /diversify) with structurally worse outcomes, dropped picks that kept falling (drops were right) or recovered (drops were too eager).
+- Look for actionable patterns, for example: a rating grade that consistently loses (tighten the rating guide or drop the grade from advice), an RSI band that underperforms (falling knives live under some threshold, adjust the screen floor), a sector where theses keep breaking, a source (/advice vs /premarket vs /diversify) with structurally worse outcomes, dropped picks that kept falling (drops were right) or recovered (drops were too eager), or highly correlated holdings (> 0.70) in the correlation matrix that suggest concentrated systemic risk.
 - Distinguish strategy problems (the rules are wrong) from execution problems (the rules weren't followed). Only the first kind warrants a skill edit.
 
 ## Step 3: Propose (max 3 per run)
