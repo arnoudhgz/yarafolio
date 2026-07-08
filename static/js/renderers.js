@@ -368,7 +368,6 @@ export function renderPortfolioTable() {
   }
   
   const empty = !holdings.length;
-  const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('portfolioEmpty'));
   let msg = 'No portfolio snapshot yet. Click "Update from eToro" or run /import in the AI CLI.';
   if (searchQuery && holdings.length === 0) {
     msg = `No results with your current filter ('${esc(searchQuery)}'). <a href="#" onclick="document.getElementById('search').value=''; document.getElementById('search').dispatchEvent(new Event('input')); return false;">Clear filter</a>`;
