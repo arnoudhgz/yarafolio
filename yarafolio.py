@@ -110,15 +110,7 @@ class Handler(SimpleHTTPRequestHandler):
                     "ok": True, "pid": os.getpid(), "root": ROOT})
         elif self.path == "/api/stats":
             self.handle_stats()
-        elif self.path == "/api/correlation":
-            try:
-                res = subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "correlation.py")], 
-                                     capture_output=True, text=True, check=True)
-                self.respond_json(200, json.loads(res.stdout))
-            except subprocess.CalledProcessError as e:
-                self.respond_json(500, {"error": e.stderr})
-            except Exception as e:
-                self.respond_json(500, {"error": str(e)})
+
         elif self.path.startswith("/api/news"):
             self.handle_news()
         elif self.path.startswith("/api/macro"):

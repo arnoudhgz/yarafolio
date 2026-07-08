@@ -22,7 +22,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CLI: Added new `momentum` subparser to `scripts/screen.py` to identify stocks with extreme relative strength (RSI > 70).
 - AI Skills: Introduced `/momentum`, `/insider`, and `/earnings-play` workflows to both `.claude/skills` and `.gemini/skills` for identifying non-oversold market opportunities.
 - Dashboard: Implemented a Light/Dark mode toggle (using `localStorage`) for better accessibility.
-- Analytics: Added a new "30-Day Pearson Correlation Matrix" view to the Portfolio tab to help identify overlapping systemic risks between active holdings.
 
 ### Changed
 - Analytics: Overhauled the "Entry Discipline" chart to show Average P/L % instead of Win Rate %, plotting positions across 4 distinct entry bounds ("Below Drop Below", "In Buy Zone", "Chased", "Above Drop Above") and tracking Min/Max range in tooltips.
@@ -59,7 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an issue in `advice_log.py` where the new `/momentum`, `/earnings-play`, and `/insider` workflows failed to log picks due to missing source whitelists.
 - Fixed `autosync.py` to include `STRATEGY.md` in the private backup sync so personal rules are safely persisted.
 - Fixed `STRATEGY.md` and related AI skills to ensure strategy parameters (like minimum price and volume) apply globally and are not hardcoded into public skill files.
-- Fixed the "Failed to compute correlation" error on the Analytics tab by updating the `User-Agent` in `scripts/correlation.py` to bypass Yahoo Finance's new rate limits.
 
 ## [0.9.0] - 2026-06-25
 

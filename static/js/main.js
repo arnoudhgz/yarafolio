@@ -249,21 +249,12 @@ document.getElementById('btnManualBlacklist')?.addEventListener('click', () => {
   setPortfolioViewMode('collapsed');
   /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.add('active');
   /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.remove('active');
-  /** @type {HTMLElement} */ (document.getElementById('btnCorrelation')).classList.remove('active');
   renderPortfolioTable();
 });
 /** @type {HTMLElement} */ (document.getElementById('btnSplit')).addEventListener('click', () => {
   setPortfolioViewMode('split');
   /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.add('active');
   /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.remove('active');
-  /** @type {HTMLElement} */ (document.getElementById('btnCorrelation')).classList.remove('active');
-  renderPortfolioTable();
-});
-/** @type {HTMLElement} */ (document.getElementById('btnCorrelation')).addEventListener('click', () => {
-  setPortfolioViewMode('correlation');
-  /** @type {HTMLElement} */ (document.getElementById('btnCorrelation')).classList.add('active');
-  /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.remove('active');
-  /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.remove('active');
   renderPortfolioTable();
 });
 
