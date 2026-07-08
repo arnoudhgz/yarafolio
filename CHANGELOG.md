@@ -59,6 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an issue in `advice_log.py` where the new `/momentum`, `/earnings-play`, and `/insider` workflows failed to log picks due to missing source whitelists.
 - Fixed `autosync.py` to include `STRATEGY.md` in the private backup sync so personal rules are safely persisted.
 - Fixed `STRATEGY.md` and related AI skills to ensure strategy parameters (like minimum price and volume) apply globally and are not hardcoded into public skill files.
+- Fixed the "Failed to compute correlation" error on the Analytics tab by updating the `User-Agent` in `scripts/correlation.py` to bypass Yahoo Finance's new rate limits.
 
 ## [0.9.0] - 2026-06-25
 

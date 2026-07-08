@@ -9,7 +9,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def fetch_prices(ticker):
     url = f"https://query2.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=1mo"
-    req = urllib.request.Request(url, headers={'User-Agent': 'curl/8.7.1'})
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'})
     try:
         with urllib.request.urlopen(req, timeout=10) as res:
             data = json.loads(res.read().decode())
