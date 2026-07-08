@@ -15,7 +15,7 @@ This workflow finds stocks with extreme relative strength (RSI > 70) to buy into
 Check the overall market posture (WebSearch "stock market today..."). In bear markets, momentum strategies often fail.
 
 ## Step 2: Screen candidates
-Run `python3 scripts/screen.py momentum --min-rsi 70 --exclude-held --exclude-advised`. 
+Run `python3 scripts/screen.py momentum --min-rsi 70 --exclude-held --exclude-advised`. Ensure all candidates adhere to STRATEGY.md.
 
 ## Step 3: Candidate pre-fetch
 For the top 10 candidates, run:

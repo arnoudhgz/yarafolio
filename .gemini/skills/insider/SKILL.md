@@ -12,7 +12,7 @@ metadata:
 This workflow finds stocks where executives/directors are heavily buying their own stock on the open market, indicating internal confidence.
 
 ## Step 1: Screen candidates
-Use WebSearch: `recent insider buying open market stock this week`. Find 5-10 tickers with massive CEO/Director buys (ignore 10b5-1 automated sales or option grants).
+Use WebSearch: `recent insider buying open market stock this week`. Find 5-10 tickers with massive CEO/Director buys (ignore 10b5-1 automated sales or option grants). Ensure all candidates adhere to STRATEGY.md.
 
 ## Step 2: Candidate pre-fetch
 For the candidates, run:

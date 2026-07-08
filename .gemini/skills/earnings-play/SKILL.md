@@ -12,7 +12,7 @@ metadata:
 This workflow finds stocks reporting earnings soon to evaluate them for pre-earnings run-ups or post-earnings plays.
 
 ## Step 1: Screen candidates
-Use WebSearch: `stocks reporting earnings this week`. Find 5-10 high-interest tickers.
+Use WebSearch: `stocks reporting earnings this week`. Find 5-10 high-interest tickers. Ensure all candidates adhere to STRATEGY.md.
 
 ## Step 2: Candidate pre-fetch
 For the candidates, run:

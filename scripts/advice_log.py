@@ -61,7 +61,7 @@ class AdviceLog:
         "Technology",
         "Utilities",
         "ETF / Other")
-    NEW_PICK_SOURCES = ("advice", "premarket", "diversify", "aftermarket", "manual")
+    NEW_PICK_SOURCES = ("advice", "premarket", "diversify", "aftermarket", "manual", "momentum", "earnings", "insider")
 
     def __init__(self):
         is_demo = get_env("DEMO_MODE") == "1"

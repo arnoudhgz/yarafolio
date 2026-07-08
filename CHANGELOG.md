@@ -56,6 +56,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an edge case where aftermarket advice logs generated past midnight local time wouldn't match with eToro trades opened during the previous day's US market session. This was achieved by accurately evaluating market sessions via the `America/New_York` timezone directly instead of brittle local hour comparisons.
 - Fixed `ModuleNotFoundError` for `nyse` in `yarafolio.py` by appending the `scripts` directory to `sys.path`.
 - Fixed an issue where invalid ratings (like "Buy") could be added to the advice log by enforcing strict A/B/C letter grade validation via argparse choices in `advice_log.py`.
+- Fixed an issue in `advice_log.py` where the new `/momentum`, `/earnings-play`, and `/insider` workflows failed to log picks due to missing source whitelists.
+- Fixed `autosync.py` to include `STRATEGY.md` in the private backup sync so personal rules are safely persisted.
+- Fixed `STRATEGY.md` and related AI skills to ensure strategy parameters (like minimum price and volume) apply globally and are not hardcoded into public skill files.
 
 ## [0.9.0] - 2026-06-25
 
