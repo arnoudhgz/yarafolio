@@ -1,4 +1,17 @@
   :root {
+    --bg-dark: #f8fafc;
+    --bg-light: #e2e8f0;
+    --card: rgba(255, 255, 255, 0.85);
+    --border: rgba(0, 0, 0, 0.1);
+    --text: #0f172a;
+    --muted: #64748b;
+    --green: #059669;
+    --red: #dc2626;
+    --blue: #2563eb;
+    --orange: #d97706;
+    --bg: rgba(0, 0, 0, 0.03);
+  }
+  :root[data-theme="dark"] {
     --bg-dark: #0a0e17;
     --bg-light: #151a28;
     --card: rgba(26, 33, 41, 0.55);

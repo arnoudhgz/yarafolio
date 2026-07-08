@@ -249,12 +249,21 @@ document.getElementById('btnManualBlacklist')?.addEventListener('click', () => {
   setPortfolioViewMode('collapsed');
   /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.add('active');
   /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.remove('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnCorrelation')).classList.remove('active');
   renderPortfolioTable();
 });
 /** @type {HTMLElement} */ (document.getElementById('btnSplit')).addEventListener('click', () => {
   setPortfolioViewMode('split');
   /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.add('active');
   /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.remove('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnCorrelation')).classList.remove('active');
+  renderPortfolioTable();
+});
+/** @type {HTMLElement} */ (document.getElementById('btnCorrelation')).addEventListener('click', () => {
+  setPortfolioViewMode('correlation');
+  /** @type {HTMLElement} */ (document.getElementById('btnCorrelation')).classList.add('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.remove('active');
+  /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.remove('active');
   renderPortfolioTable();
 });
 
@@ -509,6 +518,13 @@ const adviceClickHandler = (ev) => {
     if (!found) return;
     applyChange(() => { found.lot.soldAt = price; delete found.lot.exitEstimated; });
   }
+});
+
+/** @type {HTMLElement} */ (document.getElementById('themeToggle')).addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
 });
 
 /** @type {HTMLElement} */ (document.getElementById('syncBtn')).addEventListener('click', async () => {

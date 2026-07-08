@@ -323,6 +323,21 @@ export function renderPortfolio() {
 }
 
 export function renderPortfolioTable() {
+  const corrContainer = /** @type {HTMLElement} */ (document.getElementById('correlationContainer'));
+  const table = /** @type {HTMLElement} */ (document.getElementById('portfolioTable'));
+  const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('portfolioEmpty'));
+
+  if (portfolioViewMode === 'correlation') {
+    table.style.display = 'none';
+    emptyMsgEl.style.display = 'none';
+    corrContainer.style.display = 'block';
+    if (!corrContainer.dataset.loaded) {
+      renderCorrelationMatrix();
+    }
+    return;
+  }
+  corrContainer.style.display = 'none';
+
   let holdings = PORTFOLIO.holdings.filter(h => matchesSearch([h.ticker, h.name, h.sector]));
   
   if (portfolioViewMode === 'split') {
@@ -423,6 +438,42 @@ function renderSectorChart() {
       }
     }
   }));
+}
+
+async function renderCorrelationMatrix() {
+  const container = /** @type {HTMLElement} */ (document.getElementById('correlationContainer'));
+  const matrixDiv = /** @type {HTMLElement} */ (document.getElementById('correlationMatrix'));
+  matrixDiv.innerHTML = '<div style="color: var(--muted); padding: 20px;">Computing correlation matrix (fetching 30-day prices)...</div>';
+  try {
+    const res = await fetch('/api/correlation');
+    if (!res.ok) throw new Error('Failed to compute correlation');
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    const n = data.tickers.length;
+    matrixDiv.style.gridTemplateColumns = `max-content repeat(${n}, 40px)`;
+    let html = '<div></div>' + data.tickers.map(t => `<div style="text-align:center; font-size:11px; font-weight:bold; writing-mode:vertical-rl; transform:rotate(180deg); padding-top:4px;">${t}</div>`).join('');
+    
+    for (let i = 0; i < n; i++) {
+      html += `<div style="font-size:12px; font-weight:bold; display:flex; align-items:center; justify-content:flex-end; padding-right:8px;">${data.tickers[i]}</div>`;
+      for (let j = 0; j < n; j++) {
+        const val = data.matrix[i][j];
+        let bg = 'var(--card)';
+        let fg = 'var(--text)';
+        if (i !== j) {
+          if (val > 0.5) bg = `rgba(239, 68, 68, ${val})`; // Red for highly correlated
+          else if (val < -0.5) bg = `rgba(16, 185, 129, ${-val})`; // Green for inversely correlated
+          else bg = `rgba(255, 255, 255, ${Math.abs(val) * 0.2})`;
+        } else {
+          bg = 'rgba(255, 255, 255, 0.1)';
+        }
+        html += `<div style="background:${bg}; color:${fg}; font-size:11px; display:flex; align-items:center; justify-content:center; height:40px; border-radius:4px;" title="${data.tickers[i]} vs ${data.tickers[j]}: ${val}">${val.toFixed(2)}</div>`;
+      }
+    }
+    matrixDiv.innerHTML = html;
+    container.dataset.loaded = "true";
+  } catch (err) {
+    matrixDiv.innerHTML = `<div style="color: var(--red); padding: 20px;">Error: ${err.message}</div>`;
+  }
 }
 
 export function renderSectorCoverage() {

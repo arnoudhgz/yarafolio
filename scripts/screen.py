@@ -146,10 +146,16 @@ class Screen:
         return m.group(1).split()[-1] if m else None
 
     def cmd_oversold(self, args: argparse.Namespace):
-        headers, rows = self.parse_table(self.fetch("/list/oversold-stocks/"))
+        self._screen_list("/list/oversold-stocks/", args, lambda r, m: r < m)
+
+    def cmd_momentum(self, args: argparse.Namespace):
+        self._screen_list("/list/overbought-stocks/", args, lambda r, m: r > m)
+
+    def _screen_list(self, url, args, rsi_comparator):
+        headers, rows = self.parse_table(self.fetch(url))
         if not rows:
             logger.warning(
-                "oversold screen parsed 0 rows - stockanalysis.com markup likely "
+                f"{url} screen parsed 0 rows - stockanalysis.com markup likely "
                 "changed; fall back to the WebFetch sources in the skill")
         cols = {name: idx for idx, name in enumerate(headers)}
         sym = next((cols[c] for c in cols if "Symbol" in c), 1)
@@ -190,7 +196,7 @@ class Screen:
             if p is None or p < args.min_price:
                 continue
             r_val = self.to_float(cells[rsi]) or 0.0
-            if r_val < args.min_rsi:
+            if not rsi_comparator(r_val, args.min_rsi):
                 continue
             extras = [
                 cells[idx] if idx < len(cells) else "" for _,
@@ -204,7 +210,7 @@ class Screen:
             head += " | " + " | ".join(label for label, _ in extra)
         logger.info(head)
         for r, s, n, p, extras in sorted(
-                picked, key=lambda row: row[0])[
+                picked, key=lambda row: row[0], reverse=(url == "/list/overbought-stocks/"))[
                 :args.max]:
             line = f"{s} | {n} | {r} | {p}"
             if extras:
@@ -600,6 +606,20 @@ def main():
         action="store_true",
         help="append PE/VOL/MKTCAP/SECTOR columns when the page exposes them")
     p.set_defaults(func=app.cmd_oversold)
+
+    p = sub.add_parser(
+        "momentum",
+        help="momentum screen (RSI > 70), filtered candidates")
+    p.add_argument("--min-price", type=float, default=20.0)
+    p.add_argument("--min-rsi", type=float, default=70.0, help="minimum RSI to include")
+    p.add_argument("--exclude-held", action="store_true", help="exclude tickers currently held in portfolio")
+    p.add_argument("--exclude-advised", action="store_true", help="exclude tickers present in advice log")
+    p.add_argument("--max", type=int, default=25)
+    p.add_argument(
+        "--full",
+        action="store_true",
+        help="append PE/VOL/MKTCAP/SECTOR columns when the page exposes them")
+    p.set_defaults(func=app.cmd_momentum)
 
     p = sub.add_parser("quote", help="price + key stats per ticker")
     p.add_argument("tickers", nargs="+")

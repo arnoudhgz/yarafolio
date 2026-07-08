@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Days to Bounce vs RSI**: Bar chart showing the average days held for winning trades grouped by RSI band at advice.
 - Added a new "Gain vs Days Held" bar chart to the Analytics tab to visualize the average percentage gain of closed positions grouped by the number of days they were held. Tooltips include the sample size, maximum gain, and maximum loss for that specific holding period. (Also strips out any NaN dates).
 - Added 11 new stock instruments to the tracking dataset (`data/instruments.json`).
+- CLI: Added new `momentum` subparser to `scripts/screen.py` to identify stocks with extreme relative strength (RSI > 70).
+- AI Skills: Introduced `/momentum`, `/insider`, and `/earnings-play` workflows to both `.claude/skills` and `.gemini/skills` for identifying non-oversold market opportunities.
+- Dashboard: Implemented a Light/Dark mode toggle (using `localStorage`) for better accessibility.
+- Analytics: Added a new "30-Day Pearson Correlation Matrix" view to the Portfolio tab to help identify overlapping systemic risks between active holdings.
 
 ### Changed
 - Analytics: Overhauled the "Entry Discipline" chart to show Average P/L % instead of Win Rate %, plotting positions across 4 distinct entry bounds ("Below Drop Below", "In Buy Zone", "Chased", "Above Drop Above") and tracking Min/Max range in tooltips.
