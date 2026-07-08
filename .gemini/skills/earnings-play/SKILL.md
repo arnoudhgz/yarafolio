@@ -24,6 +24,8 @@ For the candidates, run:
 Use parallel `stock-researcher` agents. Have them evaluate implied volatility, historical post-earnings drift, and whether to hold through the event.
 
 ## Step 4: Table and Logging
+**CRITICAL**: Always retrieve and log the current RSI (`--rsi`) for every pick, even when the strategy is not oversold-focused. This data is required for downstream analytics.
+
 Format exactly like the standard advice table.
 Log the picks with `python3 scripts/advice_log.py add-pick TICKER --source earnings ...`
 Run the auto-backup: `python3 scripts/autosync.py "earnings run"`
