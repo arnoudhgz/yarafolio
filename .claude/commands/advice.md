@@ -1,6 +1,6 @@
 Give me a list of 10 assets with good upwards potential. Focus on oversold stocks. But when the market is bearish, advise me on some assets that are more defensive.
 
-Context: I trade on E-Toro with a strategy of buying oversold positions in batches of $600 and starting a trailing stop loss around 5% profit. This keeps my risk low and I don't need to watch the market too closely. Describe clearly per asset why it is currently oversold.
+Context: I trade on E-Toro with a strategy of buying oversold positions in batches of $600 and starting a trailing stop loss around 5% profit. This keeps my risk low and I don't need to watch the market too closely. Describe clearly per asset why it is currently oversold. Since standard intraday advice historically underperforms premarket and aftermarket runs, require exceptionally strong conviction (stronger catalysts or deeper oversold indicators) before finalizing intraday picks.
 
 Use current market data and trends from the last 24 hours to make your recommendations. If the market opened recently, use today's intraday prices, not yesterday's close. Minimum stock price should be $20.
 
