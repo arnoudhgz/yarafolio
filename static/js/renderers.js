@@ -179,7 +179,7 @@ export function renderTable() {
       '<td>' + fmtPrice(r.priceNow) + '</td>' +
       '<td class="' + (r.changePct >= 0 ? 'pos' : 'neg') + '">' + fmtPct(r.changePct) + '</td>' +
       '<td>' + (r.rating || '-') + '</td>' +
-      '<td>' + (r.rsi ?? '-') + '</td>' +
+      '<td>' + (r.rsi != null ? Math.round(r.rsi) : '-') + '</td>' +
       '<td' + (sf ? ' class="sec-' + sf + '"' : '') + '>' + (r.sector || '-') + '</td>' +
       '<td>' + fmtPrice(r.buyBelow) + '</td>' +
       '<td>' + fmtPrice(r.dropBelow) + '</td>' +

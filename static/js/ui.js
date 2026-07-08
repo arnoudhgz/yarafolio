@@ -156,7 +156,7 @@ export function openModal(id, positionID) {
         '<span class="badge ' + e.status + '">' + e.status + '</span>' +
         (e.rating ? '<span>Rating ' + esc(e.rating) + '</span>' : '') +
         (e.earningsDate ? '<span style="color:var(--orange)">Earnings ' + esc(e.earningsDate) + '</span>' : '') +
-        (e.rsiAtAdvice != null ? '<span>RSI ' + e.rsiAtAdvice + '</span>' : '') +
+        (e.rsiAtAdvice != null ? '<span>RSI ' + Math.round(e.rsiAtAdvice) + '</span>' : '') +
         (e.sector ? '<span>' + esc(e.sector) + '</span>' : '') +
         (e.buyBelow != null ? '<span>buy below ' + fmtPrice(e.buyBelow) + '</span>' : '') +
         (e.dropBelow != null ? '<span>drop below ' + fmtPrice(e.dropBelow) + '</span>' : '') +
