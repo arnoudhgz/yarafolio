@@ -10,3 +10,9 @@ When logging dates, writing data to JSON files, or manipulating market times in 
 
 ## Scratch Files Rule
 When creating scratch scripts, one-off data files, or temporary exploration files, ALWAYS store them in the `scratch/` or `tmp/` directories rather than the project root. This ensures they are automatically ignored by git.
+
+## Active Release Branch Rule
+When working on an active release branch (e.g., `release/0.10.0`), always verify if that version has been released yet. If the top of `CHANGELOG.md` matches the current branch version, append your changes to that existing section. Do NOT prematurely bump the version in `CHANGELOG.md` or create a new release branch unless explicitly instructed.
+
+## Open-Source Privacy Rule
+Never hardcode personal trading parameters (e.g., account sizes, specific broker workflows, or personal biases) into the public, tracked repository files (`GEMINI.md`, `CLAUDE.md`, or skill files). All personal strategy elements must be stored exclusively in the git-ignored `data/private/STRATEGY.md` file, and a generic placeholder must be provided in `data/STRATEGY.sample.md`.
