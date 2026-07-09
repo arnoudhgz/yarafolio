@@ -13,7 +13,7 @@ Recommend ~10 quality stocks the user does NOT hold, in sectors where the portfo
 
 This skill is the documented exception to the market-driven-only rule: it deliberately reads the portfolio (sector split + held tickers) as input. That's its whole point. Everything else about the advice discipline stays: min $20, litigation red-flag checks, one-table output.
 
-Diversification is not bounce hunting: candidates do NOT need to be oversold. Quality and sector fit come first; an oversold entry in the right sector is a bonus, not a requirement.
+Diversification is not bounce hunting, but quality standards must be flawless given recent underperformance: candidates must have an A or B+ rating, strong analyst consensus, and no Tech exposure unless pristine.
 
 ## Step 0: Fresh portfolio
 
