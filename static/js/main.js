@@ -1,18 +1,20 @@
 // @ts-check
 import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
-import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot } from './renderers.js';
+import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
 import { applyChange, fetchMacro, fetchIpos, loadLearn } from './api.js';
 import { marketHolidays } from './holidays.js';
 
 async function load() {
   try {
-    const [logRes, pfRes, eodRes, newsRes] = await Promise.all([
+    const [logRes, pfRes, eodRes, newsRes, revRes, equityRes] = await Promise.all([
       fetch('data/advice-log.json', { cache: 'no-store' }),
       fetch('data/portfolio.json', { cache: 'no-store' }),
       fetch('data/eod.md', { cache: 'no-store' }).catch(() => null),
-      fetch('data/news.md', { cache: 'no-store' }).catch(() => null)
+      fetch('data/news.md', { cache: 'no-store' }).catch(() => null),
+      fetch('data/REVIEWS.md', { cache: 'no-store' }).catch(() => null),
+      fetch('data/equity-history.json', { cache: 'no-store' }).catch(() => null)
     ]);
     if (!logRes.ok) throw new Error(logRes.statusText);
     const logData = await logRes.json();
@@ -38,6 +40,14 @@ async function load() {
             return { timestamp: "", summary: block };
         });
     } else { logData.newsSummaries = []; }
+
+    if (revRes && revRes.ok) {
+      /** @type {any} */ (logData).reviewsMd = await revRes.text();
+    } else { /** @type {any} */ (logData).reviewsMd = null; }
+
+    if (equityRes && equityRes.ok) {
+      /** @type {any} */ (logData).equityHistory = await equityRes.json();
+    }
 
     setDATA(logData);
     setPORTFOLIO(pfRes.ok ? await pfRes.json() : { lastUpdated: null, totalInvested: 0, holdings: [] });
@@ -286,6 +296,7 @@ document.querySelectorAll('.tabs button').forEach(b => {
     else if (activeTab === 'portfolio') { if (!portfolioRendered) renderPortfolio(); else renderPortfolioTable(); }
     else if (activeTab === 'eod') renderEOD();
     else if (activeTab === 'news') renderAINews();
+    else if (activeTab === 'reviews') renderReviews();
     else /** @type {HTMLElement} */ (document.getElementById('searchCount')).textContent = '';
     if (activeTab === 'analytics') { loadLearn().then(renderAnalytics); }
       if (activeTab === 'rawnews' && !/** @type {any} */ (window).rawNewsLoaded) {
@@ -372,6 +383,15 @@ document.querySelectorAll('.tabs button').forEach(b => {
 
 /** @type {HTMLElement} */ (document.getElementById('refreshIposBtn')).addEventListener('click', () => fetchIpos(true));
 /** @type {HTMLElement} */ (document.getElementById('refreshMacroBtn')).addEventListener('click', () => fetchMacro(true));
+/** @type {HTMLElement} */ (document.getElementById('refreshReviewsBtn'))?.addEventListener('click', async () => {
+  try {
+    const revRes = await fetch('data/REVIEWS.md', { cache: 'no-store' });
+    if (revRes.ok) {
+      /** @type {any} */ (DATA).reviewsMd = await revRes.text();
+      renderReviews();
+    }
+  } catch (err) { }
+});
 
 function headerSortHandler(tableId, stateKeyOrFn, render) {
   document.querySelector('#' + tableId + ' thead').addEventListener('click', (ev) => {
@@ -435,13 +455,23 @@ const adviceClickHandler = (ev) => {
   renderTable();
 });
 
-/** @type {HTMLElement} */ (document.getElementById('posFilters')).addEventListener('click', (ev) => {
-  const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
-  if (!btn) return;
-  document.querySelectorAll('#posFilters button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  setPosFilter(btn.dataset.posfilter);
-  renderPositions();
+/** @type {HTMLElement} */ (document.getElementById('posFilters')).addEventListener('click', ev => {
+  const t = /** @type {HTMLElement} */ (ev.target);
+  if (t.tagName === 'BUTTON' && t.dataset.posfilter) {
+    document.querySelectorAll('#posFilters button').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    setPosFilter(t.dataset.posfilter);
+    renderPositions();
+  }
+});
+
+/** @type {HTMLElement} */ (document.getElementById('equityToggles')).addEventListener('click', ev => {
+  const t = /** @type {HTMLElement} */ (ev.target);
+  if (t.tagName === 'BUTTON' && t.dataset.tf) {
+    document.querySelectorAll('#equityToggles button').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    import('./renderers.js').then(r => r.renderEquityChart(t.dataset.tf));
+  }
 });
 
 /** @type {HTMLElement} */ (document.getElementById('rawNewsFilters')).addEventListener('click', (ev) => {

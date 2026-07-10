@@ -325,13 +325,13 @@
   .article-content strong { color: #fff; }
   .article-content a strong, .news-markdown a strong { color: inherit; }
   
-  #newsSummary, #eodList {
+  #newsSummary, #eodList, #reviewsContent {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 32px;
   }
   @media (max-width: 1000px) {
-    #newsSummary, #eodList { grid-template-columns: 1fr; }
+    #newsSummary, #eodList, #reviewsContent { grid-template-columns: 1fr; }
   }
   .ai-article, .eod-card {
     border: 1px solid var(--border);

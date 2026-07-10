@@ -313,6 +313,8 @@ export function renderPositions() {
       '<td class="actions">' + confirmBtn + '</td>';
     tbody.appendChild(tr);
   });
+  
+  renderEquityChart('7d');
 }
 
 export function renderPortfolio() {
@@ -476,6 +478,7 @@ let analyticsRendered = false;
 
 export function renderAnalytics() {
   analyticsRendered = true;
+  renderEquityChart('24h');
   const empty = /** @type {HTMLElement} */ (document.getElementById('analyticsEmpty'));
   if (!LEARN) {
     /** @type {HTMLElement} */ (document.getElementById('analyticsCards')).innerHTML = '';
@@ -653,6 +656,67 @@ export function renderEOD() {
         </div>
       `;
     }).join('');
+  }
+}
+
+export function renderReviews() {
+  const container = /** @type {HTMLElement} */ (document.getElementById('reviewsContent'));
+  const reviewsMd = DATA['reviewsMd'];
+  if (reviewsMd ?? false) {
+    let contentStr = /** @type {string} */ (reviewsMd);
+    
+    let linkedContent = contentStr.replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
+      const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
+      const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
+      return (isAdvised || isHolding) ? tickerLink(ticker) : match;
+    });
+
+    const blocks = linkedContent.split(/(?=^##\s+\[)/m);
+    let html = '';
+    
+    blocks.forEach(block => {
+      block = block.trim();
+      if (!block.startsWith('## [')) return;
+      
+      const lines = block.split('\n');
+      const header = lines.shift().trim();
+      const dateMatch = header.match(/\[(.*?)\]/);
+      let dateStr = dateMatch ? dateMatch[1] : '';
+      const extraMatch = header.match(/\]\s+(.*)/);
+      if (extraMatch) {
+         dateStr += ' ' + extraMatch[1];
+      }
+      
+      let bodyText = lines.join('\n').trim();
+      if (!bodyText.startsWith('###')) {
+         bodyText = '### Strategy Review\n' + bodyText;
+      }
+      
+      const subBlocks = bodyText.split(/(?=^###\s+)/m);
+      subBlocks.forEach(sub => {
+         sub = sub.trim();
+         if (!sub.startsWith('###')) return;
+         
+         const subLines = sub.split('\n');
+         const titleLine = subLines.shift().trim();
+         const title = titleLine.replace(/^###\s*/, '');
+         const subContent = subLines.join('\n').trim();
+         
+         html += `
+        <div class="ai-article">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+            <h3 style="margin:0; font-size:16px;">${esc(title)}</h3>
+            <span style="font-size:12px; color:var(--muted);">${esc(dateStr)}</span>
+          </div>
+          <div style="line-height: 1.6; font-size: 14px;" class="article-content news-markdown">${marked.parse(subContent)}</div>
+        </div>
+      `;
+      });
+    });
+    
+    container.innerHTML = html || '<div class="empty">No learnings or deep dives logged yet. Run /review or ask the AI to analyze a specific ticker!</div>';
+  } else {
+    container.innerHTML = '<div class="empty">No learnings or deep dives logged yet. Run /review or ask the AI to analyze a specific ticker!</div>';
   }
 }
 
@@ -1054,6 +1118,108 @@ export function renderDaysVsRsiChart(canvasId, rows) {
         }
       },
       scales: { y: { title: { display: true, text: 'Avg Days Held' } } }
+    }
+  });
+}
+let equityChart = null;
+export function renderEquityChart(tf = '7d') {
+  const equityHistory = /** @type {any} */ (DATA).equityHistory;
+  if (!equityHistory || equityHistory.length === 0) {
+    const wrap = document.getElementById('chartEquity')?.parentElement;
+    if (wrap) wrap.innerHTML = '<div class="insufficient" style="height:100%; display:flex; align-items:center; justify-content:center;">Waiting for more data points. Chart will appear soon.</div>';
+    return;
+  }
+  
+  const now = new Date();
+  let msAgo = 0;
+  if (tf === '24h') msAgo = 24 * 3600 * 1000;
+  else if (tf === '7d') msAgo = 7 * 86400 * 1000;
+  else if (tf === '4w') msAgo = 28 * 86400 * 1000;
+  else if (tf === '12m') msAgo = 365 * 86400 * 1000;
+  
+  let pts = equityHistory;
+  if (msAgo > 0) {
+    const cutoff = new Date(now.getTime() - msAgo);
+    pts = pts.filter((p) => new Date(p.timestamp) >= cutoff);
+    if (pts.length < equityHistory.length) {
+      const earlier = equityHistory.slice(0, equityHistory.length - pts.length);
+      if (earlier.length) pts.unshift(earlier[earlier.length - 1]);
+    }
+  }
+
+  let bucketMs = 0;
+  if (tf === '24h') bucketMs = 60 * 60 * 1000; // 1 hour buckets
+  else if (tf === '7d') bucketMs = 4 * 3600 * 1000;
+  else if (tf === '4w') bucketMs = 86400 * 1000;
+  else if (tf === '12m') bucketMs = 7 * 86400 * 1000;
+  
+  if (bucketMs > 0) {
+      const buckets = {};
+      const recentPoints = [];
+      const oneHourAgo = now.getTime() - 60 * 60 * 1000;
+      
+      pts.forEach(p => {
+          const t = new Date(p.timestamp).getTime();
+          if (tf === '24h' && t >= oneHourAgo) {
+              recentPoints.push(p);
+          } else {
+              const bucket = Math.floor(t / bucketMs) * bucketMs;
+              buckets[bucket] = p; // keep last in bucket
+          }
+      });
+      pts = Object.keys(buckets).sort().map(k => buckets[k]).concat(recentPoints);
+      pts = pts.filter((item, pos, ary) => pos === 0 || item !== ary[pos - 1]);
+  }
+
+  const wrap = document.getElementById('chartEquity')?.parentElement;
+  if (!wrap) return;
+
+  if (pts.length < 2) {
+    if (!wrap.querySelector('.insufficient')) {
+        wrap.innerHTML = '<canvas id="chartEquity"></canvas><div class="insufficient" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100%; text-align:center;">Not enough data points yet.</div>';
+    }
+  } else {
+    if (wrap.querySelector('.insufficient')) {
+        wrap.innerHTML = '<canvas id="chartEquity"></canvas>';
+    }
+  }
+  
+  const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById('chartEquity'));
+  if (!canvas) return;
+  
+  if (equityChart) equityChart.destroy();
+
+  const labels = pts.map((p) => {
+      const d = new Date(p.timestamp);
+      if (tf === '24h') return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      if (tf === '7d' || tf === '4w') return d.toLocaleDateString([], {month: 'short', day: 'numeric'});
+      return d.toLocaleDateString([], {year: '2-digit', month: 'short'});
+  });
+
+  const green = cssVar('--green');
+  const blue = cssVar('--blue');
+  const text = cssVar('--text');
+
+  equityChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Total P/L', data: pts.map((p) => p.total), borderColor: text, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
+        { label: 'Realized P/L', data: pts.map((p) => p.realized), borderColor: green, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
+        { label: 'Open P/L', data: pts.map((p) => p.open), borderColor: blue, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { color: cssVar('--muted') } },
+        tooltip: { mode: 'index', intersect: false, callbacks: { label: (c) => c.dataset.label + ': $' + c.raw.toFixed(2) } }
+      },
+      scales: {
+        x: { grid: { color: cssVar('--border') }, ticks: { color: cssVar('--muted'), maxTicksLimit: 8 } },
+        y: { grid: { color: cssVar('--border') }, ticks: { color: cssVar('--muted') } }
+      }
     }
   });
 }
