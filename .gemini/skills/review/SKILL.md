@@ -33,10 +33,12 @@ One AskUserQuestion round listing the proposals (accept/reject each). Apply only
 
 ## Step 5: Record
 
-Append one entry to `data/private/REVIEWS.md` (newest on top, below the header):
+Append one entry to `data/private/REVIEWS.md` (newest on top, below the header). Use the current date and time (in New York timezone) for the header:
 
 ```markdown
-## [YYYY-MM-DD]
+## [YYYY-MM-DD HH:MM]
+
+### Strategy Review
 
 - Measurable outcomes: N (was M last run)
 - Key stats: 2-4 bullets with the numbers that mattered
