@@ -17,7 +17,7 @@ from datetime import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data", "private")
-PATHS = ["advice-log.json", "portfolio.json", "REVIEWS.md", "eod.md", "news.md", "STRATEGY.md"]
+PATHS = ["advice-log.json", "portfolio.json", "REVIEWS.md", "eod.md", "news.md", "STRATEGY.md", "equity-history.json", "correlation.json"]
 
 os.makedirs(os.path.join(ROOT, "logs"), exist_ok=True)
 logging.basicConfig(
@@ -56,6 +56,11 @@ class AutoSync:
     def sync(self, reason: str = "data update") -> None:
         if self.get_env("DEMO_MODE") == "1":
             return
+
+        try:
+            subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "record_equity.py")], cwd=ROOT)
+        except Exception as e:
+            logger.warning("Failed to record equity: %s", e)
 
         private_repo = self.get_env("PRIVATE_DATA_REPO")
         if not private_repo:
