@@ -763,5 +763,15 @@
     "ticker": "CPB",
     "name": "Campbell Soup Co",
     "sector": "Consumer Goods"
+  },
+  "1043": {
+    "ticker": "PEP",
+    "name": "PepsiCo",
+    "sector": "Consumer Goods"
+  },
+  "9674": {
+    "ticker": "XENE",
+    "name": "Xenon Pharmaceuticals Inc",
+    "sector": "Consumer Goods"
   }
 }
