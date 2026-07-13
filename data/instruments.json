@@ -773,5 +773,15 @@
     "ticker": "XENE",
     "name": "Xenon Pharmaceuticals Inc",
     "sector": "Consumer Goods"
+  },
+  "1024": {
+    "ticker": "KO",
+    "name": "Coca-Cola",
+    "sector": "Consumer Goods"
+  },
+  "1021": {
+    "ticker": "INTC",
+    "name": "Intel",
+    "sector": "Technology"
   }
 }
