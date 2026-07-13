@@ -146,7 +146,7 @@ class Screen:
         return m.group(1).split()[-1] if m else None
 
     def cmd_oversold(self, args: argparse.Namespace):
-        self._screen_list("/list/oversold-stocks/", args, lambda r, m: r < m)
+        self._screen_list("/list/oversold-stocks/", args, lambda r, m: r >= m)
 
     def cmd_momentum(self, args: argparse.Namespace):
         self._screen_list("/list/overbought-stocks/", args, lambda r, m: r > m)

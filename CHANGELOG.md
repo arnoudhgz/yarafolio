@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Added "Closed positions" and "Ignored positions" summary cards to the top bar layout.
 - CLI: Added `open-profits` command to `scripts/advice_log.py` to quickly list open positions currently in profit.
 - Pipeline: Added `--min-rsi`, `--exclude-held`, and `--exclude-advised` native filtering flags to `scripts/screen.py oversold`.
+- Pipeline: Fixed a bug in `scripts/screen.py oversold` where `--min-rsi` incorrectly acted as a maximum bound instead of a lower bound.
 - Added 4 new analytics charts to the dashboard for deep strategy insights:
   - **Performance by Day of the Week**: Bar chart showing average P/L% by the day of the week a stock was advised.
   - **Win Rate Over Time**: Line chart tracking the win rate % of advice generated each month.
