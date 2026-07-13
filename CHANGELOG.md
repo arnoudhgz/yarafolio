@@ -66,6 +66,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an issue in `advice_log.py` where the new `/momentum`, `/earnings-play`, and `/insider` workflows failed to log picks due to missing source whitelists.
 - Fixed `autosync.py` to include `STRATEGY.md` in the private backup sync so personal rules are safely persisted.
 - Fixed `STRATEGY.md` and related AI skills to ensure strategy parameters (like minimum price and volume) apply globally and are not hardcoded into public skill files.
+- Fixed `scripts/etoro_import.py` to iterate through all available `ETORO_USER_KEY` variables until a successful authentication is found, instead of failing on the first attempt.
 
 ## [0.9.0] - 2026-06-25
 

@@ -68,7 +68,7 @@ class EtoroImport:
             ROOT, "tmp", "etoro-import-preview.json")
 
     def credentials(self) -> dict:
-        creds = {}
+        env_vars = {}
         env_file = os.path.join(ROOT, ".env")
         try:
             with open(env_file) as f:
@@ -78,27 +78,57 @@ class EtoroImport:
                         continue
                     key, value = line.split("=", 1)
                     key = key.removeprefix("export ").strip()
-                    creds[key] = value.strip().strip("\"'")
+                    env_vars[key] = value.strip().strip("\"'")
         except OSError:
             pass
 
-        suffix = os.environ.get("ETORO_SUFFIX", "")
+        for k, v in os.environ.items():
+            env_vars[k] = v
 
-        if "ETORO_API_KEY" in os.environ:
-            creds["ETORO_API_KEY"] = os.environ["ETORO_API_KEY"]
-
-        user_key_name = f"ETORO_USER_KEY_{suffix}" if suffix else "ETORO_USER_KEY"
-        if user_key_name in os.environ:
-            creds["ETORO_USER_KEY"] = os.environ[user_key_name]
-        elif user_key_name in creds:
-            creds["ETORO_USER_KEY"] = creds[user_key_name]
-
-        if not creds.get("ETORO_API_KEY"):
+        api_key = env_vars.get("ETORO_API_KEY")
+        if not api_key:
             raise RuntimeError(f"Missing ETORO_API_KEY (checked environment and {env_file})")
-        if not creds.get("ETORO_USER_KEY"):
-            raise RuntimeError(f"Missing {user_key_name} (checked environment and {env_file})")
 
-        return creds
+        suffix = env_vars.get("ETORO_SUFFIX", "")
+        user_keys = []
+        if suffix:
+            k = f"ETORO_USER_KEY_{suffix}"
+            if k in env_vars:
+                user_keys.append(env_vars[k])
+        else:
+            for k, v in sorted(env_vars.items()):
+                if k.startswith("ETORO_USER_KEY"):
+                    if v not in user_keys:
+                        user_keys.append(v)
+
+        if not user_keys:
+            raise RuntimeError(f"Missing ETORO_USER_KEY (checked environment and {env_file})")
+
+        import urllib.request
+        import urllib.error
+
+        for uk in user_keys:
+            creds = {"ETORO_API_KEY": api_key, "ETORO_USER_KEY": uk}
+            req = urllib.request.Request(BASE + "/trading/info/portfolio", headers={
+                "x-api-key": api_key,
+                "x-user-key": uk,
+                "x-request-id": str(uuid.uuid4()),
+                "Accept": "application/json",
+                "User-Agent": "curl/8.7.1",
+            })
+            try:
+                with urllib.request.urlopen(req, timeout=15) as res:
+                    self.cached_portfolio = json.loads(res.read())
+                    return creds
+            except urllib.error.HTTPError as exc:
+                if exc.code in (401, 403):
+                    continue
+                else:
+                    sys.exit(f"eToro API Error ({exc.code}): {exc.reason}")
+            except (urllib.error.URLError, TimeoutError) as exc:
+                sys.exit(f"eToro API Connection Error: {exc} (timed out or network down)")
+
+        sys.exit("eToro Authentication Failed (401/403): Exhausted all available ETORO_USER_KEYs in .env")
 
     def get(self, path, creds):
         import urllib.request
@@ -111,7 +141,7 @@ class EtoroImport:
             "User-Agent": "curl/8.7.1",
         })
         try:
-            with urllib.request.urlopen(req, timeout=30) as res:
+            with urllib.request.urlopen(req, timeout=15) as res:
                 return json.loads(res.read())
         except urllib.error.HTTPError as exc:
             if exc.code in (401, 403):
@@ -119,6 +149,8 @@ class EtoroImport:
                     f"eToro Authentication Failed ({exc.code}): Please check your ETORO_API_KEY and ETORO_USER_KEY in .env")
             else:
                 sys.exit(f"eToro API Error ({exc.code}): {exc.reason}")
+        except (urllib.error.URLError, TimeoutError) as exc:
+            sys.exit(f"eToro API Connection Error: {exc} (timed out or network down)")
 
     def chunked(self, items, size=50):
         for i in range(0, len(items), size):
@@ -154,7 +186,10 @@ class EtoroImport:
 
     def fetch_preview(self):
         creds = self.credentials()
-        portfolio = self.get("/trading/info/portfolio", creds)
+        if hasattr(self, "cached_portfolio"):
+            portfolio = self.cached_portfolio
+        else:
+            portfolio = self.get("/trading/info/portfolio", creds)
         positions = portfolio["clientPortfolio"]["positions"]
         industries = self.fetch_industries(creds)
 
