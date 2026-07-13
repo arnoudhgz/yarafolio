@@ -67,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `autosync.py` to include `STRATEGY.md` in the private backup sync so personal rules are safely persisted.
 - Fixed `STRATEGY.md` and related AI skills to ensure strategy parameters (like minimum price and volume) apply globally and are not hardcoded into public skill files.
 - Fixed `scripts/etoro_import.py` to iterate through all available `ETORO_USER_KEY` variables until a successful authentication is found, instead of failing on the first attempt.
+- Fixed the dashboard Equity Curve chart to accurately update during premarket and after-hours by switching the Nasdaq reference from `^IXIC` (which only updates during the regular session) to Nasdaq 100 Futures (`NQ=F`), and by pulling live prices from the active session into the open P/L calculation.
 
 ## [0.9.0] - 2026-06-25
 
