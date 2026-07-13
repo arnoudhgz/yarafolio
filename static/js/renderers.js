@@ -1134,7 +1134,7 @@ export function renderEquityChart(tf = '7d') {
   let msAgo = 0;
   if (tf === '24h') msAgo = 24 * 3600 * 1000;
   else if (tf === '7d') msAgo = 7 * 86400 * 1000;
-  else if (tf === '4w') msAgo = 28 * 86400 * 1000;
+  else if (tf === '30d') msAgo = 30 * 86400 * 1000;
   else if (tf === '12m') msAgo = 365 * 86400 * 1000;
   
   let pts = equityHistory;
@@ -1150,7 +1150,7 @@ export function renderEquityChart(tf = '7d') {
   let bucketMs = 0;
   if (tf === '24h') bucketMs = 60 * 60 * 1000; // 1 hour buckets
   else if (tf === '7d') bucketMs = 4 * 3600 * 1000;
-  else if (tf === '4w') bucketMs = 86400 * 1000;
+  else if (tf === '30d') bucketMs = 86400 * 1000;
   else if (tf === '12m') bucketMs = 7 * 86400 * 1000;
   
   if (bucketMs > 0) {
@@ -1192,33 +1192,60 @@ export function renderEquityChart(tf = '7d') {
   const labels = pts.map((p) => {
       const d = new Date(p.timestamp);
       if (tf === '24h') return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-      if (tf === '7d' || tf === '4w') return d.toLocaleDateString([], {month: 'short', day: 'numeric'});
+      if (tf === '7d') return d.toLocaleDateString([], {month: 'short', day: 'numeric'}) + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      if (tf === '30d') return d.toLocaleDateString([], {month: 'short', day: 'numeric'});
       return d.toLocaleDateString([], {year: '2-digit', month: 'short'});
   });
 
   const green = cssVar('--green');
   const blue = cssVar('--blue');
   const text = cssVar('--text');
+  const cyan = cssVar('--cyan');
+  const yellow = cssVar('--yellow');
+
+  const basePoint = pts.find(p => p.nasdaq && p.invested);
+  const nasdaqData = pts.map(p => (basePoint && p.nasdaq) ? ((p.nasdaq - basePoint.nasdaq) / basePoint.nasdaq * 100) : null);
+  // Calculate portfolio return over the timeframe by looking at the change in Total P/L relative to the starting invested capital
+  const totalPctData = pts.map(p => (basePoint && basePoint.invested) ? ((p.total - basePoint.total) / basePoint.invested * 100) : null);
 
   equityChart = new Chart(canvas, {
     type: 'line',
     data: {
       labels,
       datasets: [
-        { label: 'Total P/L', data: pts.map((p) => p.total), borderColor: text, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
-        { label: 'Realized P/L', data: pts.map((p) => p.realized), borderColor: green, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
-        { label: 'Open P/L', data: pts.map((p) => p.open), borderColor: blue, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 }
+        { label: 'Total P/L', data: pts.map(p => p.total), yAxisID: 'y', borderColor: text, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
+        { label: 'Realized P/L', data: pts.map(p => p.realized), yAxisID: 'y', borderColor: green, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
+        { label: 'Open P/L', data: pts.map(p => p.open), yAxisID: 'y', borderColor: blue, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
+        { label: 'Portfolio Return %', data: totalPctData, yAxisID: 'y1', borderColor: yellow, borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
+        { label: 'Nasdaq %', data: nasdaqData, yAxisID: 'y1', borderColor: cyan, borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { display: true, labels: { color: cssVar('--muted') } },
-        tooltip: { mode: 'index', intersect: false, callbacks: { label: (c) => c.dataset.label + ': $' + c.raw.toFixed(2) } }
+        tooltip: { 
+            mode: 'index', intersect: false, 
+            callbacks: { 
+                label: c => {
+                    if (c.dataset.yAxisID === 'y1') return c.dataset.label + ': ' + (c.raw != null ? c.raw.toFixed(2) + '%' : 'N/A');
+                    return c.dataset.label + ': $' + (c.raw != null ? c.raw.toFixed(2) : 'N/A');
+                }
+            } 
+        }
       },
       scales: {
         x: { grid: { color: cssVar('--border') }, ticks: { color: cssVar('--muted'), maxTicksLimit: 8 } },
-        y: { grid: { color: cssVar('--border') }, ticks: { color: cssVar('--muted') } }
+        y: { 
+            type: 'linear', display: true, position: 'left',
+            grid: { color: cssVar('--border') }, 
+            ticks: { color: cssVar('--muted'), callback: v => '$' + v } 
+        },
+        y1: { 
+            type: 'linear', display: true, position: 'right',
+            grid: { drawOnChartArea: false },
+            ticks: { color: cssVar('--muted'), callback: v => (typeof v === 'number' ? v.toFixed(2) : v) + '%' } 
+        }
       }
     }
   });
