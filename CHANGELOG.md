@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Implemented a Light/Dark mode toggle (using `localStorage`) for better accessibility.
 
 ### Changed
-- Strategy update: Updated `/diversify` skill criteria to require strict quality standards (A/B+ rating, strong consensus, no Tech exposure) given recent underperformance.
+- Strategy update: Updated `/diversify` skill criteria to require strict quality standards (A rating, zero Tech exposure) given recent underperformance.
 - Workflow update: Updated `/diversify`, `/insider`, and `/earnings-play` skills to always fetch and log the exact RSI at the time of advice, ensuring better data quality for downstream analytics even on non-oversold strategies.
 - Dashboard: Fixed RSI rendering to consistently display rounded integers across tables and modals.
 - Analytics: Overhauled the "Entry Discipline" chart to show Average P/L % instead of Win Rate %, plotting positions across 4 distinct entry bounds ("Below Drop Below", "In Buy Zone", "Chased", "Above Drop Above") and tracking Min/Max range in tooltips.
@@ -38,6 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Fixed an issue where clicking table headers on identical values (like positions closed on the same day) resulted in unpredictable sorting. It now uses the company name or ticker as a stable alphabetical tie-breaker.
 - Docs: Updated the eToro sign-up link to use the new referral URL.
 - Strategy update: Updated GEMINI.md/CLAUDE.md to advise actively avoiding Tech stocks unless the setup is pristine, due to significant underperformance.
+- Strategy update: Banned all new Tech sector recommendations until performance recovers due to heavy underperformance and extreme systemic correlation.
 - Strategy update: Updated GEMINI.md/CLAUDE.md to remove C-rated stocks from the outperformance claim and flag them as falling-knife risks, due to poor performance.
 - Workflow update: Updated GEMINI.md/CLAUDE.md to utilize the new native filtering parameters for `screen.py oversold` instead of manual post-filtering.
 - Strategy update: Clarified in GEMINI.md/CLAUDE.md that B/C rated stocks historically outperform A-rated stocks in the oversold strategy.
