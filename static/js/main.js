@@ -1,7 +1,7 @@
 // @ts-check
 import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
-import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews } from './renderers.js';
+import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
 import { applyChange, fetchMacro, fetchIpos, loadLearn } from './api.js';
 import { marketHolidays } from './holidays.js';
@@ -546,6 +546,17 @@ const adviceClickHandler = (ev) => {
   const next = current === 'light' ? 'dark' : 'light';
   document.documentElement.setAttribute('data-theme', next);
   localStorage.setItem('theme', next);
+
+  setTimeout(() => {
+    if (activeTab === 'advice') renderTable();
+    if (activeTab === 'positions') renderPositions();
+    if (activeTab === 'portfolio') renderPortfolio();
+    if (activeTab === 'analytics') {
+        renderAnalytics();
+        const tf = document.querySelector('#equityToggles button.active')?.getAttribute('data-tf') || '24h';
+        renderEquityChart(tf);
+    }
+  }, 10);
 });
 
 /** @type {HTMLElement} */ (document.getElementById('syncBtn')).addEventListener('click', async () => {

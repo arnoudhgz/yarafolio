@@ -6,7 +6,7 @@
 <title>YaraFolio</title>
 <link rel="icon" type="image/png" href="static/img/yara-logo.png">
 <script src="static/js/vendor/chart.umd.min.js" defer></script>
-<link rel="stylesheet" href="static/css/styles.css">
+<link rel="stylesheet" href="static/css/styles.css?v=1.1">
 <script>
   const savedTheme = localStorage.getItem('theme') || 'dark';
   document.documentElement.setAttribute('data-theme', savedTheme);
@@ -197,7 +197,7 @@
         <div class="filters chart-toggles" id="equityToggles" style="margin-top:0;">
           <button data-tf="24h" class="active">24h</button>
           <button data-tf="7d">7d</button>
-          <button data-tf="4w">4w</button>
+          <button data-tf="30d">30d</button>
           <button data-tf="12m">12m</button>
         </div>
       </div>
