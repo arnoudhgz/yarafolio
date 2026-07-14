@@ -20,3 +20,5 @@
 - [e.g., Only average down if the stock has dropped at least 10%.]
 - [e.g., Avoid initiating new positions if earnings are within 7 days.]
 - [e.g., Never exceed 25% portfolio allocation in a single sector.]
+- [e.g., Treat highly correlated clusters as a single exposure block. Do not add new names to a saturated cluster.]
+- Exclude SPACs / Blank Check Companies during the IPO check. They trade flat at NAV ($10) until a merger target is announced and do not offer oversold bounce setups.
