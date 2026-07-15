@@ -1203,8 +1203,15 @@ export function renderEquityChart(tf = '7d') {
   const cyan = cssVar('--cyan');
   const yellow = cssVar('--yellow');
 
-  const basePoint = pts.find(p => p.nasdaq && p.invested);
-  const nasdaqData = pts.map(p => (basePoint && p.nasdaq) ? ((p.nasdaq - basePoint.nasdaq) / basePoint.nasdaq * 100) : null);
+  const basePoint = pts.find(p => p.invested);
+  const nasdaqBase = pts.find(p => p.nasdaq);
+  const sp500Base = pts.find(p => p.sp500);
+  const dowBase = pts.find(p => p.dow);
+
+  const nasdaqData = pts.map(p => (nasdaqBase && p.nasdaq) ? ((p.nasdaq - nasdaqBase.nasdaq) / nasdaqBase.nasdaq * 100) : null);
+  const sp500Data = pts.map(p => (sp500Base && p.sp500) ? ((p.sp500 - sp500Base.sp500) / sp500Base.sp500 * 100) : null);
+  const dowData = pts.map(p => (dowBase && p.dow) ? ((p.dow - dowBase.dow) / dowBase.dow * 100) : null);
+
   // Calculate portfolio return over the timeframe by looking at the change in Total P/L relative to the starting invested capital
   const totalPctData = pts.map(p => (basePoint && basePoint.invested) ? ((p.total - basePoint.total) / basePoint.invested * 100) : null);
 
@@ -1217,7 +1224,9 @@ export function renderEquityChart(tf = '7d') {
         { label: 'Realized P/L', data: pts.map(p => p.realized), yAxisID: 'y', borderColor: green, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
         { label: 'Open P/L', data: pts.map(p => p.open), yAxisID: 'y', borderColor: blue, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
         { label: 'Portfolio Return %', data: totalPctData, yAxisID: 'y1', borderColor: yellow, borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
-        { label: 'Nasdaq %', data: nasdaqData, yAxisID: 'y1', borderColor: cyan, borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 }
+        { label: 'Nasdaq %', data: nasdaqData, yAxisID: 'y1', borderColor: cyan, borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
+        { label: 'S&P 500 %', data: sp500Data, yAxisID: 'y1', borderColor: cssVar('--orange'), borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
+        { label: 'Dow %', data: dowData, yAxisID: 'y1', borderColor: cssVar('--red'), borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 }
       ]
     },
     options: {

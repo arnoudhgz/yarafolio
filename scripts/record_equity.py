@@ -56,12 +56,24 @@ def main():
             pass
 
     nasdaq_price = 0.0
+    sp500_price = 0.0
+    dow_price = 0.0
     try:
         import urllib.request
         req = urllib.request.Request("https://query1.finance.yahoo.com/v8/finance/chart/NQ=F", headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=10) as response:
             qdata = json.loads(response.read().decode())
             nasdaq_price = qdata["chart"]["result"][0]["meta"]["regularMarketPrice"]
+            
+        req = urllib.request.Request("https://query1.finance.yahoo.com/v8/finance/chart/ES=F", headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=10) as response:
+            qdata = json.loads(response.read().decode())
+            sp500_price = qdata["chart"]["result"][0]["meta"]["regularMarketPrice"]
+            
+        req = urllib.request.Request("https://query1.finance.yahoo.com/v8/finance/chart/YM=F", headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=10) as response:
+            qdata = json.loads(response.read().decode())
+            dow_price = qdata["chart"]["result"][0]["meta"]["regularMarketPrice"]
     except:
         pass
     
@@ -72,7 +84,9 @@ def main():
         "open": round(open_pl, 2),
         "total": round(total, 2),
         "invested": round(invested, 2),
-        "nasdaq": nasdaq_price
+        "nasdaq": nasdaq_price,
+        "sp500": sp500_price,
+        "dow": dow_price
     }
     
     history = []
