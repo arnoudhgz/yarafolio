@@ -125,7 +125,7 @@ let currentBlacklistEntryId = null;
 let currentConfirmCallback = null;
 
 function closeConfirmModal() {
-  document.getElementById('confirmModal').hidden = true;
+  /** @type {HTMLDialogElement} */ (document.getElementById('confirmModal')).close();
   currentConfirmCallback = null;
 }
 
@@ -149,7 +149,7 @@ function openConfirmModal(title, message, actionText, actionColor, callback) {
     closeConfirmModal();
   };
   
-  document.getElementById('confirmModal').hidden = false;
+  /** @type {HTMLDialogElement} */ (document.getElementById('confirmModal')).showModal();
   
   // Set focus to the action button so the user can just hit Enter
   setTimeout(() => btn.focus(), 0);
@@ -159,8 +159,9 @@ window['closeConfirmModal'] = closeConfirmModal;
 window['openConfirmModal'] = openConfirmModal;
 
 function closeBlacklistModal() {
-  const modal = /** @type {HTMLElement|null} */ (document.getElementById('blacklistModal'));
-  if (modal) modal.hidden = true;
+  const modal = /** @type {HTMLDialogElement|null} */ (document.getElementById('blacklistModal'));
+  if (modal) modal.close();
+  currentBlacklistEntryId = null;
   const newReasonInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistNewReason'));
   if (newReasonInput) newReasonInput.value = '';
 }
@@ -209,7 +210,7 @@ function submitBlacklist() {
 
 function openBlacklistModal(entryId = null) {
   currentBlacklistEntryId = entryId;
-  const modal = /** @type {HTMLElement|null} */ (document.getElementById('blacklistModal'));
+  const modal = /** @type {HTMLDialogElement|null} */ (document.getElementById('blacklistModal'));
   const tickerInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistTickerInput'));
   const tagsContainer = /** @type {HTMLElement|null} */ (document.getElementById('blacklistTags'));
   const tickerGroup = /** @type {HTMLElement|null} */ (document.getElementById('blacklistTickerGroup'));
@@ -247,7 +248,7 @@ function openBlacklistModal(entryId = null) {
     tickerInput.disabled = false;
   }
   
-  modal.hidden = false;
+  modal.showModal();
 }
 (/** @type {any} */ window)['openBlacklistModal'] = openBlacklistModal;
 
@@ -268,8 +269,8 @@ document.getElementById('btnManualBlacklist')?.addEventListener('click', () => {
   renderPortfolioTable();
 });
 
-/** @type {HTMLElement} */ (document.getElementById('macroModal')).addEventListener('click', e => {
-  if (/** @type {HTMLElement} */ (e.target).id === 'macroModal') /** @type {HTMLElement} */ (document.getElementById('macroModal')).hidden = true;
+document.getElementById('macroModal')?.addEventListener('click', e => {
+  if (/** @type {HTMLElement} */ (e.target).id === 'macroModal') /** @type {HTMLDialogElement} */ (document.getElementById('macroModal')).close();
 });
 
 document.querySelectorAll('.tabs button').forEach(b => {
@@ -624,19 +625,19 @@ const adviceClickHandler = (ev) => {
   }, 180));
 });
 
-const modalEl = /** @type {HTMLElement} */ (document.getElementById('modal'));
+const modalEl = /** @type {HTMLDialogElement} */ (document.getElementById('modal'));
 modalEl.addEventListener('click', (ev) => {
   if (ev.target === modalEl || /** @type {HTMLElement} */ (ev.target).closest('.modal-close')) closeModal();
 });
 document.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape') {
-    if (!modalEl.hidden) closeModal();
-    document.querySelectorAll('.modal-backdrop:not([hidden])').forEach(m => /** @type {HTMLElement} */ (m).hidden = true);
+    if (modalEl.open) closeModal();
+    document.querySelectorAll('dialog[open]').forEach(m => /** @type {HTMLDialogElement} */ (m).close());
   }
 });
 document.addEventListener('click', (ev) => {
-  if (ev.target instanceof HTMLElement && ev.target.classList.contains('modal-backdrop')) {
-    ev.target.hidden = true;
+  if (/** @type {HTMLElement} */ (ev.target).tagName === 'DIALOG' && /** @type {HTMLElement} */ (ev.target).id !== 'modal') {
+    /** @type {HTMLDialogElement} */ (ev.target).close();
   }
 });
 

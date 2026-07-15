@@ -377,19 +377,23 @@
     margin-left: 6px;
     vertical-align: middle;
   }
-  .modal-backdrop {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-    display: flex; align-items: center; justify-content: center; z-index: 100;
+  dialog::backdrop {
+    background: rgba(0,0,0,0.6);
   }
-  .modal-backdrop[hidden] { display: none; }
+  
+  dialog:not([open]) {
+    display: none !important;
+  }
+  
   .modal-card {
     background: var(--card); border: 1px solid var(--border); border-radius: 16px;
     backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-    padding: 36px 48px; width: min(1300px, 96vw); height: auto; max-height: 92vh; position: relative;
+    padding: 36px 48px; width: min(1300px, 96vw); height: fit-content; max-height: 92vh;
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     display: flex; flex-direction: column;
     font-size: 12.5px; line-height: 1.5; color: var(--text);
     overflow-y: auto;
+    margin: auto;
   }
   #modal .modal-card {
     min-height: 40vh;
