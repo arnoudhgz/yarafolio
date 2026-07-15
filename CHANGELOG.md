@@ -56,6 +56,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Fixed an issue where the Rating bucket chart in the Analytics tab sorted grades alphabetically (e.g. A, A+, A-, B...) rather than logically (A+, A, A-, B+, B...).
 
 ### Fixed
+- Dashboard: Prevented smaller confirmation modals from stretching with an empty space at the bottom by isolating the `min-height: 40vh` CSS rule strictly to the main chart modal.
+- Workflow: `etoro_import.py` now writes to `data/instruments_cache.json` instead of the version-controlled `data/instruments.json` file, preventing instrument list updates from dirtying the git status.
 - Fixed an issue where identical notes could be duplicated multiple times on the same day when a ticker was repeatedly re-advised.
 - Fixed date sorting so that identical local dates properly use their underlying timestamp for chronological sorting.
 - Separated column sorting states per Positions filter (Open, Closed, Needs Confirm, All) so that each tab remembers its own sort order independently.
