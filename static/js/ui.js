@@ -1,6 +1,6 @@
 // @ts-check
 import { DATA, PORTFOLIO, modalChart, setModalChart, SECTOR_COLORS, SECTORS, searchQuery } from './state.js';
-import { fmtPrice, fmtPL, fmtPct, fmtMoney, tickerLink, esc, realizedPL, unrealizedPL, today, localDate, advisedFor } from './utils.js';
+import { fmtPrice, fmtPL, fmtPct, fmtMoney, tickerLink, esc, realizedPL, unrealizedPL, today, localDate, advisedFor, cssVar } from './utils.js';
 
 /**
  * @param {HTMLElement} table
@@ -131,7 +131,7 @@ export function openMacroModal(title, impact, previous, forecast, country, date)
         scenarioHTML +
       '</div>' +
     '</div>';
-  /** @type {HTMLElement} */ (document.getElementById('macroModal')).hidden = false;
+  /** @type {HTMLDialogElement} */ (document.getElementById('macroModal')).showModal();
 }
 // @ts-ignore
 window.openMacroModal = openMacroModal;
@@ -200,7 +200,7 @@ export function openModal(id, positionID) {
     '<div style="flex: 1.5; display: flex; flex-direction: column;">' +
       '<div class="modal-chart" style="flex: 1; height: 100%; margin: 0;"><canvas id="modalChartCanvas"></canvas></div>' +
     '</div>';
-  /** @type {HTMLElement} */ (document.getElementById('modal')).hidden = false;
+  /** @type {HTMLDialogElement} */ (document.getElementById('modal')).showModal();
   drawModalChart(e, lot);
 }
 
@@ -340,19 +340,19 @@ export function drawModalChart(e, lot) {
     pointBorderWidth: 1
   };
   if (e.buyBelow != null) datasets.push({ label: 'Buy below', data: labels.map(() => e.buyBelow),
-    borderColor: '#2ecc71', borderDash: [5, 5], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
+    borderColor: cssVar('--green'), borderDash: [5, 5], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
   if (e.dropBelow != null) datasets.push({ label: 'Drop below', data: labels.map(() => e.dropBelow),
-    borderColor: '#e74c3c', borderDash: [5, 5], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
+    borderColor: cssVar('--red'), borderDash: [5, 5], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
   if (e.dropAbove != null) datasets.push({ label: 'Drop above', data: labels.map(() => e.dropAbove),
-    borderColor: '#8b98a5', borderDash: [5, 5], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
+    borderColor: cssVar('--muted'), borderDash: [5, 5], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
 
   const buyPrice = lot ? lot.openRate : (e.status === 'bought' ? e.boughtAt : null);
   if (buyPrice != null) {
     datasets.push({ label: 'Bought', data: labels.map(() => buyPrice),
-      borderColor: '#3498db', borderDash: [2, 2], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
+      borderColor: cssVar('--blue'), borderDash: [2, 2], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
 
     datasets.push({ label: 'TSL Target (+5%)', data: labels.map(() => buyPrice * 1.05),
-      borderColor: '#f1c40f', borderDash: [2, 2], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
+      borderColor: cssVar('--yellow'), borderDash: [2, 2], borderWidth: 1, pointRadius: 0, ...extraDatasetProps });
   }
 
   // @ts-ignore
@@ -362,7 +362,7 @@ export function drawModalChart(e, lot) {
     options: {
       maintainAspectRatio: false,
       plugins: { 
-        legend: { labels: { color: '#e6edf3' } },
+        legend: { labels: { color: cssVar('--text') } },
         tooltip: {
           callbacks: {
             title: (items) => {
@@ -373,18 +373,18 @@ export function drawModalChart(e, lot) {
         }
       },
       scales: {
-        x: { ticks: { color: '#8b98a5' }, grid: { color: '#2a3441', drawBorder: false } },
-        y: { ticks: { color: '#8b98a5' }, grid: { color: '#2a3441', drawBorder: false } }
+        x: { ticks: { color: cssVar('--muted') }, grid: { color: cssVar('--border'), drawBorder: false } },
+        y: { ticks: { color: cssVar('--muted') }, grid: { color: cssVar('--border'), drawBorder: false } }
       }
     }
   }));
 }
 
 export function closeModal() {
-  const m = /** @type {HTMLElement} */ (document.getElementById('modal'));
-  const mm = /** @type {HTMLElement} */ (document.getElementById('macroModal'));
-  if (m) m.hidden = true;
-  if (mm) mm.hidden = true;
+  const m = /** @type {HTMLDialogElement|null} */ (document.getElementById('modal'));
+  if (m) m.close();
+  const mm = /** @type {HTMLDialogElement|null} */ (document.getElementById('macroModal'));
+  if (mm) mm.close();
   if (modalChart) { modalChart.destroy(); setModalChart(null); }
 }
 

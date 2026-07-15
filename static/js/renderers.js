@@ -467,8 +467,8 @@ export function renderSectorCoverage() {
           ctx.parsed.x.toFixed(1) + '% · ' + (adviceCount[ctx.label] || 0) + ' advice pick(s)' } }
       },
       scales: {
-        x: { min: 0, ticks: { color: '#8b98a5', callback: (v) => v + '%' }, grid: { color: '#2a3441' } },
-        y: { ticks: { color: '#e6edf3' }, grid: { display: false } }
+        x: { min: 0, ticks: { color: cssVar('--muted'), callback: (v) => v + '%' }, grid: { color: cssVar('--border') } },
+        y: { ticks: { color: cssVar('--text') }, grid: { display: false } }
       }
     }
   }));
@@ -551,19 +551,19 @@ export function renderBucketChart(canvasId, buckets) {
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       scales: {
-        y: { position: 'left', min: 0, max: 100, title: { display: true, text: 'Win %', color: '#8b98a5' },
-             ticks: { color: '#8b98a5' }, grid: { color: '#2a3441', drawBorder: false } },
-        y1: { position: 'right', grid: { display: false }, title: { display: true, text: 'Avg %', color: '#8b98a5' },
-              ticks: { color: '#8b98a5' } },
-        x: { ticks: { color: '#8b98a5' }, grid: { display: false, drawBorder: false } }
+        y: { position: 'left', min: 0, max: 100, title: { display: true, text: 'Win %', color: cssVar('--muted') },
+             ticks: { color: cssVar('--muted') }, grid: { color: cssVar('--border'), drawBorder: false } },
+        y1: { position: 'right', grid: { display: false }, title: { display: true, text: 'Avg %', color: cssVar('--muted') },
+              ticks: { color: cssVar('--muted') } },
+        x: { ticks: { color: cssVar('--muted') }, grid: { display: false, drawBorder: false } }
       },
       plugins: {
-        legend: { labels: { color: '#e6edf3', usePointStyle: true, boxWidth: 10 } },
+        legend: { labels: { color: cssVar('--text'), usePointStyle: true, boxWidth: 10 } },
         tooltip: {
-          backgroundColor: 'rgba(13, 17, 23, 0.9)',
-          titleColor: '#e6edf3',
-          bodyColor: '#e6edf3',
-          borderColor: '#30363d',
+          backgroundColor: cssVar('--card'),
+          titleColor: cssVar('--text'),
+          bodyColor: cssVar('--text'),
+          borderColor: cssVar('--border'),
           borderWidth: 1,
           padding: 12,
           callbacks: { afterBody: (items) => {
