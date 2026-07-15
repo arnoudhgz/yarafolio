@@ -596,7 +596,15 @@
   <dialog id="infoSource" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoSource').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">By source</h2>
-      <p style="margin-bottom:0;">Compares the performance between different types of runs (e.g., standard /advice vs. /premarket vs. /aftermarket vs. /diversify).</p>
+      <p style="margin-bottom:12px;">Compares the performance between different types of runs to identify which strategy is yielding the best results:</p>
+      <ul style="margin: 0; padding-left: 20px; line-height: 1.6; font-size: 14px; color: var(--text);">
+        <li><strong style="color: var(--blue);">/advice:</strong> Standard intraday runs hunting for oversold bounces.</li>
+        <li><strong style="color: var(--blue);">/premarket:</strong> Early runs capitalizing on premarket movers before the bell.</li>
+        <li><strong style="color: var(--blue);">/aftermarket:</strong> Post-close runs targeting overreactions and earnings drops.</li>
+        <li><strong style="color: var(--blue);">/diversify:</strong> Picks specifically chosen to fill underweighted portfolio sectors.</li>
+        <li><strong style="color: var(--blue);">/momentum & others:</strong> Specialized strategies like breakouts or insider buying.</li>
+        <li><strong style="color: var(--blue);">manual:</strong> Custom tickers added manually via /check or direct import.</li>
+      </ul>
     </dialog>
 
   <dialog id="infoGainVsDays" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
