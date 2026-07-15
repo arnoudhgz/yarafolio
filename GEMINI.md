@@ -8,7 +8,7 @@ Use Opus.
 
 ## Strategy parameters
 
-Always read `data/private/STRATEGY.md` for the personal trading parameters (batch size, broker, trailing stop) and the learned output rules (sector biases, rating strictness). If that file doesn't exist, read `data/STRATEGY.sample.md` instead.
+Always read `data/private/STRATEGY.md` for the personal trading parameters (batch size, broker, trailing stop) and the learned output rules (sector biases, rating strictness). If that file doesn't exist, read `data/sample/STRATEGY.md` instead.
 
 ## Commands
 

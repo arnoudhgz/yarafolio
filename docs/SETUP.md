@@ -15,7 +15,7 @@ Before you begin, ensure that your system has **Python 3** installed (minimum ve
 Your personal trading parameters (like batch sizes, trailing stop targets, and sector biases) are stored in a private file so they aren't accidentally pushed back to GitHub.
 Copy the sample template to get started:
 ```bash
-cp data/STRATEGY.sample.md data/private/STRATEGY.md
+cp data/sample/STRATEGY.md data/private/STRATEGY.md
 ```
 Open `data/private/STRATEGY.md` and customize the parameters to fit your trading style!
 
