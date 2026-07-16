@@ -21,6 +21,7 @@ Always read `data/private/STRATEGY.md` for the personal trading parameters (batc
 | `/import` | Import my eToro positions (screenshot/paste) into the tracker (skill: `.claude/skills/import`) |
 | `/diversify` | Sector-gap picks: quality stocks I don't hold, in underweighted sectors (skill: `.claude/skills/diversify`) |
 | `/review` | Self-learning pass: outcome stats, proposes skill/CLAUDE.md improvements, approval-gated (skill: `.claude/skills/review`) |
+| `/market-rotation` | Finds opportunities in the current market rotation using systematic tactics, not strictly oversold (skill: `.claude/skills/market-rotation`) |
 | `/article TICKER` | Max 150-word article for my eToro feed, sources max 1 day old |
 
 ## Output rules (learned, non-negotiable)
