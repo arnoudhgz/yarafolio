@@ -221,7 +221,7 @@ class EtoroImport:
             rate = rates.get(iid, {})
             current = rate.get("bid") or rate.get("lastExecution")
             pl_dollar = round(
-                units * current - invested,
+                units * (current - avg_open),
                 2) if current else None
             pl_pct = round(pl_dollar / invested * 100,
                            2) if pl_dollar is not None and invested else None
@@ -245,6 +245,7 @@ class EtoroImport:
                     "openDateTime": p["openDateTime"],
                     "openRate": round(p["openRate"], 4),
                     "units": round(p["units"], 6),
+                    "invested": round(p["initialAmountInDollars"], 2),
                     "tslEnabled": bool(p.get("isTslEnabled")),
                 } for p in plist],
             })

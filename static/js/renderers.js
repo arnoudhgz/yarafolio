@@ -343,11 +343,11 @@ export function renderPortfolioTable() {
             name: h.name,
             sector: h.sector,
             units: lot.units,
-            invested: lot.units * lot.openRate,
+            invested: lot.invested || (lot.units * lot.openRate),
             avgOpen: lot.openRate,
             currentPrice: h.currentPrice,
             plDollar: lot.units * (h.currentPrice - lot.openRate),
-            plPct: lot.openRate > 0.01 ? (h.currentPrice - lot.openRate) / lot.openRate * 100 : 0,
+            plPct: (lot.invested || (lot.units * lot.openRate)) > 0 ? (lot.units * (h.currentPrice - lot.openRate)) / (lot.invested || (lot.units * lot.openRate)) * 100 : 0,
             firstOpen: lot.openDate,
             positions: 1
           });
@@ -1194,7 +1194,7 @@ export function renderEquityChart(tf = '7d') {
       if (tf === '24h') return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
       if (tf === '7d') return d.toLocaleDateString([], {month: 'short', day: 'numeric'}) + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
       if (tf === '30d') return d.toLocaleDateString([], {month: 'short', day: 'numeric'});
-      return d.toLocaleDateString([], {year: '2-digit', month: 'short'});
+      return d.toLocaleDateString([], {year: 'numeric', month: 'short'});
   });
 
   const green = cssVar('--green');
