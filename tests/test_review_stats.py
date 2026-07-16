@@ -41,9 +41,10 @@ class RsiBandTest(unittest.TestCase):
 
     def test_bands(self):
         self.assertEqual(self.app.rsi_band(18), "<20")
-        self.assertEqual(self.app.rsi_band(20), "20-25")
-        self.assertEqual(self.app.rsi_band(27), "25-30")
-        self.assertEqual(self.app.rsi_band(35), "30+")
+        self.assertEqual(self.app.rsi_band(20), "20-30")
+        self.assertEqual(self.app.rsi_band(27), "20-30")
+        self.assertEqual(self.app.rsi_band(35), "30-40")
+        self.assertEqual(self.app.rsi_band(75), "70+")
         self.assertEqual(self.app.rsi_band(0), "<20")
 
     def test_none(self):

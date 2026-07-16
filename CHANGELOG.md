@@ -28,9 +28,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added 11 new stock instruments to the tracking dataset (`data/instruments.json`).
 - CLI: Added new `momentum` subparser to `scripts/screen.py` to identify stocks with extreme relative strength (RSI > 70).
 - AI Skills: Introduced `/momentum`, `/insider`, and `/earnings-play` workflows to both `.claude/skills` and `.gemini/skills` for identifying non-oversold market opportunities.
+- AI Skills: Introduced `/market-rotation` workflow to both `.claude/skills` and `.gemini/skills` for finding opportunities in sectors gaining relative momentum using systematic tactics.
 - Dashboard: Implemented a Light/Dark mode toggle (using `localStorage`) for better accessibility.
 
 ### Changed
+- Changed: Split the RSI bands in `scripts/review_stats.py` into more granular buckets (`<20`, `20-30`, `30-40`, `40-50`, `50-60`, `60-70`, `70+`) to better represent momentum and rotation plays.
 - Strategy update: Updated `/diversify` skill criteria to require strict quality standards (A rating, zero Tech exposure) given recent underperformance.
 - Workflow update: Updated `/diversify`, `/insider`, and `/earnings-play` skills to always fetch and log the exact RSI at the time of advice, ensuring better data quality for downstream analytics even on non-oversold strategies.
 - Dashboard: Fixed RSI rendering to consistently display rounded integers across tables and modals.
@@ -58,6 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Migrated all modals from pseudo-backdrop `div`s to native HTML `<dialog>` elements for better structural semantics and simplified CSS.
 
 ### Fixed
+- Fixed an alphabetical sorting bug on the dashboard Analytics "By RSI band" chart that caused `<20` to render incorrectly on the right side of numerical buckets.
+- Fixed `etoro_import.py` and dashboard P/L calculations to correctly use the position's `avg_open` price and `initialAmountInDollars` (invested amount) rather than dynamically recalculating invested amount, preventing discrepancies.
 - Dashboard: Prevented smaller confirmation modals from stretching with an empty space at the bottom by isolating the `min-height: 40vh` CSS rule strictly to the main chart modal.
 - Workflow: `etoro_import.py` now writes to `data/instruments_cache.json` instead of the version-controlled `data/instruments.json` file, preventing instrument list updates from dirtying the git status.
 - Fixed an issue where identical notes could be duplicated multiple times on the same day when a ticker was repeatedly re-advised.

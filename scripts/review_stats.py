@@ -56,8 +56,15 @@ def get_env(key: str) -> str | None:
 
 
 class LearnStats:
-    RSI_BANDS = (("<20", 0, 20), ("20-25", 20, 25),
-                 ("25-30", 25, 30), ("30+", 30, 10 ** 6))
+    RSI_BANDS = (
+        ("<20", 0, 20),
+        ("20-30", 20, 30),
+        ("30-40", 30, 40),
+        ("40-50", 40, 50),
+        ("50-60", 50, 60),
+        ("60-70", 60, 70),
+        ("70+", 70, 10 ** 6)
+    )
     MIN_BUCKET = 1
 
     def __init__(self):
@@ -126,7 +133,13 @@ class LearnStats:
         for key, pct in rows:
             grouped.setdefault(key, []).append(pct)
         out = {}
-        for key, pcts in sorted(grouped.items(), key=lambda kv: str(kv[0])):
+        def sort_key(kv):
+            k = str(kv[0])
+            if k.startswith('<'): return f"000_{k}"
+            if '-' in k and k.split('-')[0].isdigit(): return f"{int(k.split('-')[0]):03d}_{k}"
+            if k.endswith('+') and k[:-1].isdigit(): return f"{int(k[:-1]):03d}_{k}"
+            return k
+        for key, pcts in sorted(grouped.items(), key=sort_key):
             if len(pcts) < self.MIN_BUCKET:
                 out[key] = {"n": len(pcts), "insufficient": True}
             else:
