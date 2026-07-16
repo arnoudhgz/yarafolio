@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Implemented a Light/Dark mode toggle (using `localStorage`) for better accessibility.
 
 ### Changed
+- Docs: Updated `.agents/AGENTS.md` to explicitly forbid hardcoding strategy thresholds in skill files and added a strict Ticker Validation Rule for generic stock symbols.
 - Changed: Split the RSI bands in `scripts/review_stats.py` into more granular buckets (`<20`, `20-30`, `30-40`, `40-50`, `50-60`, `60-70`, `70+`) to better represent momentum and rotation plays.
 - Strategy update: Updated `/diversify` skill criteria to require strict quality standards (A rating, zero Tech exposure) given recent underperformance.
 - Workflow update: Updated `/diversify`, `/insider`, and `/earnings-play` skills to always fetch and log the exact RSI at the time of advice, ensuring better data quality for downstream analytics even on non-oversold strategies.
