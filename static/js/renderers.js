@@ -12,7 +12,7 @@ export function renderAll() {
   /** @type {HTMLElement} */ (document.getElementById('cOpen')).textContent = String(entries.filter(e => e.status === 'bought').length);
   /** @type {HTMLElement} */ (document.getElementById('cClosed')).textContent = String(entries.filter(e => e.status === 'sold').length);
   /** @type {HTMLElement} */ (document.getElementById('cWatching')).textContent = String(entries.filter(e => e.status === 'watching').length);
-  /** @type {HTMLElement} */ (document.getElementById('cIgnored')).textContent = String(entries.filter(e => ['dropped', 'avoid', 'blacklisted'].includes(e.status)).length);
+  /** @type {HTMLElement} */ (document.getElementById('cIgnored')).textContent = String(entries.filter(e => ['dropped', 'avoid', 'blacklisted', 'removed'].includes(e.status)).length);
   renderTable();
   renderPositions();
   if (activeTab === 'portfolio') renderPortfolio();

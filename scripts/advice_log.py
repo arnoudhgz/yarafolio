@@ -463,10 +463,10 @@ class AdviceLog:
         if lots and not args.force:
             sys.exit(
                 f"{args.id} ({e.get('ticker')}) has {len(lots)} eToro lot(s); "
-                "refusing to delete a tracked position without --force")
-        data["entries"] = [x for x in data["entries"] if x.get("id") != args.id]
+                "refusing to remove a tracked position without --force")
+        e["status"] = "removed"
         self.save_log(data)
-        logger.info(f"removed {args.id} ({e.get('ticker')}, {e.get('status')})")
+        logger.info(f"marked as removed {args.id} ({e.get('ticker')})")
 
 
 def main():

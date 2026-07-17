@@ -439,7 +439,7 @@ const adviceClickHandler = (ev) => {
       'Remove',
       'red',
       () => {
-        applyChange(() => { entry.status = 'removed'; });
+        applyChange(() => { DATA.entries = DATA.entries.filter(e => e.id !== btn.dataset.id); });
       }
     );
   }

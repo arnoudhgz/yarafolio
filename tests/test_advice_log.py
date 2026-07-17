@@ -223,20 +223,23 @@ class AddPickTest(unittest.TestCase):
         new = [x for x in entries if x["id"] != "ADBE-0001"][0]
         self.assertEqual(new["status"], "watching")
 
-    def test_remove_deletes_by_id(self):
+    def test_remove_marks_as_removed(self):
         self._seed([
             {"id": "ACN-0001", "ticker": "ACN", "status": "bought", "lots": []},
             {"id": "ACN-0002", "ticker": "ACN", "status": "watching", "lots": []},
         ])
         self.app.cmd_remove(SimpleNamespace(id="ACN-0002", force=False))
-        self.assertEqual([e["id"] for e in self._entries()], ["ACN-0001"])
+        entries = self._entries()
+        self.assertEqual(len(entries), 2)
+        e2 = next(e for e in entries if e["id"] == "ACN-0002")
+        self.assertEqual(e2["status"], "removed")
 
     def test_remove_guards_position_with_lots(self):
         self._seed([{"id": "ACN-0001", "ticker": "ACN", "status": "bought",
                      "lots": [{"positionID": 1}]}])
         with self.assertRaises(SystemExit):
             self.app.cmd_remove(SimpleNamespace(id="ACN-0001", force=False))
-        self.assertEqual(len(self._entries()), 1)     # guarded, not removed
+        self.assertEqual(self._entries()[0]["status"], "bought")  # guarded, not removed
 
     def test_new_pick_seeds_adviceEvents_with_today(self):
         self.app.cmd_add_pick(_pick_args("AAPL", 170.0))
