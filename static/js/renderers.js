@@ -1159,11 +1159,17 @@ export function renderEquityChart(tf = '7d') {
       const oneHourAgo = now.getTime() - 60 * 60 * 1000;
       
       pts.forEach(p => {
-          const t = new Date(p.timestamp).getTime();
+          const d = new Date(p.timestamp);
+          const t = d.getTime();
           if (tf === '24h' && t >= oneHourAgo) {
               recentPoints.push(p);
           } else {
-              const bucket = Math.floor(t / bucketMs) * bucketMs;
+              let bucket;
+              if (tf === '30d') {
+                  bucket = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+              } else {
+                  bucket = Math.floor(t / bucketMs) * bucketMs;
+              }
               buckets[bucket] = p; // keep last in bucket
           }
       });
