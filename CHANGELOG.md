@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.0] - 2026-07-17
+## [0.10.0] - 2026-07-23
 
 ### Added
 - Feature: Added support for blacklisting stocks. Blacklisted stocks can be added manually or flagged from the dashboard, are tagged with customizable reasons (e.g., 'not listed', 'paused'), and are automatically ignored by the advice workflow.
@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Implemented a Light/Dark mode toggle (using `localStorage`) for better accessibility.
 
 ### Changed
+- Docs: Updated `GEMINI.md` and `CLAUDE.md` to document the asynchronous nature of the Equity Curve graph updates vs the live DOM update for Top Cards.
 - Docs: Updated `.agents/AGENTS.md` to explicitly forbid hardcoding strategy thresholds in skill files and added a strict Ticker Validation Rule for generic stock symbols.
 - Changed: Split the RSI bands in `scripts/review_stats.py` into more granular buckets (`<20`, `20-30`, `30-40`, `40-50`, `50-60`, `60-70`, `70+`) to better represent momentum and rotation plays.
 - Strategy update: Updated `/diversify` skill criteria to require strict quality standards (A rating, zero Tech exposure) given recent underperformance.
@@ -63,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Migrated all modals from pseudo-backdrop `div`s to native HTML `<dialog>` elements for better structural semantics and simplified CSS.
 
 ### Fixed
+- Fixed `advice_log.py checkin-candidates` using a hardcoded >7 days threshold instead of respecting the 3-day drop rule.
 - Fixed an alphabetical sorting bug on the dashboard Analytics "By RSI band" chart that caused `<20` to render incorrectly on the right side of numerical buckets.
 - Fixed `etoro_import.py` and dashboard P/L calculations to correctly use the position's `avg_open` price and `initialAmountInDollars` (invested amount) rather than dynamically recalculating invested amount, preventing discrepancies.
 - Dashboard: Prevented smaller confirmation modals from stretching with an empty space at the bottom by isolating the `min-height: 40vh` CSS rule strictly to the main chart modal.

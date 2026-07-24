@@ -68,6 +68,8 @@ Every `/advice`, `/premarket`, and `/aftermarket` run, after the table:
 
 The Advice tab shows advised picks only; imported-only holdings live on Portfolio. yarafolio.py endpoints: "Update from eToro" -> `/api/import`, "Refresh quotes" -> `/api/refresh` (scrapes `screen.py quote --json` for watching/bought advised tickers and writes them via `advice_log.py touch-many`, never touching the JSON directly), Bought/Drop/Confirm buttons -> `/api/save`. Stdlib only, no dependencies, keep it that way.
 
+**Dashboard Sync Timing:** Top cards (Win Rate, Realized P/L, Open P/L) are computed instantly in the browser from `advice-log.json` and `portfolio.json`. However, the Equity Curve graph reads from `equity-history.json`, which is appended by `record_equity.py` running asynchronously in the background via `autosync.py`. Immediately after a UI sync, the graph may temporarily trail the top cards by one data point until the page is refreshed.
+
 ## Auto-backup to the private repo
 
 The data lives in a private GitHub repo (`assisted-stock-advice`); `scripts/autosync.py` commits + pushes the data + generated files (`data/private/*.json`, `data/private/REVIEWS.md`, never code) on every change. It runs from yarafolio.py after each dashboard save/import/refresh (background, best-effort) and as the last step of `/advice`, `/premarket`, `/aftermarket`, `/check`, `/diversify`, `/import`, `/review`.
