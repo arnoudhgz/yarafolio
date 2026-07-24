@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Added visual rendering of the `openNote` property in the dashboard drill-down modal (displayed in orange below the Risk section).
 - Pipeline: Updated the CLI to parse and accept GICS sectors exclusively instead of the legacy eToro sectors.
 - Dashboard: Fixed a bug causing a DOM Exception for disabled buttons in `renderers.js` by explicitly casting to `HTMLButtonElement`.
+- Dashboard: Removed the redundant "Analytics" overarching title to fix the double title display above the "~7 days after advice" card.
+- Dashboard: Added "Advised" and "Bought" toggles to the "By Day of the Week" chart to allow bucketing by either the AI advice date or the eToro trade execution date.
 
 ### Added
 - Dashboard: Combined the Sector division and Sector coverage charts into a single "Sector Analysis" card on the Analytics tab and added explanatory modals regarding sector accuracy.

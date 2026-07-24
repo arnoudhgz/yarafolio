@@ -482,6 +482,17 @@ const adviceClickHandler = (ev) => {
   import('./renderers.js').then(r => r.renderDrawdownChart(t.dataset.tf));
 });
 
+/** @type {HTMLElement} */ (document.getElementById('dayOfWeekToggles'))?.addEventListener('click', e => {
+  const t = /** @type {HTMLElement} */ (e.target);
+  if (t.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#dayOfWeekToggles button').forEach(b => b.classList.remove('active'));
+  t.classList.add('active');
+  import('./renderers.js').then(r => {
+    const soldLots = r.positionLotRows().filter(row => row.status === 'sold');
+    r.renderDayOfWeekChart('chartDayOfWeek', soldLots);
+  });
+});
+
 /** @type {HTMLElement} */ (document.getElementById('pnlToggles')).addEventListener('click', ev => {
   const t = /** @type {HTMLElement} */ (ev.target);
   if (t.tagName === 'BUTTON' && t.dataset.tf) {

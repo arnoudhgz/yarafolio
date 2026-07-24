@@ -834,9 +834,12 @@ export function renderDayOfWeekChart(canvasId, rows) {
   const daysStr = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const buckets = [0,1,2,3,4,5,6].map(i => ({ sum: 0, count: 0, name: daysStr[i] }));
   
+  const type = document.querySelector('#dayOfWeekToggles button.active')?.dataset.type || 'advised';
+
   rows.forEach(r => {
-    if (!r.firstAdvised) return;
-    const d = new Date(r.firstAdvised).getDay();
+    let dateStr = type === 'bought' ? r.openDateTime : r.firstAdvised;
+    if (!dateStr) return;
+    const d = new Date(dateStr).getDay();
     if (isNaN(d)) return;
     buckets[d].sum += r.plPct;
     buckets[d].count += 1;
