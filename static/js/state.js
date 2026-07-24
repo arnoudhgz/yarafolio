@@ -34,6 +34,7 @@ if (typeof window !== 'undefined') marked = /** @type {any} */ (window).marked;
  * @property {number} [dropAbove]
  * @property {string} [reason]
  * @property {string} [risk]
+ * @property {string} [openNote]
  * @property {number} [boughtAt]
  * @property {number} [soldAt]
  * @property {number} [units]
@@ -103,13 +104,12 @@ export const analyticsCharts = {};
 export let modalChart = null;
 
 export const SECTOR_COLORS = {
-  'Basic Materials': '#9b59b6', 'Conglomerates': '#f1c40f', 'Consumer Goods': '#2ecc71',
-  'Financial': '#3498db', 'Healthcare': '#e74c3c', 'Industrial Goods': '#e67e22',
-  'Services': '#1abc9c', 'Technology': '#fd79a8', 'Utilities': '#f39c12', 'ETF / Other': '#95a5a6',
+  'Communication Services': '#8b5cf6', 'Consumer Discretionary': '#3b82f6', 'Consumer Staples': '#10b981',
+  'Energy': '#f59e0b', 'Financials': '#eab308', 'Healthcare': '#ef4444',
+  'Industrials': '#84cc16', 'Technology': '#ec4899', 'Materials': '#6366f1',
+  'Real Estate': '#06b6d4', 'Utilities': '#f97316', 'ETF / Other': '#64748b',
 };
-// mirrors the SECTORS tuple in scripts/advice_log.py (eToro taxonomy)
-export const SECTORS = ['Basic Materials', 'Conglomerates', 'Consumer Goods', 'Financial', 'Healthcare',
-  'Industrial Goods', 'Services', 'Technology', 'Utilities', 'ETF / Other'];
+export const SECTORS = ['Communication Services', 'Consumer Discretionary', 'Consumer Staples', 'Energy', 'Financials', 'Healthcare', 'Industrials', 'Materials', 'Real Estate', 'Technology', 'Utilities', 'ETF / Other'];
 
 /** @type {string} */
 export let portfolioViewMode = localStorage.getItem('portfolioViewMode') || 'collapsed';

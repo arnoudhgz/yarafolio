@@ -1,6 +1,6 @@
 # Purpose
 
-My personal stock portfolio helper for trading on eToro. I buy oversold positions in batches and protect profit with trailing stop losses, so I don't need to watch the market all day.
+My personal stock portfolio helper for trading on eToro. I buy positions in batches according to my strategy and protect profit with trailing stop losses, so I don't need to watch the market all day.
 
 ## Model
 
@@ -14,19 +14,19 @@ Always read `data/private/STRATEGY.md` for the personal trading parameters (batc
 
 | Command | Purpose |
 |---|---|
-| `/advice` | Up to 10 picks with upward potential, oversold focus (defensive when bearish). Less than 10 is fine if the best ones are already listed. |
+| `/advice` | Up to 10 picks with upward potential, aligned with the active strategy (defensive when bearish). Less than 10 is fine if the best ones are already listed. |
 | `/premarket` | Same max-10-pick advice, but built on premarket data before US open (skill: `.claude/skills/premarket`) |
 | `/aftermarket` | Same max-10-pick advice, but built on after-hours data and earnings drops after US close (skill: `.claude/skills/aftermarket`) |
 | `/check TICKER [url]` | Re-check a single pick: news, lawsuits, analyst moves, verdict (skill: `.claude/skills/check`) |
 | `/import` | Import my eToro positions (screenshot/paste) into the tracker (skill: `.claude/skills/import`) |
 | `/diversify` | Sector-gap picks: quality stocks I don't hold, in underweighted sectors (skill: `.claude/skills/diversify`) |
 | `/review` | Self-learning pass: outcome stats, proposes skill/GEMINI.md improvements, approval-gated (skill: `.claude/skills/review`) |
-| `/market-rotation` | Finds opportunities in the current market rotation using systematic tactics, not strictly oversold (skill: `.claude/skills/market-rotation`) |
+| `/market-rotation` | Finds opportunities in the current market rotation using systematic tactics, using alternative parameters (skill: `.claude/skills/market-rotation`) |
 | `/article TICKER` | Max 150-word article for my eToro feed, sources max 1 day old |
 
 ## Output rules (learned, non-negotiable)
 
-- Every recommendation list goes in ONE markdown table. Columns: Ticker, Price, Rating, RSI, Why oversold / thesis, Risk. No prose blocks per stock.
+- Every recommendation list goes in ONE markdown table. Columns: Ticker, Price, Rating, Target Metric, Thesis, Risk. No prose blocks per stock.
 - Sources as hyperlinks below the table.
 - Data must be fresh: last 24 hours max, intraday when the market just opened. When I say the market opened minutes ago, use prices from today's session, not yesterday's close.
 - Before listing any pick, run one targeted litigation/fraud search per final pick, unconditional, even when the pre-fetched red-flag headlines looked clean (I once almost bought ZTS during a securities fraud investigation; the keyword screen can miss a problem phrased outside its terms). A red flag means drop the pick or mark it clearly.
@@ -37,7 +37,7 @@ Always read `data/private/STRATEGY.md` for the personal trading parameters (batc
 | Step | What | Source |
 |---|---|---|
 | 1 | Market sentiment + futures | WebSearch "stock market today ..." |
-| 2 | Oversold screen | `python3 scripts/screen.py oversold --min-rsi 20 --exclude-held --exclude-advised` (add `--full` for PE/VOL/MKTCAP/SECTOR columns when the page has them); fallback on script breakage: [stockanalysis.com oversold list](https://stockanalysis.com/list/oversold-stocks/), [MarketBeat RSI screen](https://www.marketbeat.com/market-data/oversold-stocks-rsi/) |
+| 2 | Strategy screen | `python3 scripts/screen.py <strategy> <args> --exclude-held --exclude-advised` (add `--full` for PE/VOL/MKTCAP/SECTOR columns when the page has them); fallback on script breakage: a relevant web screener |
 | 2b | IPO check | `python3 scripts/screen.py ipos --json`. Look at "upcoming" and "recent" IPOs. Ignore any that are marked as avoided/Not listed in your advice log. If there is a highly anticipated IPO hitting the market today/tomorrow or a recent IPO showing a great entry point, add up to 2 of them to your candidate list. |
 | 2c | Candidate data pre-fetch | `python3 scripts/screen.py quote / forecast / news / news --red-flags` (one call per command for all candidates, rows embedded in researcher prompts). `forecast` carries the SB/B/H/S/SS analyst distribution + as-of date; `news` carries each headline's article URL; `quote --json` feeds the dashboard refresh |
 | 3 | Premarket movers (premarket only) | stockanalysis.com premarket pages |
@@ -50,7 +50,7 @@ WebSearch and the WebFetch domains above are pre-allowed in `.claude/settings.lo
 
 Advice generation is market-driven only: never use my portfolio as input for picks or researcher prompts. The portfolio enters AFTER the advice table, as a comparison. Exception: `/diversify` deliberately uses the portfolio sector split and held tickers as input; that's its whole point and the only allowed portfolio-as-input path.
 
-**Deterministic data work goes through the `scripts/` CLIs, skills never hand-edit `data/*.json`.** Log mutations: `scripts/advice_log.py` (add-pick, add-note, touch, set-status, set-tsl, checkin-candidates, compare, sector-gaps). Outcome stats: `scripts/review_stats.py`. Sync: `scripts/etoro_import.py`. Mechanical market data (oversold screen, quote stats, analyst forecast, headlines, red-flag discovery): `scripts/screen.py`, with WebFetch/WebSearch as fallback when its scraping breaks. WebSearch stays for the judgment work: reading the articles that matter, weighing litigation severity, fresh analyst moves, market posture, and candidate discovery for /diversify. This also keeps token usage down.
+**Deterministic data work goes through the `scripts/` CLIs, skills never hand-edit `data/*.json`.** Log mutations: `scripts/advice_log.py` (add-pick, add-note, touch, set-status, set-tsl, checkin-candidates, compare, sector-gaps). Outcome stats: `scripts/review_stats.py`. Sync: `scripts/etoro_import.py`. Mechanical market data (strategy screens, quote stats, analyst forecast, headlines, red-flag discovery): `scripts/screen.py`, with WebFetch/WebSearch as fallback when its scraping breaks. WebSearch stays for the judgment work: reading the articles that matter, weighing litigation severity, fresh analyst moves, market posture, and candidate discovery for /diversify. This also keeps token usage down.
 
 Every `/advice`, `/premarket`, and `/aftermarket` run, after the table:
 

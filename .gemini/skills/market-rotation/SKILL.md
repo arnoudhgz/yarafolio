@@ -9,7 +9,7 @@ metadata:
 
 # Market Rotation
 
-Recommend max ~10 stocks that benefit from the current market rotation. This strategy identifies sectors or themes that are systematically rotating into market leadership and finds high-quality setups within them. They do not have to be strictly oversold, but must strictly adhere to `STRATEGY.md`.
+Recommend max ~10 stocks that benefit from the current market rotation. This strategy identifies sectors or themes that are systematically rotating into market leadership and finds high-quality setups within them. They do not have to be strictly according to the primary metric, but must strictly adhere to `STRATEGY.md`.
 
 ## Step 1: Identify the Rotation
 Use mathematical and systematic tactics to identify sector rotation.

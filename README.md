@@ -43,7 +43,7 @@ You might wonder why YaraFolio uses flat JSON files (`data/advice-log.json`) ins
 
 This project is driven by custom agent instructions. When you talk to the AI, it reads these files to know exactly how to fetch data, evaluate stocks, and update your dashboard.
 
-Out of the box, these instructions reflect my personal "oversold bounce" strategy. **You should absolutely tune these to your own liking.**
+Out of the box, these instructions reflect my personal "strategy bounce" strategy. **You should absolutely tune these to your own liking.**
 
 Here is the breakdown of the available tools:
 1. **The Core Strategies**: Check out [`GEMINI.md`](GEMINI.md) and [`CLAUDE.md`](CLAUDE.md), which instruct the AI to read your personal configuration from `data/private/STRATEGY.md`. This private file is where your overarching rules live (batch sizes, risk tolerance, sector preferences). 

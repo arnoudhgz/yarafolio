@@ -51,17 +51,15 @@ def get_env(key: str) -> str | None:
 
 class AdviceLog:
     SECTORS = (
-        "Basic Materials",
-        "Conglomerates",
-        "Consumer Goods",
-        "Financial",
+        "Materials", "Industrials", "Communication Services", "Energy", "Real Estate",
+        "Consumer Staples", "Consumer Discretionary",
+        "Financials",
         "Healthcare",
-        "Industrial Goods",
-        "Services",
+        "Consumer Discretionary",
         "Technology",
         "Utilities",
         "ETF / Other")
-    NEW_PICK_SOURCES = ("advice", "premarket", "diversify", "aftermarket", "manual", "momentum", "earnings", "insider", "market-rotation")
+    NEW_PICK_SOURCES = ("oversold", "diversify", "manual", "momentum", "earnings", "insider", "market-rotation")
 
     def __init__(self):
         is_demo = get_env("DEMO_MODE") == "1"
@@ -156,6 +154,7 @@ class AdviceLog:
                 "priceAtAdvice": args.price,
                 "reason": None,
                 "risk": None,
+                "openNote": None,
                 "sector": None,
                 "buyBelow": None,
                 "dropBelow": None,
@@ -186,7 +185,7 @@ class AdviceLog:
         for field, value in (("rating", args.rating), ("rsiAtAdvice", args.rsi),
                              ("sector", args.sector), ("buyBelow", args.buy_below),
                              ("dropBelow", args.drop_below), ("dropAbove", args.drop_above),
-                             ("name", args.name), ("reason", args.reason), ("risk", args.risk)):
+                             ("name", args.name), ("reason", args.reason), ("risk", args.risk), ("openNote", args.open_note)):
             if value is not None:
                 e[field] = value
         if args.reason:
@@ -493,6 +492,7 @@ def main():
     p.add_argument("--name")
     p.add_argument("--reason")
     p.add_argument("--risk")
+    p.add_argument("--open-note")
     p.add_argument(
         "--note",
         help="dated commentary for the notes history (news, what happened)")

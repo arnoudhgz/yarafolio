@@ -275,6 +275,9 @@ class Screen:
         for label in QUOTE_FIELDS:
             if label in pairs:
                 data[label] = pairs[label].strip()
+        sector_match = re.search(r"\{t:\"Sector\",v:\"([^\"]+)\"", html_clean)
+        if sector_match:
+            data["Sector"] = sector_match.group(1)
         return data
 
     def cmd_quote(self, args: argparse.Namespace):

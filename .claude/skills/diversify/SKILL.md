@@ -13,7 +13,7 @@ Recommend ~10 quality stocks the user does NOT hold, in sectors where the portfo
 
 This skill is the documented exception to the market-driven-only rule: it deliberately reads the portfolio (sector split + held tickers) as input. That's its whole point. Everything else about the advice discipline stays: min $20, litigation red-flag checks, one-table output.
 
-Diversification requires a margin of safety to avoid underperformance: candidates MUST be moderately oversold (RSI < 45). Quality and sector fit come first, but we no longer buy without a pullback.
+Diversification requires a margin of safety to avoid underperformance: candidates MUST be matching the primary strategy criteria. Quality and sector fit come first, but we no longer buy without a pullback.
 
 ## Step 0: Fresh portfolio
 
@@ -48,7 +48,7 @@ Above the table: one line per target sector explaining the gap ("Healthcare is 3
 
 ## Step 5: Log picks
 
-**CRITICAL**: Always retrieve and log the current RSI (`--rsi`) for every pick, even when the strategy is not oversold-focused. This data is required for downstream analytics.
+**CRITICAL**: Always retrieve and log the current RSI (`--rsi`) for every pick, even when the strategy is not strategy-focused. This data is required for downstream analytics.
 
 One CLI call per pick: `python3 scripts/advice_log.py add-pick TICKER --source diversify --price X --rating B+ --rsi 45 --sector "Healthcare" --buy-below X --drop-below Y --drop-above Z --name "..." --reason "..." --risk "..."`. The CLI upserts, so re-advised tickers are handled automatically (add `--note "re-advised: what changed"` for those). New picks auto-note their reason.
 

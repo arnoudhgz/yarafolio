@@ -7,12 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.0] - 2026-07-24
 
+- Architecture: Refactored to a Meta-Advisor pattern, extracting `oversold` into a dedicated tactical skill and decoupling it from the `advice`, `premarket`, and `aftermarket` workflow skills.
+- Architecture: Updated all skill manifests (`.claude/` and `.gemini/`) to support the new modular strategy-agnostic approach.
+- Feature: Implemented an `--open-note` parameter in `advice_log.py add-pick` to persist actionable premarket/aftermarket timing advice directly into the database.
+- Dashboard: Added visual rendering of the `openNote` property in the dashboard drill-down modal (displayed in orange below the Risk section).
+- Pipeline: Updated the CLI to parse and accept GICS sectors exclusively instead of the legacy eToro sectors.
+- Dashboard: Fixed a bug causing a DOM Exception for disabled buttons in `renderers.js` by explicitly casting to `HTMLButtonElement`.
+
 ### Added
+- Dashboard: Combined the Sector division and Sector coverage charts into a single "Sector Analysis" card on the Analytics tab and added explanatory modals regarding sector accuracy.
+- Dashboard: Updated the sector charts with a distinct 12-color palette for improved legibility.
+- Sample Data: Added missing dummy files (`equity-history.json`, `correlation.json`, `REVIEWS.md`) and updated sectors to the GICS standard to match the real data structure.
+- Pipeline: Implemented true GICS sector extraction from StockAnalysis in `screen.py` to replace broad eToro industry labels (e.g., misclassified "Consumer Goods").
+- Pipeline: Updated `etoro_import.py` to prioritize cached GICS sectors over eToro industry IDs to prevent sector accuracy regressions.
 - Feature: Added support for blacklisting stocks. Blacklisted stocks can be added manually or flagged from the dashboard, are tagged with customizable reasons (e.g., 'not listed', 'paused'), and are automatically ignored by the advice workflow.
 - Dashboard: Added "Closed positions" and "Ignored positions" summary cards to the top bar layout.
 - Dashboard: Fixed an issue where "Removed" items were completely deleted and no longer counted towards the "Ignored positions" and "Total adviced picks" totals. "Removed" items are now marked with a `removed` status instead.
 - Dashboard: Fixed an issue on the Equity Curve where the "30d" view could sometimes display duplicate dates on the x-axis due to UTC boundary overlap. The chart now properly buckets by local calendar days.
 - Dashboard: Fixed an issue where the Realized P/L chart would not load the current month view automatically on page load.
+- Dashboard: Fixed an issue where legacy eToro sectors could cause discrepancies and missing values in the sector charts, by mapping them to GICS at render time.
 - Dashboard: Re-styled the Prev/Next pagination buttons on the Realized P/L chart to match the standard refresh button style and added a visual disabled state.
 - CLI: Added `open-profits` command to `scripts/advice_log.py` to quickly list open positions currently in profit.
 - Pipeline: Added `--min-rsi`, `--exclude-held`, and `--exclude-advised` native filtering flags to `scripts/screen.py oversold`.
@@ -51,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strategy update: Banned all new Tech sector recommendations until performance recovers due to heavy underperformance and extreme systemic correlation.
 - Strategy update: Updated GEMINI.md/CLAUDE.md to remove C-rated stocks from the outperformance claim and flag them as falling-knife risks, due to poor performance.
 - Workflow update: Updated GEMINI.md/CLAUDE.md to utilize the new native filtering parameters for `screen.py oversold` instead of manual post-filtering.
-- Strategy update: Clarified in GEMINI.md/CLAUDE.md that B/C rated stocks historically outperform A-rated stocks in the oversold strategy.
+- Strategy update: Clarified in GEMINI.md/CLAUDE.md that B/C rated stocks historically outperform A-rated stocks in the base strategy.
 - Standardized all logged timestamps (`lastUpdated`, EOD/News dates, price history) to exclusively use the `America/New_York` timezone formatted as ISO 8601 strings with offsets (e.g. `YYYY-MM-DDTHH:MM-04:00`).
 - The frontend dashboard now automatically parses these ISO strings to correctly display dates in the user's local timezone.
 - Replaced timezone-hacky local `date.today()` calls with a dedicated `nyse_now()` and `nyse_today()` helper across all python scripts.

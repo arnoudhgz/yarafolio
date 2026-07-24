@@ -11,7 +11,7 @@ metadata:
 
 Full `/advice` variant built on after-market and earnings data. The US market closes at 16:00 ET and after-hours runs until 20:00 ET. Everything must use TODAY's after-market data and focus on stocks that overreacted to news or earnings.
 
-The advice itself is market-driven only: candidates come from the screens, researcher prompts get market context only, never portfolio info. The portfolio enters AFTER the table (step 5), as a comparison.
+This workflow acts as a Meta-Advisor. It reads STRATEGY.md and delegates to tactical skills (like /oversold, /momentum) to fetch candidates. The advice itself is market-driven only: candidates come from the screens, researcher prompts get market context only, never portfolio info. The portfolio enters AFTER the table (step 5), as a comparison.
 
 ## Step 1: Market posture
 
@@ -25,7 +25,7 @@ Declare a posture at the top of the output: **earnings-reaction day** or **macro
 ## Step 2: Candidate gathering
 
 - Use WebSearch to find stocks that plunged, tumbled, or dropped significantly in the after-market today due to earnings misses, guidance cuts, or macro data overreactions.
-- Use `python3 scripts/screen.py oversold` to grab additional heavily battered stocks as a baseline.
+- Use `python3 scripts/screen.py <strategy>` to grab additional stocks fitting the strategy as a baseline.
 - Filter: listed on eToro-likely exchanges (NYSE/Nasdaq large/mid caps). Focus strictly on stocks that have a high probability of a relief bounce at the next day's open.
 
 ## Step 3: Per-ticker research (parallel)
@@ -38,7 +38,7 @@ Pre-fetch per-candidate data, one call per command for ALL candidates: `python3 
 
 One markdown table, max 10 picks:
 
-| Ticker | After-hours price | Rating | RSI | Why oversold / thesis | Buy below | Drop below | Drop above | Risk | Open note |
+| Ticker | After-hours price | Rating | RSI | Thesis | Buy below | Drop below | Drop above | Risk | Open note |
 |---|---|---|---|---|---|---|---|---|---|
 
 - Rating: my read on bounce quality (A/B/C with +/-), falling knives marked.
@@ -52,7 +52,7 @@ Deterministic data work goes through the CLIs, never hand-edit the JSON.
 
 1. Sync from eToro: `python3 scripts/etoro_import.py preview && python3 scripts/etoro_import.py merge`
 2. Portfolio comparison: `python3 scripts/advice_log.py compare` - report its output as a short "vs your portfolio" footnote.
-3. Log each pick: `python3 scripts/advice_log.py add-pick TICKER --source aftermarket --price X.XX --rating B+ --rsi 27 --sector "Services" --buy-below X --drop-below X --drop-above X --name "..." --reason "..." --risk "..."`.
+3. Log each pick: `python3 scripts/advice_log.py add-pick TICKER --source <tactic> (e.g. oversold or momentum) --price X.XX --rating B+ --rsi 27 --sector "Services" --buy-below X --drop-below X --drop-above X --name "..." --reason "..." --risk "..." --open-note "..."`.
 
 ## Step 6: Keep/drop check-in
 

@@ -24,7 +24,7 @@ Script-first (one Bash call covers all four):
 - `python3 scripts/screen.py news TICKER --days 3` - recent headlines
 - `python3 scripts/screen.py news TICKER --days 30 --red-flags` - lawsuit/investigation/SEC headlines
 
-Then judgment, via WebSearch/WebFetch only where needed: open the article behind any headline whose severity is unclear (law firm press releases fishing for plaintiffs are common noise; an actual SEC investigation or restatement is not), search for today's analyst moves when the forecast line looks stale, and find RSI (the quote page has no RSI; use `screen.py oversold` when the ticker is on it, otherwise a quick search). If the user gave a URL: fetch it and weigh how serious the source is.
+Then judgment, via WebSearch/WebFetch only where needed: open the article behind any headline whose severity is unclear (law firm press releases fishing for plaintiffs are common noise; an actual SEC investigation or restatement is not), search for today's analyst moves when the forecast line looks stale, and find RSI (the quote page has no RSI; use `screen.py <strategy>` when the ticker is on it, otherwise a quick search). If the user gave a URL: fetch it and weigh how serious the source is.
 
 **Red-flag gate (mandatory):** run exactly one targeted `WebSearch "TICKER lawsuit OR SEC investigation OR fraud OR class action [month year]"`, unconditional even when the `--red-flags` headlines looked clean: the keyword screen can miss a real problem phrased outside its terms (the ZTS lesson). A genuine SEC investigation, restatement, or executive departure under a cloud flips the verdict toward exit/avoid; law-firm fishing press releases are noise.
 

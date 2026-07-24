@@ -12,7 +12,7 @@ import advice_log  # noqa: E402
 
 
 def _pick_args(ticker, price, **over):
-    base = dict(ticker=ticker, price=price, source="advice", rating=None, rsi=None,
+    base = dict(ticker=ticker, price=price, source="oversold", rating=None, rsi=None,
                 sector=None, buy_below=None, drop_below=None, drop_above=None,
                 name=None, reason=None, risk=None, note=None)
     base.update(over)
@@ -196,7 +196,7 @@ class AddPickTest(unittest.TestCase):
         # Re-advising a ticker you already hold must refresh the position, not
         # spawn a lot-less 'watching' ghost that lingers in the Advice tab.
         self._seed([{
-            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "advice",
+            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "oversold",
             "rating": "A-", "priceAtAdvice": 133.2,
             "priceHistory": [{"date": "2026-06-18", "price": 133.2}],
             "notes": [], "lots": [{"positionID": 1, "openRate": 126.0}],
@@ -217,7 +217,7 @@ class AddPickTest(unittest.TestCase):
             "id": "ADBE-0001", "ticker": "ADBE", "status": "bought", "source": "import",
             "priceHistory": [], "notes": [], "lots": [],
         }])
-        self.app.cmd_add_pick(_pick_args("ADBE", 200.0, source="advice", rating="B"))
+        self.app.cmd_add_pick(_pick_args("ADBE", 200.0, source="oversold", rating="B"))
         entries = self._entries()
         self.assertEqual(len(entries), 2)             # import holding stays separate
         new = [x for x in entries if x["id"] != "ADBE-0001"][0]
@@ -252,7 +252,7 @@ class AddPickTest(unittest.TestCase):
         # adviceEvents lets the Positions view show which advice (date + price)
         # prompted each lot.
         self._seed([{
-            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "advice",
+            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "oversold",
             "firstAdvised": "2026-01-01", "priceAtAdvice": 133.2,
             "priceHistory": [], "notes": [], "lots": [],
         }])
@@ -268,7 +268,7 @@ class AddPickTest(unittest.TestCase):
     def test_readvise_migrates_legacy_adviceDates(self):
         # An entry created before adviceEvents existed must not keep the dead field.
         self._seed([{
-            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "advice",
+            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "oversold",
             "firstAdvised": "2026-01-01", "priceAtAdvice": 133.2, "adviceDates": ["2026-01-01"],
             "priceHistory": [], "notes": [], "lots": [],
         }])

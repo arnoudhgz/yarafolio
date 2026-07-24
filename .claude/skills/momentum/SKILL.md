@@ -9,7 +9,7 @@ metadata:
 
 # Momentum / Breakout advice
 
-This workflow finds stocks with extreme relative strength (RSI > 70) to buy into momentum, contrasting with the mean-reversion oversold strategy.
+This workflow finds stocks with extreme relative strength (RSI > 70) to buy into momentum, contrasting with the mean-reversion base strategy.
 
 ## Step 1: Market posture
 Check the overall market posture (WebSearch "stock market today..."). In bear markets, momentum strategies often fail.

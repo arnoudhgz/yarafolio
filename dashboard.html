@@ -172,20 +172,6 @@
       </table>
       <div class="empty" id="portfolioEmpty" style="display:none">No portfolio snapshot yet. Click "Update from eToro" or run /import in the AI CLI.</div>
     </div>
-    <div class="panel">
-      <h2>Sector coverage vs full taxonomy</h2>
-      <div class="donut-row">
-        <div class="donut-wrap"><canvas id="sectorCoverageChart"></canvas></div>
-        <ul class="gap-list" id="sectorGaps"></ul>
-      </div>
-    </div>
-    <div class="panel">
-      <h2>Sector division (invested $)</h2>
-      <div class="donut-row">
-        <div class="donut-wrap"><canvas id="sectorChart"></canvas></div>
-        <ul class="sector-list" id="sectorList"></ul>
-      </div>
-    </div>
   </section>
 
   <section id="tab-analytics" class="tab-section">
@@ -246,6 +232,25 @@
     <div class="panel"><h2>Win Rate Over Time <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoWinRateTrend').showModal()" title="About win rate trend chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartWinRateTrend"></canvas></div><div id="chartWinRateTrendNote"></div></div>
     <div class="panel"><h2>Entry Discipline <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoEntryDiscipline').showModal()" title="About entry discipline chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartEntryDiscipline"></canvas></div><div id="chartEntryDisciplineNote"></div></div>
     <div class="panel"><h2>Days to Bounce vs RSI <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDaysVsRsi').showModal()" title="About days vs rsi chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartDaysVsRsi"></canvas></div><div id="chartDaysVsRsiNote"></div></div>
+    <div class="panel">
+      <h2 style="margin:0; margin-bottom:16px; display:flex; align-items:center; gap:8px;">Sector Analysis <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSectorAnalysis').showModal()" title="About Sector Analysis"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 24px;">
+        <div style="flex: 1 1 300px;">
+          <h3 style="margin-top:0; font-size: 14px; color: var(--muted); margin-bottom: 12px;">Coverage vs taxonomy</h3>
+          <div class="donut-row">
+            <div class="donut-wrap"><canvas id="sectorCoverageChart"></canvas></div>
+            <ul class="gap-list" id="sectorGaps"></ul>
+          </div>
+        </div>
+        <div style="flex: 1 1 300px;">
+          <h3 style="margin-top:0; font-size: 14px; color: var(--muted); margin-bottom: 12px;">Division (invested $)</h3>
+          <div class="donut-row">
+            <div class="donut-wrap"><canvas id="sectorChart"></canvas></div>
+            <ul class="sector-list" id="sectorList"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="empty" id="analyticsEmpty" style="display:none">Not enough finished advice yet to learn from. Outcomes appear once picks are sold, dropped, or 7+ days old.</div>
   </section>
 
@@ -659,6 +664,13 @@
       <button class="modal-close" onclick="document.getElementById('infoDaysVsRsi').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Days to Bounce vs RSI</h2>
       <p style="margin-bottom:0;">Average days held for WINNING trades, grouped by the RSI at the time of advice. Answers if deeply oversold stocks bounce faster.</p>
+    </dialog>
+
+  <dialog id="infoSectorAnalysis" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoSectorAnalysis').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Sector Analysis</h2>
+      <p style="margin-bottom:12px;"><strong>Coverage vs taxonomy:</strong> Shows your portfolio's sector distribution compared to the full 11 GICS sectors. We use true GICS sectors instead of eToro's labels for better accuracy.</p>
+      <p style="margin-bottom:0;"><strong>Division (invested $):</strong> Shows the invested dollar amount per sector.</p>
     </dialog>
 
   <dialog id="blacklistModal" class="modal-card" style="max-width: 400px; padding: 24px;" onclick="if(event.target===this) closeBlacklistModal()">

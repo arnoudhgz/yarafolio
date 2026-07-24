@@ -11,7 +11,7 @@ metadata:
 
 Full `/advice` variant built on premarket data. US premarket runs 04:00-09:30 ET, the open is 09:30 ET. Everything must use TODAY's premarket data, not yesterday's close commentary.
 
-The advice itself is market-driven only: candidates come from the screens, researcher prompts get market context only, never portfolio info. The portfolio enters AFTER the table (step 5), as a comparison. (`/diversify` is the one deliberate exception to the market-only rule.)
+This workflow acts as a Meta-Advisor. It reads STRATEGY.md and delegates to tactical skills (like /oversold, /momentum) to fetch candidates. The advice itself is market-driven only: candidates come from the screens, researcher prompts get market context only, never portfolio info. The portfolio enters AFTER the table (step 5), as a comparison. (`/diversify` is the one deliberate exception to the market-only rule.)
 
 ## Step 1: Market posture
 
@@ -22,11 +22,11 @@ Run these in parallel (WebSearch):
 
 Also check today's calendar: earnings before open / after close, economic releases.
 
-Declare a posture at the top of the output: **oversold-bounce day** or **defensive day**, one sentence why (futures direction + macro events).
+Declare a posture at the top of the output: **strategy-bounce day** or **defensive day**, one sentence why (futures direction + macro events).
 
 ## Step 2: Candidate gathering
 
-- `python3 scripts/screen.py oversold` (scrapes the stockanalysis oversold list, $20 floor built in). Fallback when it errors: WebFetch the [stockanalysis oversold list](https://stockanalysis.com/list/oversold-stocks/) and the [MarketBeat RSI screen](https://www.marketbeat.com/market-data/oversold-stocks-rsi/), and mention the breakage.
+- `python3 scripts/screen.py <strategy>` (scrapes a relevant screener, floor built in). Fallback when it errors: WebFetch the [stockanalysis oversold list](https://stockanalysis.com/list/oversold-stocks/) and the [MarketBeat RSI screen](https://www.marketbeat.com/market-data/oversold-stocks-rsi/), and mention the breakage.
 - Premarket losers/gainers pages on stockanalysis.com for gap context (WebFetch). The `quote` pre-fetch in step 3 already returns the premarket price, session-tagged with the regular close, so no separate price lookup is needed.
 - IPO check: `python3 scripts/screen.py ipos --json`. Look at upcoming and recent IPOs; ignore any marked avoided / Not listed in the advice log. If a highly anticipated IPO is hitting today/tomorrow, or a recent IPO is showing a great entry point, add up to 2 of them to the candidate list.
 
@@ -42,7 +42,7 @@ Pre-fetch per-candidate data, one call per command for ALL candidates: `python3 
 
 One markdown table, max 10 picks:
 
-| Ticker | Premarket price | Rating | RSI | Why oversold / thesis | Buy below | Drop below | Drop above | Risk | Open note |
+| Ticker | Premarket price | Rating | RSI | Thesis | Buy below | Drop below | Drop above | Risk | Open note |
 |---|---|---|---|---|---|---|---|---|---|
 
 - Rating: my read on bounce quality (A/B/C with +/-), falling knives marked.
@@ -57,7 +57,7 @@ Deterministic data work goes through the CLIs, never hand-edit the JSON.
 
 1. Sync from eToro: `python3 scripts/etoro_import.py preview && python3 scripts/etoro_import.py merge` (routine, no confirmation; flag API errors; the merge output lists likely-sold tickers, raise those in the check-in).
 2. Portfolio comparison: `python3 scripts/advice_log.py compare` - report its output as a short "vs your portfolio" footnote, a few lines max.
-3. Log each pick: `python3 scripts/advice_log.py add-pick TICKER --source premarket --price 81.20 --rating B+ --rsi 27 --sector "Services" --buy-below 78.50 --drop-below 72.00 --drop-above 92.00 --name "..." --reason "..." --risk "..."`. The CLI upserts: re-advised tickers get a price point + refreshed fields automatically. New picks auto-note their reason; for re-advised tickers add `--note "re-advised: what changed since last time"` so the dated notes history on the dashboard stays meaningful.
+3. Log each pick: `python3 scripts/advice_log.py add-pick TICKER --source <tactic> (e.g. oversold or momentum) --price 81.20 --rating B+ --rsi 27 --sector "Services" --buy-below 78.50 --drop-below 72.00 --drop-above 92.00 --name "..." --reason "..." --risk "..." --open-note "..."`. The CLI upserts: re-advised tickers get a price point + refreshed fields automatically. New picks auto-note their reason; for re-advised tickers add `--note "re-advised: what changed since last time"` so the dated notes history on the dashboard stays meaningful.
 
 ## Step 6: Keep/drop check-in
 

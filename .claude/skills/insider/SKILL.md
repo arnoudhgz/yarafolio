@@ -24,7 +24,7 @@ For the candidates, run:
 Use parallel `stock-researcher` agents. Have them explicitly evaluate the fundamentals to ensure the insider buy aligns with a solid technical entry point.
 
 ## Step 4: Table and Logging
-**CRITICAL**: Always retrieve and log the current RSI (`--rsi`) for every pick, even when the strategy is not oversold-focused. This data is required for downstream analytics.
+**CRITICAL**: Always retrieve and log the current RSI (`--rsi`) for every pick, even when the strategy is not strategy-focused. This data is required for downstream analytics.
 
 Format exactly like the standard advice table.
 Log the picks with `python3 scripts/advice_log.py add-pick TICKER --source insider ...`

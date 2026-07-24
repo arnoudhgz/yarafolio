@@ -210,6 +210,11 @@ class EtoroImport:
                     creds)["rates"]:
                 rates[r["instrumentID"]] = r
 
+        cache = {}
+        if os.path.exists(self.instruments_cache):
+            with open(self.instruments_cache) as f:
+                cache = json.load(f)
+
         entries = []
         for iid in ids:
             plist = by_instrument[iid]
@@ -225,11 +230,15 @@ class EtoroImport:
                 2) if current else None
             pl_pct = round(pl_dollar / invested * 100,
                            2) if pl_dollar is not None and invested else None
+            
+            cached_sector = cache.get(str(iid), {}).get("sector")
+            sector_val = cached_sector if cached_sector else self.sector_for(m, industries)
+
             entries.append({
                 "ticker": m.get("symbolFull", f"ID{iid}"),
                 "name": m.get("instrumentDisplayName", ""),
                 "instrumentID": iid,
-                "sector": self.sector_for(m, industries),
+                "sector": sector_val,
                 "positions": len(plist),
                 "units": round(units, 6),
                 "invested": round(invested, 2),
@@ -260,9 +269,10 @@ class EtoroImport:
             record = cache.get(str(iid), {})
             record["ticker"] = m["symbolFull"]
             record["name"] = m["instrumentDisplayName"]
-            sector = self.sector_for(m, industries)
-            if sector is not None:
-                record["sector"] = sector
+            if "sector" not in record:
+                sector = self.sector_for(m, industries)
+                if sector is not None:
+                    record["sector"] = sector
             cache[str(iid)] = record
         self.atomic_write(self.instruments_cache, cache)
 

@@ -167,6 +167,7 @@ export function openModal(id, positionID) {
       '</div>' +
       (e.reason ? '<h4>Thesis</h4><div>' + esc(e.reason) + '</div>' : '') +
       (e.risk ? '<h4>Risk</h4><div>' + esc(e.risk) + '</div>' : '') +
+      (e.openNote ? '<h4 style="color:var(--orange)">Open Note</h4><div>' + esc(e.openNote) + '</div>' : '') +
       ((e.lots && e.lots.length) ? '<h4>Advice-Tracked Lots</h4><ul class="note-list">' +
         e.lots.map(l => {
           const closed = l.soldAt != null;

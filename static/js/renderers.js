@@ -96,12 +96,24 @@ export function actionButtons(e) {
   return '';
 }
 
+export function mapSector(sector) {
+  if (!sector) return 'ETF / Other';
+  if (SECTORS.includes(sector)) return sector;
+  const legacy = {
+    'Basic Materials': 'Materials', 'Conglomerates': 'Industrials',
+    'Consumer Goods': 'Consumer Staples', 'Financial': 'Financials',
+    'Industrial Goods': 'Industrials', 'Services': 'Consumer Discretionary'
+  };
+  return legacy[sector] || 'ETF / Other';
+}
+
 export function sectorPctMap() {
+  if (!PORTFOLIO || !PORTFOLIO.holdings) return null;
   const total = PORTFOLIO.holdings.reduce((s, h) => s + (h.invested || 0), 0);
   if (!total) return null;
   const invested = {};
   PORTFOLIO.holdings.forEach(h => {
-    const s = h.sector || 'ETF / Other';
+    const s = mapSector(h.sector);
     invested[s] = (invested[s] || 0) + (h.invested || 0);
   });
   const pct = {};
@@ -318,8 +330,6 @@ export function renderPositions() {
 }
 
 export function renderPortfolio() {
-  renderSectorCoverage();
-  renderSectorChart();
   renderPortfolioTable();
   setPortfolioRendered(true);
 }
@@ -392,7 +402,7 @@ function renderSectorChart() {
   if (sectorChart) { sectorChart.destroy(); setSectorChart(null); }
   const bySector = new Map();
   PORTFOLIO.holdings.forEach(h => {
-    const s = h.sector || 'ETF / Other';
+    const s = mapSector(h.sector);
     bySector.set(s, (bySector.get(s) || 0) + h.invested);
   });
   const sorted = [...bySector.entries()].sort((a, b) => b[1] - a[1]);
@@ -434,11 +444,16 @@ export function renderSectorCoverage() {
   const invested = {};
   const total = PORTFOLIO.holdings.reduce((s, h) => s + (h.invested || 0), 0);
   PORTFOLIO.holdings.forEach(h => {
-    const s = h.sector || 'ETF / Other';
+    const s = mapSector(h.sector);
     invested[s] = (invested[s] || 0) + (h.invested || 0);
   });
   const adviceCount = {};
-  advised().forEach(e => { if (e.sector) adviceCount[e.sector] = (adviceCount[e.sector] || 0) + 1; });
+  advised().forEach(e => {
+    const s = mapSector(e.sector);
+    if (s !== 'ETF / Other' || e.sector) {
+      adviceCount[s] = (adviceCount[s] || 0) + 1;
+    }
+  });
   const pct = (s) => total ? (invested[s] || 0) / total * 100 : 0;
   /** @type {HTMLElement} */ (document.getElementById('sectorGaps')).innerHTML = SECTORS.map(s => {
     const p = pct(s), ac = adviceCount[s] || 0;
@@ -480,6 +495,8 @@ export function renderAnalytics() {
   analyticsRendered = true;
   renderEquityChart('24h');
   renderRealizedPnlChart();
+  renderSectorCoverage();
+  renderSectorChart();
   const empty = /** @type {HTMLElement} */ (document.getElementById('analyticsEmpty'));
   if (!LEARN) {
     /** @type {HTMLElement} */ (document.getElementById('analyticsCards')).innerHTML = '';
@@ -1324,14 +1341,14 @@ export function renderRealizedPnlChart() {
           "July", "August", "September", "October", "November", "December"
         ];
         document.getElementById('pnlLabel').textContent = `${monthNames[month]} ${year}`;
-        document.getElementById('pnlPrevBtn').disabled = allLots.length === 0 || (allLots[0].date.getFullYear() > year || (allLots[0].date.getFullYear() === year && allLots[0].date.getMonth() >= month));
-        document.getElementById('pnlNextBtn').disabled = allLots.length === 0 || (allLots[allLots.length-1].date.getFullYear() < year || (allLots[allLots.length-1].date.getFullYear() === year && allLots[allLots.length-1].date.getMonth() <= month));
+        /** @type {HTMLButtonElement} */ (document.getElementById('pnlPrevBtn')).disabled = allLots.length === 0 || (allLots[0].date.getFullYear() > year || (allLots[0].date.getFullYear() === year && allLots[0].date.getMonth() >= month));
+        /** @type {HTMLButtonElement} */ (document.getElementById('pnlNextBtn')).disabled = allLots.length === 0 || (allLots[allLots.length-1].date.getFullYear() < year || (allLots[allLots.length-1].date.getFullYear() === year && allLots[allLots.length-1].date.getMonth() <= month));
         document.getElementById('pnlYearGroupToggles').style.display = 'none';
     } else {
         filteredLots = allLots.filter(l => l.date.getFullYear() === year);
         document.getElementById('pnlLabel').textContent = `${year}`;
-        document.getElementById('pnlPrevBtn').disabled = allLots.length === 0 || allLots[0].date.getFullYear() >= year;
-        document.getElementById('pnlNextBtn').disabled = allLots.length === 0 || allLots[allLots.length-1].date.getFullYear() <= year;
+        /** @type {HTMLButtonElement} */ (document.getElementById('pnlPrevBtn')).disabled = allLots.length === 0 || allLots[0].date.getFullYear() >= year;
+        /** @type {HTMLButtonElement} */ (document.getElementById('pnlNextBtn')).disabled = allLots.length === 0 || allLots[allLots.length-1].date.getFullYear() <= year;
         document.getElementById('pnlYearGroupToggles').style.display = 'flex';
     }
 

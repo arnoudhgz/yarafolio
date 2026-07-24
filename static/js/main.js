@@ -1,7 +1,7 @@
 // @ts-check
 import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
-import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart } from './renderers.js';
+import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart, renderRealizedPnlChart, setPnlTf, setPnlYearGroup, shiftPnlDate } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
 import { applyChange, fetchMacro, fetchIpos, loadLearn } from './api.js';
 import { marketHolidays } from './holidays.js';
@@ -475,6 +475,27 @@ const adviceClickHandler = (ev) => {
   }
 });
 
+/** @type {HTMLElement} */ (document.getElementById('pnlToggles')).addEventListener('click', ev => {
+  const t = /** @type {HTMLElement} */ (ev.target);
+  if (t.tagName === 'BUTTON' && t.dataset.tf) {
+    document.querySelectorAll('#pnlToggles button').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    setPnlTf(t.dataset.tf);
+  }
+});
+
+/** @type {HTMLElement} */ (document.getElementById('pnlYearGroupToggles')).addEventListener('click', ev => {
+  const t = /** @type {HTMLElement} */ (ev.target);
+  if (t.tagName === 'BUTTON' && t.dataset.group) {
+    document.querySelectorAll('#pnlYearGroupToggles button').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    setPnlYearGroup(t.dataset.group);
+  }
+});
+
+/** @type {HTMLElement} */ (document.getElementById('pnlPrevBtn')).addEventListener('click', () => shiftPnlDate(-1));
+/** @type {HTMLElement} */ (document.getElementById('pnlNextBtn')).addEventListener('click', () => shiftPnlDate(1));
+
 /** @type {HTMLElement} */ (document.getElementById('rawNewsFilters')).addEventListener('click', (ev) => {
   const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
   if (!btn) return;
@@ -556,6 +577,7 @@ const adviceClickHandler = (ev) => {
         renderAnalytics();
         const tf = document.querySelector('#equityToggles button.active')?.getAttribute('data-tf') || '24h';
         renderEquityChart(tf);
+        renderRealizedPnlChart();
     }
   }, 10);
 });
