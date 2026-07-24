@@ -256,11 +256,56 @@
       <div id="sevenDayBox"></div>
     </div>
     <div class="panel"><h2>Trade Efficiency <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoGainVsDays').showModal()" title="About trade efficiency chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartGainVsDays"></canvas></div><div id="chartGainVsDaysNote"></div></div>
-    <div class="panel"><h2>Win rate: over time <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoWinRateTrend').showModal()" title="About win rate trend chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartWinRateTrend"></canvas></div><div id="chartWinRateTrendNote"></div></div>
-    <div class="panel"><h2>Win rate: by rating <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRating').showModal()" title="About rating chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRating"></canvas></div><div id="chartRatingNote"></div></div>
-    <div class="panel"><h2>Win rate: by RSI <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRsi').showModal()" title="About RSI band chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRsiBand"></canvas></div><div id="chartRsiBandNote"></div></div>
-    <div class="panel"><h2>Win rate: by sector <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSector').showModal()" title="About sector chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div></div>
-    <div class="panel"><h2>Win rate: by source <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSource').showModal()" title="About source chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div></div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Win rate: over time <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoWinRateTrend').showModal()" title="About win rate trend chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles toggle-bucket" data-target="chartWinRateTrend" style="margin-top:0;">
+          <button data-type="pct" class="active">%</button>
+          <button data-type="dol">$</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartWinRateTrend"></canvas></div><div id="chartWinRateTrendNote"></div>
+    </div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Win rate: by rating <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRating').showModal()" title="About rating chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles toggle-bucket" data-target="chartRating" style="margin-top:0;">
+          <button data-type="pct" class="active">%</button>
+          <button data-type="dol">$</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartRating"></canvas></div><div id="chartRatingNote"></div>
+    </div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Win rate: by RSI <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRsi').showModal()" title="About RSI band chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles toggle-bucket" data-target="chartRsiBand" style="margin-top:0;">
+          <button data-type="pct" class="active">%</button>
+          <button data-type="dol">$</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartRsiBand"></canvas></div><div id="chartRsiBandNote"></div>
+    </div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Win rate: by sector <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSector').showModal()" title="About sector chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles toggle-bucket" data-target="chartSector" style="margin-top:0;">
+          <button data-type="pct" class="active">%</button>
+          <button data-type="dol">$</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div>
+    </div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Win rate: by source <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSource').showModal()" title="About source chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles toggle-bucket" data-target="chartSource" style="margin-top:0;">
+          <button data-type="pct" class="active">%</button>
+          <button data-type="dol">$</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div>
+    </div>
     <div class="panel"><h2>Entry Discipline <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoEntryDiscipline').showModal()" title="About entry discipline chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartEntryDiscipline"></canvas></div><div id="chartEntryDisciplineNote"></div></div>
     <div class="panel"><h2>Days to Bounce vs RSI <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDaysVsRsi').showModal()" title="About days vs rsi chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartDaysVsRsi"></canvas></div><div id="chartDaysVsRsiNote"></div></div>
     <div class="panel">
@@ -631,7 +676,7 @@
   <dialog id="infoRating" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoRating').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Win rate &amp; move by rating</h2>
-      <p style="margin-bottom:12px; line-height: 1.6;">Breaks down the success rate and average profit/loss depending on the conviction rating assigned by the AI. This helps visualize if higher-conviction picks perform better.</p>
+      <p style="margin-bottom:12px; line-height: 1.6;">Breaks down the success rate depending on the conviction rating assigned by the AI. Toggle between <strong>%</strong> (average percentage move) and <strong>$</strong> (total absolute profit) to see which ratings actually harvest the most money.</p>
       <ul style="color:var(--muted); line-height:1.6; padding-left:20px; margin:0;">
         <li style="margin-bottom:8px;"><strong>A</strong> = Extreme conviction: clean overreaction, pristine balance sheet, immediate clear catalyst.</li>
         <li style="margin-bottom:8px;"><strong>B</strong> = Decent bounce odds, some open questions. Default for most good setups.</li>
@@ -643,19 +688,19 @@
   <dialog id="infoRsi" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoRsi').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">By RSI band</h2>
-      <p style="margin-bottom:0;">Analyzes performance based on how oversold a stock was when advised (its RSI). It helps determine whether catching stocks at more extreme oversold levels yields higher win rates.</p>
+      <p style="margin-bottom:0;">Analyzes performance based on how oversold a stock was when advised. Use the <strong>% / $</strong> toggle to flip between the average percentage move and the total realized dollar profit per band.</p>
     </dialog>
 
   <dialog id="infoSector" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoSector').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">By sector</h2>
-      <p style="margin-bottom:0;">Shows which specific sectors your strategy performs best or worst in. Useful for recognizing blindspots or avoiding perma-bear sectors.</p>
+      <p style="margin-bottom:0;">Shows which specific sectors your strategy performs best or worst in. The <strong>% / $</strong> toggle lets you see which sectors actually yield the highest absolute dollar returns.</p>
     </dialog>
 
   <dialog id="infoSource" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoSource').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">By source</h2>
-      <p style="margin-bottom:12px;">Compares the performance between different types of runs to identify which strategy is yielding the best results:</p>
+      <p style="margin-bottom:12px;">Compares the performance between different types of runs to identify which strategy is yielding the best results (toggleable between % and $):</p>
       <ul style="margin: 0; padding-left: 20px; line-height: 1.6; font-size: 14px; color: var(--text);">
         <li><strong style="color: var(--blue);">/advice:</strong> Standard intraday runs hunting for oversold bounces.</li>
         <li><strong style="color: var(--blue);">/premarket:</strong> Early runs capitalizing on premarket movers before the bell.</li>
@@ -670,20 +715,19 @@
     <div class="modal-body">
       <button class="modal-close" onclick="document.getElementById('infoGainVsDays').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Trade Efficiency</h2>
-      <p>A scatter plot of every closed position, plotting <strong>Days Held</strong> against the <strong>Return Percentage</strong>. Quickly visualizes if you are efficiently taking profits or holding onto losing positions too long.</p>
-    </div>
-  </dialog>
+      <p>A scatter plot of every closed position, plotting <strong>Days Held</strong> against the return. Use the <strong>% / $</strong> toggle to visualize if you are efficiently taking absolute profits or if holding longer leads to diminishing returns.</p>
+    </dialog>
 
   <dialog id="infoDayOfWeek" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoDayOfWeek').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">By Day of the Week</h2>
-      <p style="margin-bottom:0;">Average P/L% grouped by the day of the week a stock was initially advised. Helps reveal if weekend news affects Friday picks vs mid-week entries.</p>
+      <p style="margin-bottom:0;">Groups performance by the weekday a trade was entered. Toggle between <strong>Bought</strong> (only trades actually executed) and <strong>Advised</strong> (all virtual AI recommendations) to evaluate if specific days offer better statistical edge for entry.</p>
     </dialog>
 
   <dialog id="infoWinRateTrend" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoWinRateTrend').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Win Rate Over Time</h2>
-      <p style="margin-bottom:0;">Line chart tracking the Win Rate % of advice generated per month. Highlights if the strategy is losing its edge in the current market regime.</p>
+      <p style="margin-bottom:0;">Tracks the success rate of advice generated per month (line). The bar chart represents either the average % move or the total cumulative profit $ harvested during that month, controlled by the <strong>% / $</strong> toggle.</p>
     </dialog>
 
   <dialog id="infoEntryDiscipline" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">

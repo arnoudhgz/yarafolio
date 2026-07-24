@@ -493,6 +493,22 @@ const adviceClickHandler = (ev) => {
   });
 });
 
+document.querySelectorAll('.toggle-bucket').forEach(el => {
+  el.addEventListener('click', e => {
+    const t = /** @type {HTMLElement} */ (e.target);
+    if (t.tagName !== 'BUTTON') return;
+    el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    const targetChart = el.dataset.target;
+    import('./renderers.js').then(r => {
+      if (r.bucketModes && targetChart) {
+        r.bucketModes[targetChart] = t.dataset.type;
+        r.reRenderAnalyticsChart(targetChart);
+      }
+    });
+  });
+});
+
 /** @type {HTMLElement} */ (document.getElementById('pnlToggles')).addEventListener('click', ev => {
   const t = /** @type {HTMLElement} */ (ev.target);
   if (t.tagName === 'BUTTON' && t.dataset.tf) {

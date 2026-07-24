@@ -491,6 +491,45 @@ export function renderSectorCoverage() {
 
 let analyticsRendered = false;
 
+export const bucketModes = {
+  chartRating: 'pct',
+  chartRsiBand: 'pct',
+  chartSector: 'pct',
+  chartSource: 'pct',
+  chartWinRateTrend: 'pct',
+  chartGainVsDays: 'pct'
+};
+
+export function reRenderAnalyticsChart(targetChart) {
+  const allLots = positionLotRows();
+  const soldLots = allLots.filter(r => r.status === 'sold');
+  const b = (window.LEARN && window.LEARN.buckets) ? window.LEARN.buckets : {};
+
+  if (targetChart === 'chartGainVsDays') {
+    renderGainVsDaysChart(targetChart, soldLots);
+  } else if (targetChart === 'chartWinRateTrend') {
+    renderWinRateTrendChart(targetChart, soldLots);
+  } else if (targetChart === 'chartRating') {
+    renderBucketChart('chartRating', b.rating, r => r.e.rating, allLots);
+  } else if (targetChart === 'chartSector') {
+    renderBucketChart('chartSector', b.sector, r => r.e.sector, allLots);
+  } else if (targetChart === 'chartSource') {
+    renderBucketChart('chartSource', b.source, r => r.e.source, allLots);
+  } else if (targetChart === 'chartRsiBand') {
+    renderBucketChart('chartRsiBand', b.rsiBand, r => {
+      const v = r.e.rsiAtAdvice;
+      if (v == null) return null;
+      if (v < 20) return '<20';
+      if (v < 30) return '20-30';
+      if (v < 40) return '30-40';
+      if (v < 50) return '40-50';
+      if (v < 60) return '50-60';
+      if (v < 70) return '60-70';
+      return '70+';
+    }, allLots);
+  }
+}
+
 export function renderAnalytics() {
   analyticsRendered = true;
   renderEquityChart('24h');
@@ -526,12 +565,13 @@ export function renderAnalytics() {
   renderBucketChart('chartRsiBand', b.rsiBand, r => {
     const v = r.e.rsiAtAdvice;
     if (v == null) return null;
-    if (v < 20) return '< 20 (Deep)';
-    if (v < 25) return '20 - 25';
-    if (v < 30) return '25 - 30';
-    if (v < 35) return '30 - 35';
-    if (v < 40) return '35 - 40';
-    return '40+';
+    if (v < 20) return '<20';
+    if (v < 30) return '20-30';
+    if (v < 40) return '30-40';
+    if (v < 50) return '40-50';
+    if (v < 60) return '50-60';
+    if (v < 70) return '60-70';
+    return '70+';
   }, allLots);
   renderBucketChart('chartSector', b.sector, r => r.e.sector, allLots);
   renderBucketChart('chartSource', b.source, r => r.e.source, allLots);
@@ -576,14 +616,20 @@ export function renderBucketChart(canvasId, buckets, keyFn = null, allLots = nul
     });
   }
 
+  const isDol = bucketModes[canvasId] === 'dol';
+  const barData = isDol ? ok.map(k => dols[k]) : ok.map(k => buckets[k].avg);
+  const barColors = isDol 
+    ? ok.map(k => dols[k] >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)')
+    : ok.map(k => buckets[k].avg >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)');
+
   canvas.style.display = '';
   analyticsCharts[canvasId] = new Chart(canvas, {
     data: {
       labels: ok,
       datasets: [
         { type: 'line', label: 'Win rate %', yAxisID: 'y', data: ok.map(k => buckets[k].winRate), borderColor: '#3498db', backgroundColor: '#3498db', borderWidth: 3, pointBackgroundColor: '#fff', pointBorderWidth: 2, pointRadius: 5, tension: 0.3 },
-        { type: 'bar', label: 'Avg move %', yAxisID: 'y1', data: ok.map(k => buckets[k].avg),
-          backgroundColor: ok.map(k => buckets[k].avg >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)'), borderRadius: 6, maxBarThickness: 50 },
+        { type: 'bar', label: isDol ? 'Total Profit $' : 'Avg move %', yAxisID: 'y1', data: barData,
+          backgroundColor: barColors, borderRadius: 6, maxBarThickness: 50 },
       ]
     },
     options: {
@@ -592,8 +638,8 @@ export function renderBucketChart(canvasId, buckets, keyFn = null, allLots = nul
       scales: {
         y: { position: 'left', min: 0, max: 100, title: { display: true, text: 'Win %', color: cssVar('--muted') },
              ticks: { color: cssVar('--muted') }, grid: { color: cssVar('--border'), drawBorder: false } },
-        y1: { position: 'right', grid: { display: false }, title: { display: true, text: 'Avg %', color: cssVar('--muted') },
-              ticks: { color: cssVar('--muted') } },
+        y1: { position: 'right', grid: { display: false }, title: { display: true, text: isDol ? 'Total $' : 'Avg %', color: cssVar('--muted') },
+              ticks: { color: cssVar('--muted'), callback: isDol ? (v => '$' + v) : undefined } },
         x: { ticks: { color: cssVar('--muted') }, grid: { display: false, drawBorder: false } }
       },
       plugins: {
@@ -777,6 +823,7 @@ export function renderGainVsDaysChart(canvasId, rows) {
     return;
   }
   
+  const isDol = bucketModes[canvasId] === 'dol';
   const scatterData = [];
   rows.forEach(r => {
     const d1 = new Date(r.openDate).getTime();
@@ -784,7 +831,8 @@ export function renderGainVsDaysChart(canvasId, rows) {
     let days = Math.round((d2 - d1) / (1000 * 3600 * 24));
     if (isNaN(days)) return;
     if (days < 0) days = 0;
-    scatterData.push({ x: days, y: r.plPct, ticker: r.ticker, plDollar: r.plDollar || 0 });
+    const yVal = isDol ? (r.plDollar || 0) : r.plPct;
+    scatterData.push({ x: days, y: yVal, ticker: r.ticker, plDollar: r.plDollar || 0, plPct: r.plPct });
   });
 
   if (!scatterData.length) {
@@ -802,8 +850,8 @@ export function renderGainVsDaysChart(canvasId, rows) {
       datasets: [{
         label: 'Trades',
         data: scatterData,
-        backgroundColor: scatterData.map(d => d.y >= 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)'),
-        borderColor: scatterData.map(d => d.y >= 0 ? 'rgba(46, 204, 113, 1)' : 'rgba(231, 76, 60, 1)'),
+        backgroundColor: scatterData.map(d => d.plPct >= 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)'),
+        borderColor: scatterData.map(d => d.plPct >= 0 ? 'rgba(46, 204, 113, 1)' : 'rgba(231, 76, 60, 1)'),
         borderWidth: 1,
         pointRadius: 6,
         pointHoverRadius: 8
@@ -824,7 +872,7 @@ export function renderGainVsDaysChart(canvasId, rows) {
           callbacks: {
             label: (ctx) => {
               const d = ctx.raw;
-              const yStr = d.y > 0 ? '+' + d.y.toFixed(2) : d.y.toFixed(2);
+              const yStr = d.plPct > 0 ? '+' + d.plPct.toFixed(2) : d.plPct.toFixed(2);
               const dollarStr = d.plDollar >= 0 ? '+$' + d.plDollar.toFixed(2) : '-$' + Math.abs(d.plDollar).toFixed(2);
               return `${d.ticker}: ${yStr}% (${dollarStr}) in ${d.x} days`;
             }
@@ -834,14 +882,13 @@ export function renderGainVsDaysChart(canvasId, rows) {
       scales: {
         x: { 
           title: { display: true, text: 'Days Held', color: cssVar('--muted') },
-          min: 0,
           ticks: { color: cssVar('--muted') },
-          grid: { color: cssVar('--border'), drawBorder: false }
+          grid: { color: cssVar('--border') }
         },
         y: { 
-          title: { display: true, text: 'Return %', color: cssVar('--muted') },
-          ticks: { color: cssVar('--muted') },
-          grid: { color: cssVar('--border'), drawBorder: false }
+          title: { display: true, text: isDol ? 'Realized Profit $' : 'Realized Return %', color: cssVar('--muted') },
+          ticks: { color: cssVar('--muted'), callback: isDol ? (v => '$' + v) : (v => v + '%') },
+          grid: { color: cssVar('--border') }
         }
       }
     }
@@ -962,42 +1009,78 @@ export function renderWinRateTrendChart(canvasId, rows) {
   const counts = sortedMonths.map(m => buckets[m].total);
   const avgs = sortedMonths.map(m => buckets[m].plSum / buckets[m].total);
   const dols = sortedMonths.map(m => buckets[m].dolSum);
+  const isDol = bucketModes[canvasId] === 'dol';
+  const barData = isDol ? dols : avgs;
+  const barColors = isDol 
+    ? dols.map(v => v >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)')
+    : avgs.map(v => v >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)');
 
   analyticsCharts[canvasId] = new Chart(canvas, {
     type: 'line',
     data: {
       labels: labels,
-      datasets: [{
-        label: 'Win Rate %',
-        data: winRates,
-        borderColor: '#3498db',
-        backgroundColor: 'rgba(52, 152, 219, 0.2)',
-        fill: true,
-        tension: 0.2
-      }]
+      datasets: [
+        {
+          type: 'line',
+          label: 'Win Rate %',
+          data: winRates,
+          borderColor: '#3498db',
+          backgroundColor: '#3498db',
+          borderWidth: 3,
+          pointBackgroundColor: '#fff',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          tension: 0.3,
+          yAxisID: 'y'
+        },
+        {
+          type: 'bar',
+          label: isDol ? 'Total Profit $' : 'Avg move %',
+          data: barData,
+          backgroundColor: barColors,
+          borderRadius: 6,
+          maxBarThickness: 50,
+          yAxisID: 'y1'
+        }
+      ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: false },
+        legend: { labels: { color: cssVar('--text'), usePointStyle: true, boxWidth: 10 } },
         tooltip: {
+          mode: 'index',
+          intersect: false,
           callbacks: {
-            label: (ctx) => {
-              const y = ctx.raw;
-              const n = counts[ctx.dataIndex];
-              const avg = avgs[ctx.dataIndex];
-              const dol = dols[ctx.dataIndex];
+            afterBody: (items) => {
+              const label = items[0].label;
+              const idx = sortedMonths.indexOf(label);
+              if (idx === -1) return [];
+              const n = counts[idx];
+              const dol = dols[idx];
               const dollarStr = dol >= 0 ? '+$' + dol.toFixed(2) : '-$' + Math.abs(dol).toFixed(2);
-              return [
-                `Win Rate: ${y.toFixed(1)}% (n=${n})`,
-                `Avg P/L: ${avg > 0 ? '+' : ''}${avg.toFixed(2)}% | Total: ${dollarStr}`
-              ];
+              return ['n = ' + n, 'Total Profit: ' + dollarStr];
             }
           }
         }
       },
-      scales: { y: { title: { display: true, text: 'Win Rate %' }, min: 0, max: 100 } }
+      scales: {
+        y: { 
+          position: 'left',
+          title: { display: true, text: 'Win Rate %', color: cssVar('--muted') }, 
+          min: 0, max: 100,
+          ticks: { color: cssVar('--muted') },
+          grid: { color: cssVar('--border') }
+        },
+        y1: {
+          position: 'right',
+          title: { display: true, text: isDol ? 'Total $' : 'Avg %', color: cssVar('--muted') },
+          grid: { display: false },
+          ticks: { color: cssVar('--muted'), callback: isDol ? (v => '$' + v) : undefined }
+        },
+        x: { ticks: { color: cssVar('--muted') }, grid: { display: false } }
+      }
     }
   });
 }
@@ -1334,7 +1417,7 @@ export function renderEquityChart(tf = '7d') {
         y1: { 
             type: 'linear', display: true, position: 'right',
             grid: { drawOnChartArea: false },
-            ticks: { color: cssVar('--muted'), callback: v => (typeof v === 'number' ? v.toFixed(2) : v) + '%' } 
+            ticks: { color: cssVar('--muted'), callback: v => (typeof v === 'number' ? parseFloat(v.toFixed(2)) : v) + '%' } 
         }
       }
     }
@@ -1484,7 +1567,7 @@ export function renderDrawdownChart(tf = '24h') {
         y: { 
             type: 'linear', display: true, position: 'left',
             grid: { color: cssVar('--border') }, 
-            ticks: { color: cssVar('--muted'), callback: v => v + '%' },
+            ticks: { color: cssVar('--muted'), callback: v => (typeof v === 'number' ? parseFloat(v.toFixed(2)) : v) + '%' },
             max: 0
         }
       }
