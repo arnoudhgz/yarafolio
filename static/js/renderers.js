@@ -521,12 +521,22 @@ export function renderAnalytics() {
       (sd.median >= 0 ? 'pos' : 'neg') + '">' + fmtPct(sd.median) + '</span> (n=' + sd.n + ')'
     : '<div class="insufficient">No 7-day windows yet.</div>';
   const b = LEARN.buckets || {};
-  renderBucketChart('chartRating', b.rating);
-  renderBucketChart('chartRsiBand', b.rsiBand);
-  renderBucketChart('chartSector', b.sector);
-  renderBucketChart('chartSource', b.source);
+  const allLots = positionLotRows();
+  renderBucketChart('chartRating', b.rating, r => r.e.rating, allLots);
+  renderBucketChart('chartRsiBand', b.rsiBand, r => {
+    const v = r.e.rsiAtAdvice;
+    if (v == null) return null;
+    if (v < 20) return '< 20 (Deep)';
+    if (v < 25) return '20 - 25';
+    if (v < 30) return '25 - 30';
+    if (v < 35) return '30 - 35';
+    if (v < 40) return '35 - 40';
+    return '40+';
+  }, allLots);
+  renderBucketChart('chartSector', b.sector, r => r.e.sector, allLots);
+  renderBucketChart('chartSource', b.source, r => r.e.source, allLots);
   
-  const soldLots = positionLotRows().filter(r => r.status === 'sold');
+  const soldLots = allLots.filter(r => r.status === 'sold');
   renderGainVsDaysChart('chartGainVsDays', soldLots);
   renderDayOfWeekChart('chartDayOfWeek', soldLots);
   renderWinRateTrendChart('chartWinRateTrend', soldLots);
@@ -536,7 +546,7 @@ export function renderAnalytics() {
   empty.style.display = LEARN.measurableOutcomes ? 'none' : 'block';
 }
 
-export function renderBucketChart(canvasId, buckets) {
+export function renderBucketChart(canvasId, buckets, keyFn = null, allLots = null) {
   if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
   buckets = buckets || {};
   const note = document.getElementById(canvasId + 'Note');
@@ -556,6 +566,16 @@ export function renderBucketChart(canvasId, buckets) {
     if (note && !weak.length) note.innerHTML = '<div class="insufficient">No finished outcomes in this dimension yet.</div>';
     return;
   }
+  
+  const dols = {};
+  ok.forEach(k => dols[k] = 0);
+  if (allLots && keyFn) {
+    allLots.forEach(r => {
+      const k = keyFn(r);
+      if (k && dols[k] !== undefined) dols[k] += (r.plDollar || 0);
+    });
+  }
+
   canvas.style.display = '';
   analyticsCharts[canvasId] = new Chart(canvas, {
     data: {
@@ -586,8 +606,15 @@ export function renderBucketChart(canvasId, buckets) {
           borderWidth: 1,
           padding: 12,
           callbacks: { afterBody: (items) => {
-            const s = buckets[items[0].label];
-            return ['n = ' + s.n, 'median: ' + fmtPct(s.median)];
+            const label = items[0].label;
+            const s = buckets[label];
+            const arr = ['n = ' + s.n, 'median: ' + fmtPct(s.median)];
+            if (dols[label] !== undefined) {
+              const dol = dols[label];
+              const dollarStr = dol >= 0 ? '+$' + dol.toFixed(2) : '-$' + Math.abs(dol).toFixed(2);
+              arr.push('Total Profit: ' + dollarStr);
+            }
+            return arr;
           } }
         }
       }
@@ -757,7 +784,7 @@ export function renderGainVsDaysChart(canvasId, rows) {
     let days = Math.round((d2 - d1) / (1000 * 3600 * 24));
     if (isNaN(days)) return;
     if (days < 0) days = 0;
-    scatterData.push({ x: days, y: r.plPct, ticker: r.ticker });
+    scatterData.push({ x: days, y: r.plPct, ticker: r.ticker, plDollar: r.plDollar || 0 });
   });
 
   if (!scatterData.length) {
@@ -798,7 +825,8 @@ export function renderGainVsDaysChart(canvasId, rows) {
             label: (ctx) => {
               const d = ctx.raw;
               const yStr = d.y > 0 ? '+' + d.y.toFixed(2) : d.y.toFixed(2);
-              return `${d.ticker}: ${yStr}% in ${d.x} days`;
+              const dollarStr = d.plDollar >= 0 ? '+$' + d.plDollar.toFixed(2) : '-$' + Math.abs(d.plDollar).toFixed(2);
+              return `${d.ticker}: ${yStr}% (${dollarStr}) in ${d.x} days`;
             }
           }
         }
@@ -832,9 +860,9 @@ export function renderDayOfWeekChart(canvasId, rows) {
   }
 
   const daysStr = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const buckets = [0,1,2,3,4,5,6].map(i => ({ sum: 0, count: 0, name: daysStr[i] }));
+  const buckets = [0,1,2,3,4,5,6].map(i => ({ sum: 0, count: 0, plSum: 0, name: daysStr[i] }));
   
-  const type = document.querySelector('#dayOfWeekToggles button.active')?.dataset.type || 'advised';
+  const type = document.querySelector('#dayOfWeekToggles button.active')?.dataset.type || 'bought';
 
   rows.forEach(r => {
     let dateStr = type === 'bought' ? r.openDateTime : r.firstAdvised;
@@ -843,6 +871,7 @@ export function renderDayOfWeekChart(canvasId, rows) {
     if (isNaN(d)) return;
     buckets[d].sum += r.plPct;
     buckets[d].count += 1;
+    buckets[d].plSum += (r.plDollar || 0);
   });
 
   const validBuckets = buckets.filter(b => b.count > 0);
@@ -857,6 +886,7 @@ export function renderDayOfWeekChart(canvasId, rows) {
   const labels = validBuckets.map(b => b.name);
   const averages = validBuckets.map(b => b.sum / b.count);
   const counts = validBuckets.map(b => b.count);
+  const plSums = validBuckets.map(b => b.plSum);
 
   analyticsCharts[canvasId] = new Chart(canvas, {
     type: 'bar',
@@ -879,7 +909,12 @@ export function renderDayOfWeekChart(canvasId, rows) {
             label: (ctx) => {
               const y = ctx.raw;
               const n = counts[ctx.dataIndex];
-              return `Avg: ${y > 0 ? '+' : ''}${y.toFixed(2)}% (n=${n})`;
+              const dol = plSums[ctx.dataIndex];
+              const dollarStr = dol >= 0 ? '+$' + dol.toFixed(2) : '-$' + Math.abs(dol).toFixed(2);
+              return [
+                `Avg: ${y > 0 ? '+' : ''}${y.toFixed(2)}%`,
+                `Total: ${dollarStr} (n=${n})`
+              ];
             }
           }
         }
@@ -906,9 +941,11 @@ export function renderWinRateTrendChart(canvasId, rows) {
     const d = new Date(r.firstAdvised);
     if (isNaN(d.getTime())) return;
     const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    if (!buckets[month]) buckets[month] = { wins: 0, total: 0 };
+    if (!buckets[month]) buckets[month] = { wins: 0, total: 0, plSum: 0, dolSum: 0 };
     if (r.plPct > 0) buckets[month].wins += 1;
     buckets[month].total += 1;
+    buckets[month].plSum += r.plPct;
+    buckets[month].dolSum += (r.plDollar || 0);
   });
 
   const sortedMonths = Object.keys(buckets).sort();
@@ -923,6 +960,8 @@ export function renderWinRateTrendChart(canvasId, rows) {
   const labels = sortedMonths;
   const winRates = sortedMonths.map(m => (buckets[m].wins / buckets[m].total) * 100);
   const counts = sortedMonths.map(m => buckets[m].total);
+  const avgs = sortedMonths.map(m => buckets[m].plSum / buckets[m].total);
+  const dols = sortedMonths.map(m => buckets[m].dolSum);
 
   analyticsCharts[canvasId] = new Chart(canvas, {
     type: 'line',
@@ -947,7 +986,13 @@ export function renderWinRateTrendChart(canvasId, rows) {
             label: (ctx) => {
               const y = ctx.raw;
               const n = counts[ctx.dataIndex];
-              return `Win Rate: ${y.toFixed(1)}% (n=${n})`;
+              const avg = avgs[ctx.dataIndex];
+              const dol = dols[ctx.dataIndex];
+              const dollarStr = dol >= 0 ? '+$' + dol.toFixed(2) : '-$' + Math.abs(dol).toFixed(2);
+              return [
+                `Win Rate: ${y.toFixed(1)}% (n=${n})`,
+                `Avg P/L: ${avg > 0 ? '+' : ''}${avg.toFixed(2)}% | Total: ${dollarStr}`
+              ];
             }
           }
         }
@@ -969,10 +1014,10 @@ export function renderEntryDisciplineChart(canvasId, rows) {
   }
 
   const buckets = {
-    'Below Drop Below': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity },
-    'In Buy Zone': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity },
-    'Chased': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity },
-    'Above Drop Above': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity }
+    'Below Drop Below': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity, dolSum: 0 },
+    'In Buy Zone': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity, dolSum: 0 },
+    'Chased': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity, dolSum: 0 },
+    'Above Drop Above': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity, dolSum: 0 }
   };
   
   rows.forEach(r => {
@@ -992,6 +1037,7 @@ export function renderEntryDisciplineChart(canvasId, rows) {
     
     buckets[category].plSum += r.plPct;
     buckets[category].total += 1;
+    buckets[category].dolSum += (r.plDollar || 0);
     if (r.plPct < buckets[category].minPl) buckets[category].minPl = r.plPct;
     if (r.plPct > buckets[category].maxPl) buckets[category].maxPl = r.plPct;
   });
@@ -1010,6 +1056,7 @@ export function renderEntryDisciplineChart(canvasId, rows) {
   const counts = labels.map(l => buckets[l].total);
   const mins = labels.map(l => buckets[l].minPl);
   const maxes = labels.map(l => buckets[l].maxPl);
+  const dols = labels.map(l => buckets[l].dolSum);
 
   const colors = {
     'Below Drop Below': 'rgba(231, 76, 60, 0.8)',
@@ -1042,9 +1089,12 @@ export function renderEntryDisciplineChart(canvasId, rows) {
               const n = counts[ctx.dataIndex];
               const min = mins[ctx.dataIndex];
               const max = maxes[ctx.dataIndex];
+              const dol = dols[ctx.dataIndex];
+              const dollarStr = dol >= 0 ? '+$' + dol.toFixed(2) : '-$' + Math.abs(dol).toFixed(2);
               return [
-                `Avg P/L: ${y > 0 ? '+' : ''}${y.toFixed(2)}% (n=${n})`,
-                `Range: ${min > 0 ? '+' : ''}${min.toFixed(2)}% to ${max > 0 ? '+' : ''}${max.toFixed(2)}%`
+                `Avg P/L: ${y > 0 ? '+' : ''}${y.toFixed(2)}% | Total: ${dollarStr}`,
+                `Range: ${min > 0 ? '+' : ''}${min.toFixed(2)}% to ${max > 0 ? '+' : ''}${max.toFixed(2)}%`,
+                `Trades: n=${n}`
               ];
             }
           }
@@ -1089,9 +1139,10 @@ export function renderDaysVsRsiChart(canvasId, rows) {
     if (isNaN(days)) return;
     if (days < 0) days = 0;
     
-    if (!buckets[rsiBand]) buckets[rsiBand] = { sum: 0, count: 0 };
+    if (!buckets[rsiBand]) buckets[rsiBand] = { sum: 0, count: 0, dolSum: 0 };
     buckets[rsiBand].sum += days;
     buckets[rsiBand].count += 1;
+    buckets[rsiBand].dolSum += (r.plDollar || 0);
   });
 
   const order = ['< 20 (Deep)', '20 - 25', '25 - 30', '30 - 35', '35 - 40', '40+'];
@@ -1108,6 +1159,7 @@ export function renderDaysVsRsiChart(canvasId, rows) {
 
   const averages = labels.map(l => buckets[l].sum / buckets[l].count);
   const counts = labels.map(l => buckets[l].count);
+  const dols = labels.map(l => buckets[l].dolSum);
 
   analyticsCharts[canvasId] = new Chart(canvas, {
     type: 'bar',
@@ -1130,7 +1182,12 @@ export function renderDaysVsRsiChart(canvasId, rows) {
             label: (ctx) => {
               const y = ctx.raw;
               const n = counts[ctx.dataIndex];
-              return `Avg: ${y.toFixed(1)} days (n=${n})`;
+              const dol = dols[ctx.dataIndex];
+              const dollarStr = dol >= 0 ? '+$' + dol.toFixed(2) : '-$' + Math.abs(dol).toFixed(2);
+              return [
+                `Avg Days Held: ${y.toFixed(1)} (n=${n})`,
+                `Total Profit: ${dollarStr}`
+              ];
             }
           }
         }
