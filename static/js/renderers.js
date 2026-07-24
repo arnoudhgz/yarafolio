@@ -494,6 +494,7 @@ let analyticsRendered = false;
 export function renderAnalytics() {
   analyticsRendered = true;
   renderEquityChart('24h');
+  renderDrawdownChart('24h');
   renderRealizedPnlChart();
   renderSectorCoverage();
   renderSectorChart();
@@ -749,23 +750,17 @@ export function renderGainVsDaysChart(canvasId, rows) {
     return;
   }
   
-  const buckets = {};
+  const scatterData = [];
   rows.forEach(r => {
     const d1 = new Date(r.openDate).getTime();
     const d2 = new Date(r.closedDate).getTime();
     let days = Math.round((d2 - d1) / (1000 * 3600 * 24));
     if (isNaN(days)) return;
     if (days < 0) days = 0;
-    if (!buckets[days]) buckets[days] = { sum: 0, count: 0, min: r.plPct, max: r.plPct };
-    buckets[days].sum += r.plPct;
-    buckets[days].count += 1;
-    if (r.plPct < buckets[days].min) buckets[days].min = r.plPct;
-    if (r.plPct > buckets[days].max) buckets[days].max = r.plPct;
+    scatterData.push({ x: days, y: r.plPct, ticker: r.ticker });
   });
 
-  const daysKeys = Object.keys(buckets).map(Number).sort((a,b) => a - b);
-  
-  if (!daysKeys.length) {
+  if (!scatterData.length) {
     canvas.style.display = 'none';
     if (note) note.innerHTML = '<div class="insufficient">No closed positions with valid dates yet.</div>';
     return;
@@ -774,22 +769,17 @@ export function renderGainVsDaysChart(canvasId, rows) {
   canvas.style.display = '';
   if (note) note.innerHTML = '';
 
-  const labels = daysKeys.map(d => d + (d === 1 ? ' day' : ' days'));
-  const averages = daysKeys.map(d => buckets[d].sum / buckets[d].count);
-  const counts = daysKeys.map(d => buckets[d].count);
-  const highs = daysKeys.map(d => buckets[d].max);
-  const lows = daysKeys.map(d => buckets[d].min);
-  
   analyticsCharts[canvasId] = new Chart(canvas, {
-    type: 'bar',
+    type: 'scatter',
     data: {
-      labels: labels,
       datasets: [{
-        label: 'Avg P/L %',
-        data: averages,
-        backgroundColor: averages.map(y => y >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)'),
-        borderRadius: 6,
-        maxBarThickness: 50
+        label: 'Trades',
+        data: scatterData,
+        backgroundColor: scatterData.map(d => d.y >= 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)'),
+        borderColor: scatterData.map(d => d.y >= 0 ? 'rgba(46, 204, 113, 1)' : 'rgba(231, 76, 60, 1)'),
+        borderWidth: 1,
+        pointRadius: 6,
+        pointHoverRadius: 8
       }]
     },
     options: {
@@ -798,26 +788,33 @@ export function renderGainVsDaysChart(canvasId, rows) {
       plugins: {
         legend: { display: false },
         tooltip: {
+          backgroundColor: cssVar('--card'),
+          titleColor: cssVar('--text'),
+          bodyColor: cssVar('--text'),
+          borderColor: cssVar('--border'),
+          borderWidth: 1,
+          padding: 12,
           callbacks: {
             label: (ctx) => {
-              const idx = ctx.dataIndex;
-              const y = ctx.raw;
-              const n = counts[idx];
-              const h = highs[idx];
-              const l = lows[idx];
-              const hStr = h > 0 ? '+' + h.toFixed(2) : h.toFixed(2);
-              const lStr = l > 0 ? '+' + l.toFixed(2) : l.toFixed(2);
-              return [
-                `Avg: ${y > 0 ? '+' : ''}${y.toFixed(2)}% (n=${n})`,
-                `High: ${hStr}%`,
-                `Low: ${lStr}%`
-              ];
+              const d = ctx.raw;
+              const yStr = d.y > 0 ? '+' + d.y.toFixed(2) : d.y.toFixed(2);
+              return `${d.ticker}: ${yStr}% in ${d.x} days`;
             }
           }
         }
       },
       scales: {
-        y: { title: { display: true, text: 'Avg P/L %' } }
+        x: { 
+          title: { display: true, text: 'Days Held', color: cssVar('--muted') },
+          min: 0,
+          ticks: { color: cssVar('--muted') },
+          grid: { color: cssVar('--border'), drawBorder: false }
+        },
+        y: { 
+          title: { display: true, text: 'Return %', color: cssVar('--muted') },
+          ticks: { color: cssVar('--muted') },
+          grid: { color: cssVar('--border'), drawBorder: false }
+        }
       }
     }
   });
@@ -1278,6 +1275,143 @@ export function renderEquityChart(tf = '7d') {
             type: 'linear', display: true, position: 'right',
             grid: { drawOnChartArea: false },
             ticks: { color: cssVar('--muted'), callback: v => (typeof v === 'number' ? v.toFixed(2) : v) + '%' } 
+        }
+      }
+    }
+  });
+}
+
+let drawdownChart = null;
+export function renderDrawdownChart(tf = '24h') {
+  const equityHistory = /** @type {any} */ (DATA).equityHistory;
+  if (!equityHistory || equityHistory.length === 0) {
+    const wrap = document.getElementById('chartDrawdown')?.parentElement;
+    if (wrap) wrap.innerHTML = '<div class="insufficient" style="height:100%; display:flex; align-items:center; justify-content:center;">Waiting for more data points.</div>';
+    return;
+  }
+  
+  const now = new Date();
+  let msAgo = 0;
+  if (tf === '24h') msAgo = 24 * 3600 * 1000;
+  else if (tf === '7d') msAgo = 7 * 86400 * 1000;
+  else if (tf === '30d') msAgo = 30 * 86400 * 1000;
+  else if (tf === '12m') msAgo = 365 * 86400 * 1000;
+  
+  let pts = equityHistory;
+  if (msAgo > 0) {
+    const cutoff = new Date(now.getTime() - msAgo);
+    pts = pts.filter((p) => new Date(p.timestamp) >= cutoff);
+    if (pts.length < equityHistory.length) {
+      const earlier = equityHistory.slice(0, equityHistory.length - pts.length);
+      if (earlier.length) pts.unshift(earlier[earlier.length - 1]);
+    }
+  }
+
+  let bucketMs = 0;
+  if (tf === '24h') bucketMs = 60 * 60 * 1000;
+  else if (tf === '7d') bucketMs = 4 * 3600 * 1000;
+  else if (tf === '30d') bucketMs = 86400 * 1000;
+  else if (tf === '12m') bucketMs = 7 * 86400 * 1000;
+  
+  if (bucketMs > 0) {
+      const buckets = {};
+      const recentPoints = [];
+      const oneHourAgo = now.getTime() - 60 * 60 * 1000;
+      
+      pts.forEach(p => {
+          const d = new Date(p.timestamp);
+          const t = d.getTime();
+          if (tf === '24h' && t >= oneHourAgo) {
+              recentPoints.push(p);
+          } else {
+              let bucket;
+              if (tf === '30d') {
+                  bucket = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+              } else {
+                  bucket = Math.floor(t / bucketMs) * bucketMs;
+              }
+              buckets[bucket] = p; // keep last in bucket
+          }
+      });
+      pts = Object.keys(buckets).sort().map(k => buckets[k]).concat(recentPoints);
+      pts = pts.filter((item, pos, ary) => pos === 0 || item !== ary[pos - 1]);
+  }
+
+  const wrap = document.getElementById('chartDrawdown')?.parentElement;
+  if (!wrap) return;
+
+  if (pts.length < 2) {
+    if (!wrap.querySelector('.insufficient')) {
+        wrap.innerHTML = '<canvas id="chartDrawdown"></canvas><div class="insufficient" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100%; text-align:center;">Not enough data points yet.</div>';
+    }
+  } else {
+    if (wrap.querySelector('.insufficient')) {
+        wrap.innerHTML = '<canvas id="chartDrawdown"></canvas>';
+    }
+  }
+  
+  const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById('chartDrawdown'));
+  if (!canvas) return;
+  
+  if (drawdownChart) drawdownChart.destroy();
+
+  const labels = pts.map((p) => {
+      const d = new Date(p.timestamp);
+      if (tf === '24h') return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      if (tf === '7d') return d.toLocaleDateString([], {month: 'short', day: 'numeric'}) + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      if (tf === '30d') return d.toLocaleDateString([], {month: 'short', day: 'numeric'});
+      return d.toLocaleDateString([], {year: 'numeric', month: 'short'});
+  });
+
+  let runningPeak = 0;
+  const eqMap = new Map();
+  equityHistory.forEach(p => {
+      const eq = (p.invested || 0) + (p.total || 0);
+      if (eq > runningPeak) runningPeak = eq;
+      const dd = runningPeak > 0 ? ((eq - runningPeak) / runningPeak) * 100 : 0;
+      eqMap.set(p.timestamp, dd);
+  });
+  
+  const ddData = pts.map(p => eqMap.get(p.timestamp) || 0);
+
+  drawdownChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { 
+          label: 'Drawdown %', 
+          data: ddData, 
+          borderColor: 'rgba(231, 76, 60, 1)', 
+          backgroundColor: 'rgba(231, 76, 60, 0.2)',
+          fill: true,
+          borderWidth: 2, 
+          pointRadius: 0, 
+          pointHoverRadius: 4, 
+          tension: 0.1 
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { 
+            mode: 'index', intersect: false, 
+            callbacks: { 
+                label: c => {
+                    return c.dataset.label + ': ' + c.raw.toFixed(2) + '%';
+                }
+            } 
+        }
+      },
+      scales: {
+        x: { grid: { color: cssVar('--border') }, ticks: { color: cssVar('--muted'), maxTicksLimit: 8 } },
+        y: { 
+            type: 'linear', display: true, position: 'left',
+            grid: { color: cssVar('--border') }, 
+            ticks: { color: cssVar('--muted'), callback: v => v + '%' },
+            max: 0
         }
       }
     }

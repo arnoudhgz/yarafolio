@@ -1,7 +1,7 @@
 // @ts-check
 import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
-import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart, renderRealizedPnlChart, setPnlTf, setPnlYearGroup, shiftPnlDate } from './renderers.js';
+import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart, renderDrawdownChart, renderRealizedPnlChart, setPnlTf, setPnlYearGroup, shiftPnlDate } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
 import { applyChange, fetchMacro, fetchIpos, loadLearn } from './api.js';
 import { marketHolidays } from './holidays.js';
@@ -466,13 +466,20 @@ const adviceClickHandler = (ev) => {
   }
 });
 
-/** @type {HTMLElement} */ (document.getElementById('equityToggles')).addEventListener('click', ev => {
-  const t = /** @type {HTMLElement} */ (ev.target);
-  if (t.tagName === 'BUTTON' && t.dataset.tf) {
-    document.querySelectorAll('#equityToggles button').forEach(b => b.classList.remove('active'));
-    t.classList.add('active');
-    import('./renderers.js').then(r => r.renderEquityChart(t.dataset.tf));
-  }
+/** @type {HTMLElement} */ (document.getElementById('equityToggles'))?.addEventListener('click', e => {
+  const t = /** @type {HTMLElement} */ (e.target);
+  if (t.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#equityToggles button').forEach(b => b.classList.remove('active'));
+  t.classList.add('active');
+  import('./renderers.js').then(r => r.renderEquityChart(t.dataset.tf));
+});
+
+/** @type {HTMLElement} */ (document.getElementById('drawdownToggles'))?.addEventListener('click', e => {
+  const t = /** @type {HTMLElement} */ (e.target);
+  if (t.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#drawdownToggles button').forEach(b => b.classList.remove('active'));
+  t.classList.add('active');
+  import('./renderers.js').then(r => r.renderDrawdownChart(t.dataset.tf));
 });
 
 /** @type {HTMLElement} */ (document.getElementById('pnlToggles')).addEventListener('click', ev => {
@@ -577,6 +584,8 @@ const adviceClickHandler = (ev) => {
         renderAnalytics();
         const tf = document.querySelector('#equityToggles button.active')?.getAttribute('data-tf') || '24h';
         renderEquityChart(tf);
+        const dtf = document.querySelector('#drawdownToggles button.active')?.getAttribute('data-tf') || '24h';
+        renderDrawdownChart(dtf);
         renderRealizedPnlChart();
     }
   }, 10);

@@ -19,6 +19,7 @@ import argparse
 import json
 import os
 import statistics
+import math
 import logging
 import sys
 from datetime import date, datetime, timedelta
@@ -71,6 +72,7 @@ class LearnStats:
         is_demo = get_env("DEMO_MODE") == "1"
         subdir = "sample" if is_demo else "private"
         self.log_file = os.path.join(ROOT, "data", subdir, "advice-log.json")
+        self.equity_file = os.path.join(ROOT, "data", subdir, "equity-history.json")
         self.out_file = os.path.join(ROOT, "data", subdir, "review-stats.json")
 
     def parse_date(self, s: str) -> date:
@@ -151,6 +153,56 @@ class LearnStats:
                 }
         return out
 
+    def portfolio_metrics(self) -> dict:
+        try:
+            with open(self.equity_file) as f:
+                history = json.load(f)
+        except (OSError, ValueError):
+            return {"mdd": None, "sharpe": None}
+            
+        if not history or len(history) < 2:
+            return {"mdd": None, "sharpe": None}
+            
+        equities = [h.get("invested", 0) + h.get("total", 0) for h in history]
+        peak = equities[0]
+        mdd = 0.0
+        for e in equities:
+            if e > peak:
+                peak = e
+            dd = (peak - e) / peak if peak > 0 else 0
+            if dd > mdd:
+                mdd = dd
+                
+        daily_equity = {}
+        for h in history:
+            try:
+                dt = datetime.strptime(h["timestamp"][:16], "%Y-%m-%dT%H:%M")
+                day_str = dt.strftime("%Y-%m-%d")
+                daily_equity[day_str] = h.get("invested", 0) + h.get("total", 0)
+            except ValueError:
+                continue
+        
+        daily_values = list(daily_equity.values())
+        if len(daily_values) < 2:
+            return {"mdd": round(mdd * 100, 2), "sharpe": None}
+            
+        daily_returns = [(daily_values[i] - daily_values[i-1]) / daily_values[i-1] 
+                         for i in range(1, len(daily_values)) if daily_values[i-1] > 0]
+                         
+        if not daily_returns:
+            return {"mdd": round(mdd * 100, 2), "sharpe": None}
+            
+        avg_ret = statistics.mean(daily_returns)
+        std_ret = statistics.pstdev(daily_returns) if len(daily_returns) > 1 else 0
+        risk_free = 0.04 / 252
+        
+        sharpe = (avg_ret - risk_free) / std_ret * math.sqrt(252) if std_ret > 0 else None
+        
+        return {
+            "mdd": round(mdd * 100, 2),
+            "sharpe": round(sharpe, 2) if sharpe is not None else None
+        }
+
     def collect(self) -> dict:
         with open(self.log_file) as f:
             data = json.load(f)
@@ -201,6 +253,7 @@ class LearnStats:
                     statistics.median(seven),
                     2) if seven else None,
             },
+            "portfolio": self.portfolio_metrics(),
         }
 
     def print_human(self, stats: dict) -> None:
@@ -222,6 +275,12 @@ class LearnStats:
                     logger.info(
                         f"  {key:16} n={s['n']:<3} win {s['winRate']:5.1f}%  "
                         f"avg {s['avg']:+7.2f}%  median {s['median']:+7.2f}%")
+        p = stats.get("portfolio", {})
+        if p.get("mdd") is not None:
+            sharpe_str = f"{p['sharpe']:.2f}" if p.get("sharpe") is not None else "N/A"
+            logger.info(f"\nPortfolio metrics:")
+            logger.info(f"  Maximum Drawdown: {p['mdd']}%")
+            logger.info(f"  Sharpe Ratio:     {sharpe_str}")
 
 
 def main():

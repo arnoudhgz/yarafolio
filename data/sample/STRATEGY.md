@@ -10,7 +10,7 @@
 | Minimum stock price | [e.g., $10] |
 | Minimum daily volume | [e.g., > 500k shares] |
 | Focus | [e.g., Oversold stocks with bounce potential (RSI 20-30)] |
-| Quality metrics | [e.g., High ROE (> 15%), Low Debt-to-Equity (< 0.5)] |
+| Quality metrics | [e.g., High ROE (> 15%), Low Debt-to-Equity (< 0.5), FCF Yield > 5%] |
 | Bankruptcy Risk (Altman Z) | [e.g., Altman Z-Score > 2.99] |
 | Fraud Detection (Beneish M) | [e.g., Beneish M-Score < -1.78] |
 

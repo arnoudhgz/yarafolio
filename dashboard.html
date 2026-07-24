@@ -193,6 +193,20 @@
     </div>
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Underwater Drawdown <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDrawdown').showModal()" title="About Underwater Drawdown"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles" id="drawdownToggles" style="margin-top:0;">
+          <button data-tf="24h" class="active">24h</button>
+          <button data-tf="7d">7d</button>
+          <button data-tf="30d">30d</button>
+          <button data-tf="12m">12m</button>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:200px;">
+        <canvas id="chartDrawdown"></canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
         <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Realized P/L <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRealized').showModal()" title="About Realized P/L"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
         <div class="filters chart-toggles" id="pnlToggles" style="margin-top:0;">
           <button data-tf="month" class="active">Month</button>
@@ -227,7 +241,7 @@
     <div class="panel"><h2>By RSI band <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRsi').showModal()" title="About RSI band chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRsiBand"></canvas></div><div id="chartRsiBandNote"></div></div>
     <div class="panel"><h2>By sector <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSector').showModal()" title="About sector chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div></div>
     <div class="panel"><h2>By source <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSource').showModal()" title="About source chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div></div>
-    <div class="panel"><h2>Gain vs Days Held <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoGainVsDays').showModal()" title="About gain vs days chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartGainVsDays"></canvas></div><div id="chartGainVsDaysNote"></div></div>
+    <div class="panel"><h2>Trade Efficiency <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoGainVsDays').showModal()" title="About trade efficiency chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartGainVsDays"></canvas></div><div id="chartGainVsDaysNote"></div></div>
     <div class="panel"><h2>By Day of the Week <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDayOfWeek').showModal()" title="About day of week chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartDayOfWeek"></canvas></div><div id="chartDayOfWeekNote"></div></div>
     <div class="panel"><h2>Win Rate Over Time <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoWinRateTrend').showModal()" title="About win rate trend chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartWinRateTrend"></canvas></div><div id="chartWinRateTrendNote"></div></div>
     <div class="panel"><h2>Entry Discipline <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoEntryDiscipline').showModal()" title="About entry discipline chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartEntryDiscipline"></canvas></div><div id="chartEntryDisciplineNote"></div></div>
@@ -569,11 +583,19 @@
       <h2 style="margin-top:0; margin-bottom:16px;">Win rate (closed)</h2>
       <p style="margin-bottom:0;">The percentage of closed positions that ended with a positive return (profit).</p>
     </dialog>
+
   <dialog id="infoEquity" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoEquity').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Equity Curve</h2>
       <p style="margin-bottom:0;">Tracks your total Realized and Open P/L over time based on the active portfolio. Snapshots are recorded securely on each data update.</p>
     </dialog>
+
+  <dialog id="infoDrawdown" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-body">
+      <h2 style="margin-top:0; margin-bottom:16px;">Underwater Drawdown</h2>
+      <p>Tracks the portfolio's percentage drop from its all-time high over time. This exposes the true psychological pain and market volatility you are enduring while holding these positions.</p>
+    </div>
+  </dialog>
 
   <dialog id="infoRealized" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoRealized').close()" aria-label="Close">&times;</button>
@@ -637,10 +659,12 @@
     </dialog>
 
   <dialog id="infoGainVsDays" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-body">
       <button class="modal-close" onclick="document.getElementById('infoGainVsDays').close()" aria-label="Close">&times;</button>
-      <h2 style="margin-top:0; margin-bottom:16px;">Gain vs Days Held</h2>
-      <p style="margin-bottom:0;">A bar chart showing the average percentage gain (or loss) of closed positions grouped by the number of days they were held.</p>
-    </dialog>
+      <h2 style="margin-top:0; margin-bottom:16px;">Trade Efficiency</h2>
+      <p>A scatter plot of every closed position, plotting <strong>Days Held</strong> against the <strong>Return Percentage</strong>. Quickly visualizes if you are efficiently taking profits or holding onto losing positions too long.</p>
+    </div>
+  </dialog>
 
   <dialog id="infoDayOfWeek" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoDayOfWeek').close()" aria-label="Close">&times;</button>
