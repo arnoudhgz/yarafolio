@@ -374,7 +374,7 @@ class AdviceLog:
                         datetime.strptime(
                             e["firstAdvised"],
                             "%Y-%m-%d").date()).days
-                    if age > 7:
+                    if age > 3:
                         rows.append(
                             (1, -age, f"{e['ticker']}: watching {age}d, advised @ ${e.get('priceAtAdvice')}, "
                              f"now ${self.latest_price(e)}"))
