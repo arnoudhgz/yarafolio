@@ -479,6 +479,7 @@ let analyticsRendered = false;
 export function renderAnalytics() {
   analyticsRendered = true;
   renderEquityChart('24h');
+  renderRealizedPnlChart();
   const empty = /** @type {HTMLElement} */ (document.getElementById('analyticsEmpty'));
   if (!LEARN) {
     /** @type {HTMLElement} */ (document.getElementById('analyticsCards')).innerHTML = '';
@@ -1264,4 +1265,164 @@ export function renderEquityChart(tf = '7d') {
       }
     }
   });
+}
+
+let pnlChart = null;
+let pnlTf = 'month'; // 'month', 'year'
+let pnlYearGroup = 'month'; // 'week', 'month', 'quarter'
+let pnlCurrentDate = new Date(); // To track current month/year being viewed
+
+export function setPnlTf(tf) { pnlTf = tf; renderRealizedPnlChart(); }
+export function setPnlYearGroup(group) { pnlYearGroup = group; renderRealizedPnlChart(); }
+export function shiftPnlDate(dir) {
+    if (pnlTf === 'month') {
+        pnlCurrentDate.setMonth(pnlCurrentDate.getMonth() + dir);
+    } else {
+        pnlCurrentDate.setFullYear(pnlCurrentDate.getFullYear() + dir);
+    }
+    renderRealizedPnlChart();
+}
+
+function getWeekNumber(d) {
+    const dStr = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = dStr.getUTCDay() || 7;
+    dStr.setUTCDate(dStr.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(dStr.getUTCFullYear(),0,1));
+    return Math.ceil((((dStr.getTime() - yearStart.getTime()) / 86400000) + 1)/7);
+}
+
+export function renderRealizedPnlChart() {
+    if (!DATA || !DATA.entries) return;
+    
+    // 1. Gather all closed lots and compute P/L
+    let allLots = [];
+    DATA.entries.forEach(e => {
+        if (e.lots) {
+            e.lots.forEach(lot => {
+                if (lot.closedDate && lot.soldAt && lot.openRate && lot.units) {
+                    const pl = (lot.soldAt - lot.openRate) * lot.units;
+                    allLots.push({ date: new Date(lot.closedDate), pl: pl });
+                }
+            });
+        }
+    });
+    
+    // Sort lots by date
+    allLots.sort((a, b) => a.date - b.date);
+
+    const canvas = document.getElementById('chartRealizedPnl');
+    if (!canvas) return;
+
+    // 2. Filter by timeframe
+    let filteredLots = [];
+    const year = pnlCurrentDate.getFullYear();
+    const month = pnlCurrentDate.getMonth();
+    
+    if (pnlTf === 'month') {
+        filteredLots = allLots.filter(l => l.date.getFullYear() === year && l.date.getMonth() === month);
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+        document.getElementById('pnlLabel').textContent = `${monthNames[month]} ${year}`;
+        document.getElementById('pnlPrevBtn').disabled = allLots.length === 0 || (allLots[0].date.getFullYear() > year || (allLots[0].date.getFullYear() === year && allLots[0].date.getMonth() >= month));
+        document.getElementById('pnlNextBtn').disabled = allLots.length === 0 || (allLots[allLots.length-1].date.getFullYear() < year || (allLots[allLots.length-1].date.getFullYear() === year && allLots[allLots.length-1].date.getMonth() <= month));
+        document.getElementById('pnlYearGroupToggles').style.display = 'none';
+    } else {
+        filteredLots = allLots.filter(l => l.date.getFullYear() === year);
+        document.getElementById('pnlLabel').textContent = `${year}`;
+        document.getElementById('pnlPrevBtn').disabled = allLots.length === 0 || allLots[0].date.getFullYear() >= year;
+        document.getElementById('pnlNextBtn').disabled = allLots.length === 0 || allLots[allLots.length-1].date.getFullYear() <= year;
+        document.getElementById('pnlYearGroupToggles').style.display = 'flex';
+    }
+
+    // 3. Group by bucket
+    const buckets = {};
+    if (pnlTf === 'month') {
+        // Group by Day
+        // Pre-fill all days in the month
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        for (let i = 1; i <= daysInMonth; i++) {
+            buckets[`${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`] = 0;
+        }
+        filteredLots.forEach(l => {
+            const dayStr = `${l.date.getFullYear()}-${String(l.date.getMonth()+1).padStart(2,'0')}-${String(l.date.getDate()).padStart(2,'0')}`;
+            buckets[dayStr] += l.pl;
+        });
+    } else { // Year view
+        if (pnlYearGroup === 'week') {
+            // Group by Week
+            for (let i = 1; i <= 52; i++) buckets[`W${i}`] = 0;
+            filteredLots.forEach(l => {
+                const w = getWeekNumber(l.date);
+                if (buckets[`W${w}`] !== undefined) buckets[`W${w}`] += l.pl;
+                else buckets[`W${w}`] = l.pl;
+            });
+        } else if (pnlYearGroup === 'month') {
+            // Group by Month
+            const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            shortMonths.forEach(m => buckets[m] = 0);
+            filteredLots.forEach(l => {
+                const m = shortMonths[l.date.getMonth()];
+                buckets[m] += l.pl;
+            });
+        } else if (pnlYearGroup === 'quarter') {
+            // Group by Quarter
+            ['Q1', 'Q2', 'Q3', 'Q4'].forEach(q => buckets[q] = 0);
+            filteredLots.forEach(l => {
+                const q = Math.floor(l.date.getMonth() / 3) + 1;
+                buckets[`Q${q}`] += l.pl;
+            });
+        }
+    }
+
+    const labels = Object.keys(buckets);
+    const data = labels.map(k => buckets[k]);
+    const bgColors = data.map(v => v >= 0 ? cssVar('--green') : cssVar('--red'));
+
+    if (pnlChart) pnlChart.destroy();
+    
+    // Check if there is data
+    const wrap = canvas.parentElement;
+    if (data.every(v => v === 0)) {
+        if (!wrap.querySelector('.insufficient')) {
+            wrap.innerHTML = '<canvas id="chartRealizedPnl"></canvas><div class="insufficient" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100%; text-align:center;">No realized P/L for this period.</div>';
+        }
+    } else {
+        if (wrap.querySelector('.insufficient')) {
+            wrap.innerHTML = '<canvas id="chartRealizedPnl"></canvas>';
+        }
+    }
+
+    const newCanvas = document.getElementById('chartRealizedPnl');
+    pnlChart = new Chart(newCanvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Realized P/L',
+                data: data,
+                backgroundColor: bgColors,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: c => '$' + c.raw.toFixed(2)
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: cssVar('--muted') } },
+                y: { 
+                    type: 'linear', display: true, position: 'left',
+                    grid: { color: cssVar('--border') }, 
+                    ticks: { color: cssVar('--muted'), callback: v => '$' + v } 
+                }
+            }
+        }
+    });
 }
