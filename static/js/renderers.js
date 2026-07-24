@@ -1366,14 +1366,28 @@ export function renderDrawdownChart(tf = '24h') {
       return d.toLocaleDateString([], {year: 'numeric', month: 'short'});
   });
 
-  let runningPeak = 0;
+  // Build an indexed equity curve immune to cash deposits/withdrawals
+  // We track the percentage change in Total P/L relative to the Invested capital at that moment.
   const eqMap = new Map();
-  equityHistory.forEach(p => {
-      const eq = (p.invested || 0) + (p.total || 0);
-      if (eq > runningPeak) runningPeak = eq;
-      const dd = runningPeak > 0 ? ((eq - runningPeak) / runningPeak) * 100 : 0;
+  let currentIndex = 100;
+  let runningPeak = 100;
+  
+  for (let i = 0; i < equityHistory.length; i++) {
+      const p = equityHistory[i];
+      if (i > 0) {
+          const prev = equityHistory[i - 1];
+          const delta = (p.total || 0) - (prev.total || 0);
+          // If there is active capital, calculate the return. Otherwise 0.
+          // We use the max of current or previous invested to be conservative during trades.
+          const activeCapital = Math.max(p.invested || 0, prev.invested || 0);
+          const r = activeCapital > 0 ? (delta / activeCapital) : 0;
+          currentIndex = currentIndex * (1 + r);
+      }
+      
+      if (currentIndex > runningPeak) runningPeak = currentIndex;
+      const dd = runningPeak > 0 ? ((currentIndex - runningPeak) / runningPeak) * 100 : 0;
       eqMap.set(p.timestamp, dd);
-  });
+  }
   
   const ddData = pts.map(p => eqMap.get(p.timestamp) || 0);
 

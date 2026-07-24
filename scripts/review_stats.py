@@ -163,13 +163,21 @@ class LearnStats:
         if not history or len(history) < 2:
             return {"mdd": None, "sharpe": None}
             
-        equities = [h.get("invested", 0) + h.get("total", 0) for h in history]
-        peak = equities[0]
+        current_index = 100.0
+        peak = 100.0
         mdd = 0.0
-        for e in equities:
-            if e > peak:
-                peak = e
-            dd = (peak - e) / peak if peak > 0 else 0
+        for i in range(len(history)):
+            h = history[i]
+            if i > 0:
+                prev = history[i-1]
+                delta = h.get("total", 0) - prev.get("total", 0)
+                active_capital = max(h.get("invested", 0), prev.get("invested", 0))
+                r = (delta / active_capital) if active_capital > 0 else 0
+                current_index = current_index * (1 + r)
+            
+            if current_index > peak:
+                peak = current_index
+            dd = (peak - current_index) / peak if peak > 0 else 0
             if dd > mdd:
                 mdd = dd
                 
