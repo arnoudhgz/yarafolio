@@ -19,3 +19,9 @@ Never hardcode personal trading parameters (e.g., account sizes, specific broker
 
 ## Ticker Validation Rule
 When retrieving data for or recommending stocks with highly generic ticker symbols (e.g., GOLD, SILVER, V), you MUST explicitly verify that the ticker currently maps to the intended equity (company name) rather than a commodity future or ETF. Tickers can be reassigned. Always output the full company name alongside the ticker in your advice to ensure the user searches for the right asset on their broker.
+
+## Git Hygiene Rule
+After completing a major task, feature, or refactor—or before concluding a session—ALWAYS run `git status` to check for modified files. You must proactively document your changes in `CHANGELOG.md` and commit/push them to the active release branch so that work is never left dangling in the working directory.
+
+## Timezone Communication Rule
+When discussing US stock market hours, premarket/aftermarket trading windows, or broker cut-offs, ALWAYS check the `USER_TIMEZONE` environment variable in the `.env` file (e.g., `Europe/Amsterdam`). You must automatically translate the New York Eastern Time (ET) schedule into the user's configured local timezone for absolute clarity. If the variable is missing, fallback to calculating the offset using the local time provided in your system metadata prompt.

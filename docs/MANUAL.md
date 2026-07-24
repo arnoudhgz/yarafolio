@@ -7,7 +7,7 @@ YaraFolio features a local web interface that completely replaces complex spread
 
 This is the core of the dashboard. It tracks all the stocks the AI has recommended.
 - **Dynamic Tracking**: Automatically highlights whether an AI-advised stock has hit your custom "Buy Zone" (Green line) or dropped below your Stop-Loss line (Red line).
-- **Deep-Dive Modals**: Click on any stock row to instantly view the AI's full research thesis, known risks, and an embedded price chart.
+- **Deep-Dive Modals**: Click on any stock row to instantly view the AI's full research thesis, known risks, any actionable **Open Notes** (for premarket/aftermarket timing), and an embedded price chart.
 - **Upcoming Events**: If a tracked stock has an impending market event (like earnings), the ticker will pulse <span style="color:#f59e0b;font-weight:600">Orange</span> to alert you.
 
 ## 2. Positions Tab
@@ -22,7 +22,7 @@ Once you actually buy a stock on eToro, the `import` script (CLI or Resync butto
 ![Portfolio Tab Screenshot](images/portfolio_tab.png)
 
 A complete sync of your eToro holdings.
-- **Sector Analytics**: Visualizes your entire portfolio in a pie chart to instantly expose "Sector Gaps". If you are dangerously underweighted in Healthcare, the dashboard will highlight it in <span style="color:#ef4444;font-weight:600">Red</span> or <span style="color:#f59e0b;font-weight:600">Orange</span>.
+- **Sector Analytics**: Visualizes your entire portfolio in a pie chart to instantly expose "Sector Gaps" using accurate GICS sector definitions. If you are dangerously underweighted in Healthcare, the dashboard will highlight it in <span style="color:#ef4444;font-weight:600">Red</span> or <span style="color:#f59e0b;font-weight:600">Orange</span>.
 
 ## 4. Analytics Tab
 ![Analytics Tab Screenshot](images/analytics_tab.png)
@@ -75,5 +75,6 @@ The dashboard and CLI are deeply integrated with a self-learning loop. Once you 
 
 ## Features Available on Every Screen
 - **Global Search:** Type any ticker or name to instantly filter the current view.
+- **Top Bar Summaries**: Quick-glance cards showing your total advised picks, active holdings, closed positions, and ignored picks.
 - **Live Market Timers**: A built-in countdown clock synced exactly to the New York Stock Exchange (NYSE) trading hours, tracking the Pre-Market, Open Session, and After-Hours.
 - **Location Switcher**: A dropdown menu allowing you to swap between your Home or Office eToro API keys on the fly.

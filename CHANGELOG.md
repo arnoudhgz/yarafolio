@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.0] - 2026-07-24
 
+- Configuration: Added `USER_TIMEZONE` to `.env.sample` for configurable AI timezone handling.
+- Architecture: Added new `Git Hygiene` and `Timezone Communication` rules to `.agents/AGENTS.md`.
+- Documentation: Updated `docs/MANUAL.md` to reflect new 0.10.0 features (Open Notes, GICS Sectors, Top Bar Summaries).
+
+
 - Architecture: Refactored to a Meta-Advisor pattern, extracting `oversold` into a dedicated tactical skill and decoupling it from the `advice`, `premarket`, and `aftermarket` workflow skills.
 - Architecture: Updated all skill manifests (`.claude/` and `.gemini/`) to support the new modular strategy-agnostic approach.
 - Feature: Implemented an `--open-note` parameter in `advice_log.py add-pick` to persist actionable premarket/aftermarket timing advice directly into the database.
