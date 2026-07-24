@@ -5,13 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.0] - 2026-07-23
+## [0.10.0] - 2026-07-24
 
 ### Added
 - Feature: Added support for blacklisting stocks. Blacklisted stocks can be added manually or flagged from the dashboard, are tagged with customizable reasons (e.g., 'not listed', 'paused'), and are automatically ignored by the advice workflow.
 - Dashboard: Added "Closed positions" and "Ignored positions" summary cards to the top bar layout.
-- Dashboard: Fixed an issue where "Removed" items were completely deleted and no longer counted towards the "Ignored positions" and "Total adviced picks" totals. "Removed" items are now marked with a \`removed\` status instead.
+- Dashboard: Fixed an issue where "Removed" items were completely deleted and no longer counted towards the "Ignored positions" and "Total adviced picks" totals. "Removed" items are now marked with a `removed` status instead.
 - Dashboard: Fixed an issue on the Equity Curve where the "30d" view could sometimes display duplicate dates on the x-axis due to UTC boundary overlap. The chart now properly buckets by local calendar days.
+- Dashboard: Fixed an issue where the Realized P/L chart would not load the current month view automatically on page load.
+- Dashboard: Re-styled the Prev/Next pagination buttons on the Realized P/L chart to match the standard refresh button style and added a visual disabled state.
 - CLI: Added `open-profits` command to `scripts/advice_log.py` to quickly list open positions currently in profit.
 - Pipeline: Added `--min-rsi`, `--exclude-held`, and `--exclude-advised` native filtering flags to `scripts/screen.py oversold`.
 - Pipeline: Fixed a bug in `scripts/screen.py oversold` where `--min-rsi` incorrectly acted as a maximum bound instead of a lower bound.
