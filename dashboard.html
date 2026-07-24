@@ -193,20 +193,6 @@
     </div>
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Underwater Drawdown <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDrawdown').showModal()" title="About Underwater Drawdown"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
-        <div class="filters chart-toggles" id="drawdownToggles" style="margin-top:0;">
-          <button data-tf="24h" class="active">24h</button>
-          <button data-tf="7d">7d</button>
-          <button data-tf="30d">30d</button>
-          <button data-tf="12m">12m</button>
-        </div>
-      </div>
-      <div class="chart-wrap" style="height:200px;">
-        <canvas id="chartDrawdown"></canvas>
-      </div>
-    </div>
-    <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
         <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Realized P/L <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRealized').showModal()" title="About Realized P/L"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
         <div class="filters chart-toggles" id="pnlToggles" style="margin-top:0;">
           <button data-tf="month" class="active">Month</button>
@@ -230,22 +216,19 @@
       </div>
     </div>
     <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 24px;">
-        <h2 style="margin:0;">Analytics</h2>
-        <div id="analyticsUpdated" style="color:var(--muted);font-size:12px;"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Underwater Drawdown <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDrawdown').showModal()" title="About Underwater Drawdown"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles" id="drawdownToggles" style="margin-top:0;">
+          <button data-tf="24h" class="active">24h</button>
+          <button data-tf="7d">7d</button>
+          <button data-tf="30d">30d</button>
+          <button data-tf="12m">12m</button>
+        </div>
       </div>
-      <h2>~7 days after advice <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSevenDays').showModal()" title="About 7 days chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
-      <div id="sevenDayBox"></div>
+      <div class="chart-wrap" style="height:200px;">
+        <canvas id="chartDrawdown"></canvas>
+      </div>
     </div>
-    <div class="panel"><h2>Win rate &amp; move by rating <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRating').showModal()" title="About rating chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRating"></canvas></div><div id="chartRatingNote"></div></div>
-    <div class="panel"><h2>By RSI band <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRsi').showModal()" title="About RSI band chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRsiBand"></canvas></div><div id="chartRsiBandNote"></div></div>
-    <div class="panel"><h2>By sector <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSector').showModal()" title="About sector chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div></div>
-    <div class="panel"><h2>By source <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSource').showModal()" title="About source chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div></div>
-    <div class="panel"><h2>Trade Efficiency <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoGainVsDays').showModal()" title="About trade efficiency chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartGainVsDays"></canvas></div><div id="chartGainVsDaysNote"></div></div>
-    <div class="panel"><h2>By Day of the Week <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDayOfWeek').showModal()" title="About day of week chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartDayOfWeek"></canvas></div><div id="chartDayOfWeekNote"></div></div>
-    <div class="panel"><h2>Win Rate Over Time <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoWinRateTrend').showModal()" title="About win rate trend chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartWinRateTrend"></canvas></div><div id="chartWinRateTrendNote"></div></div>
-    <div class="panel"><h2>Entry Discipline <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoEntryDiscipline').showModal()" title="About entry discipline chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartEntryDiscipline"></canvas></div><div id="chartEntryDisciplineNote"></div></div>
-    <div class="panel"><h2>Days to Bounce vs RSI <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDaysVsRsi').showModal()" title="About days vs rsi chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartDaysVsRsi"></canvas></div><div id="chartDaysVsRsiNote"></div></div>
     <div class="panel">
       <h2 style="margin:0; margin-bottom:16px; display:flex; align-items:center; gap:8px;">Sector Analysis <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSectorAnalysis').showModal()" title="About Sector Analysis"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
       <div style="display: flex; flex-wrap: wrap; gap: 24px;">
@@ -265,6 +248,23 @@
         </div>
       </div>
     </div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 24px;">
+        <h2 style="margin:0;">Analytics</h2>
+        <div id="analyticsUpdated" style="color:var(--muted);font-size:12px;"></div>
+      </div>
+      <h2>~7 days after advice <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSevenDays').showModal()" title="About 7 days chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+      <div id="sevenDayBox"></div>
+    </div>
+    <div class="panel"><h2>Trade Efficiency <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoGainVsDays').showModal()" title="About trade efficiency chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartGainVsDays"></canvas></div><div id="chartGainVsDaysNote"></div></div>
+    <div class="panel"><h2>Win rate &amp; move by rating <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRating').showModal()" title="About rating chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRating"></canvas></div><div id="chartRatingNote"></div></div>
+    <div class="panel"><h2>By source <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSource').showModal()" title="About source chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div></div>
+    <div class="panel"><h2>Win Rate Over Time <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoWinRateTrend').showModal()" title="About win rate trend chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartWinRateTrend"></canvas></div><div id="chartWinRateTrendNote"></div></div>
+    <div class="panel"><h2>Entry Discipline <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoEntryDiscipline').showModal()" title="About entry discipline chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartEntryDiscipline"></canvas></div><div id="chartEntryDisciplineNote"></div></div>
+    <div class="panel"><h2>By RSI band <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRsi').showModal()" title="About RSI band chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRsiBand"></canvas></div><div id="chartRsiBandNote"></div></div>
+    <div class="panel"><h2>Days to Bounce vs RSI <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDaysVsRsi').showModal()" title="About days vs rsi chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartDaysVsRsi"></canvas></div><div id="chartDaysVsRsiNote"></div></div>
+    <div class="panel"><h2>By sector <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSector').showModal()" title="About sector chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div></div>
+    <div class="panel"><h2>By Day of the Week <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDayOfWeek').showModal()" title="About day of week chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartDayOfWeek"></canvas></div><div id="chartDayOfWeekNote"></div></div>
     <div class="empty" id="analyticsEmpty" style="display:none">Not enough finished advice yet to learn from. Outcomes appear once picks are sold, dropped, or 7+ days old.</div>
   </section>
 

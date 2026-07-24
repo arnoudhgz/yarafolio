@@ -37,6 +37,10 @@ By default, your logs and portfolio snapshots are saved locally to `data/private
 - Set `STOCKS_AUTOSYNC=1` in your `.env` to enable automatic pushing.
 - **CRITICAL WARNING:** Ensure the repository you create for this is explicitly set to **PRIVATE**. Your `data/private/` folder contains your personal financial holdings and history. Do not sync this data to a public repository!
 
+## Configure AI Timezone
+The AI agent uses your timezone to accurately interpret market hours and your commands based on your local time. 
+Set `USER_TIMEZONE` in your `.env` file to your specific timezone (e.g., `America/Mexico_City`, `Europe/Amsterdam`). If omitted, the agent will attempt to calculate it automatically, but explicitly setting it prevents translation errors.
+
 ## Provide mock data (Optional, for testing)
 If you don't want to start with a blank slate, you can set `DEMO_MODE=1` in your `.env` file. This tells the system to automatically load the provided sample data from the `data/sample/` directory instead of using your personal data in `data/private/`.
 

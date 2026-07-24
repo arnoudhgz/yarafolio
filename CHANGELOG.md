@@ -8,10 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.10.0] - 2026-07-24
 
 - Configuration: Added `USER_TIMEZONE` to `.env.sample` for configurable AI timezone handling.
+- Documentation: Added explicit configuration instructions for `USER_TIMEZONE` to `docs/SETUP.md`.
 - Architecture: Added new `Git Hygiene` and `Timezone Communication` rules to `.agents/AGENTS.md`.
 - Documentation: Updated `docs/MANUAL.md` to reflect new 0.10.0 features (Open Notes, GICS Sectors, Top Bar Summaries).
 - Strategy update: Upgraded the vague 'Consistent Free Cash Flow' requirement in the Buffett Moat matrix to a hard 'FCF Yield > 5%' metric in `STRATEGY.md`.
 - Analytics: Added total portfolio Maximum Drawdown (MDD) and Sharpe Ratio calculation to `review_stats.py` using `equity-history.json` to properly weight the varying position sizes.
+- Dashboard: Reordered the Analytics tab charts to prioritize Equity Curve and Realized P/L at the top, followed by Underwater Drawdown and Sector Analysis.
 - Dashboard: Added an "Underwater Drawdown" area chart beneath the Equity Curve to visualize the percentage drop from the portfolio's all-time high over time.
 - Dashboard: Upgraded the "Gain vs Days Held" bar chart into a "Trade Efficiency" scatter plot, mapping every individual closed position to visually expose behavioral habits like holding losers too long.
 
