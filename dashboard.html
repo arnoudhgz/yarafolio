@@ -206,6 +206,30 @@
       </div>
     </div>
     <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Realized P/L <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRealized').showModal()" title="About Realized P/L"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles" id="pnlToggles" style="margin-top:0;">
+          <button data-tf="month" class="active">Month</button>
+          <button data-tf="year">Year</button>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:14px;">
+        <button id="pnlPrevBtn" class="refresh-btn">&larr; Prev</button>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span id="pnlLabel" style="font-weight:600; min-width:120px; text-align:center;"></span>
+          <div class="filters chart-toggles" id="pnlYearGroupToggles" style="margin:0; display:none;">
+            <button data-group="week">Week</button>
+            <button data-group="month" class="active">Month</button>
+            <button data-group="quarter">Quarter</button>
+          </div>
+        </div>
+        <button id="pnlNextBtn" class="refresh-btn">Next &rarr;</button>
+      </div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="chartRealizedPnl"></canvas>
+      </div>
+    </div>
+    <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 24px;">
         <h2 style="margin:0;">Analytics</h2>
         <div id="analyticsUpdated" style="color:var(--muted);font-size:12px;"></div>
