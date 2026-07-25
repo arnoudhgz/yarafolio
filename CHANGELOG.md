@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Reordered the Analytics tab charts to prioritize Equity Curve and Realized P/L at the top, followed by Underwater Drawdown and Sector Analysis.
 - Dashboard: Added an "Underwater Drawdown" area chart beneath the Equity Curve to visualize the percentage drop from the portfolio's all-time high over time.
 - Dashboard: Upgraded the "Gain vs Days Held" bar chart into a "Trade Efficiency" scatter plot, mapping every individual closed position to visually expose behavioral habits like holding losers too long.
+- Dashboard: Introduced a `%` vs `$` toggle on most Win Rate and Trade Efficiency charts to instantly switch between average percentage returns and absolute realized dollars without reloading the dashboard.
+- Analytics: Re-engineered Maximum Drawdown (MDD) calculation to use a compounding return index, ensuring cash deposits/withdrawals no longer falsely register as portfolio drawdowns.
+- Dashboard: Grouped all Win Rate charts (over time, by rating, by RSI, by sector, by source) sequentially in the UI and updated titles for clarity.
+- Dashboard: Set the "Bought" view as the default active toggle for the Day of the Week chart.
+- Dashboard: Updated all chart info modals to clearly document the new `%`/`$` toggle behaviors and accurately describe the new Drawdown metric.
+- Bugfix: Corrected floating-point precision noise on the Y-axis ticks of the Equity Curve and Drawdown charts.
 
 - Architecture: Refactored to a Meta-Advisor pattern, extracting `oversold` into a dedicated tactical skill and decoupling it from the `advice`, `premarket`, and `aftermarket` workflow skills.
 - Architecture: Updated all skill manifests (`.claude/` and `.gemini/`) to support the new modular strategy-agnostic approach.
