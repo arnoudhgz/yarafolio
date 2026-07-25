@@ -503,7 +503,7 @@ export function reRenderAnalyticsChart(targetChart) {
   const allLots = positionLotRows();
   const soldLots = allLots.filter(r => r.status === 'sold');
   
-  const b = (window.LEARN && window.LEARN.buckets) ? window.LEARN.buckets : {};
+  const b = (LEARN && LEARN.buckets) ? LEARN.buckets : {};
 
   if (targetChart === 'chartGainVsDays') {
     renderGainVsDaysChart(targetChart, soldLots);
