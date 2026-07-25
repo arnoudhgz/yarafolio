@@ -502,6 +502,7 @@ export const bucketModes = {
 export function reRenderAnalyticsChart(targetChart) {
   const allLots = positionLotRows();
   const soldLots = allLots.filter(r => r.status === 'sold');
+  
   const b = (window.LEARN && window.LEARN.buckets) ? window.LEARN.buckets : {};
 
   if (targetChart === 'chartGainVsDays') {
@@ -509,11 +510,11 @@ export function reRenderAnalyticsChart(targetChart) {
   } else if (targetChart === 'chartWinRateTrend') {
     renderWinRateTrendChart(targetChart, soldLots);
   } else if (targetChart === 'chartRating') {
-    renderBucketChart('chartRating', b.rating, r => r.e.rating, allLots);
+    renderBucketChart('chartRating', b.rating, r => r.e.rating, soldLots);
   } else if (targetChart === 'chartSector') {
-    renderBucketChart('chartSector', b.sector, r => r.e.sector, allLots);
+    renderBucketChart('chartSector', b.sector, r => r.e.sector, soldLots);
   } else if (targetChart === 'chartSource') {
-    renderBucketChart('chartSource', b.source, r => r.e.source, allLots);
+    renderBucketChart('chartSource', b.source, r => r.e.source, soldLots);
   } else if (targetChart === 'chartRsiBand') {
     renderBucketChart('chartRsiBand', b.rsiBand, r => {
       const v = r.e.rsiAtAdvice;
@@ -525,7 +526,7 @@ export function reRenderAnalyticsChart(targetChart) {
       if (v < 60) return '50-60';
       if (v < 70) return '60-70';
       return '70+';
-    }, allLots);
+    }, soldLots);
   }
 }
 
@@ -560,7 +561,8 @@ export function renderAnalytics() {
     : '<div class="insufficient">No 7-day windows yet.</div>';
   const b = LEARN.buckets || {};
   const allLots = positionLotRows();
-  renderBucketChart('chartRating', b.rating, r => r.e.rating, allLots);
+  const soldLots = allLots.filter(r => r.status === 'sold');
+  renderBucketChart('chartRating', b.rating, r => r.e.rating, soldLots);
   renderBucketChart('chartRsiBand', b.rsiBand, r => {
     const v = r.e.rsiAtAdvice;
     if (v == null) return null;
@@ -571,11 +573,11 @@ export function renderAnalytics() {
     if (v < 60) return '50-60';
     if (v < 70) return '60-70';
     return '70+';
-  }, allLots);
-  renderBucketChart('chartSector', b.sector, r => r.e.sector, allLots);
-  renderBucketChart('chartSource', b.source, r => r.e.source, allLots);
+  }, soldLots);
+  renderBucketChart('chartSector', b.sector, r => r.e.sector, soldLots);
+  renderBucketChart('chartSource', b.source, r => r.e.source, soldLots);
   
-  const soldLots = allLots.filter(r => r.status === 'sold');
+  
   renderGainVsDaysChart('chartGainVsDays', soldLots);
   renderDayOfWeekChart('chartDayOfWeek', soldLots);
   renderWinRateTrendChart('chartWinRateTrend', soldLots);
@@ -1048,17 +1050,11 @@ export function renderWinRateTrendChart(canvasId, rows) {
   const labels = sortedMonths;
   const winRates = sortedMonths.map(m => (buckets[m].wins / buckets[m].total) * 100);
   const counts = sortedMonths.map(m => buckets[m].total);
-  const avgs = sortedMonths.map(m => buckets[m].plSum / buckets[m].total);
-  const dols = sortedMonths.map(m => buckets[m].dolSum);
-  const barData = avgs;
-  const barColors = avgs.map(v => v >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)');
 
   if (analyticsCharts[canvasId]) {
     const chart = analyticsCharts[canvasId];
     chart.data.labels = labels;
     chart.data.datasets[0].data = winRates;
-    chart.data.datasets[1].data = barData;
-    chart.data.datasets[1].backgroundColor = barColors;
     chart.update();
     return;
   }
@@ -1067,66 +1063,37 @@ export function renderWinRateTrendChart(canvasId, rows) {
     type: 'line',
     data: {
       labels: labels,
-      datasets: [
-        {
-          type: 'line',
-          label: 'Win Rate %',
-          data: winRates,
-          borderColor: '#3498db',
-          backgroundColor: '#3498db',
-          borderWidth: 3,
-          pointBackgroundColor: '#fff',
-          pointBorderWidth: 2,
-          pointRadius: 5,
-          tension: 0.3,
-          fill: false,
-          yAxisID: 'y'
-        },
-        {
-          type: 'bar',
-          label: 'Avg move %',
-          data: barData,
-          backgroundColor: barColors,
-          borderRadius: 6,
-          maxBarThickness: 50,
-          yAxisID: 'y1'
-        }
-      ]
+      datasets: [{
+        label: 'Win Rate %',
+        data: winRates,
+        borderColor: '#3498db',
+        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+        fill: true,
+        tension: 0.2
+      }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { labels: { color: cssVar('--text'), usePointStyle: true, boxWidth: 10 } },
+        legend: { display: false },
         tooltip: {
-          mode: 'index',
-          intersect: false,
           callbacks: {
             afterBody: (items) => {
               const label = items[0].label;
               const idx = sortedMonths.indexOf(label);
-              if (idx === -1) return [];
-              const n = counts[idx];
-              const dol = dols[idx];
-              const dollarStr = dol >= 0 ? '+$' + dol.toFixed(2) : '-$' + Math.abs(dol).toFixed(2);
-              return ['n = ' + n, 'Total Profit: ' + dollarStr];
+              if (idx === -1) return '';
+              return 'n = ' + counts[idx];
             }
           }
         }
       },
       scales: {
         y: { 
-          position: 'left',
           title: { display: true, text: 'Win Rate %', color: cssVar('--muted') }, 
           min: 0, max: 100,
           ticks: { color: cssVar('--muted') },
           grid: { color: cssVar('--border') }
-        },
-        y1: {
-          position: 'right',
-          title: { display: true, text: 'Avg %', color: cssVar('--muted') },
-          grid: { display: false },
-          ticks: { color: cssVar('--muted') }
         },
         x: { ticks: { color: cssVar('--muted') }, grid: { display: false } }
       }
