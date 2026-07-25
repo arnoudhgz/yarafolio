@@ -586,7 +586,6 @@ export function renderAnalytics() {
 }
 
 export function renderBucketChart(canvasId, buckets, keyFn = null, allLots = null) {
-  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
   buckets = buckets || {};
   const note = document.getElementById(canvasId + 'Note');
   const canvas = document.getElementById(canvasId);
@@ -597,14 +596,21 @@ export function renderBucketChart(canvasId, buckets, keyFn = null, allLots = nul
   }
   const ok = keys.filter(k => !buckets[k].insufficient);
   const weak = keys.filter(k => buckets[k].insufficient);
+  const toggle = document.querySelector(`.toggle-bucket[data-target="${canvasId}"]`);
+  
   if (note) note.innerHTML = weak.length
     ? '<div class="insufficient">Insufficient (n&lt;3): ' + weak.map(k => k + ' (n=' + buckets[k].n + ')').join(', ') + '</div>'
     : '';
+    
   if (!ok.length) {
     canvas.style.display = 'none';
+    if (toggle) toggle.style.display = 'none';
     if (note && !weak.length) note.innerHTML = '<div class="insufficient">No finished outcomes in this dimension yet.</div>';
+    if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
     return;
   }
+  
+  if (toggle) toggle.style.display = '';
   
   const dols = {};
   ok.forEach(k => dols[k] = 0);
@@ -826,16 +832,21 @@ export function renderReviews() {
 }
 
 export function renderGainVsDaysChart(canvasId, rows) {
-  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
   const note = document.getElementById(canvasId + 'Note');
+  const toggle = document.querySelector(`.toggle-bucket[data-target="${canvasId}"]`);
+  
   if (!rows || !rows.length) {
     canvas.style.display = 'none';
+    if (toggle) toggle.style.display = 'none';
     if (note) note.innerHTML = '<div class="insufficient">No closed positions available for this chart yet.</div>';
+    if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
     return;
   }
   
+  if (toggle) toggle.style.display = '';
+
   const isDol = bucketModes[canvasId] === 'dol';
   const scatterData = [];
   rows.forEach(r => {
@@ -996,15 +1007,19 @@ export function renderDayOfWeekChart(canvasId, rows) {
 }
 
 export function renderWinRateTrendChart(canvasId, rows) {
-  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
   const note = document.getElementById(canvasId + 'Note');
+  const toggle = document.querySelector(`.toggle-bucket[data-target="${canvasId}"]`);
+  
   if (!rows || !rows.length) {
     canvas.style.display = 'none';
+    if (toggle) toggle.style.display = 'none';
     if (note) note.innerHTML = '<div class="insufficient">No closed positions available for this chart yet.</div>';
+    if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
     return;
   }
+  if (toggle) toggle.style.display = '';
 
   const buckets = {};
   rows.forEach(r => {
@@ -1022,7 +1037,9 @@ export function renderWinRateTrendChart(canvasId, rows) {
   const sortedMonths = Object.keys(buckets).sort();
   if (!sortedMonths.length) {
     canvas.style.display = 'none';
+    if (toggle) toggle.style.display = 'none';
     if (note) note.innerHTML = '<div class="insufficient">No valid advice dates found.</div>';
+    if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
     return;
   }
   canvas.style.display = '';
