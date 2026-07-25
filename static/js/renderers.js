@@ -496,7 +496,6 @@ export const bucketModes = {
   chartRsiBand: 'pct',
   chartSector: 'pct',
   chartSource: 'pct',
-  chartWinRateTrend: 'pct',
   chartGainVsDays: 'pct'
 };
 
@@ -623,11 +622,25 @@ export function renderBucketChart(canvasId, buckets, keyFn = null, allLots = nul
     : ok.map(k => buckets[k].avg >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)');
 
   canvas.style.display = '';
+
+  if (analyticsCharts[canvasId]) {
+    const chart = analyticsCharts[canvasId];
+    chart.data.labels = ok;
+    chart.data.datasets[0].data = ok.map(k => buckets[k].winRate);
+    chart.data.datasets[1].data = barData;
+    chart.data.datasets[1].backgroundColor = barColors;
+    chart.data.datasets[1].label = isDol ? 'Total Profit $' : 'Avg move %';
+    chart.options.scales.y1.title.text = isDol ? 'Total $' : 'Avg %';
+    chart.options.scales.y1.ticks.callback = isDol ? (v => '$' + v) : undefined;
+    chart.update();
+    return;
+  }
+
   analyticsCharts[canvasId] = new Chart(canvas, {
     data: {
       labels: ok,
       datasets: [
-        { type: 'line', label: 'Win rate %', yAxisID: 'y', data: ok.map(k => buckets[k].winRate), borderColor: '#3498db', backgroundColor: '#3498db', borderWidth: 3, pointBackgroundColor: '#fff', pointBorderWidth: 2, pointRadius: 5, tension: 0.3 },
+        { type: 'line', label: 'Win rate %', yAxisID: 'y', data: ok.map(k => buckets[k].winRate), borderColor: '#3498db', backgroundColor: '#3498db', borderWidth: 3, pointBackgroundColor: '#fff', pointBorderWidth: 2, pointRadius: 5, tension: 0.3, fill: false },
         { type: 'bar', label: isDol ? 'Total Profit $' : 'Avg move %', yAxisID: 'y1', data: barData,
           backgroundColor: barColors, borderRadius: 6, maxBarThickness: 50 },
       ]
@@ -844,6 +857,17 @@ export function renderGainVsDaysChart(canvasId, rows) {
   canvas.style.display = '';
   if (note) note.innerHTML = '';
 
+  if (analyticsCharts[canvasId]) {
+    const chart = analyticsCharts[canvasId];
+    chart.data.datasets[0].data = scatterData;
+    chart.data.datasets[0].backgroundColor = scatterData.map(d => d.plPct >= 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)');
+    chart.data.datasets[0].borderColor = scatterData.map(d => d.plPct >= 0 ? 'rgba(46, 204, 113, 1)' : 'rgba(231, 76, 60, 1)');
+    chart.options.scales.y.title.text = isDol ? 'Realized Profit $' : 'Realized Return %';
+    chart.options.scales.y.ticks.callback = isDol ? (v => '$' + v) : (v => v + '%');
+    chart.update();
+    return;
+  }
+
   analyticsCharts[canvasId] = new Chart(canvas, {
     type: 'scatter',
     data: {
@@ -1009,11 +1033,18 @@ export function renderWinRateTrendChart(canvasId, rows) {
   const counts = sortedMonths.map(m => buckets[m].total);
   const avgs = sortedMonths.map(m => buckets[m].plSum / buckets[m].total);
   const dols = sortedMonths.map(m => buckets[m].dolSum);
-  const isDol = bucketModes[canvasId] === 'dol';
-  const barData = isDol ? dols : avgs;
-  const barColors = isDol 
-    ? dols.map(v => v >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)')
-    : avgs.map(v => v >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)');
+  const barData = avgs;
+  const barColors = avgs.map(v => v >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)');
+
+  if (analyticsCharts[canvasId]) {
+    const chart = analyticsCharts[canvasId];
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = winRates;
+    chart.data.datasets[1].data = barData;
+    chart.data.datasets[1].backgroundColor = barColors;
+    chart.update();
+    return;
+  }
 
   analyticsCharts[canvasId] = new Chart(canvas, {
     type: 'line',
@@ -1031,11 +1062,12 @@ export function renderWinRateTrendChart(canvasId, rows) {
           pointBorderWidth: 2,
           pointRadius: 5,
           tension: 0.3,
+          fill: false,
           yAxisID: 'y'
         },
         {
           type: 'bar',
-          label: isDol ? 'Total Profit $' : 'Avg move %',
+          label: 'Avg move %',
           data: barData,
           backgroundColor: barColors,
           borderRadius: 6,
@@ -1075,9 +1107,9 @@ export function renderWinRateTrendChart(canvasId, rows) {
         },
         y1: {
           position: 'right',
-          title: { display: true, text: isDol ? 'Total $' : 'Avg %', color: cssVar('--muted') },
+          title: { display: true, text: 'Avg %', color: cssVar('--muted') },
           grid: { display: false },
-          ticks: { color: cssVar('--muted'), callback: isDol ? (v => '$' + v) : undefined }
+          ticks: { color: cssVar('--muted') }
         },
         x: { ticks: { color: cssVar('--muted') }, grid: { display: false } }
       }

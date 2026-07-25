@@ -256,16 +256,7 @@
       <div id="sevenDayBox"></div>
     </div>
     <div class="panel"><h2>Trade Efficiency <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoGainVsDays').showModal()" title="About trade efficiency chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartGainVsDays"></canvas></div><div id="chartGainVsDaysNote"></div></div>
-    <div class="panel">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Win rate: over time <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoWinRateTrend').showModal()" title="About win rate trend chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
-        <div class="filters chart-toggles toggle-bucket" data-target="chartWinRateTrend" style="margin-top:0;">
-          <button data-type="pct" class="active">%</button>
-          <button data-type="dol">$</button>
-        </div>
-      </div>
-      <div class="chart-wrap"><canvas id="chartWinRateTrend"></canvas></div><div id="chartWinRateTrendNote"></div>
-    </div>
+    <div class="panel"><h2>Win rate: over time <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoWinRateTrend').showModal()" title="About win rate trend chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartWinRateTrend"></canvas></div><div id="chartWinRateTrendNote"></div></div>
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
         <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Win rate: by rating <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRating').showModal()" title="About rating chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
@@ -727,7 +718,7 @@
   <dialog id="infoWinRateTrend" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoWinRateTrend').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Win Rate Over Time</h2>
-      <p style="margin-bottom:0;">Tracks the success rate of advice generated per month (line). The bar chart represents either the average % move or the total cumulative profit $ harvested during that month, controlled by the <strong>% / $</strong> toggle.</p>
+      <p style="margin-bottom:0;">Line chart tracking the Win Rate % of advice generated per month. Highlights if the strategy is losing its edge in the current market regime.</p>
     </dialog>
 
   <dialog id="infoEntryDiscipline" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
