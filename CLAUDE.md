@@ -85,3 +85,13 @@ Always update the `CHANGELOG.md` file when making code changes and before making
 
 ## Sync Rule
 If you ever make changes to this file, you MUST immediately mirror those exact changes into `GEMINI.md` to keep the AI contexts perfectly in sync.
+
+
+## Atomic Commits & Versioning Rule
+Never bundle multiple unrelated features or fixes into a single massive git commit. Commits must be small and atomic. Furthermore, never proactively bump software versions (e.g., to 1.0.0) or assume it's time for a release unless explicitly commanded by the user. The user always controls the timeline.
+
+## UI Modal Fidelity Rule
+Whenever modifying the underlying logic of a chart (such as swapping between % and $ calculations), immediately verify and update the corresponding informational modals in the HTML so the descriptive UI text perfectly matches the new data behavior. Never leave the UI text out of sync with the data.
+
+## Strict DOM Type-Checking Rule
+When writing or refactoring JavaScript in this project, always use strict JSDoc type casting (e.g., `/** @type {HTMLElement} */`) and explicit runtime checks (`instanceof HTMLElement`) when interacting with DOM elements, otherwise the strict type-checker will throw implicit `any` errors.

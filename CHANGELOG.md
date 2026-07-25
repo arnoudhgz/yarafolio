@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Configuration: Added `USER_TIMEZONE` to `.env.sample` for configurable AI timezone handling.
 - Documentation: Added explicit configuration instructions for `USER_TIMEZONE` to `docs/SETUP.md`.
-- Architecture: Added new `Git Hygiene` and `Timezone Communication` rules to `.agents/AGENTS.md`.
+- Architecture: Added new Git Hygiene, Timezone Communication, Atomic Commits, UI Modal Fidelity, and Strict DOM Type-Checking rules to `.agents/AGENTS.md`, `GEMINI.md`, and `CLAUDE.md`.
 - Documentation: Updated `docs/MANUAL.md` to reflect new 0.10.0 features (Open Notes, GICS Sectors, Top Bar Summaries).
 - Strategy update: Upgraded the vague 'Consistent Free Cash Flow' requirement in the Buffett Moat matrix to a hard 'FCF Yield > 5%' metric in `STRATEGY.md`.
 - Analytics: Added total portfolio Maximum Drawdown (MDD) and Sharpe Ratio calculation to `review_stats.py` using `equity-history.json` to properly weight the varying position sizes.
