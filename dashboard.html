@@ -255,7 +255,16 @@
       </div>
       <div id="sevenDayBox"></div>
     </div>
-    <div class="panel"><h2>Trade Efficiency <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoGainVsDays').showModal()" title="About trade efficiency chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartGainVsDays"></canvas></div><div id="chartGainVsDaysNote"></div></div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Trade Efficiency <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoGainVsDays').showModal()" title="About trade efficiency chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles toggle-bucket" data-target="chartGainVsDays" style="margin-top:0;">
+          <button class="filter-btn active" data-mode="pct">%</button>
+          <button class="filter-btn" data-mode="dol">$</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartGainVsDays"></canvas></div><div id="chartGainVsDaysNote"></div>
+    </div>
     <div class="panel"><h2>Win rate: over time <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoWinRateTrend').showModal()" title="About win rate trend chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartWinRateTrend"></canvas></div><div id="chartWinRateTrendNote"></div></div>
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
