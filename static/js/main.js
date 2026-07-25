@@ -494,12 +494,13 @@ const adviceClickHandler = (ev) => {
 });
 
 document.querySelectorAll('.toggle-bucket').forEach(el => {
-  el.addEventListener('click', e => {
+  const bucket = /** @type {HTMLElement} */ (el);
+  bucket.addEventListener('click', e => {
     const t = /** @type {HTMLElement} */ (e.target);
     if (t.tagName !== 'BUTTON') return;
-    el.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    bucket.querySelectorAll('button').forEach(b => b.classList.remove('active'));
     t.classList.add('active');
-    const targetChart = el.dataset.target;
+    const targetChart = bucket.dataset.target;
     import('./renderers.js').then(r => {
       if (r.bucketModes && targetChart) {
         r.bucketModes[targetChart] = t.dataset.type;

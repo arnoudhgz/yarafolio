@@ -606,13 +606,13 @@ export function renderBucketChart(canvasId, buckets, keyFn = null, allLots = nul
     
   if (!ok.length) {
     canvas.style.display = 'none';
-    if (toggle) toggle.style.display = 'none';
+    if (toggle instanceof HTMLElement) toggle.style.display = 'none';
     if (note && !weak.length) note.innerHTML = '<div class="insufficient">No finished outcomes in this dimension yet.</div>';
     if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
     return;
   }
   
-  if (toggle) toggle.style.display = '';
+  if (toggle instanceof HTMLElement) toggle.style.display = '';
   
   const dols = {};
   ok.forEach(k => dols[k] = 0);
@@ -841,13 +841,13 @@ export function renderGainVsDaysChart(canvasId, rows) {
   
   if (!rows || !rows.length) {
     canvas.style.display = 'none';
-    if (toggle) toggle.style.display = 'none';
+    if (toggle instanceof HTMLElement) toggle.style.display = 'none';
     if (note) note.innerHTML = '<div class="insufficient">No closed positions available for this chart yet.</div>';
     if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
     return;
   }
   
-  if (toggle) toggle.style.display = '';
+  if (toggle instanceof HTMLElement) toggle.style.display = '';
 
   const isDol = bucketModes[canvasId] === 'dol';
   const scatterData = [];
@@ -946,7 +946,8 @@ export function renderDayOfWeekChart(canvasId, rows) {
   const daysStr = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const buckets = [0,1,2,3,4,5,6].map(i => ({ sum: 0, count: 0, plSum: 0, name: daysStr[i] }));
   
-  const type = document.querySelector('#dayOfWeekToggles button.active')?.dataset.type || 'bought';
+  const activeToggle = document.querySelector('#dayOfWeekToggles button.active');
+  const type = activeToggle instanceof HTMLElement ? activeToggle.dataset.type || 'bought' : 'bought';
 
   rows.forEach(r => {
     let dateStr = type === 'bought' ? r.openDateTime : r.firstAdvised;
@@ -1012,7 +1013,7 @@ export function renderWinRateTrendChart(canvasId, rows) {
   const canvas = document.getElementById(canvasId);
   if (!canvas) return;
   const note = document.getElementById(canvasId + 'Note');
-  const toggle = document.querySelector(`.toggle-bucket[data-target="${canvasId}"]`);
+  const toggle = /** @type {HTMLElement | null} */ (document.querySelector(`.toggle-bucket[data-target="${canvasId}"]`));
   
   if (!rows || !rows.length) {
     canvas.style.display = 'none';
