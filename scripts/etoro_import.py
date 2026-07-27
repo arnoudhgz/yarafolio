@@ -445,6 +445,14 @@ class EtoroImport:
                 })
                 added += 1
 
+        import_tickers_in_preview = {item["ticker"] for item in preview}
+        for ticker, existing_e in import_by_ticker.items():
+            if ticker not in import_tickers_in_preview and existing_e.get("status") == "bought":
+                existing_e["status"] = "sold"
+                history = existing_e.get("priceHistory", [])
+                existing_e["soldAt"] = history[-1]["price"] if history else existing_e.get("boughtAt")
+                merged += 1
+
         sector_by_ticker = {}
         if os.path.exists(self.instruments_cache):
             with open(self.instruments_cache) as f:

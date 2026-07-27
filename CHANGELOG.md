@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.0] - 2026-07-24
+## [0.10.0] - 2026-07-27
 
 - Configuration: Added `USER_TIMEZONE` to `.env.sample` for configurable AI timezone handling.
 - Documentation: Added explicit configuration instructions for `USER_TIMEZONE` to `docs/SETUP.md`.
@@ -97,6 +97,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Migrated all modals from pseudo-backdrop `div`s to native HTML `<dialog>` elements for better structural semantics and simplified CSS.
 
 ### Fixed
+- Fixed an issue where manual eToro imports permanently remained "Bought" and continued to display an active open P/L, even after being fully closed out in eToro. The sync process now properly auto-closes them.
+- Fixed a duplicated ID collision between manual imports and subsequent advice runs for the same ticker.
 - Fixed `advice_log.py checkin-candidates` using a hardcoded >7 days threshold instead of respecting the 3-day drop rule.
 - Fixed an alphabetical sorting bug on the dashboard Analytics "By RSI band" chart that caused `<20` to render incorrectly on the right side of numerical buckets.
 - Fixed `etoro_import.py` and dashboard P/L calculations to correctly use the position's `avg_open` price and `initialAmountInDollars` (invested amount) rather than dynamically recalculating invested amount, preventing discrepancies.
