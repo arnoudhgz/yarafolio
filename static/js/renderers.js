@@ -447,10 +447,11 @@ function renderPortfolioTreemap(holdings) {
           if (ctx.type !== 'data') return 'transparent';
           if (ctx.raw.l === 0) return 'rgba(255, 255, 255, 0.03)'; // sector background
           
-          const data = ctx.raw._data;
-          // leaf node: data is the single holding object itself
-          const totalInvested = data.invested || 0;
-          const totalPlDollar = data.plDollar || 0;
+          const raw = ctx.raw;
+          const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
+          
+          const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
+          const totalPlDollar = items.reduce((sum, item) => sum + (item.plDollar || 0), 0);
           const plPct = totalInvested > 0 ? (totalPlDollar / totalInvested) : 0;
           
           if (plPct > 0.05) return '#10b981'; // bright green
@@ -466,10 +467,11 @@ function renderPortfolioTreemap(holdings) {
           formatter: (ctx) => {
             if (ctx.type !== 'data') return '';
             if (ctx.raw.l === 0) return ''; // We use captions for sector names
-            const data = ctx.raw._data;
-            const ticker = data.displayTicker || data.ticker;
-            const totalInvested = data.invested || 0;
-            const totalPlDollar = data.plDollar || 0;
+            const raw = ctx.raw;
+            const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
+            const ticker = raw.g || (items[0] && (items[0].displayTicker || items[0].ticker)) || '';
+            const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
+            const totalPlDollar = items.reduce((sum, item) => sum + (item.plDollar || 0), 0);
             const plPct = totalInvested > 0 ? (totalPlDollar / totalInvested) : 0;
             return [ticker, fmtPct(plPct)];
           }
@@ -490,15 +492,16 @@ function renderPortfolioTreemap(holdings) {
             title: (items) => {
               const raw = items[0].raw;
               if (raw.l === 0) return raw.g; // sector
-              return raw._data.displayTicker || raw._data.ticker;
+              const dataItems = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
+              return raw.g || (dataItems[0] && (dataItems[0].displayTicker || dataItems[0].ticker)) || '';
             },
             label: (ctx) => {
               const raw = ctx.raw;
               if (raw.l === 0) return '';
-              const data = raw._data;
-              const name = data.name || '';
-              const totalInvested = data.invested || 0;
-              const totalPlDollar = data.plDollar || 0;
+              const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
+              const name = (items[0] && items[0].name) || '';
+              const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
+              const totalPlDollar = items.reduce((sum, item) => sum + (item.plDollar || 0), 0);
               const plPct = totalInvested > 0 ? (totalPlDollar / totalInvested) : 0;
               return [name, `Invested: ${fmtPrice(totalInvested)}`, `P/L: ${fmtPrice(totalPlDollar)} (${fmtPct(plPct)})`];
             }
