@@ -279,6 +279,7 @@ document.getElementById('portfolioHeatmapContainer').style.display = (portfolioT
 
 document.querySelectorAll('#heatmapTimeframeToggles button').forEach(b => b.classList.toggle('active', b.dataset.timeframe === heatmapTimeframe));
 let initSub = "Based on Today's % Change";
+if (heatmapTimeframe === 'yesterday') initSub = "Based on Yesterday's % Change";
 if (heatmapTimeframe === 'week') initSub = "Based on This Week's % Change";
 if (heatmapTimeframe === 'month') initSub = "Based on This Month's % Change";
 if (heatmapTimeframe === 'all') initSub = "Based on All-Time Open P/L";
@@ -291,6 +292,7 @@ document.querySelectorAll('#heatmapTimeframeToggles button').forEach(btn => btn.
   document.querySelectorAll('#heatmapTimeframeToggles button').forEach(b => b.classList.toggle('active', b.dataset.timeframe === tf));
   
   let sub = "Based on Today's % Change";
+  if (tf === 'yesterday') sub = "Based on Yesterday's % Change";
   if (tf === 'week') sub = "Based on This Week's % Change";
   if (tf === 'month') sub = "Based on This Month's % Change";
   if (tf === 'all') sub = "Based on All-Time Open P/L";

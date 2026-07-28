@@ -530,6 +530,7 @@ function renderPortfolioTreemap(holdings) {
               const plPct = totalInvested > 0 ? (totalHeatmapDollar / totalInvested) * 100 : 0;
               let labelPrefix = "Change";
               if (heatmapTimeframe === 'today') labelPrefix = "Today's Change";
+              if (heatmapTimeframe === 'yesterday') labelPrefix = "Yesterday's Change";
               if (heatmapTimeframe === 'week') labelPrefix = "This Week's Change";
               if (heatmapTimeframe === 'month') labelPrefix = "This Month's Change";
               if (heatmapTimeframe === 'all') labelPrefix = "All-Time P/L";

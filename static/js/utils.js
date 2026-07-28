@@ -85,6 +85,44 @@ export const periodChangePct = (e, timeframe) => {
 
   if (!e || !e.priceHistory || e.priceHistory.length < 2) return 0;
   const hist = e.priceHistory;
+
+  if (timeframe === 'yesterday') {
+    const distinctDates = [];
+    for (let i = hist.length - 1; i >= 0; i--) {
+      const dStr = hist[i].date.split(' ')[0];
+      if (distinctDates.length === 0 || distinctDates[distinctDates.length - 1] !== dStr) {
+        distinctDates.push(dStr);
+      }
+    }
+    if (distinctDates.length < 2) return 0;
+    
+    const t1Date = distinctDates[1];
+    const t2Date = distinctDates.length >= 3 ? distinctDates[2] : null;
+
+    let currentPrice = null;
+    for (let i = hist.length - 1; i >= 0; i--) {
+      if (hist[i].date.split(' ')[0] === t1Date) {
+        currentPrice = hist[i].price;
+        break;
+      }
+    }
+
+    let prevClose = null;
+    if (t2Date) {
+      for (let i = hist.length - 1; i >= 0; i--) {
+        if (hist[i].date.split(' ')[0] === t2Date) {
+          prevClose = hist[i].price;
+          break;
+        }
+      }
+    } else {
+      prevClose = hist[0].price;
+    }
+
+    if (!currentPrice || !prevClose || prevClose === 0) return 0;
+    return ((currentPrice - prevClose) / prevClose) * 100;
+  }
+
   const latestDateStr = hist[hist.length - 1].date.split(' ')[0];
   const latestDate = new Date(latestDateStr);
   let targetDate = new Date(latestDate);
