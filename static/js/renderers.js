@@ -416,14 +416,8 @@ export function renderPortfolioTable() {
     DATA.entries.forEach(e => advisedMap.set(e.ticker, e));
   }
   holdings.forEach(h => {
-    const entry = advisedMap.get(h.ticker);
-    if (heatmapTimeframe === 'all') {
-      h.heatmapPct = h.plPct || 0;
-      h.heatmapDollar = h.plDollar || 0;
-    } else {
-      h.heatmapPct = entry ? periodChangePct(entry, heatmapTimeframe) : 0;
-      h.heatmapDollar = h.invested > 0 ? h.invested * (h.heatmapPct / 100) : 0;
-    }
+    h.heatmapPct = h.plPct || 0;
+    h.heatmapDollar = h.plDollar || 0;
   });
 
   renderPortfolioTreemap(holdings);
@@ -474,10 +468,7 @@ function renderPortfolioTreemap(holdings) {
           const totalHeatmapDollar = items.reduce((sum, item) => sum + (item.heatmapDollar || 0), 0);
           const plPct = totalInvested > 0 ? (totalHeatmapDollar / totalInvested) * 100 : 0;
           
-          let thresholds = [2.0, 0];
-          if (heatmapTimeframe === 'week') thresholds = [4.0, 0];
-          if (heatmapTimeframe === 'month') thresholds = [8.0, 0];
-          if (heatmapTimeframe === 'all') thresholds = [15.0, 0];
+          let thresholds = [15.0, 0];
 
           if (plPct > thresholds[0]) return '#10b981'; // bright green
           if (plPct > thresholds[1]) return '#059669'; // dark green
@@ -528,12 +519,7 @@ function renderPortfolioTreemap(holdings) {
               const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
               const totalHeatmapDollar = items.reduce((sum, item) => sum + (item.heatmapDollar || 0), 0);
               const plPct = totalInvested > 0 ? (totalHeatmapDollar / totalInvested) * 100 : 0;
-              let labelPrefix = "Change";
-              if (heatmapTimeframe === 'today') labelPrefix = "Today's Change";
-              if (heatmapTimeframe === 'yesterday') labelPrefix = "Yesterday's Change";
-              if (heatmapTimeframe === 'week') labelPrefix = "This Week's Change";
-              if (heatmapTimeframe === 'month') labelPrefix = "This Month's Change";
-              if (heatmapTimeframe === 'all') labelPrefix = "All-Time P/L";
+              let labelPrefix = "Open P/L";
               return [name, `Invested: ${fmtPrice(totalInvested)}`, `${labelPrefix}: ${fmtPrice(totalHeatmapDollar)} (${fmtPct(plPct)})`];
             }
           }
