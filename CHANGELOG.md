@@ -122,6 +122,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Fixed a Flash of Unstyled Content (FOUC) when reloading the page on non-default tabs by using an inline synchronous script.
 - Dashboard: Restored the animated starry sky (sparkles) behind the Yara popup that was accidentally removed during the `<dialog>` migration.
 - Dashboard: Updated chart colors to use CSS variables so axes, ticks, grids, and legend text are visible in both light and dark themes.
+- Fixed an issue in `etoro_import.py` where eToro's industry metadata would aggressively overwrite custom sectors set by the advice workflow. The advice tracker's sector categorization now correctly takes precedence for both the advice log and the imported portfolio data.
 
 ## [0.9.0] - 2026-06-25
 

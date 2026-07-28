@@ -378,6 +378,11 @@ class EtoroImport:
         with open(self.log_file) as f:
             data = json.load(f)
 
+        known_sectors = {e["ticker"]: e["sector"] for e in data["entries"] if e.get("sector")}
+        for item in preview:
+            if item["ticker"] in known_sectors:
+                item["sector"] = known_sectors[item["ticker"]]
+
         today = nyse.nyse_today().isoformat()
         self.write_portfolio(preview, today)
 
@@ -418,7 +423,7 @@ class EtoroImport:
                     units=item["units"])
                 existing_e["tslSet"] = item.get(
                     "tslEnabled", existing_e.get("tslSet"))
-                if item["sector"] is not None:
+                if item["sector"] is not None and not existing_e.get("sector"):
                     existing_e["sector"] = item["sector"]
                 if not existing_e["priceHistory"]:
                     existing_e["priceHistory"].append(price_point)
@@ -462,7 +467,7 @@ class EtoroImport:
         backfilled = 0
         for entry in data["entries"]:
             if entry["ticker"] in sector_by_ticker:
-                if entry.get("sector") != sector_by_ticker[entry["ticker"]]:
+                if not entry.get("sector"):
                     entry["sector"] = sector_by_ticker[entry["ticker"]]
                     backfilled += 1
 
