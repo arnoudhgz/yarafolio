@@ -1,6 +1,6 @@
 // @ts-check
-import { DATA, PORTFOLIO, currentFilter, posFilter, activeTab, portfolioViewMode, portfolioTabMode, LEARN, analyticsCharts, canSave, SECTORS, SECTOR_COLORS, sortState, setSectorChart, setSectorCoverageChart, portfolioHeatmapChart, setPortfolioHeatmapChart, sectorChart, sectorCoverageChart, setPortfolioRendered, Chart, marked, searchQuery } from './state.js';
-import { advised, latestPrice, changePct, todayChangePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, cssVar, localDate, localDateTime, advisedFor } from './utils.js';
+import { DATA, PORTFOLIO, currentFilter, posFilter, activeTab, portfolioViewMode, portfolioTabMode, heatmapTimeframe, LEARN, analyticsCharts, canSave, SECTORS, SECTOR_COLORS, sortState, setSectorChart, setSectorCoverageChart, portfolioHeatmapChart, setPortfolioHeatmapChart, sectorChart, sectorCoverageChart, setPortfolioRendered, Chart, marked, searchQuery } from './state.js';
+import { advised, latestPrice, changePct, periodChangePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, cssVar, localDate, localDateTime, advisedFor } from './utils.js';
 import { markSortedHeader, setSearchCount } from './ui.js';
 
 export function renderAll() {
@@ -417,8 +417,13 @@ export function renderPortfolioTable() {
   }
   holdings.forEach(h => {
     const entry = advisedMap.get(h.ticker);
-    h.todayPct = entry ? todayChangePct(entry) : 0;
-    h.todayDollar = h.invested > 0 ? h.invested * (h.todayPct / 100) : 0;
+    if (heatmapTimeframe === 'all') {
+      h.heatmapPct = h.plPct || 0;
+      h.heatmapDollar = h.plDollar || 0;
+    } else {
+      h.heatmapPct = entry ? periodChangePct(entry, heatmapTimeframe) : 0;
+      h.heatmapDollar = h.invested > 0 ? h.invested * (h.heatmapPct / 100) : 0;
+    }
   });
 
   renderPortfolioTreemap(holdings);
@@ -462,13 +467,18 @@ function renderPortfolioTreemap(holdings) {
           const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
           
           const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
-          const totalTodayDollar = items.reduce((sum, item) => sum + (item.todayDollar || 0), 0);
-          const plPct = totalInvested > 0 ? (totalTodayDollar / totalInvested) * 100 : 0;
+          const totalHeatmapDollar = items.reduce((sum, item) => sum + (item.heatmapDollar || 0), 0);
+          const plPct = totalInvested > 0 ? (totalHeatmapDollar / totalInvested) * 100 : 0;
           
-          if (plPct > 2.0) return '#10b981'; // bright green
-          if (plPct > 0) return '#059669'; // dark green
-          if (plPct < -2.0) return '#ef4444'; // bright red
-          if (plPct < 0) return '#b91c1c'; // dark red
+          let thresholds = [2.0, 0];
+          if (heatmapTimeframe === 'week') thresholds = [4.0, 0];
+          if (heatmapTimeframe === 'month') thresholds = [8.0, 0];
+          if (heatmapTimeframe === 'all') thresholds = [15.0, 0];
+
+          if (plPct > thresholds[0]) return '#10b981'; // bright green
+          if (plPct > thresholds[1]) return '#059669'; // dark green
+          if (plPct < -thresholds[0]) return '#ef4444'; // bright red
+          if (plPct < thresholds[1]) return '#b91c1c'; // dark red
           return '#374151'; // flat gray
         },
         labels: {
@@ -482,8 +492,8 @@ function renderPortfolioTreemap(holdings) {
             const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
             const ticker = raw.g || (items[0] && (items[0].displayTicker || items[0].ticker)) || '';
             const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
-            const totalTodayDollar = items.reduce((sum, item) => sum + (item.todayDollar || 0), 0);
-            const plPct = totalInvested > 0 ? (totalTodayDollar / totalInvested) * 100 : 0;
+            const totalHeatmapDollar = items.reduce((sum, item) => sum + (item.heatmapDollar || 0), 0);
+            const plPct = totalInvested > 0 ? (totalHeatmapDollar / totalInvested) * 100 : 0;
             return [ticker, fmtPct(plPct)];
           }
         },
@@ -512,9 +522,14 @@ function renderPortfolioTreemap(holdings) {
               const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
               const name = (items[0] && items[0].name) || '';
               const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
-              const totalTodayDollar = items.reduce((sum, item) => sum + (item.todayDollar || 0), 0);
-              const plPct = totalInvested > 0 ? (totalTodayDollar / totalInvested) * 100 : 0;
-              return [name, `Invested: ${fmtPrice(totalInvested)}`, `Today's Change: ${fmtPrice(totalTodayDollar)} (${fmtPct(plPct)})`];
+              const totalHeatmapDollar = items.reduce((sum, item) => sum + (item.heatmapDollar || 0), 0);
+              const plPct = totalInvested > 0 ? (totalHeatmapDollar / totalInvested) * 100 : 0;
+              let labelPrefix = "Change";
+              if (heatmapTimeframe === 'today') labelPrefix = "Today's Change";
+              if (heatmapTimeframe === 'week') labelPrefix = "This Week's Change";
+              if (heatmapTimeframe === 'month') labelPrefix = "This Month's Change";
+              if (heatmapTimeframe === 'all') labelPrefix = "All-Time P/L";
+              return [name, `Invested: ${fmtPrice(totalInvested)}`, `${labelPrefix}: ${fmtPrice(totalHeatmapDollar)} (${fmtPct(plPct)})`];
             }
           }
         }

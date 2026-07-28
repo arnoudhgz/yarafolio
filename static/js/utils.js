@@ -77,21 +77,47 @@ export const changePct = (e) => {
 
 /** 
  * @param {import('./state.js').AdviceEntry} e 
+ * @param {string} timeframe
  * @returns {number} 
  */
-export const todayChangePct = (e) => {
+export const periodChangePct = (e, timeframe) => {
+  if (timeframe === 'all') return changePct(e);
+
   if (!e || !e.priceHistory || e.priceHistory.length < 2) return 0;
   const hist = e.priceHistory;
   const latestDateStr = hist[hist.length - 1].date.split(' ')[0];
+  const latestDate = new Date(latestDateStr);
+  let targetDate = new Date(latestDate);
+
+  if (timeframe === 'week') {
+    targetDate.setDate(targetDate.getDate() - 7);
+  } else if (timeframe === 'month') {
+    targetDate.setMonth(targetDate.getMonth() - 1);
+  }
+
+  const targetDateStr = targetDate.toISOString().split('T')[0];
   let prevClose = null;
+
   for (let i = hist.length - 1; i >= 0; i--) {
     const dStr = hist[i].date.split(' ')[0];
-    if (dStr < latestDateStr) {
-      prevClose = hist[i].price;
-      break;
+    if (timeframe === 'today') {
+      if (dStr < latestDateStr) {
+        prevClose = hist[i].price;
+        break;
+      }
+    } else {
+      if (dStr <= targetDateStr) {
+        prevClose = hist[i].price;
+        break;
+      }
     }
   }
-  if (prevClose == null || prevClose === 0) return 0;
+
+  if (prevClose == null) {
+    prevClose = hist[0].price;
+  }
+  
+  if (prevClose === 0) return 0;
   const currentPrice = hist[hist.length - 1].price;
   return ((currentPrice - prevClose) / prevClose) * 100;
 };

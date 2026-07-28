@@ -1,5 +1,5 @@
 // @ts-check
-import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, portfolioTabMode, setPortfolioTabMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
+import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, portfolioTabMode, setPortfolioTabMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered, setHeatmapTimeframe, heatmapTimeframe } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
 import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart, renderDrawdownChart, renderRealizedPnlChart, setPnlTf, setPnlYearGroup, shiftPnlDate } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
@@ -275,12 +275,44 @@ document.getElementById('macroModal')?.addEventListener('click', e => {
   if (/** @type {HTMLElement} */ (e.target).id === 'macroModal') /** @type {HTMLDialogElement} */ (document.getElementById('macroModal')).close();
 });
 
+document.getElementById('portfolioHeatmapContainer').style.display = (portfolioTabMode === 'heatmap' || portfolioTabMode === 'heatmap-all') ? 'block' : 'none';
+
+document.querySelectorAll('#heatmapTimeframeToggles button').forEach(b => b.classList.toggle('active', b.dataset.timeframe === heatmapTimeframe));
+let initSub = "Based on Today's % Change";
+if (heatmapTimeframe === 'week') initSub = "Based on This Week's % Change";
+if (heatmapTimeframe === 'month') initSub = "Based on This Month's % Change";
+if (heatmapTimeframe === 'all') initSub = "Based on All-Time Open P/L";
+document.getElementById('heatmapSubtitle').textContent = initSub;
+
+document.querySelectorAll('#heatmapTimeframeToggles button').forEach(btn => btn.addEventListener('click', (e) => {
+  const tf = /** @type {HTMLElement} */ (e.target).dataset.timeframe;
+  setHeatmapTimeframe(tf);
+  localStorage.setItem('heatmapTimeframe', tf);
+  document.querySelectorAll('#heatmapTimeframeToggles button').forEach(b => b.classList.toggle('active', b.dataset.timeframe === tf));
+  
+  let sub = "Based on Today's % Change";
+  if (tf === 'week') sub = "Based on This Week's % Change";
+  if (tf === 'month') sub = "Based on This Month's % Change";
+  if (tf === 'all') sub = "Based on All-Time Open P/L";
+  document.getElementById('heatmapSubtitle').textContent = sub;
+  
+  renderPortfolioTable();
+}));
+
 document.getElementById('portfolioTabModeToggles')?.addEventListener('click', ev => {
   const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
   if (!btn) return;
   setPortfolioTabMode(btn.dataset.mode);
   document.querySelectorAll('#portfolioTabModeToggles button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
+  
+  const mode = btn.dataset.mode;
+  if (mode === 'heatmap' || mode === 'heatmap-all') {
+    document.getElementById('portfolioHeatmapContainer').style.display = 'block';
+  } else {
+    document.getElementById('portfolioHeatmapContainer').style.display = 'none';
+  }
+  
   renderPortfolioTable();
 });
 

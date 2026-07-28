@@ -120,6 +120,10 @@ export let portfolioViewMode = localStorage.getItem('portfolioViewMode') || 'col
 /** @type {string} */
 export let portfolioTabMode = localStorage.getItem('portfolioTabMode') || 'table';
 
+/** @type {string} */
+export let heatmapTimeframe = localStorage.getItem('heatmapTimeframe') || 'today';
+export const setHeatmapTimeframe = (tf) => { heatmapTimeframe = tf; };
+
 const savedSortState = localStorage.getItem('sortState');
 const defaultSortState = {
   advice: { key: 'buyProx', dir: 1 },
