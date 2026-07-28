@@ -80,7 +80,7 @@ export let newsFilter = localStorage.getItem('newsFilter') || 'all';
 export let ipoFilter = localStorage.getItem('ipoFilter') || 'listed';
 
 /** @type {string} */
-export let activeTab = localStorage.getItem('activeTab') || 'portfolio';
+export let activeTab = localStorage.getItem('activeTab') || 'advice';
 
 /** @type {boolean} */
 export let portfolioRendered = false;
