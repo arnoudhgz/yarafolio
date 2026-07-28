@@ -433,8 +433,8 @@ function renderPortfolioTreemap(holdings) {
   const filteredHoldings = holdings.filter(h => h.invested > 0);
   let treeData = filteredHoldings;
   if (portfolioTabMode === 'heatmap') {
-    // AI Advised Only: filter out holdings not in advice DB
-    const advisedTickers = new Set(DATA.entries.map(e => e.ticker));
+    // AI Advised Only: filter out holdings not in advice DB (exclude 'import' source)
+    const advisedTickers = new Set(advised().map(e => e.ticker));
     treeData = filteredHoldings.filter(h => advisedTickers.has(h.ticker));
   }
 
