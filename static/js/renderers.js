@@ -689,6 +689,20 @@ export function renderBucketChart(canvasId, buckets, keyFn = null, allLots = nul
   });
 }
 
+function linkifyHtml(html) {
+  const parts = html.split(/(<[^>]*>)/);
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 0) {
+      parts[i] = parts[i].replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
+        const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
+        const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
+        return (isAdvised || isHolding) ? tickerLink(ticker) : match;
+      });
+    }
+  }
+  return parts.join('');
+}
+
 export function renderAINews() {
   const summaryContainer = /** @type {HTMLElement} */ (document.getElementById('newsSummary'));
   if (DATA.newsSummaries && DATA.newsSummaries.length > 0) {
@@ -703,16 +717,7 @@ export function renderAINews() {
         contentStr = contentStr.replace(/^###\s*(.*?)(\n|$)/, '');
       }
 
-      let linkedSummary = contentStr.replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
-        const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
-        const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
-        if (isAdvised || isHolding) {
-          return tickerLink(ticker);
-        }
-        return match;
-      });
-
-      let content = marked.parse(linkedSummary.trim());
+      let content = linkifyHtml(marked.parse(contentStr.trim()));
 
       html += `
         <div class="ai-article">
@@ -748,16 +753,7 @@ export function renderEOD() {
         contentStr = contentStr.replace(/^###\s*(.*?)(\n|$)/, '');
       }
 
-      let linkedSummary = contentStr.replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
-        const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
-        const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
-        if (isAdvised || isHolding) {
-          return tickerLink(ticker);
-        }
-        return match;
-      });
-
-      let content = marked.parse(linkedSummary.trim());
+      let content = linkifyHtml(marked.parse(contentStr.trim()));
 
       return `
         <div class="ai-article">
@@ -778,13 +774,7 @@ export function renderReviews() {
   if (reviewsMd ?? false) {
     let contentStr = /** @type {string} */ (reviewsMd);
     
-    let linkedContent = contentStr.replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
-      const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
-      const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
-      return (isAdvised || isHolding) ? tickerLink(ticker) : match;
-    });
-
-    const blocks = linkedContent.split(/(?=^##\s+\[)/m);
+    const blocks = contentStr.split(/(?=^##\s+\[)/m);
     let html = '';
     
     blocks.forEach(block => {
@@ -821,7 +811,7 @@ export function renderReviews() {
             <h3 style="margin:0; font-size:16px;">${esc(title)}</h3>
             <span style="font-size:12px; color:var(--muted);">${esc(dateStr)}</span>
           </div>
-          <div style="line-height: 1.6; font-size: 14px;" class="article-content news-markdown">${marked.parse(subContent)}</div>
+          <div style="line-height: 1.6; font-size: 14px;" class="article-content news-markdown">${linkifyHtml(marked.parse(subContent))}</div>
         </div>
       `;
       });
@@ -1401,13 +1391,13 @@ export function renderEquityChart(tf = '7d') {
     data: {
       labels,
       datasets: [
-        { label: 'Total P/L', data: pts.map(p => p.total), yAxisID: 'y', borderColor: text, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
-        { label: 'Realized P/L', data: pts.map(p => p.realized), yAxisID: 'y', borderColor: green, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
-        { label: 'Open P/L', data: pts.map(p => p.open), yAxisID: 'y', borderColor: blue, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
-        { label: 'Portfolio Return %', data: totalPctData, yAxisID: 'y1', borderColor: yellow, borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
-        { label: 'Nasdaq %', data: nasdaqData, yAxisID: 'y1', borderColor: cyan, borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
-        { label: 'S&P 500 %', data: sp500Data, yAxisID: 'y1', borderColor: cssVar('--orange'), borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 },
-        { label: 'Dow %', data: dowData, yAxisID: 'y1', borderColor: cssVar('--red'), borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1 }
+        { label: 'Total P/L', data: pts.map(p => p.total), yAxisID: 'y', borderColor: text, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'Realized P/L', data: pts.map(p => p.realized), yAxisID: 'y', borderColor: green, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'Open P/L', data: pts.map(p => p.open), yAxisID: 'y', borderColor: blue, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'Portfolio Return %', data: totalPctData, yAxisID: 'y1', borderColor: yellow, borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'Nasdaq %', data: nasdaqData, yAxisID: 'y1', borderColor: cyan, borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'S&P 500 %', data: sp500Data, yAxisID: 'y1', borderColor: cssVar('--orange'), borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'Dow %', data: dowData, yAxisID: 'y1', borderColor: cssVar('--red'), borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true }
       ]
     },
     options: {

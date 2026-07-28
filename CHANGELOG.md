@@ -22,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Set the "Bought" view as the default active toggle for the Day of the Week chart.
 - Dashboard: Updated all chart info modals to clearly document the new `%`/`$` toggle behaviors and accurately describe the new Drawdown metric.
 - Bugfix: Corrected floating-point precision noise on the Y-axis ticks of the Equity Curve and Drawdown charts.
-
+- Bugfix: Fixed an issue where ticker hyperlinks inside markdown code blocks (e.g. \`DUOL\`) would render as raw HTML strings in the News, EOD, and Learnings UI.
 - Architecture: Refactored to a Meta-Advisor pattern, extracting `oversold` into a dedicated tactical skill and decoupling it from the `advice`, `premarket`, and `aftermarket` workflow skills.
 - Architecture: Updated all skill manifests (`.claude/` and `.gemini/`) to support the new modular strategy-agnostic approach.
 - Feature: Implemented an `--open-note` parameter in `advice_log.py add-pick` to persist actionable premarket/aftermarket timing advice directly into the database.
