@@ -100,11 +100,8 @@ async function load() {
   setFilterActive('#rawNewsFilters', newsFilter);
   setFilterActive('#ipoFilters', ipoFilter);
 
-  const savedTab = localStorage.getItem('activeTab');
-  if (savedTab && savedTab !== 'advice') {
-    const tabBtn = document.querySelector(`.tabs button[data-tab="${savedTab}"]`);
-    if (tabBtn instanceof HTMLElement) tabBtn.click();
-  }
+  const tabBtn = document.querySelector(`.tabs button[data-tab="${activeTab}"]`);
+  if (tabBtn instanceof HTMLElement) tabBtn.click();
 
   // Background check for near-term IPOs to update the tab dot
   if (/** @type {HTMLElement} */ (document.getElementById('iposBody')).innerHTML === '') {

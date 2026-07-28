@@ -49,10 +49,9 @@
   </div>
 
   <div class="tabs" id="tabs">
+    <button data-tab="portfolio">Holdings</button>
     <button data-tab="advice">Advice</button>
-
     <button data-tab="positions">Positions</button>
-    <button data-tab="portfolio">Portfolio</button>
     <button data-tab="analytics">Analytics</button>
     <button data-tab="eod">EOD Reports</button>
     <button data-tab="news">AI News</button>
@@ -149,9 +148,9 @@
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('portfolioInfoModal').showModal()" title="About portfolio"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         </h2>
         <div class="filters chart-toggles" id="portfolioTabModeToggles" style="margin:0;">
-          <button data-mode="heatmap" class="active">Heatmap (AI Advised)</button>
+          <button data-mode="table" class="active">Holdings</button>
+          <button data-mode="heatmap">Heatmap (AI Advised)</button>
           <button data-mode="heatmap-all">Heatmap (Entire Portfolio)</button>
-          <button data-mode="table">Table View</button>
         </div>
       </div>
 

@@ -80,7 +80,7 @@ export let newsFilter = localStorage.getItem('newsFilter') || 'all';
 export let ipoFilter = localStorage.getItem('ipoFilter') || 'listed';
 
 /** @type {string} */
-export let activeTab = localStorage.getItem('activeTab') || 'advice';
+export let activeTab = localStorage.getItem('activeTab') || 'portfolio';
 
 /** @type {boolean} */
 export let portfolioRendered = false;
@@ -118,7 +118,7 @@ export const SECTORS = ['Communication Services', 'Consumer Discretionary', 'Con
 export let portfolioViewMode = localStorage.getItem('portfolioViewMode') || 'collapsed';
 
 /** @type {string} */
-export let portfolioTabMode = localStorage.getItem('portfolioTabMode') || 'heatmap';
+export let portfolioTabMode = localStorage.getItem('portfolioTabMode') || 'table';
 
 const savedSortState = localStorage.getItem('sortState');
 const defaultSortState = {
