@@ -29,7 +29,7 @@ export function adviceRows() {
       priceThen: (e.status === 'bought' || e.status === 'sold') ? (e.boughtAt ?? e.priceAtAdvice) : e.priceAtAdvice,
       priceNow,
       changePct: changePct(e),
-      todayChangePct: todayChangePct(e),
+      todayChangePct: periodChangePct(e, 'today'),
       rating: e.rating || null,
       rsi: e.rsiAtAdvice ?? null,
       sector: e.sector || null,
