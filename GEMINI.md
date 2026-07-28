@@ -92,3 +92,9 @@ Whenever modifying the underlying logic of a chart (such as swapping between % a
 
 ## Strict DOM Type-Checking Rule
 When writing or refactoring JavaScript in this project, always use strict JSDoc type casting (e.g., `/** @type {HTMLElement} */`) and explicit runtime checks (`instanceof HTMLElement`) when interacting with DOM elements, otherwise the strict type-checker will throw implicit `any` errors.
+
+## Data Integrity & eToro Import Precedence Rule
+The `advice-log.json` and its custom GICS sector categorizations (e.g., "Technology", "Healthcare", "Materials") are the ultimate source of truth for instrument metadata. When running eToro import scripts or merging data, raw eToro industry labels (like "Consumer Goods", "Services", or "Basic Materials") must NEVER overwrite existing custom sectors in the tracker. If new instruments are imported, their eToro sectors should be mapped to standard GICS sectors whenever possible.
+
+## Portfolio Analysis Context Rule (The "Ghost of 2022")
+When analyzing the user's overall portfolio performance or open P/L, be aware of the "Ghost of 2022." The user is carrying significant unrealized losses in open positions due to early mistakes with leverage during the 2022 market crash. Do not interpret these long-term underwater bags as a failure of the current mechanical strategy (which is highly profitable and focuses on cutting winners and managing risk).
