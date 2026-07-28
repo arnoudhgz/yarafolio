@@ -438,9 +438,13 @@ function renderPortfolioTreemap(holdings) {
   const filteredHoldings = holdings.filter(h => h.invested > 0);
   let treeData = filteredHoldings;
   if (portfolioTabMode === 'heatmap') {
-    // AI Advised Only: filter out holdings not in advice DB (exclude 'import' source)
-    const advisedTickers = new Set(advised().map(e => e.ticker));
-    treeData = filteredHoldings.filter(h => advisedTickers.has(h.ticker));
+    // AI Advised Only: filter out holdings not actively held in advice DB (exclude 'import', 'sold', 'dropped', 'blacklisted')
+    const activeAdvisedTickers = new Set(
+      advised()
+        .filter(e => e.status === 'bought' || e.status === 'watching')
+        .map(e => e.ticker)
+    );
+    treeData = filteredHoldings.filter(h => activeAdvisedTickers.has(h.ticker));
   }
 
   if (treeData.length === 0) return;
