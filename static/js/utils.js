@@ -77,6 +77,27 @@ export const changePct = (e) => {
 
 /** 
  * @param {import('./state.js').AdviceEntry} e 
+ * @returns {number} 
+ */
+export const todayChangePct = (e) => {
+  if (!e || !e.priceHistory || e.priceHistory.length < 2) return 0;
+  const hist = e.priceHistory;
+  const latestDateStr = hist[hist.length - 1].date.split(' ')[0];
+  let prevClose = null;
+  for (let i = hist.length - 1; i >= 0; i--) {
+    const dStr = hist[i].date.split(' ')[0];
+    if (dStr < latestDateStr) {
+      prevClose = hist[i].price;
+      break;
+    }
+  }
+  if (prevClose == null || prevClose === 0) return 0;
+  const currentPrice = hist[hist.length - 1].price;
+  return ((currentPrice - prevClose) / prevClose) * 100;
+};
+
+/** 
+ * @param {import('./state.js').AdviceEntry} e 
  * @returns {number | null} 
  */
 export const realizedPL = (e) => (e.status === 'sold' && e.soldAt != null && e.boughtAt != null && e.units != null)

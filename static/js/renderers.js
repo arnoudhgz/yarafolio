@@ -1,6 +1,6 @@
 // @ts-check
 import { DATA, PORTFOLIO, currentFilter, posFilter, activeTab, portfolioViewMode, portfolioTabMode, LEARN, analyticsCharts, canSave, SECTORS, SECTOR_COLORS, sortState, setSectorChart, setSectorCoverageChart, portfolioHeatmapChart, setPortfolioHeatmapChart, sectorChart, sectorCoverageChart, setPortfolioRendered, Chart, marked, searchQuery } from './state.js';
-import { advised, latestPrice, changePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, cssVar, localDate, localDateTime, advisedFor } from './utils.js';
+import { advised, latestPrice, changePct, todayChangePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, cssVar, localDate, localDateTime, advisedFor } from './utils.js';
 import { markSortedHeader, setSearchCount } from './ui.js';
 
 export function renderAll() {
@@ -29,6 +29,7 @@ export function adviceRows() {
       priceThen: (e.status === 'bought' || e.status === 'sold') ? (e.boughtAt ?? e.priceAtAdvice) : e.priceAtAdvice,
       priceNow,
       changePct: changePct(e),
+      todayChangePct: todayChangePct(e),
       rating: e.rating || null,
       rsi: e.rsiAtAdvice ?? null,
       sector: e.sector || null,
@@ -410,6 +411,16 @@ export function renderPortfolioTable() {
     tbody.appendChild(tr);
   });
 
+  const advisedMap = new Map();
+  if (DATA && DATA.entries) {
+    DATA.entries.forEach(e => advisedMap.set(e.ticker, e));
+  }
+  holdings.forEach(h => {
+    const entry = advisedMap.get(h.ticker);
+    h.todayPct = entry ? todayChangePct(entry) : 0;
+    h.todayDollar = h.invested > 0 ? h.invested * (h.todayPct / 100) : 0;
+  });
+
   renderPortfolioTreemap(holdings);
 }
 
@@ -451,12 +462,12 @@ function renderPortfolioTreemap(holdings) {
           const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
           
           const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
-          const totalPlDollar = items.reduce((sum, item) => sum + (item.plDollar || 0), 0);
-          const plPct = totalInvested > 0 ? (totalPlDollar / totalInvested) : 0;
+          const totalTodayDollar = items.reduce((sum, item) => sum + (item.todayDollar || 0), 0);
+          const plPct = totalInvested > 0 ? (totalTodayDollar / totalInvested) * 100 : 0;
           
-          if (plPct > 0.05) return '#10b981'; // bright green
+          if (plPct > 2.0) return '#10b981'; // bright green
           if (plPct > 0) return '#059669'; // dark green
-          if (plPct < -0.05) return '#ef4444'; // bright red
+          if (plPct < -2.0) return '#ef4444'; // bright red
           if (plPct < 0) return '#b91c1c'; // dark red
           return '#374151'; // flat gray
         },
@@ -471,8 +482,8 @@ function renderPortfolioTreemap(holdings) {
             const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
             const ticker = raw.g || (items[0] && (items[0].displayTicker || items[0].ticker)) || '';
             const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
-            const totalPlDollar = items.reduce((sum, item) => sum + (item.plDollar || 0), 0);
-            const plPct = totalInvested > 0 ? (totalPlDollar / totalInvested) : 0;
+            const totalTodayDollar = items.reduce((sum, item) => sum + (item.todayDollar || 0), 0);
+            const plPct = totalInvested > 0 ? (totalTodayDollar / totalInvested) * 100 : 0;
             return [ticker, fmtPct(plPct)];
           }
         },
@@ -501,9 +512,9 @@ function renderPortfolioTreemap(holdings) {
               const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
               const name = (items[0] && items[0].name) || '';
               const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
-              const totalPlDollar = items.reduce((sum, item) => sum + (item.plDollar || 0), 0);
-              const plPct = totalInvested > 0 ? (totalPlDollar / totalInvested) : 0;
-              return [name, `Invested: ${fmtPrice(totalInvested)}`, `P/L: ${fmtPrice(totalPlDollar)} (${fmtPct(plPct)})`];
+              const totalTodayDollar = items.reduce((sum, item) => sum + (item.todayDollar || 0), 0);
+              const plPct = totalInvested > 0 ? (totalTodayDollar / totalInvested) * 100 : 0;
+              return [name, `Invested: ${fmtPrice(totalInvested)}`, `Today's Change: ${fmtPrice(totalTodayDollar)} (${fmtPct(plPct)})`];
             }
           }
         }
