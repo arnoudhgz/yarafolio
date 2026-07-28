@@ -451,7 +451,7 @@ function renderPortfolioTreemap(holdings) {
       datasets: [{
         tree: treeData,
         key: 'invested',
-        groups: ['cleanSector', 'displayTicker'],
+        groups: ['cleanSector', 'ticker'],
         spacing: 1,
         borderWidth: 0,
         backgroundColor: (ctx) => {
