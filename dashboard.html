@@ -6,6 +6,7 @@
 <title>YaraFolio</title>
 <link rel="icon" type="image/png" href="static/img/yara-logo.png">
 <script src="static/js/vendor/chart.umd.min.js" defer></script>
+<script src="static/js/vendor/chartjs-chart-treemap.min.js" defer></script>
 <link rel="stylesheet" href="static/css/styles.css?v=1.1">
 <script>
   const savedTheme = localStorage.getItem('theme') || 'dark';
@@ -147,8 +148,21 @@
           eToro holdings
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('portfolioInfoModal').showModal()" title="About portfolio"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         </h2>
+        <div class="filters chart-toggles" id="portfolioTabModeToggles" style="margin:0;">
+          <button data-mode="heatmap" class="active">Heatmap (AI Advised)</button>
+          <button data-mode="heatmap-all">Heatmap (Entire Portfolio)</button>
+          <button data-mode="table">Table View</button>
+        </div>
       </div>
-      <div class="filters view-toggle" style="margin-top: 16px;">
+
+      <div id="portfolioHeatmapContainer" style="margin-top: 16px;">
+        <div class="chart-wrap" style="height: 600px;">
+          <canvas id="chartPortfolioHeatmap"></canvas>
+        </div>
+      </div>
+
+      <div id="portfolioTableContainer" style="display:none;">
+        <div class="filters view-toggle" style="margin-top: 16px;">
         <button id="btnCollapse" class="active">Collapse</button>
         <button id="btnSplit">Split</button>
       </div>
@@ -171,6 +185,7 @@
         <tbody></tbody>
       </table>
       <div class="empty" id="portfolioEmpty" style="display:none">No portfolio snapshot yet. Click "Update from eToro" or run /import in the AI CLI.</div>
+      </div>
     </div>
   </section>
 

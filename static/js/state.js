@@ -64,6 +64,9 @@ export let sectorChart = null;
 /** @type {any} */
 export let sectorCoverageChart = null;
 
+/** @type {any} */
+export let portfolioHeatmapChart = null;
+
 /** @type {string} */
 export let currentFilter = localStorage.getItem('currentFilter') || 'watching';
 
@@ -114,6 +117,9 @@ export const SECTORS = ['Communication Services', 'Consumer Discretionary', 'Con
 /** @type {string} */
 export let portfolioViewMode = localStorage.getItem('portfolioViewMode') || 'collapsed';
 
+/** @type {string} */
+export let portfolioTabMode = localStorage.getItem('portfolioTabMode') || 'heatmap';
+
 const savedSortState = localStorage.getItem('sortState');
 const defaultSortState = {
   advice: { key: 'buyProx', dir: 1 },
@@ -142,6 +148,8 @@ export function setPORTFOLIO(val) { PORTFOLIO = val; }
 export function setSectorChart(val) { sectorChart = val; }
 /** @param {any} val */
 export function setSectorCoverageChart(val) { sectorCoverageChart = val; }
+/** @param {any} val */
+export function setPortfolioHeatmapChart(val) { portfolioHeatmapChart = val; }
 /** @param {string} val */
 export function setCurrentFilter(val) { currentFilter = val; localStorage.setItem('currentFilter', val); }
 /** @param {string} val */
@@ -168,3 +176,5 @@ export function setSearchTimer(val) { searchTimer = val; }
 export function setModalChart(val) { modalChart = val; }
 /** @param {string} val */
 export function setPortfolioViewMode(val) { portfolioViewMode = val; localStorage.setItem('portfolioViewMode', val); }
+/** @param {string} val */
+export function setPortfolioTabMode(val) { portfolioTabMode = val; localStorage.setItem('portfolioTabMode', val); }

@@ -1,5 +1,5 @@
 // @ts-check
-import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
+import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, portfolioTabMode, setPortfolioTabMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
 import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart, renderDrawdownChart, renderRealizedPnlChart, setPnlTf, setPnlYearGroup, shiftPnlDate } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
@@ -119,6 +119,11 @@ if (portfolioViewMode === 'split') {
   /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.add('active');
   /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.remove('active');
 }
+
+document.querySelectorAll('#portfolioTabModeToggles button').forEach(b => {
+  b.classList.remove('active');
+  if (/** @type {HTMLButtonElement} */ (b).dataset.mode === portfolioTabMode) b.classList.add('active');
+});
 
 let currentBlacklistEntryId = null;
 
@@ -271,6 +276,15 @@ document.getElementById('btnManualBlacklist')?.addEventListener('click', () => {
 
 document.getElementById('macroModal')?.addEventListener('click', e => {
   if (/** @type {HTMLElement} */ (e.target).id === 'macroModal') /** @type {HTMLDialogElement} */ (document.getElementById('macroModal')).close();
+});
+
+document.getElementById('portfolioTabModeToggles')?.addEventListener('click', ev => {
+  const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
+  if (!btn) return;
+  setPortfolioTabMode(btn.dataset.mode);
+  document.querySelectorAll('#portfolioTabModeToggles button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPortfolioTable();
 });
 
 document.querySelectorAll('.tabs button').forEach(b => {

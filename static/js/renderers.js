@@ -1,5 +1,5 @@
 // @ts-check
-import { DATA, PORTFOLIO, currentFilter, posFilter, activeTab, portfolioViewMode, LEARN, analyticsCharts, canSave, SECTORS, SECTOR_COLORS, sortState, setSectorChart, setSectorCoverageChart, sectorChart, sectorCoverageChart, setPortfolioRendered, Chart, marked, searchQuery } from './state.js';
+import { DATA, PORTFOLIO, currentFilter, posFilter, activeTab, portfolioViewMode, portfolioTabMode, LEARN, analyticsCharts, canSave, SECTORS, SECTOR_COLORS, sortState, setSectorChart, setSectorCoverageChart, portfolioHeatmapChart, setPortfolioHeatmapChart, sectorChart, sectorCoverageChart, setPortfolioRendered, Chart, marked, searchQuery } from './state.js';
 import { advised, latestPrice, changePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, cssVar, localDate, localDateTime, advisedFor } from './utils.js';
 import { markSortedHeader, setSearchCount } from './ui.js';
 
@@ -106,6 +106,7 @@ export function mapSector(sector) {
   };
   return legacy[sector] || 'ETF / Other';
 }
+
 
 export function sectorPctMap() {
   if (!PORTFOLIO || !PORTFOLIO.holdings) return null;
@@ -338,6 +339,18 @@ export function renderPortfolioTable() {
   const table = /** @type {HTMLElement} */ (document.getElementById('portfolioTable'));
   const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('portfolioEmpty'));
 
+  const tableContainer = document.getElementById('portfolioTableContainer');
+  const heatmapContainer = document.getElementById('portfolioHeatmapContainer');
+  if (tableContainer && heatmapContainer) {
+    if (portfolioTabMode === 'table') {
+      tableContainer.style.display = 'block';
+      heatmapContainer.style.display = 'none';
+    } else {
+      tableContainer.style.display = 'none';
+      heatmapContainer.style.display = 'block';
+    }
+  }
+
   let holdings = PORTFOLIO.holdings.filter(h => matchesSearch([h.ticker, h.name, h.sector]));
   
   if (portfolioViewMode === 'split') {
@@ -396,6 +409,102 @@ export function renderPortfolioTable() {
       '<td>' + h.positions + '</td>';
     tbody.appendChild(tr);
   });
+
+  renderPortfolioTreemap(holdings);
+}
+
+function renderPortfolioTreemap(holdings) {
+  if (portfolioHeatmapChart) { portfolioHeatmapChart.destroy(); setPortfolioHeatmapChart(null); }
+  if (portfolioTabMode === 'table') return;
+
+  const filteredHoldings = holdings.filter(h => h.invested > 0);
+  let treeData = filteredHoldings;
+  if (portfolioTabMode === 'heatmap') {
+    // AI Advised Only: filter out holdings not in advice DB
+    const advisedTickers = new Set(DATA.entries.map(e => e.ticker));
+    treeData = filteredHoldings.filter(h => advisedTickers.has(h.ticker));
+  }
+
+  if (treeData.length === 0) return;
+
+  // Group by sector, then ticker
+  treeData.forEach(h => {
+    h.cleanSector = h.sector || 'ETF / Other';
+  });
+
+  const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById('chartPortfolioHeatmap'));
+  setPortfolioHeatmapChart(new Chart(ctx, {
+    type: 'treemap',
+    data: {
+      datasets: [{
+        tree: treeData,
+        key: 'invested',
+        groups: ['cleanSector', 'displayTicker'],
+        spacing: 1,
+        borderWidth: 0,
+        backgroundColor: (ctx) => {
+          if (ctx.type !== 'data') return 'transparent';
+          if (ctx.raw.l === 0) return 'rgba(255, 255, 255, 0.03)'; // sector background
+          
+          const data = ctx.raw._data;
+          const totalInvested = data.reduce((sum, item) => sum + item.invested, 0);
+          const totalPlDollar = data.reduce((sum, item) => sum + item.plDollar, 0);
+          const plPct = totalInvested > 0 ? (totalPlDollar / totalInvested) : 0;
+          
+          if (plPct > 0.05) return '#10b981'; // bright green
+          if (plPct > 0) return '#059669'; // dark green
+          if (plPct < -0.05) return '#ef4444'; // bright red
+          if (plPct < 0) return '#b91c1c'; // dark red
+          return '#374151'; // flat gray
+        },
+        labels: {
+          display: true,
+          color: '#fff',
+          font: [{ size: 14, weight: 'bold' }, { size: 12 }],
+          formatter: (ctx) => {
+            if (ctx.type !== 'data') return '';
+            if (ctx.raw.l === 0) return ''; // We use captions for sector names
+            const data = ctx.raw._data;
+            const ticker = data[0].displayTicker;
+            const totalInvested = data.reduce((sum, item) => sum + item.invested, 0);
+            const totalPlDollar = data.reduce((sum, item) => sum + item.plDollar, 0);
+            const plPct = totalInvested > 0 ? (totalPlDollar / totalInvested) : 0;
+            return [ticker, fmtPct(plPct)];
+          }
+        },
+        captions: {
+          display: true,
+          color: 'rgba(255, 255, 255, 0.8)',
+          font: { size: 14, weight: 'bold' }
+        }
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (items) => {
+              const raw = items[0].raw;
+              if (raw.l === 0) return raw.g; // sector
+              return raw._data[0].displayTicker;
+            },
+            label: (ctx) => {
+              const raw = ctx.raw;
+              if (raw.l === 0) return '';
+              const data = raw._data;
+              const name = data[0].name || '';
+              const totalInvested = data.reduce((sum, item) => sum + item.invested, 0);
+              const totalPlDollar = data.reduce((sum, item) => sum + item.plDollar, 0);
+              const plPct = totalInvested > 0 ? (totalPlDollar / totalInvested) : 0;
+              return [name, `Invested: ${fmtPrice(totalInvested)}`, `P/L: ${fmtPrice(totalPlDollar)} (${fmtPct(plPct)})`];
+            }
+          }
+        }
+      }
+    }
+  }));
 }
 
 function renderSectorChart() {
