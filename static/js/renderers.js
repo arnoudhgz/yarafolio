@@ -809,7 +809,7 @@ export function renderReviews() {
         <div class="ai-article">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
             <h3 style="margin:0; font-size:16px;">${esc(title)}</h3>
-            <span style="font-size:12px; color:var(--muted);">${esc(dateStr)}</span>
+            <span style="font-size:12px; color:var(--muted);">${esc(localDateTime(dateStr))}</span>
           </div>
           <div style="line-height: 1.6; font-size: 14px;" class="article-content news-markdown">${linkifyHtml(marked.parse(subContent))}</div>
         </div>

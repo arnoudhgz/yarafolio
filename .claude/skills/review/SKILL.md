@@ -33,10 +33,10 @@ One AskUserQuestion round listing the proposals (accept/reject each). Apply only
 
 ## Step 5: Record
 
-Append one entry to `data/private/REVIEWS.md` (newest on top, below the header). Use the current date and time (in New York timezone) for the header:
+Append one entry to `data/private/REVIEWS.md` (newest on top, below the header). Use the current date and time in strict ISO 8601 format with explicit timezone offsets (generated via `scripts/nyse.py`) for the header:
 
 ```markdown
-## [YYYY-MM-DD HH:MM]
+## [YYYY-MM-DDTHH:MM-04:00]
 
 ### Strategy Review
 
