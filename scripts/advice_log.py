@@ -130,6 +130,19 @@ class AdviceLog:
         data = self.load_log()
         today = nyse.nyse_today().isoformat()
 
+        def parse_float(val):
+            if val is None or str(val).lower() in ("n/a", "none", "null", ""):
+                return None
+            try:
+                return float(val)
+            except ValueError:
+                sys.exit(f"Invalid float value: {val}")
+
+        rsi_val = parse_float(args.rsi)
+        buy_below_val = parse_float(args.buy_below)
+        drop_below_val = parse_float(args.drop_below)
+        drop_above_val = parse_float(args.drop_above)
+
         e = None
         for x in data["entries"]:
             if x["ticker"] == args.ticker and x.get(
@@ -138,9 +151,26 @@ class AdviceLog:
                 break
 
         if e is None:
-            if not args.source:
-                sys.exit(
-                    f"{args.ticker} is new: --source ({'|'.join(self.NEW_PICK_SOURCES)}) is required")
+            for x in data["entries"]:
+                if x["ticker"] == args.ticker and x.get("status") in ("blacklisted", "avoid"):
+                    sys.exit(f"Addition aborted: {args.ticker} is already marked as {x.get('status')} in the log.")
+            
+            missing = []
+            if args.source is None: missing.append("--source")
+            if args.rating is None: missing.append("--rating")
+            if args.sector is None: missing.append("--sector")
+            if args.buy_below is None: missing.append("--buy-below")
+            if args.drop_below is None: missing.append("--drop-below")
+            if args.name is None: missing.append("--name")
+            if args.reason is None: missing.append("--reason")
+            if args.risk is None: missing.append("--risk")
+            if args.open_note is None: missing.append("--open-note")
+            if args.rsi is None: missing.append("--rsi")
+            if args.drop_above is None: missing.append("--drop-above")
+
+            if missing:
+                sys.exit(f"{args.ticker} is new: The following parameters are strictly mandatory: {', '.join(missing)}. Use 'N/A' if not applicable.")
+
             count = sum(1 for x in data["entries"]
                         if x["ticker"] == args.ticker) + 1
             e = {
@@ -182,11 +212,19 @@ class AdviceLog:
         events.sort(key=lambda ev: ev["date"])
         e["adviceEvents"] = events
         self.push_history(e, args.price)
-        for field, value in (("rating", args.rating), ("rsiAtAdvice", args.rsi),
-                             ("sector", args.sector), ("buyBelow", args.buy_below),
-                             ("dropBelow", args.drop_below), ("dropAbove", args.drop_above),
-                             ("name", args.name), ("reason", args.reason), ("risk", args.risk), ("openNote", args.open_note)):
-            if value is not None:
+        for field, arg_raw, value in (
+            ("rating", args.rating, args.rating),
+            ("rsiAtAdvice", args.rsi, rsi_val),
+            ("sector", args.sector, args.sector),
+            ("buyBelow", args.buy_below, buy_below_val),
+            ("dropBelow", args.drop_below, drop_below_val),
+            ("dropAbove", args.drop_above, drop_above_val),
+            ("name", args.name, args.name),
+            ("reason", args.reason, args.reason),
+            ("risk", args.risk, args.risk),
+            ("openNote", args.open_note, args.open_note)
+        ):
+            if arg_raw is not None:
                 e[field] = value
         if args.reason:
             advised = f"Advised ({args.source or e.get('source')}): {args.reason}"
@@ -481,13 +519,13 @@ def main():
     p.add_argument("--price", type=float, required=True)
     p.add_argument("--source", choices=app.NEW_PICK_SOURCES)
     p.add_argument("--rating", choices=["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-"])
-    p.add_argument("--rsi", type=float)
+    p.add_argument("--rsi", type=str)
     p.add_argument("--sector", choices=app.SECTORS)
-    p.add_argument("--buy-below", type=float)
-    p.add_argument("--drop-below", type=float)
+    p.add_argument("--buy-below", type=str)
+    p.add_argument("--drop-below", type=str)
     p.add_argument(
         "--drop-above",
-        type=float,
+        type=str,
         help="ceiling: above this the oversold bounce already ran, drop the watch")
     p.add_argument("--name")
     p.add_argument("--reason")
