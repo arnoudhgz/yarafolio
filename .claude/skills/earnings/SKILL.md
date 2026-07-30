@@ -1,5 +1,5 @@
 ---
-name: earnings-play
+name: earnings
 description: Scans for companies reporting earnings this week to play volatility.
 license: Apache-2.0
 metadata:
@@ -12,7 +12,7 @@ metadata:
 This workflow finds stocks reporting earnings soon to evaluate them for pre-earnings run-ups or post-earnings plays.
 
 ## Step 1: Screen candidates
-Use WebSearch: `stocks reporting earnings this week`. Find 5-10 high-interest tickers. Ensure all candidates adhere to STRATEGY.md.
+Use WebSearch: `stocks reporting earnings this week`. Find 5-10 high-interest tickers.
 
 ## Step 2: Candidate pre-fetch
 For the candidates, run:
