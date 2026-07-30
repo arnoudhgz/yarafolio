@@ -14,16 +14,15 @@ Always read `data/private/STRATEGY.md` for the personal trading parameters (batc
 
 | Command | Purpose |
 |---|---|
-| `/advice` | Master orchestrator for up to 10 picks. **Time-Aware:** It automatically adjusts its data sources (futures vs premarket movers vs after-hours drops) and selects the right tactical sub-skills (`oversold`, `momentum`, `earnings`, `insider`, `market-rotation`) based on the current local time relative to US market hours. |
+| `/advice` | Master orchestrator for up to 10 picks. **Time-Aware:** It automatically adjusts its data sources (futures vs premarket movers vs after-hours drops) and selects the right tactical sub-skills (`oversold`, `momentum`, `earnings`, `insider`, `market-rotation`, `diversify`) based on the current local time relative to US market hours. |
 | `/import` | Import my eToro positions (screenshot/paste) into the tracker (skill: `.claude/skills/import`) |
-| `/diversify` | Sector-gap picks: quality stocks I don't hold, in underweighted sectors (skill: `.claude/skills/diversify`) |
 | `/review` | Self-learning pass: outcome stats, proposes skill/CLAUDE.md improvements, approval-gated (skill: `.claude/skills/review`) |
-| `/market-rotation` | Finds opportunities in the current market rotation using systematic tactics, using alternative parameters (skill: `.claude/skills/market-rotation`) |
 | `/article TICKER` | Max 150-word article for my eToro feed, sources max 1 day old |
 
 ## Output rules (learned, non-negotiable)
 
 - Every recommendation list goes in ONE markdown table. Columns: Ticker, Price, Rating, Target Metric, Thesis, Risk. No prose blocks per stock.
+- After the table, explicitly list every tactical sub-skill executed during the run (e.g., `oversold`, `momentum`, `earnings`, `insider`, `market-rotation`, `diversify`) and briefly explain why they did or did not yield potential picks (e.g., rejected due to strict RSI rules, failed litigation checks).
 - Sources as hyperlinks below the table.
 - Data must be fresh: last 24 hours max, intraday when the market just opened. When I say the market opened minutes ago, use prices from today's session, not yesterday's close.
 - Before listing any pick, run one targeted litigation/fraud search per final pick, unconditional, even when the pre-fetched red-flag headlines looked clean (I once almost bought ZTS during a securities fraud investigation; the keyword screen can miss a problem phrased outside its terms). A red flag means drop the pick or mark it clearly.
@@ -34,7 +33,7 @@ Always read `data/private/STRATEGY.md` for the personal trading parameters (batc
 | Step | What | Source |
 |---|---|---|
 | 1 | Market sentiment + futures | WebSearch "stock market today ..." |
-| 2 | Strategy screen | Execute one or more tactical skills based on market posture: `python3 scripts/screen.py <tactic> --exclude-held --exclude-advised`. Available tactics: `oversold`, `momentum`, `earnings`, `insider`, `market-rotation`. Use `--full` if available. Fallback: web screener. |
+| 2 | Strategy screen | Execute one or more tactical skills based on market posture: `python3 scripts/screen.py <tactic> --exclude-held --exclude-advised`. Available tactics: `oversold`, `momentum`, `earnings`, `insider`, `market-rotation`, `diversify`. Use `--full` if available. Fallback: web screener. |
 | 2b | IPO check | `python3 scripts/screen.py ipos --json`. Look at "upcoming" and "recent" IPOs. Ignore any that are marked as avoided/Not listed in your advice log. If there is a highly anticipated IPO hitting the market today/tomorrow or a recent IPO showing a great entry point, add up to 2 of them to your candidate list. |
 | 2c | Candidate data pre-fetch | `python3 scripts/screen.py quote / forecast / news / news --red-flags` (one call per command for all candidates, rows embedded in researcher prompts). `forecast` carries the SB/B/H/S/SS analyst distribution + as-of date; `news` carries each headline's article URL; `quote --json` feeds the dashboard refresh |
 | 3 | Premarket movers (premarket only) | stockanalysis.com premarket pages |
@@ -45,9 +44,9 @@ WebSearch and the WebFetch domains above are pre-allowed in `.claude/settings.lo
 
 ## Advice tracking
 
-Advice generation is market-driven only: never use my portfolio as input for picks or researcher prompts. The portfolio enters AFTER the advice table, as a comparison. Exception: `/diversify` deliberately uses the portfolio sector split and held tickers as input; that's its whole point and the only allowed portfolio-as-input path.
+Advice generation is market-driven only: never use my portfolio as input for picks or researcher prompts. The portfolio enters AFTER the advice table, as a comparison. Exception: the `diversify` tactic deliberately uses the portfolio sector split and held tickers as input; that's its whole point and the only allowed portfolio-as-input path.
 
-**Deterministic data work goes through the `scripts/` CLIs, skills never hand-edit `data/*.json`.** Log mutations: `scripts/advice_log.py` (add-pick, add-note, touch, set-status, set-tsl, checkin-candidates, compare, sector-gaps). Outcome stats: `scripts/review_stats.py`. Sync: `scripts/etoro_import.py`. Mechanical market data (strategy screens, quote stats, analyst forecast, headlines, red-flag discovery): `scripts/screen.py`, with WebFetch/WebSearch as fallback when its scraping breaks. WebSearch stays for the judgment work: reading the articles that matter, weighing litigation severity, fresh analyst moves, market posture, and candidate discovery for /diversify. This also keeps token usage down.
+**Deterministic data work goes through the `scripts/` CLIs, skills never hand-edit `data/*.json`.** Log mutations: `scripts/advice_log.py` (add-pick, add-note, touch, set-status, set-tsl, checkin-candidates, compare, sector-gaps). Outcome stats: `scripts/review_stats.py`. Sync: `scripts/etoro_import.py`. Mechanical market data (strategy screens, quote stats, analyst forecast, headlines, red-flag discovery): `scripts/screen.py`, with WebFetch/WebSearch as fallback when its scraping breaks. WebSearch stays for the judgment work: reading the articles that matter, weighing litigation severity, fresh analyst moves, market posture, and candidate discovery for the diversify tactic. This also keeps token usage down.
 
 Every `/advice` run, after the table:
 

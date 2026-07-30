@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.0] - 2026-07-30
+## [0.10.0] - 2026-07-31
 
 - Configuration: Added `USER_TIMEZONE` to `.env.sample` for configurable AI timezone handling.
 - Documentation: Added explicit configuration instructions for `USER_TIMEZONE` to `docs/SETUP.md`.
@@ -69,6 +69,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Implemented a Light/Dark mode toggle (using `localStorage`) for better accessibility.
 
 ### Changed
+- Architecture: Integrated `/diversify` as a tactical sub-skill under the master `/advice` orchestrator (removed as a standalone command).
+- Docs: Added a non-negotiable rule to `GEMINI.md` and `CLAUDE.md` requiring the `/advice` orchestrator to explicitly list all executed sub-skills and explain any picks or rejections after the main advice table.
 - Architecture: Unified the `/premarket` and `/aftermarket` skills into a single time-aware `/advice` orchestrator.
 - Architecture: Renamed the `/earnings-play` skill to `/earnings` across all skills and CLI to ensure consistency.
 - Docs: Exposed the available tactical sub-skills (`oversold`, `momentum`, `earnings`, `insider`, `market-rotation`) directly in the `GEMINI.md` and `CLAUDE.md` workflow documentation so orchestrators explicitly know they exist.
