@@ -271,6 +271,8 @@ class EtoroImport:
             record = cache.get(str(iid), {})
             record["ticker"] = m["symbolFull"]
             record["name"] = m["instrumentDisplayName"]
+            if record["ticker"].endswith(".US") and "mappedTicker" not in record:
+                record["mappedTicker"] = record["ticker"].replace(".US", "")
             if "sector" not in record:
                 sector = self.sector_for(m, industries)
                 if sector is not None:
