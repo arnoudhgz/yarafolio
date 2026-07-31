@@ -52,6 +52,6 @@ Above the table: one line per target sector explaining the gap ("Healthcare is 3
 
 One CLI call per pick: `python3 scripts/advice_log.py add-pick TICKER --source diversify --price X --rating B+ --rsi 45 --sector "Healthcare" --buy-below X --drop-below Y --drop-above Z --name "..." --reason "..." --risk "..."`. The CLI upserts, so re-advised tickers are handled automatically (add `--note "re-advised: what changed"` for those). New picks auto-note their reason.
 
-No keep/drop check-in here; that belongs to /advice and /premarket runs.
+No keep/drop check-in here; that belongs to /advice runs.
 
 Last step, auto-backup: run `python3 scripts/autosync.py "diversify run"`. Commits + pushes the data files to the private backup repo when `STOCKS_AUTOSYNC=1`, silent no-op otherwise, so always run it.

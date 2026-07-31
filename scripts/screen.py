@@ -9,9 +9,9 @@ Usage:
 
 Scrapes stockanalysis.com's server-rendered pages (screen, quote, analyst
 forecast) and Google News RSS (headlines, red-flag discovery). This replaces
-the mechanical WebFetch/WebSearch steps in /advice, /premarket, /check,
-/diversify and the stock-researcher agents; the judgment work (reading the
-articles that matter, weighing litigation severity) stays with the agent.
+the mechanical WebFetch/WebSearch steps in /advice and the stock-researcher agents; the 
+judgment work (reading the articles that matter, weighing litigation severity) stays with 
+the agent.
 
 Brittleness warning: this parses unofficial page markup. When a command
 prints nothing or errors, the markup probably changed: fall back to
