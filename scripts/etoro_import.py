@@ -63,7 +63,7 @@ class EtoroImport:
             ROOT, "data", self.subdir, "advice-log.json")
         self.portfolio_file = os.path.join(
             ROOT, "data", self.subdir, "portfolio.json")
-        self.instruments_cache = os.path.join(ROOT, "data", "instruments_cache.json")
+        self.instruments_cache = os.path.join(ROOT, "data", self.subdir, "instruments_cache.json")
         self.preview_file = os.path.join(
             ROOT, "tmp", "etoro-import-preview.json")
 

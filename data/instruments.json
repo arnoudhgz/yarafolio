@@ -27,7 +27,7 @@
   "1047": {
     "ticker": "VOD",
     "name": "Vodafone Group plc-ADR",
-    "sector": "Technology"
+    "sector": "Communication Services"
   },
   "1069": {
     "ticker": "SMCI",
@@ -47,7 +47,7 @@
   "1133": {
     "ticker": "AGNC",
     "name": "AGNC Investment Corp",
-    "sector": "Financials"
+    "sector": "Real Estate"
   },
   "1203": {
     "ticker": "BAYN.DE",
@@ -93,7 +93,7 @@
   "1484": {
     "ticker": "PYPL",
     "name": "PayPal Holdings",
-    "sector": "Technology"
+    "sector": "Financials"
   },
   "1490": {
     "ticker": "TGT",
@@ -113,7 +113,7 @@
   "1545": {
     "ticker": "NOC",
     "name": "Northrop Grumman Corp",
-    "sector": "Industrial Goods"
+    "sector": "Industrials"
   },
   "1584": {
     "ticker": "THC",
@@ -143,12 +143,12 @@
   "1823": {
     "ticker": "INGR",
     "name": "Ingredion Inc",
-    "sector": "Consumer Discretionary"
+    "sector": "Consumer Staples"
   },
   "1957": {
     "ticker": "WSO",
     "name": "Watsco Inc",
-    "sector": "Communication Services"
+    "sector": "Industrials"
   },
   "1972": {
     "ticker": "REGN",
@@ -199,12 +199,12 @@
   "4072": {
     "ticker": "HSY",
     "name": "Hershey Co",
-    "sector": "Consumer Discretionary"
+    "sector": "Consumer Staples"
   },
   "4108": {
     "ticker": "MELI",
     "name": "MercadoLibre Inc",
-    "sector": "Communication Services"
+    "sector": "Consumer Discretionary"
   },
   "4138": {
     "ticker": "ROP",
@@ -234,7 +234,7 @@
   "4323": {
     "ticker": "VEEV",
     "name": "Veeva Systems Inc A",
-    "sector": "Technology"
+    "sector": "Healthcare"
   },
   "4330": {
     "ticker": "DXC",
@@ -279,42 +279,42 @@
   "5628": {
     "ticker": "CNMD",
     "name": "Conmed Corp.",
-    "sector": "Consumer Discretionary"
+    "sector": "Healthcare"
   },
   "5634": {
     "ticker": "ENPH",
     "name": "Enphase Energy Inc.",
-    "sector": "Industrial Goods"
+    "sector": "Technology"
   },
   "5683": {
     "ticker": "INSP",
     "name": "Inspire Medical Systems Inc.",
-    "sector": "Consumer Discretionary"
+    "sector": "Healthcare"
   },
   "5708": {
     "ticker": "SFM",
     "name": "Sprouts Farmers Market Inc.",
-    "sector": "Consumer Discretionary"
+    "sector": "Consumer Staples"
   },
   "5960": {
     "ticker": "SE",
     "name": "Sea Ltd-ADR",
-    "sector": "Technology"
+    "sector": "Consumer Discretionary"
   },
   "5973": {
     "ticker": "MPT",
     "name": "Medical Properties Trust Inc",
-    "sector": "Financials"
+    "sector": "Real Estate"
   },
   "5976": {
     "ticker": "BMRN",
     "name": "BioMarin Pharmaceutical Inc",
-    "sector": "Consumer Discretionary"
+    "sector": "Healthcare"
   },
   "5988": {
     "ticker": "IT",
     "name": "Gartner Inc",
-    "sector": "Consumer Discretionary"
+    "sector": "Technology"
   },
   "6051": {
     "ticker": "DECK",
@@ -324,7 +324,7 @@
   "6230": {
     "ticker": "HTGMQ",
     "name": "HTG Molecular Diagnostics Inc",
-    "sector": "Consumer Discretionary"
+    "sector": "Healthcare"
   },
   "6255": {
     "ticker": "NNDM",
@@ -344,7 +344,7 @@
   "6529": {
     "ticker": "SDGR",
     "name": "Schrodinger Inc/United States",
-    "sector": "Technology"
+    "sector": "Healthcare"
   },
   "6581": {
     "ticker": "ADC",
@@ -354,27 +354,27 @@
   "6703": {
     "ticker": "COUR",
     "name": "Coursera Inc.",
-    "sector": "Consumer Discretionary"
+    "sector": "Consumer Staples"
   },
   "6794": {
     "ticker": "NOMD",
     "name": "Nomad Foods Ltd",
-    "sector": "Consumer Discretionary"
+    "sector": "Consumer Staples"
   },
   "6817": {
     "ticker": "PHR",
     "name": "Phreesia Inc",
-    "sector": "Technology"
+    "sector": "Healthcare"
   },
   "6844": {
     "ticker": "NVO",
     "name": "Novo-Nordisk A/S SPONS ADR",
-    "sector": "Consumer Discretionary"
+    "sector": "Healthcare"
   },
   "6849": {
     "ticker": "SITC",
     "name": "SITE Centers Corp",
-    "sector": "Financials"
+    "sector": "Real Estate"
   },
   "6886": {
     "ticker": "UL.US",
@@ -390,17 +390,17 @@
   "7916": {
     "ticker": "VITL",
     "name": "Vital Farms Inc",
-    "sector": "Consumer Discretionary"
+    "sector": "Consumer Staples"
   },
   "7996": {
     "ticker": "U",
     "name": "Unity Software Inc.",
-    "sector": "Consumer Discretionary"
+    "sector": "Technology"
   },
   "8617": {
     "ticker": "NLOP",
     "name": "Net Lease Office Properties",
-    "sector": "Financials"
+    "sector": "Real Estate"
   },
   "8637": {
     "ticker": "DUOL",
@@ -415,7 +415,7 @@
   "8716": {
     "ticker": "PHG",
     "name": "Koninklijke Philips NV",
-    "sector": "Consumer Discretionary"
+    "sector": "Healthcare"
   },
   "8870": {
     "ticker": "G.US",
@@ -436,12 +436,12 @@
   "9033": {
     "ticker": "AHCO",
     "name": "AdaptHealth Corp.",
-    "sector": "Consumer Discretionary"
+    "sector": "Healthcare"
   },
   "9267": {
     "ticker": "OTLY",
     "name": "Oatly Group AB",
-    "sector": "Consumer Discretionary"
+    "sector": "Consumer Staples"
   },
   "9278": {
     "ticker": "MFLTY",
@@ -486,12 +486,12 @@
   "15618": {
     "ticker": "SPCX",
     "name": "Space Exploration Technologies Corp",
-    "sector": "Technology"
+    "sector": "Industrials"
   },
   "1469": {
     "ticker": "HON",
     "name": "Honeywell International Inc",
-    "sector": "Industrial Goods"
+    "sector": "Industrials"
   },
   "6689": {
     "ticker": "EQT",
@@ -581,7 +581,7 @@
   "1001": {
     "ticker": "AAPL",
     "name": "Apple",
-    "sector": "Consumer Discretionary"
+    "sector": "Consumer Goods"
   },
   "4397": {
     "ticker": "ON",
@@ -701,7 +701,7 @@
   "1026": {
     "ticker": "MMM",
     "name": "3M",
-    "sector": "Conglomerates"
+    "sector": "Industrials"
   },
   "1578": {
     "ticker": "SO",
@@ -741,17 +741,17 @@
   "1017": {
     "ticker": "GE",
     "name": "General Electric Co",
-    "sector": "Industrial Goods"
+    "sector": "Industrials"
   },
   "1526": {
     "ticker": "DE",
     "name": "Deere & Co",
-    "sector": "Industrial Goods"
+    "sector": "Industrials"
   },
   "1869": {
     "ticker": "TDS",
     "name": "Telephone And Data Systems Inc",
-    "sector": "Technology"
+    "sector": "Communication Services"
   },
   "1492": {
     "ticker": "UNP",
@@ -766,26 +766,162 @@
   "1725": {
     "ticker": "CPB",
     "name": "Campbell Soup Co",
-    "sector": "Consumer Discretionary"
+    "sector": "Consumer Staples"
   },
   "1043": {
     "ticker": "PEP",
     "name": "PepsiCo",
-    "sector": "Consumer Discretionary"
+    "sector": "Consumer Staples"
   },
   "9674": {
     "ticker": "XENE",
     "name": "Xenon Pharmaceuticals Inc",
-    "sector": "Consumer Discretionary"
+    "sector": "Healthcare"
   },
   "1024": {
     "ticker": "KO",
     "name": "Coca-Cola",
-    "sector": "Consumer Discretionary"
+    "sector": "Consumer Staples"
   },
   "1021": {
     "ticker": "INTC",
     "name": "Intel",
     "sector": "Technology"
+  },
+  "9737": {
+    "ticker": "KRUS",
+    "name": "Kura Sushi USA Inc",
+    "sector": "Consumer Discretionary"
+  },
+  "1033": {
+    "ticker": "RTX",
+    "name": "Raytheon-Technologies",
+    "sector": "Industrials"
+  },
+  "1631": {
+    "ticker": "PH",
+    "name": "Parker-Hannifin Corp",
+    "sector": "Industrials"
+  },
+  "1032": {
+    "ticker": "UNH",
+    "name": "UnitedHealth",
+    "sector": "Healthcare"
+  },
+  "17": {
+    "ticker": "OIL",
+    "name": "Oil (Non Expiry)",
+    "sector": "ETF / Other"
+  },
+  "18": {
+    "ticker": "GOLD",
+    "name": "Gold (Non Expiry)",
+    "sector": "Financials"
+  },
+  "1136": {
+    "ticker": "LMT",
+    "name": "Lockheed Martin Corporation",
+    "sector": "Industrials"
+  },
+  "1757": {
+    "ticker": "NEM",
+    "name": "Newmont Mining Corp",
+    "sector": "Materials"
+  },
+  "1557": {
+    "ticker": "NUE",
+    "name": "Nucor Corp",
+    "sector": "Materials"
+  },
+  "1661": {
+    "ticker": "BLK",
+    "name": "BlackRock Inc",
+    "sector": "Financials"
+  },
+  "6501": {
+    "ticker": "PGNY",
+    "name": "Progyny Inc",
+    "sector": "Healthcare"
+  },
+  "1616": {
+    "ticker": "ECL",
+    "name": "Ecolab Inc",
+    "sector": "Materials"
+  },
+  "9955": {
+    "ticker": "WINA",
+    "name": "Winmark Corporation",
+    "sector": "Industrials"
+  },
+  "1146": {
+    "ticker": "MOS",
+    "name": "Mosaic Co",
+    "sector": "Materials"
+  },
+  "1946": {
+    "ticker": "AMT",
+    "name": "American Tower Corp",
+    "sector": "Real Estate"
+  },
+  "1014": {
+    "ticker": "CVX.US",
+    "name": "Chevron",
+    "sector": "Energy",
+    "mappedTicker": "CVX"
+  },
+  "1177": {
+    "ticker": "ALB",
+    "name": "Albemarle Corporation",
+    "sector": "Utilities"
+  },
+  "1555": {
+    "ticker": "FCX",
+    "name": "Freeport-McMoRan Inc",
+    "sector": "Materials"
+  },
+  "1130": {
+    "ticker": "MU",
+    "name": "Micron Technology, Inc.",
+    "sector": "Technology"
+  },
+  "1510": {
+    "ticker": "COP",
+    "name": "ConocoPhillips Co",
+    "sector": "Basic Materials"
+  },
+  "1855": {
+    "ticker": "SPGI",
+    "name": "S&P Global Inc",
+    "sector": "Services"
+  },
+  "1676": {
+    "ticker": "APD",
+    "name": "Air Products & Chemicals Inc",
+    "sector": "Basic Materials"
+  },
+  "4268": {
+    "ticker": "EQIX",
+    "name": "Equinix Inc",
+    "sector": "Financial"
+  },
+  "1003": {
+    "ticker": "META",
+    "name": "Meta Platforms Inc",
+    "sector": "Technology"
+  },
+  "8103": {
+    "ticker": "SAIA",
+    "name": "Saia Inc.",
+    "sector": "Industrial Goods"
+  },
+  "6378": {
+    "ticker": "ALNY",
+    "name": "Alnylam Pharmaceuticals Inc",
+    "sector": "Consumer Goods"
+  },
+  "RTO-TEMP": {
+    "ticker": "RTO.US",
+    "name": "Rentokil Initial",
+    "mappedTicker": "RTO"
   }
 }

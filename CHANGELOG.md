@@ -45,6 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Fixed a bug causing a DOM Exception for disabled buttons in `renderers.js` by explicitly casting to `HTMLButtonElement`.
 - Dashboard: Removed the redundant "Analytics" overarching title to fix the double title display above the "~7 days after advice" card.
 - Dashboard: Added "Advised" and "Bought" toggles to the "By Day of the Week" chart to allow bucketing by either the AI advice date or the eToro trade execution date.
+- Security: Moved the `instruments_cache.json` file into the `data/private` folder so that it is properly backed up by `autosync.py` without risking public exposure of trading history.
+- Script: Added a new `scripts/publish_instruments.py` utility to safely merge your private cached instruments into the public `instruments.json` on-demand for community releases.
 
 ### Added
 - Dashboard: Combined the Sector division and Sector coverage charts into a single "Sector Analysis" card on the Analytics tab and added explanatory modals regarding sector accuracy.
@@ -142,6 +144,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed `scripts/etoro_import.py` to iterate through all available `ETORO_USER_KEY` variables until a successful authentication is found, instead of failing on the first attempt.
 - Fixed the dashboard Equity Curve chart to accurately update during premarket and after-hours by switching the Nasdaq reference from `^IXIC` (which only updates during the regular session) to Nasdaq 100 Futures (`NQ=F`), and by pulling live prices from the active session into the open P/L calculation.
 - Fixed duplicate date labels on the 7d Equity Curve chart by including intraday time in the X-axis formatter.
+- Pipeline: `etoro_import.py` now targets `data/private/instruments_cache.json` to prevent local data loss if the project is cloned to a new machine.
 - Dashboard: Fixed a Flash of Unstyled Content (FOUC) when reloading the page on non-default tabs by using an inline synchronous script.
 - Dashboard: Restored the animated starry sky (sparkles) behind the Yara popup that was accidentally removed during the `<dialog>` migration.
 - Dashboard: Updated chart colors to use CSS variables so axes, ticks, grids, and legend text are visible in both light and dark themes.
