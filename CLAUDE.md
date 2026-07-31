@@ -21,9 +21,18 @@ Always read `data/private/STRATEGY.md` for the personal trading parameters (batc
 
 ## Output rules (learned, non-negotiable)
 
-- Every recommendation list goes in ONE markdown table. Columns: Ticker, Price, Rating, Target Metric, Thesis, Risk. No prose blocks per stock.
-- After the table, explicitly list every tactical sub-skill executed during the run (e.g., `oversold`, `momentum`, `earnings`, `insider`, `market-rotation`, `diversify`) and briefly explain why they did or did not yield potential picks (e.g., rejected due to strict RSI rules, failed litigation checks).
-- Sources as hyperlinks below the table.
+When executing an `/advice` run, you MUST output a highly structured, rigorous research report designed to be cross-checked by a second model. The report must contain exactly the following 10 sections:
+
+1. **Run conditions**: State local time, market time, session posture (premarket/intraday/after-hours), and prior runs.
+2. **Market context established**: Briefly summarize major index moves, key macro/earnings events, and current sector rotation.
+3. **Strategy constraints applied**: List the hard filters from `STRATEGY.md` and any learned rules from `REVIEWS.md` that influenced your decisions.
+4. **Screens run**: A markdown table documenting every tactical screen run (e.g., `oversold`, `momentum`, `ipos`) and the raw count of candidates found before filtering. State if a third-party source was used.
+5. **Candidates and verdicts**: A markdown table containing all researched tickers (Columns: Ticker, Price (close), Day, RSI (verified), Rating, Verdict). Below the table, provide a detailed "The pick" section for any A/B rated stocks (with thesis, levels, and entry instructions), followed by "Reject reasoning, one line each" for all C-rated or filtered stocks.
+6. **Sector context**: Explain how the candidates interact with the portfolio's current sector gaps.
+7. **Tactics used, and not used**: Explicitly list all tactics that were used (e.g., `oversold`, `ipos`) and honestly self-evaluate any that were skipped or mislabeled (e.g., `market-rotation`, `diversify`).
+8. **Known data-quality problems**: Note any discrepancies found during research (e.g., false red-flag headlines, incorrect third-party RSI data).
+9. **Questions worth putting to a second model**: Propose 3-5 provocative questions challenging your own logic, missed opportunities, or borderline rejections.
+10. **Sources read**: A comprehensive list of hyperlinks to every article, screener, and data page used during the run.
 - Data must be fresh: last 24 hours max, intraday when the market just opened. When I say the market opened minutes ago, use prices from today's session, not yesterday's close.
 - Before listing any pick, run one targeted litigation/fraud search per final pick, unconditional, even when the pre-fetched red-flag headlines looked clean (I once almost bought ZTS during a securities fraud investigation; the keyword screen can miss a problem phrased outside its terms). A red flag means drop the pick or mark it clearly.
 - When I mention geopolitical events (war, tariffs, elections), shift the list toward defensive assets.
@@ -33,7 +42,7 @@ Always read `data/private/STRATEGY.md` for the personal trading parameters (batc
 | Step | What | Source |
 |---|---|---|
 | 1 | Market sentiment + futures | WebSearch "stock market today ..." |
-| 2 | Strategy screen | Execute one or more tactical skills based on market posture: `python3 scripts/screen.py <tactic> --exclude-held --exclude-advised`. Available tactics: `oversold`, `momentum`, `earnings`, `insider`, `market-rotation`, `diversify`. Use `--full` if available. Fallback: web screener. |
+| 2 | Strategy screen | Execute one or more tactical skills based on market posture. Pick the tactics that fit the posture, not just the default one, and label each candidate with the tactic that actually found it. **Two are screen.py screens:** `python3 scripts/screen.py oversold\|momentum --exclude-held --exclude-advised [--full]`. **Four are WebSearch-driven skills with no screen.py subcommand** (`.claude/skills/<tactic>/SKILL.md`): `earnings`, `insider`, `market-rotation`, `diversify` - run the skill, don't look for a screen.py flag. Fallback: web screener. |
 | 2b | IPO check | `python3 scripts/screen.py ipos --json`. Look at "upcoming" and "recent" IPOs. Ignore any that are marked as avoided/Not listed in your advice log. If there is a highly anticipated IPO hitting the market today/tomorrow or a recent IPO showing a great entry point, add up to 2 of them to your candidate list. |
 | 2c | Candidate data pre-fetch | `python3 scripts/screen.py quote / forecast / news / news --red-flags` (one call per command for all candidates, rows embedded in researcher prompts). `forecast` carries the SB/B/H/S/SS analyst distribution + as-of date; `news` carries each headline's article URL; `quote --json` feeds the dashboard refresh |
 | 3 | Premarket movers (premarket only) | stockanalysis.com premarket pages |
@@ -54,7 +63,7 @@ Every `/advice` run, after the table:
 2. `python3 scripts/advice_log.py compare` for the short "vs your portfolio" footnote.
 3. Log each pick via `python3 scripts/advice_log.py add-pick ...` (upserts: re-advised tickers get a priceHistory point, not a duplicate, never hand-edit it). Picks carry sector and buyBelow/dropBelow/dropAbove tipping points from the researcher.
 4. Keep/drop check-in: `python3 scripts/advice_log.py checkin-candidates`, then one AskUserQuestion round (max 4 tickers, most urgent first): bought? still holding? drop it? Apply via `set-status` / `set-tsl`. Skip when the CLI prints no candidates.
-5. Learn nudge: if `python3 scripts/review_stats.py --count-only` is 10+ above the latest REVIEWS.md baseline, suggest `/review` in one sentence (never auto-run).
+5. Learn nudge: if `python3 scripts/review_stats.py --count-only` is 10+ above the latest data/private/REVIEWS.md baseline, suggest `/review` in one sentence (never auto-run).
 
 `dashboard.html` is my visual view (start with `python3 yarafolio.py`), a global search bar (ticker/name/reason/sector, filters whichever table tab is active) plus four tabs:
 - **Advice** (default): my live watchlist (watching, with a Dropped filter; anything with eToro lots moves to Positions). Sortable table with buyBelow/dropBelow/dropAbove markers (green buy zone / red drop-below / grey "missed") + Buy zone / Drop alert / Missed filters, sector cell colored vs my portfolio (red gap / orange underweight) + Sector gap / Underweight filters, rating info box. Only a Drop button (buying happens in eToro and arrives via the import). Row click opens a drill-down modal: full thesis + risk + dated notes + per-lot breakdown + a price chart with buy/drop reference lines.

@@ -16,4 +16,4 @@ When the user asks you to run `/advice`:
 1. Read the `GEMINI.md` file in the project root.
 2. Strictly follow the **Strategy parameters**, **Output rules**, **Research workflow**, and **Advice tracking** steps defined in that file.
 3. Specifically, use the exact scripts and tools mentioned in the `GEMINI.md` file to fetch candidates based on STRATEGY.md, perform deep dives, check red flags, and then log the picks.
-4. **"No Result is a Result" Rule:** You MUST orchestrate and explicitly list EVERY tactical sub-skill requested by `GEMINI.md`, even if they yield zero valid candidates. If a tactic yields no picks, do not omit it; instead, state "[tactic]: No suitable candidates" and briefly explain why (e.g., failed valuation filters, price too low).
+4. **Report Generation:** You MUST synthesize the data from all tactical screens and subagent deep-dives into the exact 10-section "Cross-Check" format defined in the `GEMINI.md` output rules. You must explicitly list all tactics in Section 7, even if they yield zero candidates, stating "No suitable candidates" and explaining why.

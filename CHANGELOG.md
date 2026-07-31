@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.0] - 2026-07-31
 
+- Bugfix: `advice_log.py add-pick` now updates `source` on an existing entry. Previously `source` was only set at creation, so a mislabelled tactic could not be corrected through the CLI.
+- Bugfix: `advice_log.py add-pick` now replaces the same-day `Advised (...)` note instead of appending a second one. Rewording a thesis used to stack the draft and the edit on top of each other in the drill-down modal.
+- Documentation: Corrected the research workflow in `CLAUDE.md` and `GEMINI.md`. It documented all six tactics as `screen.py <tactic>` subcommands, but only `oversold` and `momentum` exist there. The other four (`earnings`, `insider`, `market-rotation`, `diversify`) are WebSearch-driven skills, which had led to them being skipped as unavailable.
+- Documentation: Resynced `GEMINI.md` with `CLAUDE.md`. It was missing the Changelog Rule section and omitted `/diversify` from the autosync command list.
 - Strategy update: Added 'No Result is a Result' rule to the advice orchestrator skill to ensure every tactical sub-skill is explicitly reported, even when yielding zero candidates.
 - Bugfix: Removed legacy oversold-biased terminology from the stock-researcher agent prompt to allow clean evaluation of non-oversold tactics.
 - Documentation: Finalized the public sample STRATEGY.md template with serious quantitative metrics (ROE, Debt/Equity, Piotroski, Beneish M-Score) and appended a realistic self-learning entry to REVIEWS.md.

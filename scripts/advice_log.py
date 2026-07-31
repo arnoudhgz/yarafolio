@@ -126,6 +126,19 @@ class AdviceLog:
         if not any(n.get("date") == today_str and n.get("text") == text for n in notes):
             notes.append({"date": today_str, "text": text})
 
+    def replace_advice_note(self, e: dict, text: str) -> None:
+        """One 'Advised (...)' note per ticker per day.
+
+        Re-running add-pick to reword a thesis used to stack a second note on top
+        of the first, so the drill-down modal showed both the draft and the edit.
+        """
+        today_str = nyse.nyse_today().isoformat()
+        notes = e.setdefault("notes", [])
+        e["notes"] = [n for n in notes
+                      if not (n.get("date") == today_str
+                              and str(n.get("text", "")).startswith("Advised ("))]
+        self.push_note(e, text)
+
     def cmd_add_pick(self, args: argparse.Namespace):
         data = self.load_log()
         today = nyse.nyse_today().isoformat()
@@ -220,6 +233,7 @@ class AdviceLog:
             ("dropBelow", args.drop_below, drop_below_val),
             ("dropAbove", args.drop_above, drop_above_val),
             ("name", args.name, args.name),
+            ("source", args.source, args.source),
             ("reason", args.reason, args.reason),
             ("risk", args.risk, args.risk),
             ("openNote", args.open_note, args.open_note)
@@ -228,8 +242,7 @@ class AdviceLog:
                 e[field] = value
         if args.reason:
             advised = f"Advised ({args.source or e.get('source')}): {args.reason}"
-            if not any(n.get("text") == advised for n in e.get("notes", [])):
-                self.push_note(e, advised)
+            self.replace_advice_note(e, advised)
         if args.note:
             self.push_note(e, args.note)
         self.save_log(data)
