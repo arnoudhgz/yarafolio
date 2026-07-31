@@ -12,9 +12,9 @@ import advice_log  # noqa: E402
 
 
 def _pick_args(ticker, price, **over):
-    base = dict(ticker=ticker, price=price, source="oversold", rating=None, rsi=None,
-                sector=None, buy_below=None, drop_below=None, drop_above=None,
-                name=None, reason=None, risk=None, note=None, open_note=None)
+    base = dict(ticker=ticker, price=price, source="oversold", rating="B", rsi=20,
+                sector="Technology", buy_below=price * 0.95, drop_below=price * 0.9, drop_above=price * 1.1,
+                name="Test Corp", reason="test reason", risk="test risk", note=None, open_note="test note")
     base.update(over)
     return SimpleNamespace(**base)
 

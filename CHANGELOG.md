@@ -105,6 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Migrated all modals from pseudo-backdrop `div`s to native HTML `<dialog>` elements for better structural semantics and simplified CSS.
 
 ### Fixed
+- Fixed test failures in `tests/test_advice_log.py` caused by missing mandatory parameters for new picks by updating the `_pick_args` helper.
 - CLI: Enforced `--reason` and `--risk` as strictly mandatory parameters in `scripts/advice_log.py add-pick` to prevent blank UI modals.
 - CLI: Added strict blacklist enforcement to `scripts/advice_log.py add-pick` to prevent adding blacklisted tickers.
 - Fixed an issue where manual eToro imports permanently remained "Bought" and continued to display an active open P/L, even after being fully closed out in eToro. The sync process now properly auto-closes them.
