@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.0] - 2026-07-31
 
+- Strategy update: Added 'No Result is a Result' rule to the advice orchestrator skill to ensure every tactical sub-skill is explicitly reported, even when yielding zero candidates.
+- Bugfix: Removed legacy oversold-biased terminology from the stock-researcher agent prompt to allow clean evaluation of non-oversold tactics.
+- Documentation: Finalized the public sample STRATEGY.md template with serious quantitative metrics (ROE, Debt/Equity, Piotroski, Beneish M-Score) and appended a realistic self-learning entry to REVIEWS.md.
 - Strategy update: Added ATR trailing stops, Bollinger Band mean reversion, and OBV volume confirmation requirements to the trading strategy and AI researcher prompts.
 - Bugfix: Fixed an issue where the AI stock-researcher would incorrectly reject 'insider' or 'momentum' candidates by blindly holding them to the 'oversold' RSI criteria.
 - Security: Scrubbed hardcoded personal quantitative thresholds from the open-source stock-researcher agent to strictly comply with the Open-Source Privacy Rule.

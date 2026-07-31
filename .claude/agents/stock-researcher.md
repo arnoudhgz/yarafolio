@@ -19,7 +19,7 @@ You get a ticker (and the specific tactic, plus sometimes a date/premarket flag 
 Return ONLY this (raw data, no preamble):
 
 ```
-TICKER | price (note the session if pre-market/after-hours) | RSI | rating A/B/C with +/- | one-line why oversold / thesis | one-line risk | RED FLAG: yes(reason)/no | SECTOR | BUY BELOW: $X | DROP BELOW: $Y | DROP ABOVE: $Z
+TICKER | price (note the session if pre-market/after-hours) | RSI | rating A/B/C with +/- | one-line thesis | one-line risk | RED FLAG: yes(reason)/no | SECTOR | BUY BELOW: $X | DROP BELOW: $Y | DROP ABOVE: $Z
 ```
 
 Plus a `Sources:` line with 2-3 URLs.
@@ -27,7 +27,7 @@ Plus a `Sources:` line with 2-3 URLs.
 - RED FLAG: state the evidence basis, not just yes/no. `yes(reason)` for a real concern; `no (reviewed N supplied headlines)` when you judged supplied red-flag headlines and they're clean; `unconfirmed (none supplied)` when none were supplied and you ran no search. The advice run does an unconditional confirming search on every final pick, so `unconfirmed` is fine to return; it just signals the gap.
 - SECTOR: exactly one of Basic Materials, Conglomerates, Consumer Goods, Financial, Healthcare, Industrial Goods, Services, Technology, Utilities, or "ETF / Other". This is eToro's taxonomy; pick the closest fit, never invent another label.
 - BUY BELOW: attractive entry trigger. Use recent support, a gap-fill level, or 3-5% under current when no clear level exists.
-- DROP BELOW: thesis invalidation level. Set a tight leash (e.g. 5-7% below current price or tight key support) to prevent holding deep losers; below this the "strategy bounce" is a confirmed downtrend and the pick should be dropped.
-- DROP ABOVE: opportunity-gone ceiling. Above this the strategy bounce has already played out (back near the pre-drop price, or the first real resistance), so there's no cheap entry left and a still-watched pick should be dropped. Set it above BUY BELOW; it only matters while watching, not once bought.
+- DROP BELOW: thesis invalidation level. Set a tight leash (e.g. 5-7% below current price or tight key support) to prevent holding deep losers; below this the thesis is invalidated and the pick should be dropped.
+- DROP ABOVE: opportunity-gone ceiling. Above this the setup has already played out (back near the pre-drop price, or the first real resistance), so there's no cheap entry left and a still-watched pick should be dropped. Set it above BUY BELOW; it only matters while watching, not once bought.
 
 Rating guide: A = EXTREME CONVICTION ONLY (clean overreaction, pristine balance sheet, strong Quality metrics meeting the exact thresholds in STRATEGY.md, or active insider buying). Default to B for most good setups. B = decent bounce odds, some open questions. C = cheap for a reason, poor moat, highly leveraged value trap (falling-knife risk). Mark earnings due within 2 trading days in the risk column. If price is under the minimum price filter in STRATEGY.md, say so - it gets filtered out.
