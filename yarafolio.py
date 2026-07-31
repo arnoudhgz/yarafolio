@@ -110,6 +110,21 @@ class Handler(SimpleHTTPRequestHandler):
         if self.path in ("/data/advice-log.json", "/data/portfolio.json", "/data/eod.md", "/data/news.md", "/data/REVIEWS.md", "/data/equity-history.json", "/data/instruments_cache.json"):
             self.path = self.path.replace("/data/", f"/data/{subdir}/")
 
+        if self.path == f"/data/{subdir}/instruments_cache.json":
+            data = {}
+            base_path = os.path.join(ROOT, "data", "instruments.json")
+            cache_path = os.path.join(ROOT, "data", subdir, "instruments_cache.json")
+            if os.path.exists(base_path):
+                with open(base_path) as f:
+                    try: data.update(json.load(f))
+                    except: pass
+            if os.path.exists(cache_path):
+                with open(cache_path) as f:
+                    try: data.update(json.load(f))
+                    except: pass
+            self.respond_json(200, data)
+            return
+
         if self.path == "/api/status":
             self.respond_json(
                 200, {

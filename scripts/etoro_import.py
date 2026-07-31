@@ -264,9 +264,13 @@ class EtoroImport:
         self.atomic_write(self.preview_file, entries)
 
         cache = {}
+        base_instruments = os.path.join(ROOT, "data", "instruments.json")
+        if os.path.exists(base_instruments):
+            with open(base_instruments) as f:
+                cache = json.load(f)
         if os.path.exists(self.instruments_cache):
             with open(self.instruments_cache) as f:
-                cache = json.load(f)
+                cache.update(json.load(f))
         for iid, m in meta.items():
             record = cache.get(str(iid), {})
             record["ticker"] = m["symbolFull"]
