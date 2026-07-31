@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.0] - 2026-07-31
 
+- Strategy update: Added ATR trailing stops, Bollinger Band mean reversion, and OBV volume confirmation requirements to the trading strategy and AI researcher prompts.
+- Security: Scrubbed hardcoded personal quantitative thresholds from the open-source stock-researcher agent to strictly comply with the Open-Source Privacy Rule.
+- Documentation: Overhauled the sample STRATEGY.md template to showcase advanced institutional metrics while maintaining generic formatting.
 - Configuration: Added `USER_TIMEZONE` to `.env.sample` for configurable AI timezone handling.
 - Documentation: Added explicit configuration instructions for `USER_TIMEZONE` to `docs/SETUP.md`.
 - Architecture: Added new Git Hygiene, Timezone Communication, Atomic Commits, UI Modal Fidelity, and Strict DOM Type-Checking rules to `.agents/AGENTS.md`, `GEMINI.md`, and `CLAUDE.md`.
