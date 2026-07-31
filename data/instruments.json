@@ -87,7 +87,8 @@
   "1477": {
     "ticker": "MDT.US",
     "name": "Medtronic PLC",
-    "sector": "Healthcare"
+    "sector": "Healthcare",
+    "mappedTicker": "MDT"
   },
   "1484": {
     "ticker": "PYPL",
@@ -182,7 +183,8 @@
   "3199": {
     "ticker": "LABU.US",
     "name": "Direxion Daily S&P Biotech Bull 3X ETF",
-    "sector": "ETF / Other"
+    "sector": "ETF / Other",
+    "mappedTicker": "LABU"
   },
   "3221": {
     "ticker": "SDIV",
@@ -377,7 +379,8 @@
   "6886": {
     "ticker": "UL.US",
     "name": "Unilever PLC-ADR",
-    "sector": "Consumer Staples"
+    "sector": "Consumer Staples",
+    "mappedTicker": "UL"
   },
   "7528": {
     "ticker": "PRX.NV",
@@ -417,7 +420,8 @@
   "8870": {
     "ticker": "G.US",
     "name": "Genpact Limited",
-    "sector": "Technology"
+    "sector": "Technology",
+    "mappedTicker": "G"
   },
   "8877": {
     "ticker": "ATR",

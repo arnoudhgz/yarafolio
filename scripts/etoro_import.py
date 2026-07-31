@@ -231,11 +231,13 @@ class EtoroImport:
             pl_pct = round(pl_dollar / invested * 100,
                            2) if pl_dollar is not None and invested else None
             
-            cached_sector = cache.get(str(iid), {}).get("sector")
+            cached = cache.get(str(iid), {})
+            cached_sector = cached.get("sector")
+            mapped_ticker = cached.get("mappedTicker")
             sector_val = cached_sector if cached_sector else self.sector_for(m, industries)
 
             entries.append({
-                "ticker": m.get("symbolFull", f"ID{iid}"),
+                "ticker": mapped_ticker or m.get("symbolFull", f"ID{iid}"),
                 "name": m.get("instrumentDisplayName", ""),
                 "instrumentID": iid,
                 "sector": sector_val,

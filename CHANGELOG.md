@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.0] - 2026-07-31
+## [0.10.0] - 2026-08-01
 
 - Bugfix: `advice_log.py add-pick` now updates `source` on an existing entry. Previously `source` was only set at creation, so a mislabelled tactic could not be corrected through the CLI.
 - Bugfix: `advice_log.py add-pick` now replaces the same-day `Advised (...)` note instead of appending a second one. Rewording a thesis used to stack the draft and the edit on top of each other in the drill-down modal.
@@ -147,6 +147,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dashboard: Updated chart colors to use CSS variables so axes, ticks, grids, and legend text are visible in both light and dark themes.
 - Fixed an issue in `etoro_import.py` where eToro's industry metadata would aggressively overwrite custom sectors set by the advice workflow. The advice tracker's sector categorization now correctly takes precedence for both the advice log and the imported portfolio data.
 - Scrubbed legacy eToro sector strings (like "Consumer Goods", "Services", "Basic Materials") from the `instruments.json` database and replaced them with standard GICS sectors to ensure consistency across UI charts.
+- Fixed an issue where eToro's `.US` suffixed tickers (e.g. CVX.US) caused duplicated advice entries and tracking breaks. `etoro_import.py` now supports and respects `mappedTicker` in `instruments_cache.json`.
+- Fixed the dashboard ticker links to properly use the original eToro ticker (e.g. `CVX.US`) when generating the eToro URL, rather than the stripped symbol, so the URLs resolve correctly.
 
 ## [0.9.0] - 2026-06-25
 

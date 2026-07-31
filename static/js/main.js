@@ -8,13 +8,14 @@ import { marketHolidays } from './holidays.js';
 
 async function load() {
   try {
-    const [logRes, pfRes, eodRes, newsRes, revRes, equityRes] = await Promise.all([
+    const [logRes, pfRes, eodRes, newsRes, revRes, equityRes, instrRes] = await Promise.all([
       fetch('data/advice-log.json', { cache: 'no-store' }),
       fetch('data/portfolio.json', { cache: 'no-store' }),
       fetch('data/eod.md', { cache: 'no-store' }).catch(() => null),
       fetch('data/news.md', { cache: 'no-store' }).catch(() => null),
       fetch('data/REVIEWS.md', { cache: 'no-store' }).catch(() => null),
-      fetch('data/equity-history.json', { cache: 'no-store' }).catch(() => null)
+      fetch('data/equity-history.json', { cache: 'no-store' }).catch(() => null),
+      fetch('data/instruments_cache.json', { cache: 'no-store' }).catch(() => null)
     ]);
     if (!logRes.ok) throw new Error(logRes.statusText);
     const logData = await logRes.json();
@@ -47,6 +48,10 @@ async function load() {
 
     if (equityRes && equityRes.ok) {
       /** @type {any} */ (logData).equityHistory = await equityRes.json();
+    }
+
+    if (instrRes && instrRes.ok) {
+      /** @type {any} */ (window).ETORO_CACHE = await instrRes.json();
     }
 
     setDATA(logData);

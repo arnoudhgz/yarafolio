@@ -203,7 +203,17 @@ export const tickerLink = (t, display) => {
       }
     }
   }
-  return '<a class="tlink" style="font-weight: 800;" href="https://www.etoro.com/markets/' + encodeURIComponent(t.toLowerCase()) +
+  let etoroTicker = t;
+  const cache = /** @type {any} */ (window).ETORO_CACHE;
+  if (cache) {
+    for (const key in cache) {
+      if (cache[key].mappedTicker === t) {
+        etoroTicker = cache[key].ticker;
+        break;
+      }
+    }
+  }
+  return '<a class="tlink" style="font-weight: 800;" href="https://www.etoro.com/markets/' + encodeURIComponent(etoroTicker.toLowerCase()) +
     '" target="_blank" rel="noopener"><strong>' + esc(display || t) + '</strong></a>' + warning;
 };
 
