@@ -9,8 +9,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
+      - name: Checkout Code Repository
         uses: actions/checkout@v4
+
+      - name: Checkout Data Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/etoro-portfolio-data
+          path: data/private
+          token: ${{ secrets.DATA_REPO_PAT }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -25,10 +32,11 @@ jobs:
           python3 scripts/etoro_import.py preview
           python3 scripts/etoro_import.py merge
 
-      - name: Commit and Push Changes
+      - name: Commit and Push Changes to Data Repo
         run: |
+          cd data/private
           git config --global user.name "Yarafolio Companion"
           git config --global user.email "companion@yarafolio.local"
-          git add data/private/portfolio.json data/private/advice-log.json data/private/custom_instruments.json
+          git add portfolio.json advice-log.json custom_instruments.json
           # Only commit if there are changes
           git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-sync from eToro via Mobile Companion" && git push)
