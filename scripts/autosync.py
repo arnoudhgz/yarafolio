@@ -81,6 +81,11 @@ class AutoSync:
         if not present:
             return
 
+        # Safely pull any changes made by the Mobile Companion before pushing
+        self.git("stash")
+        self.git("pull", "--rebase", "origin", "main")
+        self.git("stash", "pop")
+
         self.git("add", "--", *present)
         if self.git("diff", "--cached", "--quiet").returncode == 0:
             return  # nothing changed

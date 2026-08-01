@@ -1,0 +1,34 @@
+name: eToro Sync
+
+on:
+  workflow_dispatch:
+    # Allows you to trigger this workflow manually from the Actions tab or via GitHub API
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run eToro Sync
+        env:
+          ETORO_API_KEY: ${{ secrets.ETORO_API_KEY }}
+          ETORO_USER_KEY: ${{ secrets.ETORO_USER_KEY }}
+        run: |
+          python3 scripts/etoro_import.py preview
+          python3 scripts/etoro_import.py merge
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "Yarafolio Companion"
+          git config --global user.email "companion@yarafolio.local"
+          git add data/private/portfolio.json data/private/advice-log.json data/private/custom_instruments.json
+          # Only commit if there are changes
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-sync from eToro via Mobile Companion" && git push)
