@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Merge private instrument cache into public instruments list.
 
-Reads data/private/instruments_cache.json (and sample if it exists) and
+Reads data/private/custom_instruments.json (and sample if it exists) and
 merges new entries or updates into data/instruments.json.
 This allows contributing community mappings back to the open source project
 without dirtying the git status during daily use.
@@ -13,8 +13,8 @@ import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_FILE = os.path.join(ROOT, "data", "instruments.json")
-CACHE_PRIVATE = os.path.join(ROOT, "data", "private", "instruments_cache.json")
-CACHE_SAMPLE = os.path.join(ROOT, "data", "sample", "instruments_cache.json")
+CACHE_PRIVATE = os.path.join(ROOT, "data", "private", "custom_instruments.json")
+CACHE_SAMPLE = os.path.join(ROOT, "data", "sample", "custom_instruments.json")
 
 def load_json(path):
     if not os.path.exists(path):
@@ -43,7 +43,14 @@ def main():
     
     new_len = len(base_data)
     save_json(BASE_FILE, base_data)
+    
+    # Clear out the merged caches so they only store future deltas
+    for cache_path in [CACHE_PRIVATE, CACHE_SAMPLE]:
+        if os.path.exists(cache_path):
+            save_json(cache_path, {})
+            
     print(f"Merged {new_len - original_len} new entries. Total entries: {new_len}.")
+    print("Private caches have been cleared.")
     print("You can now safely commit data/instruments.json!")
 
 if __name__ == "__main__":

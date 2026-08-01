@@ -107,13 +107,13 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_error(404)
 
     def do_GET(self):
-        if self.path in ("/data/advice-log.json", "/data/portfolio.json", "/data/eod.md", "/data/news.md", "/data/REVIEWS.md", "/data/equity-history.json", "/data/instruments_cache.json"):
+        if self.path in ("/data/advice-log.json", "/data/portfolio.json", "/data/eod.md", "/data/news.md", "/data/REVIEWS.md", "/data/equity-history.json", "/data/custom_instruments.json"):
             self.path = self.path.replace("/data/", f"/data/{subdir}/")
 
-        if self.path == f"/data/{subdir}/instruments_cache.json":
+        if self.path == f"/data/{subdir}/custom_instruments.json":
             data = {}
             base_path = os.path.join(ROOT, "data", "instruments.json")
-            cache_path = os.path.join(ROOT, "data", subdir, "instruments_cache.json")
+            cache_path = os.path.join(ROOT, "data", subdir, "custom_instruments.json")
             if os.path.exists(base_path):
                 with open(base_path) as f:
                     try: data.update(json.load(f))

@@ -15,7 +15,7 @@ async function load() {
       fetch('data/news.md', { cache: 'no-store' }).catch(() => null),
       fetch('data/REVIEWS.md', { cache: 'no-store' }).catch(() => null),
       fetch('data/equity-history.json', { cache: 'no-store' }).catch(() => null),
-      fetch('data/instruments_cache.json', { cache: 'no-store' }).catch(() => null)
+      fetch('data/custom_instruments.json', { cache: 'no-store' }).catch(() => null)
     ]);
     if (!logRes.ok) throw new Error(logRes.statusText);
     const logData = await logRes.json();

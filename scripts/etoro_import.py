@@ -63,7 +63,7 @@ class EtoroImport:
             ROOT, "data", self.subdir, "advice-log.json")
         self.portfolio_file = os.path.join(
             ROOT, "data", self.subdir, "portfolio.json")
-        self.instruments_cache = os.path.join(ROOT, "data", self.subdir, "instruments_cache.json")
+        self.instruments_cache = os.path.join(ROOT, "data", self.subdir, "custom_instruments.json")
         self.preview_file = os.path.join(
             ROOT, "tmp", "etoro-import-preview.json")
 
@@ -263,16 +263,21 @@ class EtoroImport:
 
         self.atomic_write(self.preview_file, entries)
 
-        cache = {}
+        base_cache = {}
         base_instruments = os.path.join(ROOT, "data", "instruments.json")
         if os.path.exists(base_instruments):
             with open(base_instruments) as f:
-                cache = json.load(f)
+                base_cache = json.load(f)
+                
+        custom_cache = {}
         if os.path.exists(self.instruments_cache):
             with open(self.instruments_cache) as f:
-                cache.update(json.load(f))
+                custom_cache = json.load(f)
+                
+        full_cache = {**base_cache, **custom_cache}
+        
         for iid, m in meta.items():
-            record = cache.get(str(iid), {})
+            record = full_cache.get(str(iid), {})
             record["ticker"] = m["symbolFull"]
             record["name"] = m["instrumentDisplayName"]
             if record["ticker"].endswith(".US") and "mappedTicker" not in record:
@@ -281,8 +286,14 @@ class EtoroImport:
                 sector = self.sector_for(m, industries)
                 if sector is not None:
                     record["sector"] = sector
-            cache[str(iid)] = record
-        self.atomic_write(self.instruments_cache, cache)
+            
+            base_record = base_cache.get(str(iid))
+            if base_record == record:
+                custom_cache.pop(str(iid), None)
+            else:
+                custom_cache[str(iid)] = record
+                
+        self.atomic_write(self.instruments_cache, custom_cache)
 
         logger.info(f"{len(entries)} instruments, {len(positions)} positions, "
                     f"${sum(e['invested'] for e in entries):,.2f} invested")
@@ -467,6 +478,12 @@ class EtoroImport:
                 merged += 1
 
         sector_by_ticker = {}
+        base_instruments = os.path.join(ROOT, "data", "instruments.json")
+        if os.path.exists(base_instruments):
+            with open(base_instruments) as f:
+                for record in json.load(f).values():
+                    if record.get("sector"):
+                        sector_by_ticker[record["ticker"]] = record["sector"]
         if os.path.exists(self.instruments_cache):
             with open(self.instruments_cache) as f:
                 for record in json.load(f).values():
