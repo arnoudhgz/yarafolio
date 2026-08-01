@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2026-08-01
+
+### Added
+- Advanced Analytics: Added a new "Equity Curve" chart to track total portfolio Maximum Drawdown (MDD), compounding returns, Sharpe Ratio, and benchmarks (S&P 500, Dow Jones).
+- Strategy Analytics: Added "Trade Efficiency" scatter plot (Hold Times vs Realized Gains), "Performance by Day of the Week", "Win Rate Over Time", and "Entry Discipline" charts.
+- Deep Market Tactics: Introduced 5 specialized AI sub-skills (`oversold`, `momentum`, `earnings`, `insider`, `market-rotation`) to dynamically adapt to market posture.
+- Dashboard Features: Introduced a new "Learnings" tab, a Portfolio Treemap/Heatmap visualizer, and a `%` vs `$` toggle on all performance charts for instant realized dollar conversions.
+- Blacklisting: Added support for manually flagging and blacklisting stocks so they are permanently ignored by the advice workflow.
+- Open-Source Privacy: Added `STRATEGY.md` file separation to safely isolate personal quantitative thresholds from public repositories.
+
+### Changed
+- Strategy Architecture: Refactored the core AI strategy into a Meta-Advisor pattern, where a master `/advice` skill orchestrates the tactical sub-skills.
+- GICS Sector Standardization: Fully replaced legacy eToro industry labels with the standard 11 GICS sectors for strict consistency across all portfolio analytics and gap analyses.
+- Dashboard: Upgraded all modal overlays to native HTML `<dialog>` elements for better structural semantics and simplified CSS.
+- Timezone Handling: Standardized all logged timestamps to strictly use the `America/New_York` timezone formatted as ISO 8601 strings, parsed locally by the frontend.
+
+### Fixed
+- Fixed an edge case where aftermarket advice logs generated past midnight local time wouldn't match with eToro trades opened during the previous day's US market session.
+- Fixed the dashboard Equity Curve chart to accurately update during premarket and after-hours by switching the Nasdaq reference to Nasdaq 100 Futures (`NQ=F`).
+- Resolved an issue in `etoro_import.py` where eToro's industry metadata would aggressively overwrite custom sectors set by the advice workflow.
+
 ## [0.9.0] - 2026-06-25
 
 ### Added
@@ -37,7 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Opening the drill-down from a Positions row now scopes the chart to that specific lot: anchored at the advice that prompted it (date + price) with its own buy and trailing-stop lines, and the lot is flagged in the lots list. Opening from the Advice tab keeps the whole-pick chart.
 
 ### Changed
-- Strategy update: lowered preferred RSI to < 25 and added an output warning for A-rated Tech stocks due to value trap risks (applied via `/learn`).
+- Strategy update: lowered preferred RSI to < 25 and added an output warning for A-rated Tech stocks due to value trap risks (applied via `/review`).
 - Strategy update: Enforced a new rule to never add a ticker to the dashboard/advice list when there are already two open positions for it.
 - Dashboard sparklines now use the theme's `--green`/`--red` (they were rendering a different hardcoded green/red), and the repeated info-icon inline styles collapsed into one `.info-icon` class.
 - The oversold screen logs a clear warning when it parses zero rows (stockanalysis.com markup changed) instead of silently returning no candidates.

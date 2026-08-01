@@ -9,9 +9,9 @@ Usage:
 
 Scrapes stockanalysis.com's server-rendered pages (screen, quote, analyst
 forecast) and Google News RSS (headlines, red-flag discovery). This replaces
-the mechanical WebFetch/WebSearch steps in /advice, /premarket, /check,
-/diversify and the stock-researcher agents; the judgment work (reading the
-articles that matter, weighing litigation severity) stays with the agent.
+the mechanical WebFetch/WebSearch steps in /advice and the stock-researcher agents; the 
+judgment work (reading the articles that matter, weighing litigation severity) stays with 
+the agent.
 
 Brittleness warning: this parses unofficial page markup. When a command
 prints nothing or errors, the markup probably changed: fall back to
@@ -146,37 +146,62 @@ class Screen:
         return m.group(1).split()[-1] if m else None
 
     def cmd_oversold(self, args: argparse.Namespace):
-        headers, rows = self.parse_table(self.fetch("/list/oversold-stocks/"))
+        self._screen_list("/list/oversold-stocks/", args, lambda r, m: r >= m)
+
+    def cmd_momentum(self, args: argparse.Namespace):
+        self._screen_list("/list/overbought-stocks/", args, lambda r, m: r > m)
+
+    def _screen_list(self, url, args, rsi_comparator):
+        headers, rows = self.parse_table(self.fetch(url))
         if not rows:
             logger.warning(
-                "oversold screen parsed 0 rows - stockanalysis.com markup likely "
+                f"{url} screen parsed 0 rows - stockanalysis.com markup likely "
                 "changed; fall back to the WebFetch sources in the skill")
         cols = {name: idx for idx, name in enumerate(headers)}
         sym = next((cols[c] for c in cols if "Symbol" in c), 1)
-        name = next((cols[c] for c in cols if "Name" in c), 2)
+        name_idx = next((cols[c] for c in cols if "Name" in c), 2)
         rsi = next((cols[c] for c in cols if "RSI" in c), 3)
         price = next((cols[c] for c in cols if "Price" in c), 4)
+
+        exclude = set()
+        if args.exclude_held:
+            try:
+                with open(os.path.join(ROOT, "data", "private", "portfolio.json")) as f:
+                    port = json.load(f)
+                    for item in port.get("holdings", []):
+                        exclude.add(item.get("ticker", ""))
+            except Exception:
+                pass
+        
+        if args.exclude_advised:
+            try:
+                with open(os.path.join(ROOT, "data", "private", "advice-log.json")) as f:
+                    adv = json.load(f)
+                    for e in adv.get("entries", []):
+                        exclude.add(e.get("ticker", ""))
+            except Exception:
+                pass
 
         extra = [(label, next((cols[c] for c in cols if key in c), None)) for label, key in (
             ("PE", "PE"), ("VOL", "Volume"), ("MKTCAP", "Market Cap"), ("SECTOR", "Industry"))]
         extra = [(label, idx) for label, idx in extra if idx is not None]
         picked = []
         for cells in rows:
-            if len(cells) <= max(sym, name, rsi, price):
+            if len(cells) <= max(sym, name_idx, rsi, price):
+                continue
+            ticker = cells[sym]
+            if ticker in exclude:
                 continue
             p = self.to_float(cells[price])
             if p is None or p < args.min_price:
                 continue
+            r_val = self.to_float(cells[rsi]) or 0.0
+            if not rsi_comparator(r_val, args.min_rsi):
+                continue
             extras = [
                 cells[idx] if idx < len(cells) else "" for _,
                 idx in extra] if args.full else []
-            picked.append(
-                (self.to_float(
-                    cells[rsi]) or 0.0,
-                    cells[sym],
-                    cells[name],
-                    p,
-                    extras))
+            picked.append((r_val, ticker, cells[name_idx], p, extras))
         if not picked:
             sys.exit(
                 "no rows parsed: stockanalysis markup may have changed, fall back to WebFetch")
@@ -185,7 +210,7 @@ class Screen:
             head += " | " + " | ".join(label for label, _ in extra)
         logger.info(head)
         for r, s, n, p, extras in sorted(
-                picked, key=lambda row: row[0])[
+                picked, key=lambda row: row[0], reverse=(url == "/list/overbought-stocks/"))[
                 :args.max]:
             line = f"{s} | {n} | {r} | {p}"
             if extras:
@@ -250,6 +275,9 @@ class Screen:
         for label in QUOTE_FIELDS:
             if label in pairs:
                 data[label] = pairs[label].strip()
+        sector_match = re.search(r"\{t:\"Sector\",v:\"([^\"]+)\"", html_clean)
+        if sector_match:
+            data["Sector"] = sector_match.group(1)
         return data
 
     def cmd_quote(self, args: argparse.Namespace):
@@ -572,12 +600,29 @@ def main():
         "oversold",
         help="oversold screen (RSI < 30), filtered candidates")
     p.add_argument("--min-price", type=float, default=20.0)
+    p.add_argument("--min-rsi", type=float, default=0.0, help="minimum RSI to include")
+    p.add_argument("--exclude-held", action="store_true", help="exclude tickers currently held in portfolio")
+    p.add_argument("--exclude-advised", action="store_true", help="exclude tickers present in advice log")
     p.add_argument("--max", type=int, default=25)
     p.add_argument(
         "--full",
         action="store_true",
         help="append PE/VOL/MKTCAP/SECTOR columns when the page exposes them")
     p.set_defaults(func=app.cmd_oversold)
+
+    p = sub.add_parser(
+        "momentum",
+        help="momentum screen (RSI > 70), filtered candidates")
+    p.add_argument("--min-price", type=float, default=20.0)
+    p.add_argument("--min-rsi", type=float, default=70.0, help="minimum RSI to include")
+    p.add_argument("--exclude-held", action="store_true", help="exclude tickers currently held in portfolio")
+    p.add_argument("--exclude-advised", action="store_true", help="exclude tickers present in advice log")
+    p.add_argument("--max", type=int, default=25)
+    p.add_argument(
+        "--full",
+        action="store_true",
+        help="append PE/VOL/MKTCAP/SECTOR columns when the page exposes them")
+    p.set_defaults(func=app.cmd_momentum)
 
     p = sub.add_parser("quote", help="price + key stats per ticker")
     p.add_argument("tickers", nargs="+")

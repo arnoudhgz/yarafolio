@@ -20,6 +20,7 @@ import logging
 from datetime import date, datetime
 
 import price_history
+import nyse
 
 BASE = "https://public-api.etoro.com/api/v1"
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -62,12 +63,12 @@ class EtoroImport:
             ROOT, "data", self.subdir, "advice-log.json")
         self.portfolio_file = os.path.join(
             ROOT, "data", self.subdir, "portfolio.json")
-        self.instruments_cache = os.path.join(ROOT, "data", "instruments.json")
+        self.instruments_cache = os.path.join(ROOT, "data", self.subdir, "custom_instruments.json")
         self.preview_file = os.path.join(
             ROOT, "tmp", "etoro-import-preview.json")
 
     def credentials(self) -> dict:
-        creds = {}
+        env_vars = {}
         env_file = os.path.join(ROOT, ".env")
         try:
             with open(env_file) as f:
@@ -77,27 +78,57 @@ class EtoroImport:
                         continue
                     key, value = line.split("=", 1)
                     key = key.removeprefix("export ").strip()
-                    creds[key] = value.strip().strip("\"'")
+                    env_vars[key] = value.strip().strip("\"'")
         except OSError:
             pass
 
-        suffix = os.environ.get("ETORO_SUFFIX", "")
+        for k, v in os.environ.items():
+            env_vars[k] = v
 
-        if "ETORO_API_KEY" in os.environ:
-            creds["ETORO_API_KEY"] = os.environ["ETORO_API_KEY"]
-
-        user_key_name = f"ETORO_USER_KEY_{suffix}" if suffix else "ETORO_USER_KEY"
-        if user_key_name in os.environ:
-            creds["ETORO_USER_KEY"] = os.environ[user_key_name]
-        elif user_key_name in creds:
-            creds["ETORO_USER_KEY"] = creds[user_key_name]
-
-        if not creds.get("ETORO_API_KEY"):
+        api_key = env_vars.get("ETORO_API_KEY")
+        if not api_key:
             raise RuntimeError(f"Missing ETORO_API_KEY (checked environment and {env_file})")
-        if not creds.get("ETORO_USER_KEY"):
-            raise RuntimeError(f"Missing {user_key_name} (checked environment and {env_file})")
 
-        return creds
+        suffix = env_vars.get("ETORO_SUFFIX", "")
+        user_keys = []
+        if suffix:
+            k = f"ETORO_USER_KEY_{suffix}"
+            if k in env_vars:
+                user_keys.append(env_vars[k])
+        else:
+            for k, v in sorted(env_vars.items()):
+                if k.startswith("ETORO_USER_KEY"):
+                    if v not in user_keys:
+                        user_keys.append(v)
+
+        if not user_keys:
+            raise RuntimeError(f"Missing ETORO_USER_KEY (checked environment and {env_file})")
+
+        import urllib.request
+        import urllib.error
+
+        for uk in user_keys:
+            creds = {"ETORO_API_KEY": api_key, "ETORO_USER_KEY": uk}
+            req = urllib.request.Request(BASE + "/trading/info/portfolio", headers={
+                "x-api-key": api_key,
+                "x-user-key": uk,
+                "x-request-id": str(uuid.uuid4()),
+                "Accept": "application/json",
+                "User-Agent": "curl/8.7.1",
+            })
+            try:
+                with urllib.request.urlopen(req, timeout=15) as res:
+                    self.cached_portfolio = json.loads(res.read())
+                    return creds
+            except urllib.error.HTTPError as exc:
+                if exc.code in (401, 403):
+                    continue
+                else:
+                    sys.exit(f"eToro API Error ({exc.code}): {exc.reason}")
+            except (urllib.error.URLError, TimeoutError) as exc:
+                sys.exit(f"eToro API Connection Error: {exc} (timed out or network down)")
+
+        sys.exit("eToro Authentication Failed (401/403): Exhausted all available ETORO_USER_KEYs in .env")
 
     def get(self, path, creds):
         import urllib.request
@@ -110,7 +141,7 @@ class EtoroImport:
             "User-Agent": "curl/8.7.1",
         })
         try:
-            with urllib.request.urlopen(req, timeout=30) as res:
+            with urllib.request.urlopen(req, timeout=15) as res:
                 return json.loads(res.read())
         except urllib.error.HTTPError as exc:
             if exc.code in (401, 403):
@@ -118,6 +149,8 @@ class EtoroImport:
                     f"eToro Authentication Failed ({exc.code}): Please check your ETORO_API_KEY and ETORO_USER_KEY in .env")
             else:
                 sys.exit(f"eToro API Error ({exc.code}): {exc.reason}")
+        except (urllib.error.URLError, TimeoutError) as exc:
+            sys.exit(f"eToro API Connection Error: {exc} (timed out or network down)")
 
     def chunked(self, items, size=50):
         for i in range(0, len(items), size):
@@ -153,7 +186,10 @@ class EtoroImport:
 
     def fetch_preview(self):
         creds = self.credentials()
-        portfolio = self.get("/trading/info/portfolio", creds)
+        if hasattr(self, "cached_portfolio"):
+            portfolio = self.cached_portfolio
+        else:
+            portfolio = self.get("/trading/info/portfolio", creds)
         positions = portfolio["clientPortfolio"]["positions"]
         industries = self.fetch_industries(creds)
 
@@ -174,6 +210,11 @@ class EtoroImport:
                     creds)["rates"]:
                 rates[r["instrumentID"]] = r
 
+        cache = {}
+        if os.path.exists(self.instruments_cache):
+            with open(self.instruments_cache) as f:
+                cache = json.load(f)
+
         entries = []
         for iid in ids:
             plist = by_instrument[iid]
@@ -185,15 +226,21 @@ class EtoroImport:
             rate = rates.get(iid, {})
             current = rate.get("bid") or rate.get("lastExecution")
             pl_dollar = round(
-                units * current - invested,
+                units * (current - avg_open),
                 2) if current else None
             pl_pct = round(pl_dollar / invested * 100,
                            2) if pl_dollar is not None and invested else None
+            
+            cached = cache.get(str(iid), {})
+            cached_sector = cached.get("sector")
+            mapped_ticker = cached.get("mappedTicker")
+            sector_val = cached_sector if cached_sector else self.sector_for(m, industries)
+
             entries.append({
-                "ticker": m.get("symbolFull", f"ID{iid}"),
+                "ticker": mapped_ticker or m.get("symbolFull", f"ID{iid}"),
                 "name": m.get("instrumentDisplayName", ""),
                 "instrumentID": iid,
-                "sector": self.sector_for(m, industries),
+                "sector": sector_val,
                 "positions": len(plist),
                 "units": round(units, 6),
                 "invested": round(invested, 2),
@@ -209,25 +256,44 @@ class EtoroImport:
                     "openDateTime": p["openDateTime"],
                     "openRate": round(p["openRate"], 4),
                     "units": round(p["units"], 6),
+                    "invested": round(p["initialAmountInDollars"], 2),
                     "tslEnabled": bool(p.get("isTslEnabled")),
                 } for p in plist],
             })
 
         self.atomic_write(self.preview_file, entries)
 
-        cache = {}
+        base_cache = {}
+        base_instruments = os.path.join(ROOT, "data", "instruments.json")
+        if os.path.exists(base_instruments):
+            with open(base_instruments) as f:
+                base_cache = json.load(f)
+                
+        custom_cache = {}
         if os.path.exists(self.instruments_cache):
             with open(self.instruments_cache) as f:
-                cache = json.load(f)
+                custom_cache = json.load(f)
+                
+        full_cache = {**base_cache, **custom_cache}
+        
         for iid, m in meta.items():
-            record = cache.get(str(iid), {})
+            record = full_cache.get(str(iid), {})
             record["ticker"] = m["symbolFull"]
             record["name"] = m["instrumentDisplayName"]
-            sector = self.sector_for(m, industries)
-            if sector is not None:
-                record["sector"] = sector
-            cache[str(iid)] = record
-        self.atomic_write(self.instruments_cache, cache)
+            if record["ticker"].endswith(".US") and "mappedTicker" not in record:
+                record["mappedTicker"] = record["ticker"].replace(".US", "")
+            if "sector" not in record:
+                sector = self.sector_for(m, industries)
+                if sector is not None:
+                    record["sector"] = sector
+            
+            base_record = base_cache.get(str(iid))
+            if base_record == record:
+                custom_cache.pop(str(iid), None)
+            else:
+                custom_cache[str(iid)] = record
+                
+        self.atomic_write(self.instruments_cache, custom_cache)
 
         logger.info(f"{len(entries)} instruments, {len(positions)} positions, "
                     f"${sum(e['invested'] for e in entries):,.2f} invested")
@@ -235,7 +301,7 @@ class EtoroImport:
 
     def write_portfolio(self, preview, today):
         self.atomic_write(self.portfolio_file, {
-            "lastUpdated": datetime.now().strftime("%Y-%m-%d %H:%M"),
+            "lastUpdated": nyse.nyse_now().isoformat("T", "minutes"),
             "totalInvested": round(sum(i["invested"] for i in preview), 2),
             "holdings": [{
                 "ticker": i["ticker"], "name": i["name"], "instrumentID": i["instrumentID"],
@@ -323,7 +389,7 @@ class EtoroImport:
             entry["exitEstimated"] = any(lot.get("exitEstimated") for lot in lots)
         if current_price:
             hist = entry.setdefault("priceHistory", [])
-            price_history.push_price_point(hist, current_price, now=datetime.now())
+            price_history.push_price_point(hist, current_price, now=nyse.nyse_now())
 
     def merge(self):
         with open(self.preview_file) as f:
@@ -331,7 +397,12 @@ class EtoroImport:
         with open(self.log_file) as f:
             data = json.load(f)
 
-        today = date.today().isoformat()
+        known_sectors = {e["ticker"]: e["sector"] for e in data["entries"] if e.get("sector")}
+        for item in preview:
+            if item["ticker"] in known_sectors:
+                item["sector"] = known_sectors[item["ticker"]]
+
+        today = nyse.nyse_today().isoformat()
         self.write_portfolio(preview, today)
 
         by_ticker = {item["ticker"]: item for item in preview}
@@ -371,7 +442,7 @@ class EtoroImport:
                     units=item["units"])
                 existing_e["tslSet"] = item.get(
                     "tslEnabled", existing_e.get("tslSet"))
-                if item["sector"] is not None:
+                if item["sector"] is not None and not existing_e.get("sector"):
                     existing_e["sector"] = item["sector"]
                 if not existing_e["priceHistory"]:
                     existing_e["priceHistory"].append(price_point)
@@ -398,7 +469,21 @@ class EtoroImport:
                 })
                 added += 1
 
+        import_tickers_in_preview = {item["ticker"] for item in preview}
+        for ticker, existing_e in import_by_ticker.items():
+            if ticker not in import_tickers_in_preview and existing_e.get("status") == "bought":
+                existing_e["status"] = "sold"
+                history = existing_e.get("priceHistory", [])
+                existing_e["soldAt"] = history[-1]["price"] if history else existing_e.get("boughtAt")
+                merged += 1
+
         sector_by_ticker = {}
+        base_instruments = os.path.join(ROOT, "data", "instruments.json")
+        if os.path.exists(base_instruments):
+            with open(base_instruments) as f:
+                for record in json.load(f).values():
+                    if record.get("sector"):
+                        sector_by_ticker[record["ticker"]] = record["sector"]
         if os.path.exists(self.instruments_cache):
             with open(self.instruments_cache) as f:
                 for record in json.load(f).values():
@@ -407,11 +492,11 @@ class EtoroImport:
         backfilled = 0
         for entry in data["entries"]:
             if entry["ticker"] in sector_by_ticker:
-                if entry.get("sector") != sector_by_ticker[entry["ticker"]]:
+                if not entry.get("sector"):
                     entry["sector"] = sector_by_ticker[entry["ticker"]]
                     backfilled += 1
 
-        data["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        data["lastUpdated"] = nyse.nyse_now().isoformat("T", "minutes")
         self.atomic_write(self.log_file, data)
 
         parts = []

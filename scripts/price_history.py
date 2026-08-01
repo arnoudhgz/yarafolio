@@ -22,8 +22,9 @@ def push_price_point(hist: list[dict], price: float, now: datetime | None = None
     - keep every point from today, collapse each earlier day to its last point (date only).
     """
     if now is None:
-        now = datetime.now()
-    now_str = now.strftime("%Y-%m-%d %H:%M")
+        import nyse
+        now = nyse.nyse_now()
+    now_str = now.isoformat("T", "minutes")
     today_str = now.strftime("%Y-%m-%d")
 
     if hist:

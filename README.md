@@ -43,10 +43,10 @@ You might wonder why YaraFolio uses flat JSON files (`data/advice-log.json`) ins
 
 This project is driven by custom agent instructions. When you talk to the AI, it reads these files to know exactly how to fetch data, evaluate stocks, and update your dashboard.
 
-Out of the box, these instructions reflect my personal "oversold bounce" strategy. **You should absolutely tune these to your own liking.**
+Out of the box, these instructions reflect my personal "strategy bounce" strategy. **You should absolutely tune these to your own liking.**
 
 Here is the breakdown of the available tools:
-1. **The Core Strategies**: Check out [`GEMINI.md`](GEMINI.md) and [`CLAUDE.md`](CLAUDE.md). This is where the overarching rules live (what defines a "buy", risk tolerance, sector preferences). 
+1. **The Core Strategies**: Check out [`GEMINI.md`](GEMINI.md) and [`CLAUDE.md`](CLAUDE.md), which instruct the AI to read your personal configuration from `data/private/STRATEGY.md`. This private file is where your overarching rules live (batch sizes, risk tolerance, sector preferences). 
 2. **The Specific Commands**: Look inside the `.gemini/skills/` and `.claude/skills/` directories. Each folder contains a `SKILL.md` file that teaches the AI how to execute a specific command. Here are the tools currently loaded:
    - `/advice`: Run the primary stock screening workflow (finds oversold stocks with bounce potential).
    - `/aftermarket`: Runs the advice workflow using after-hours data to catch earnings overreactions.
@@ -54,7 +54,7 @@ Here is the breakdown of the available tools:
    - `/diversify`: Scans your eToro portfolio for missing sectors and recommends quality stocks to fill the gaps.
    - `/eod`: End-of-Day check to secure small profits on low-conviction picks before the market closes.
    - `/import`: Parses a screenshot or text paste of your eToro portfolio and syncs it to the tracker.
-   - `/learn`: Does a self-learning pass over past advice outcomes to suggest improvements to the strategy.
+   - `/review`: Does a self-learning pass over past advice outcomes to suggest improvements to the strategy.
    - `/news`: Generates a quick AI management summary of the latest news for your active and watched tickers.
    - `/premarket`: Runs the advice workflow specifically using today's premarket data before the US open.
 
@@ -87,4 +87,4 @@ If this project makes your day a little better, consider buying me a coffee or f
 
 - [Buy me a coffee on Ko-fi ☕](https://ko-fi.com/arnoudhgz) (Not required, never paywalled — purely optional)
 - [Follow me on eToro 📈](https://www.etoro.com/people/arnoudhgz)
-- [Join eToro 🤝](https://etoro.tw/46AcIfc)
+- [Join eToro 🤝](https://www.etoro.com/?ref=26106514)

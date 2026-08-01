@@ -34,6 +34,7 @@ if (typeof window !== 'undefined') marked = /** @type {any} */ (window).marked;
  * @property {number} [dropAbove]
  * @property {string} [reason]
  * @property {string} [risk]
+ * @property {string} [openNote]
  * @property {number} [boughtAt]
  * @property {number} [soldAt]
  * @property {number} [units]
@@ -62,6 +63,9 @@ export let sectorChart = null;
 
 /** @type {any} */
 export let sectorCoverageChart = null;
+
+/** @type {any} */
+export let portfolioHeatmapChart = null;
 
 /** @type {string} */
 export let currentFilter = localStorage.getItem('currentFilter') || 'watching';
@@ -103,22 +107,31 @@ export const analyticsCharts = {};
 export let modalChart = null;
 
 export const SECTOR_COLORS = {
-  'Basic Materials': '#9b59b6', 'Conglomerates': '#f1c40f', 'Consumer Goods': '#2ecc71',
-  'Financial': '#3498db', 'Healthcare': '#e74c3c', 'Industrial Goods': '#e67e22',
-  'Services': '#1abc9c', 'Technology': '#fd79a8', 'Utilities': '#f39c12', 'ETF / Other': '#95a5a6',
+  'Communication Services': '#8b5cf6', 'Consumer Discretionary': '#3b82f6', 'Consumer Staples': '#10b981',
+  'Energy': '#f59e0b', 'Financials': '#eab308', 'Healthcare': '#ef4444',
+  'Industrials': '#84cc16', 'Technology': '#ec4899', 'Materials': '#6366f1',
+  'Real Estate': '#06b6d4', 'Utilities': '#f97316', 'ETF / Other': '#64748b',
 };
-// mirrors the SECTORS tuple in scripts/advice_log.py (eToro taxonomy)
-export const SECTORS = ['Basic Materials', 'Conglomerates', 'Consumer Goods', 'Financial', 'Healthcare',
-  'Industrial Goods', 'Services', 'Technology', 'Utilities', 'ETF / Other'];
+export const SECTORS = ['Communication Services', 'Consumer Discretionary', 'Consumer Staples', 'Energy', 'Financials', 'Healthcare', 'Industrials', 'Materials', 'Real Estate', 'Technology', 'Utilities', 'ETF / Other'];
 
 /** @type {string} */
 export let portfolioViewMode = localStorage.getItem('portfolioViewMode') || 'collapsed';
+
+/** @type {string} */
+export let portfolioTabMode = localStorage.getItem('portfolioTabMode') || 'table';
+
+/** @type {string} */
+export let heatmapTimeframe = localStorage.getItem('heatmapTimeframe') || 'today';
+export const setHeatmapTimeframe = (tf) => { heatmapTimeframe = tf; };
 
 const savedSortState = localStorage.getItem('sortState');
 const defaultSortState = {
   advice: { key: 'buyProx', dir: 1 },
   archive: { key: 'firstAdvised', dir: -1 },
-  positions: { key: 'firstAdvised', dir: -1 },
+  positions_all: { key: 'firstAdvised', dir: -1 },
+  positions_open: { key: 'firstAdvised', dir: -1 },
+  positions_closed: { key: 'firstAdvised', dir: -1 },
+  positions_needsconfirm: { key: 'firstAdvised', dir: -1 },
   portfolio: { key: 'plPct', dir: -1 },
 };
 let initialSortState = defaultSortState;
@@ -139,6 +152,8 @@ export function setPORTFOLIO(val) { PORTFOLIO = val; }
 export function setSectorChart(val) { sectorChart = val; }
 /** @param {any} val */
 export function setSectorCoverageChart(val) { sectorCoverageChart = val; }
+/** @param {any} val */
+export function setPortfolioHeatmapChart(val) { portfolioHeatmapChart = val; }
 /** @param {string} val */
 export function setCurrentFilter(val) { currentFilter = val; localStorage.setItem('currentFilter', val); }
 /** @param {string} val */
@@ -165,3 +180,5 @@ export function setSearchTimer(val) { searchTimer = val; }
 export function setModalChart(val) { modalChart = val; }
 /** @param {string} val */
 export function setPortfolioViewMode(val) { portfolioViewMode = val; localStorage.setItem('portfolioViewMode', val); }
+/** @param {string} val */
+export function setPortfolioTabMode(val) { portfolioTabMode = val; localStorage.setItem('portfolioTabMode', val); }

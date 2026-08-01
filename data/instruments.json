@@ -7,7 +7,7 @@
   "1016": {
     "ticker": "DIS",
     "name": "Walt Disney",
-    "sector": "Services"
+    "sector": "Communication Services"
   },
   "1022": {
     "ticker": "JNJ",
@@ -17,17 +17,17 @@
   "1029": {
     "ticker": "PG",
     "name": "Procter & Gamble Co",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "1042": {
     "ticker": "NKE",
     "name": "NIKE",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "1047": {
     "ticker": "VOD",
     "name": "Vodafone Group plc-ADR",
-    "sector": "Technology"
+    "sector": "Communication Services"
   },
   "1069": {
     "ticker": "SMCI",
@@ -42,12 +42,12 @@
   "1127": {
     "ticker": "NFLX",
     "name": "Netflix, Inc.",
-    "sector": "Services"
+    "sector": "Communication Services"
   },
   "1133": {
     "ticker": "AGNC",
     "name": "AGNC Investment Corp",
-    "sector": "Financial"
+    "sector": "Real Estate"
   },
   "1203": {
     "ticker": "BAYN.DE",
@@ -57,52 +57,53 @@
   "1206": {
     "ticker": "MBG.DE",
     "name": "Mercedes-Benz Group AG",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "1210": {
     "ticker": "VOW3.DE",
     "name": "Volkswagen AG",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "1250": {
     "ticker": "KER.PA",
     "name": "Kering SA",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "1253": {
     "ticker": "MC.PA",
     "name": "LVMH Moet Hennessy Louis Vuitton SA",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "1259": {
     "ticker": "RI.PA",
     "name": "Pernod-Ricard SA",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Staples"
   },
   "1400": {
     "ticker": "NESN.ZU",
     "name": "Nestle SA",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Staples"
   },
   "1477": {
     "ticker": "MDT.US",
     "name": "Medtronic PLC",
-    "sector": "Healthcare"
+    "sector": "Healthcare",
+    "mappedTicker": "MDT"
   },
   "1484": {
     "ticker": "PYPL",
     "name": "PayPal Holdings",
-    "sector": "Technology"
+    "sector": "Financials"
   },
   "1490": {
     "ticker": "TGT",
     "name": "Target Corp",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "1506": {
     "ticker": "FMC",
     "name": "FMC Corp",
-    "sector": "Basic Materials"
+    "sector": "Materials"
   },
   "1522": {
     "ticker": "HCA",
@@ -112,7 +113,7 @@
   "1545": {
     "ticker": "NOC",
     "name": "Northrop Grumman Corp",
-    "sector": "Industrial Goods"
+    "sector": "Industrials"
   },
   "1584": {
     "ticker": "THC",
@@ -127,12 +128,12 @@
   "1636": {
     "ticker": "MRSH",
     "name": "Marsh & McLennan Cos Inc",
-    "sector": "Financial"
+    "sector": "Financials"
   },
   "1696": {
     "ticker": "AZO",
     "name": "Autozone Inc",
-    "sector": "Services"
+    "sector": "Communication Services"
   },
   "1722": {
     "ticker": "BDX",
@@ -142,12 +143,12 @@
   "1823": {
     "ticker": "INGR",
     "name": "Ingredion Inc",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Staples"
   },
   "1957": {
     "ticker": "WSO",
     "name": "Watsco Inc",
-    "sector": "Services"
+    "sector": "Industrials"
   },
   "1972": {
     "ticker": "REGN",
@@ -182,7 +183,8 @@
   "3199": {
     "ticker": "LABU.US",
     "name": "Direxion Daily S&P Biotech Bull 3X ETF",
-    "sector": "ETF / Other"
+    "sector": "ETF / Other",
+    "mappedTicker": "LABU"
   },
   "3221": {
     "ticker": "SDIV",
@@ -197,12 +199,12 @@
   "4072": {
     "ticker": "HSY",
     "name": "Hershey Co",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Staples"
   },
   "4108": {
     "ticker": "MELI",
     "name": "MercadoLibre Inc",
-    "sector": "Services"
+    "sector": "Consumer Discretionary"
   },
   "4138": {
     "ticker": "ROP",
@@ -212,7 +214,7 @@
   "4254": {
     "ticker": "TMUS",
     "name": "T-Mobile Us Inc",
-    "sector": "Services"
+    "sector": "Communication Services"
   },
   "4263": {
     "ticker": "WDAY",
@@ -232,7 +234,7 @@
   "4323": {
     "ticker": "VEEV",
     "name": "Veeva Systems Inc A",
-    "sector": "Technology"
+    "sector": "Healthcare"
   },
   "4330": {
     "ticker": "DXC",
@@ -242,32 +244,32 @@
   "4335": {
     "ticker": "YUMC",
     "name": "Yum China Holdings Inc",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "4399": {
     "ticker": "TTD",
     "name": "Trade Desk Inc",
-    "sector": "Services"
+    "sector": "Communication Services"
   },
   "4489": {
     "ticker": "NIO",
     "name": "Nio Inc.-ADR",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "4533": {
     "ticker": "RAND.NV",
     "name": "Randstad Holding NV",
-    "sector": "Consumer Goods"
+    "sector": "Industrials"
   },
   "4537": {
     "ticker": "TKWY.NV",
     "name": "Just Eat Takeaway.com NV",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "5005": {
     "ticker": "AF.PA",
     "name": "Air France-KLM",
-    "sector": "Consumer Goods"
+    "sector": "Industrials"
   },
   "5042": {
     "ticker": "UBI.PA",
@@ -277,52 +279,52 @@
   "5628": {
     "ticker": "CNMD",
     "name": "Conmed Corp.",
-    "sector": "Consumer Goods"
+    "sector": "Healthcare"
   },
   "5634": {
     "ticker": "ENPH",
     "name": "Enphase Energy Inc.",
-    "sector": "Industrial Goods"
+    "sector": "Technology"
   },
   "5683": {
     "ticker": "INSP",
     "name": "Inspire Medical Systems Inc.",
-    "sector": "Consumer Goods"
+    "sector": "Healthcare"
   },
   "5708": {
     "ticker": "SFM",
     "name": "Sprouts Farmers Market Inc.",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Staples"
   },
   "5960": {
     "ticker": "SE",
     "name": "Sea Ltd-ADR",
-    "sector": "Technology"
+    "sector": "Consumer Discretionary"
   },
   "5973": {
     "ticker": "MPT",
     "name": "Medical Properties Trust Inc",
-    "sector": "Financial"
+    "sector": "Real Estate"
   },
   "5976": {
     "ticker": "BMRN",
     "name": "BioMarin Pharmaceutical Inc",
-    "sector": "Consumer Goods"
+    "sector": "Healthcare"
   },
   "5988": {
     "ticker": "IT",
     "name": "Gartner Inc",
-    "sector": "Consumer Goods"
+    "sector": "Technology"
   },
   "6051": {
     "ticker": "DECK",
     "name": "Deckers Outdoor Corp",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "6230": {
     "ticker": "HTGMQ",
     "name": "HTG Molecular Diagnostics Inc",
-    "sector": "Consumer Goods"
+    "sector": "Healthcare"
   },
   "6255": {
     "ticker": "NNDM",
@@ -342,62 +344,63 @@
   "6529": {
     "ticker": "SDGR",
     "name": "Schrodinger Inc/United States",
-    "sector": "Technology"
+    "sector": "Healthcare"
   },
   "6581": {
     "ticker": "ADC",
     "name": "Agree Realty Corp",
-    "sector": "Financial"
+    "sector": "Financials"
   },
   "6703": {
     "ticker": "COUR",
     "name": "Coursera Inc.",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Staples"
   },
   "6794": {
     "ticker": "NOMD",
     "name": "Nomad Foods Ltd",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Staples"
   },
   "6817": {
     "ticker": "PHR",
     "name": "Phreesia Inc",
-    "sector": "Technology"
+    "sector": "Healthcare"
   },
   "6844": {
     "ticker": "NVO",
     "name": "Novo-Nordisk A/S SPONS ADR",
-    "sector": "Consumer Goods"
+    "sector": "Healthcare"
   },
   "6849": {
     "ticker": "SITC",
     "name": "SITE Centers Corp",
-    "sector": "Financial"
+    "sector": "Real Estate"
   },
   "6886": {
     "ticker": "UL.US",
     "name": "Unilever PLC-ADR",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Staples",
+    "mappedTicker": "UL"
   },
   "7528": {
     "ticker": "PRX.NV",
     "name": "Prosus NV",
-    "sector": "Services"
+    "sector": "Consumer Discretionary"
   },
   "7916": {
     "ticker": "VITL",
     "name": "Vital Farms Inc",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Staples"
   },
   "7996": {
     "ticker": "U",
     "name": "Unity Software Inc.",
-    "sector": "Consumer Goods"
+    "sector": "Technology"
   },
   "8617": {
     "ticker": "NLOP",
     "name": "Net Lease Office Properties",
-    "sector": "Financial"
+    "sector": "Real Estate"
   },
   "8637": {
     "ticker": "DUOL",
@@ -407,52 +410,53 @@
   "8653": {
     "ticker": "SICP",
     "name": "SilverGate Capital",
-    "sector": "Financial"
+    "sector": "Financials"
   },
   "8716": {
     "ticker": "PHG",
     "name": "Koninklijke Philips NV",
-    "sector": "Consumer Goods"
+    "sector": "Healthcare"
   },
   "8870": {
     "ticker": "G.US",
     "name": "Genpact Limited",
-    "sector": "Technology"
+    "sector": "Technology",
+    "mappedTicker": "G"
   },
   "8877": {
     "ticker": "ATR",
     "name": "AptarGroup Inc.",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "8983": {
     "ticker": "EYE",
     "name": "National Vision Holdings Inc.",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "9033": {
     "ticker": "AHCO",
     "name": "AdaptHealth Corp.",
-    "sector": "Consumer Goods"
+    "sector": "Healthcare"
   },
   "9267": {
     "ticker": "OTLY",
     "name": "Oatly Group AB",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Staples"
   },
   "9278": {
     "ticker": "MFLTY",
     "name": "MissFresh Ltd. ADR",
-    "sector": "Services"
+    "sector": "Industrials"
   },
   "9523": {
     "ticker": "CCOI",
     "name": "Cogent Communications Holdings Inc",
-    "sector": "Services"
+    "sector": "Communication Services"
   },
   "9542": {
     "ticker": "PERI",
     "name": "Perion Network Ltd",
-    "sector": "Services"
+    "sector": "Communication Services"
   },
   "9575": {
     "ticker": "INTA",
@@ -462,37 +466,37 @@
   "9638": {
     "ticker": "PSNY",
     "name": "Polestar Automotive Holding UK PLC",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "10482": {
     "ticker": "JILL",
     "name": "JJill Inc",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "12233": {
     "ticker": "DOU.DE",
     "name": "Douglas AG",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "14296": {
     "ticker": "WBA US CVR",
     "name": "WBA US merger CVR",
-    "sector": "Basic Materials"
+    "sector": "Healthcare"
   },
   "15618": {
     "ticker": "SPCX",
     "name": "Space Exploration Technologies Corp",
-    "sector": "Technology"
+    "sector": "Industrials"
   },
   "1469": {
     "ticker": "HON",
     "name": "Honeywell International Inc",
-    "sector": "Industrial Goods"
+    "sector": "Industrials"
   },
   "6689": {
     "ticker": "EQT",
     "name": "EQT Corp",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "1859": {
     "ticker": "LDOS",
@@ -502,12 +506,12 @@
   "8692": {
     "ticker": "ONC",
     "name": "BeiGene Ltd-ADR",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "1525": {
     "ticker": "TSN",
     "name": "Tyson Foods Inc",
-    "sector": "Consumer Goods"
+    "sector": "Consumer Discretionary"
   },
   "4167": {
     "ticker": "TRMB",
@@ -517,7 +521,7 @@
   "1450": {
     "ticker": "ACN",
     "name": "Accenture Plc",
-    "sector": "Services"
+    "sector": "Communication Services"
   },
   "8678": {
     "ticker": "SAP",
@@ -532,7 +536,7 @@
   "1138": {
     "ticker": "FDX",
     "name": "FedEx Corporation",
-    "sector": "Services"
+    "sector": "Communication Services"
   },
   "3226": {
     "ticker": "SOXL",
@@ -542,7 +546,7 @@
   "1922": {
     "ticker": "WLK",
     "name": "Westlake Chemical Corp",
-    "sector": "Basic Materials"
+    "sector": "Materials"
   },
   "1135": {
     "ticker": "ORCL",
@@ -552,21 +556,372 @@
   "1643": {
     "ticker": "JEF",
     "name": "Jefferies Financial Group Inc",
-    "sector": "Financial"
+    "sector": "Financials"
   },
   "1833": {
     "ticker": "BAH",
     "name": "Booz Allen Hamilton Holding Corp",
-    "sector": "Services"
+    "sector": "Communication Services"
   },
   "9580": {
     "ticker": "AD",
     "name": "Array Digital Infrastructure Inc",
-    "sector": "Services"
+    "sector": "Communication Services"
   },
   "15232": {
     "ticker": "MEOH",
     "name": "Methanex Corp",
+    "sector": "Materials"
+  },
+  "4430": {
+    "ticker": "SLV",
+    "name": "iShares Silver Trust",
+    "sector": "ETF / Other"
+  },
+  "1001": {
+    "ticker": "AAPL",
+    "name": "Apple",
+    "sector": "Consumer Goods"
+  },
+  "4397": {
+    "ticker": "ON",
+    "name": "ON Semiconductor Corp",
+    "sector": "Technology"
+  },
+  "4033": {
+    "ticker": "CME",
+    "name": "CME Group",
+    "sector": "Financials"
+  },
+  "4275": {
+    "ticker": "LYB",
+    "name": "LyondellBasell Industries NV",
+    "sector": "Materials"
+  },
+  "9443": {
+    "ticker": "WFRD",
+    "name": "Weatherford International plc",
+    "sector": "Utilities"
+  },
+  "15555": {
+    "ticker": "LCLN",
+    "name": "Lincoln International Inc",
+    "sector": "Financials"
+  },
+  "100077": {
+    "ticker": "QNT",
+    "name": "Quant",
+    "sector": "ETF / Other"
+  },
+  "9060": {
+    "ticker": "DOW",
+    "name": "Dow Inc.",
+    "sector": "Materials"
+  },
+  "2193": {
+    "ticker": "ICE",
+    "name": "Intercontinental Exchange Inc",
+    "sector": "Financials"
+  },
+  "1035": {
+    "ticker": "WMT",
+    "name": "Walmart Inc.",
+    "sector": "Communication Services"
+  },
+  "8698": {
+    "ticker": "BCE",
+    "name": "BCE Inc",
+    "sector": "Communication Services"
+  },
+  "3025": {
+    "ticker": "GLD",
+    "name": "SPDR Gold",
+    "sector": "ETF / Other"
+  },
+  "4253": {
+    "ticker": "SLB",
+    "name": "SLB Ltd",
+    "sector": "Materials"
+  },
+  "1155": {
+    "ticker": "BABA",
+    "name": "Alibaba-ADR",
+    "sector": "Communication Services"
+  },
+  "1142": {
+    "ticker": "SBUX",
+    "name": "Starbucks Corp",
+    "sector": "Communication Services"
+  },
+  "1531": {
+    "ticker": "HAL",
+    "name": "Halliburton Co",
+    "sector": "Materials"
+  },
+  "4257": {
+    "ticker": "OXY",
+    "name": "Occidental Petroleum Corp",
+    "sector": "Materials"
+  },
+  "2467": {
+    "ticker": "RCI",
+    "name": "Rogers Communications Inc",
+    "sector": "Communication Services"
+  },
+  "28": {
+    "ticker": "NSDQ100",
+    "name": "NASDAQ100 Index (Non Expiry)",
+    "sector": "ETF / Other"
+  },
+  "1111": {
+    "ticker": "TSLA",
+    "name": "Tesla Motors, Inc.",
+    "sector": "Consumer Discretionary"
+  },
+  "10462": {
+    "ticker": "FC",
+    "name": "Franklin Covey Co",
+    "sector": "Consumer Discretionary"
+  },
+  "6663": {
+    "ticker": "CWEN",
+    "name": "Clearway Energy Inc",
+    "sector": "Utilities"
+  },
+  "1012": {
+    "ticker": "CAT",
+    "name": "Caterpillar",
+    "sector": "Industrial Goods"
+  },
+  "4465": {
+    "ticker": "TQQQ",
+    "name": "ProShares UltraPro QQQ",
+    "sector": "ETF / Other"
+  },
+  "1026": {
+    "ticker": "MMM",
+    "name": "3M",
+    "sector": "Industrials"
+  },
+  "1578": {
+    "ticker": "SO",
+    "name": "Southern Co",
+    "sector": "Utilities"
+  },
+  "1594": {
+    "ticker": "NEE",
+    "name": "NextEra Energy Inc",
+    "sector": "Utilities"
+  },
+  "9122": {
+    "ticker": "CRC",
+    "name": "California Resources Corporation",
+    "sector": "Communication Services"
+  },
+  "9437": {
+    "ticker": "NE",
+    "name": "Noble Corporation Plc",
+    "sector": "Utilities"
+  },
+  "9477": {
+    "ticker": "MLI",
+    "name": "Mueller Industries Inc",
+    "sector": "Industrial Goods"
+  },
+  "8765": {
+    "ticker": "BAM",
+    "name": "Brookfield Asset Management Ltd",
+    "sector": "Financials"
+  },
+  "4287": {
+    "ticker": "BKR",
+    "name": "Baker Hughes Company",
+    "sector": "Materials"
+  },
+  "1017": {
+    "ticker": "GE",
+    "name": "General Electric Co",
+    "sector": "Industrials"
+  },
+  "1526": {
+    "ticker": "DE",
+    "name": "Deere & Co",
+    "sector": "Industrials"
+  },
+  "1869": {
+    "ticker": "TDS",
+    "name": "Telephone And Data Systems Inc",
+    "sector": "Communication Services"
+  },
+  "1492": {
+    "ticker": "UNP",
+    "name": "Union Pacific Corp",
+    "sector": "Industrial Goods"
+  },
+  "1541": {
+    "ticker": "DUK",
+    "name": "Duke Energy Corp",
+    "sector": "Utilities"
+  },
+  "1725": {
+    "ticker": "CPB",
+    "name": "Campbell Soup Co",
+    "sector": "Consumer Staples"
+  },
+  "1043": {
+    "ticker": "PEP",
+    "name": "PepsiCo",
+    "sector": "Consumer Staples"
+  },
+  "9674": {
+    "ticker": "XENE",
+    "name": "Xenon Pharmaceuticals Inc",
+    "sector": "Healthcare"
+  },
+  "1024": {
+    "ticker": "KO",
+    "name": "Coca-Cola",
+    "sector": "Consumer Staples"
+  },
+  "1021": {
+    "ticker": "INTC",
+    "name": "Intel",
+    "sector": "Technology"
+  },
+  "9737": {
+    "ticker": "KRUS",
+    "name": "Kura Sushi USA Inc",
+    "sector": "Consumer Discretionary"
+  },
+  "1033": {
+    "ticker": "RTX",
+    "name": "Raytheon-Technologies",
+    "sector": "Industrials"
+  },
+  "1631": {
+    "ticker": "PH",
+    "name": "Parker-Hannifin Corp",
+    "sector": "Industrials"
+  },
+  "1032": {
+    "ticker": "UNH",
+    "name": "UnitedHealth",
+    "sector": "Healthcare"
+  },
+  "17": {
+    "ticker": "OIL",
+    "name": "Oil (Non Expiry)",
+    "sector": "ETF / Other"
+  },
+  "18": {
+    "ticker": "GOLD",
+    "name": "Gold (Non Expiry)",
+    "sector": "Financials"
+  },
+  "1136": {
+    "ticker": "LMT",
+    "name": "Lockheed Martin Corporation",
+    "sector": "Industrials"
+  },
+  "1757": {
+    "ticker": "NEM",
+    "name": "Newmont Mining Corp",
+    "sector": "Materials"
+  },
+  "1557": {
+    "ticker": "NUE",
+    "name": "Nucor Corp",
+    "sector": "Materials"
+  },
+  "1661": {
+    "ticker": "BLK",
+    "name": "BlackRock Inc",
+    "sector": "Financials"
+  },
+  "6501": {
+    "ticker": "PGNY",
+    "name": "Progyny Inc",
+    "sector": "Healthcare"
+  },
+  "1616": {
+    "ticker": "ECL",
+    "name": "Ecolab Inc",
+    "sector": "Materials"
+  },
+  "9955": {
+    "ticker": "WINA",
+    "name": "Winmark Corporation",
+    "sector": "Industrials"
+  },
+  "1146": {
+    "ticker": "MOS",
+    "name": "Mosaic Co",
+    "sector": "Materials"
+  },
+  "1946": {
+    "ticker": "AMT",
+    "name": "American Tower Corp",
+    "sector": "Real Estate"
+  },
+  "1014": {
+    "ticker": "CVX.US",
+    "name": "Chevron",
+    "sector": "Energy",
+    "mappedTicker": "CVX"
+  },
+  "1177": {
+    "ticker": "ALB",
+    "name": "Albemarle Corporation",
+    "sector": "Utilities"
+  },
+  "1555": {
+    "ticker": "FCX",
+    "name": "Freeport-McMoRan Inc",
+    "sector": "Materials"
+  },
+  "1130": {
+    "ticker": "MU",
+    "name": "Micron Technology, Inc.",
+    "sector": "Technology"
+  },
+  "1510": {
+    "ticker": "COP",
+    "name": "ConocoPhillips Co",
     "sector": "Basic Materials"
+  },
+  "1855": {
+    "ticker": "SPGI",
+    "name": "S&P Global Inc",
+    "sector": "Services"
+  },
+  "1676": {
+    "ticker": "APD",
+    "name": "Air Products & Chemicals Inc",
+    "sector": "Basic Materials"
+  },
+  "4268": {
+    "ticker": "EQIX",
+    "name": "Equinix Inc",
+    "sector": "Financial"
+  },
+  "1003": {
+    "ticker": "META",
+    "name": "Meta Platforms Inc",
+    "sector": "Technology"
+  },
+  "8103": {
+    "ticker": "SAIA",
+    "name": "Saia Inc.",
+    "sector": "Industrial Goods"
+  },
+  "6378": {
+    "ticker": "ALNY",
+    "name": "Alnylam Pharmaceuticals Inc",
+    "sector": "Consumer Goods"
+  },
+  "RTO-TEMP": {
+    "ticker": "RTO.US",
+    "name": "Rentokil Initial",
+    "mappedTicker": "RTO"
   }
 }

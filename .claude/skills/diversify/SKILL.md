@@ -13,7 +13,7 @@ Recommend ~10 quality stocks the user does NOT hold, in sectors where the portfo
 
 This skill is the documented exception to the market-driven-only rule: it deliberately reads the portfolio (sector split + held tickers) as input. That's its whole point. Everything else about the advice discipline stays: min $20, litigation red-flag checks, one-table output.
 
-Diversification is not bounce hunting: candidates do NOT need to be oversold. Quality and sector fit come first; an oversold entry in the right sector is a bonus, not a requirement.
+Diversification requires a margin of safety to avoid underperformance: candidates MUST be matching the primary strategy criteria. Quality and sector fit come first, but we no longer buy without a pullback.
 
 ## Step 0: Fresh portfolio
 
@@ -44,12 +44,14 @@ ONE markdown table, ~10 picks grouped by sector:
 | Ticker | Sector | Price | Rating | RSI | Thesis | Buy below | Drop below | Drop above | Risk |
 |---|---|---|---|---|---|---|---|---|---|
 
-Above the table: one line per target sector explaining the gap ("Healthcare is 3.1% of invested, target ~10%"). Sources as hyperlinks below the table. Remind: $600 batch, trailing stop from +5%.
+Above the table: one line per target sector explaining the gap ("Healthcare is 3.1% of invested, target ~10%"). Sources as hyperlinks below the table. Remind the user of the entry parameters (batch size, trailing stop) defined in `data/private/STRATEGY.md`.
 
 ## Step 5: Log picks
 
+**CRITICAL**: Always retrieve and log the current RSI (`--rsi`) for every pick, even when the strategy is not strategy-focused. This data is required for downstream analytics.
+
 One CLI call per pick: `python3 scripts/advice_log.py add-pick TICKER --source diversify --price X --rating B+ --rsi 45 --sector "Healthcare" --buy-below X --drop-below Y --drop-above Z --name "..." --reason "..." --risk "..."`. The CLI upserts, so re-advised tickers are handled automatically (add `--note "re-advised: what changed"` for those). New picks auto-note their reason.
 
-No keep/drop check-in here; that belongs to /advice and /premarket runs.
+No keep/drop check-in here; that belongs to /advice runs.
 
 Last step, auto-backup: run `python3 scripts/autosync.py "diversify run"`. Commits + pushes the data files to the private backup repo when `STOCKS_AUTOSYNC=1`, silent no-op otherwise, so always run it.

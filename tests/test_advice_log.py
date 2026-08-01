@@ -3,7 +3,7 @@ import sys
 import tempfile
 import unittest
 import unittest.mock
-from datetime import date
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -12,9 +12,9 @@ import advice_log  # noqa: E402
 
 
 def _pick_args(ticker, price, **over):
-    base = dict(ticker=ticker, price=price, source="advice", rating=None, rsi=None,
-                sector=None, buy_below=None, drop_below=None, drop_above=None,
-                name=None, reason=None, risk=None, note=None)
+    base = dict(ticker=ticker, price=price, source="oversold", rating="B", rsi=20,
+                sector="Technology", buy_below=price * 0.95, drop_below=price * 0.9, drop_above=price * 1.1,
+                name="Test Corp", reason="test reason", risk="test risk", note=None, open_note="test note")
     base.update(over)
     return SimpleNamespace(**base)
 
@@ -62,10 +62,10 @@ class AdviceLogTest(unittest.TestCase):
         }
         self.assertEqual(self.app.latest_price(entry), 100.0)
 
-    @unittest.mock.patch('advice_log.datetime')
-    def test_push_history_prunes_past_intraday_points_and_appends(self, mock_dt):
-        mock_dt.now.return_value = unittest.mock.Mock(
-            strftime=lambda fmt: "2026-06-16 15:30" if "%H" in fmt else "2026-06-16"
+    @unittest.mock.patch('advice_log.nyse')
+    def test_push_history_prunes_past_intraday_points_and_appends(self, mock_nyse):
+        mock_nyse.nyse_now.return_value = unittest.mock.Mock(
+            isoformat=lambda *args: "2026-06-16T15:30", strftime=lambda fmt: "2026-06-16"
         )
         entry = {
             "priceHistory": [
@@ -77,53 +77,53 @@ class AdviceLogTest(unittest.TestCase):
         hist = entry["priceHistory"]
         self.assertEqual(len(hist), 2)
         self.assertEqual(hist[0], {"date": "2026-06-15", "price": 106.5})
-        self.assertEqual(hist[1], {"date": "2026-06-16 15:30", "price": 107.0})
+        self.assertEqual(hist[1], {"date": "2026-06-16T15:30", "price": 107.0})
 
-    @unittest.mock.patch('advice_log.datetime')
-    def test_push_history_updates_price_if_same_minute(self, mock_dt):
-        mock_dt.now.return_value = unittest.mock.Mock(
-            strftime=lambda fmt: "2026-06-16 15:30" if "%H" in fmt else "2026-06-16"
+    @unittest.mock.patch('advice_log.nyse')
+    def test_push_history_updates_price_if_same_minute(self, mock_nyse):
+        mock_nyse.nyse_now.return_value = unittest.mock.Mock(
+            isoformat=lambda *args: "2026-06-16T15:30", strftime=lambda fmt: "2026-06-16"
         )
         entry = {
             "priceHistory": [
-                {"date": "2026-06-16 15:30", "price": 105.0},
+                {"date": "2026-06-16T15:30", "price": 105.0},
             ]
         }
         self.app.push_history(entry, 107.0)
         hist = entry["priceHistory"]
         self.assertEqual(len(hist), 1)
-        self.assertEqual(hist[0], {"date": "2026-06-16 15:30", "price": 107.0})
+        self.assertEqual(hist[0], {"date": "2026-06-16T15:30", "price": 107.0})
 
-    @unittest.mock.patch('advice_log.datetime')
-    def test_push_history_skips_same_price_on_same_day(self, mock_dt):
-        mock_dt.now.return_value = unittest.mock.Mock(
-            strftime=lambda fmt: "2026-06-16 15:35" if "%H" in fmt else "2026-06-16"
+    @unittest.mock.patch('advice_log.nyse')
+    def test_push_history_skips_same_price_on_same_day(self, mock_nyse):
+        mock_nyse.nyse_now.return_value = unittest.mock.Mock(
+            isoformat=lambda *args: "2026-06-16T15:35", strftime=lambda fmt: "2026-06-16"
         )
         entry = {
             "priceHistory": [
-                {"date": "2026-06-16 15:30", "price": 105.0},
+                {"date": "2026-06-16T15:30", "price": 105.0},
             ]
         }
         self.app.push_history(entry, 105.0)
         hist = entry["priceHistory"]
         self.assertEqual(len(hist), 1)
-        self.assertEqual(hist[0], {"date": "2026-06-16 15:30", "price": 105.0})
+        self.assertEqual(hist[0], {"date": "2026-06-16T15:30", "price": 105.0})
 
-    @unittest.mock.patch('advice_log.datetime')
-    def test_push_history_appends_same_price_different_day(self, mock_dt):
-        mock_dt.now.return_value = unittest.mock.Mock(
-            strftime=lambda fmt: "2026-06-17 10:00" if "%H" in fmt else "2026-06-17"
+    @unittest.mock.patch('advice_log.nyse')
+    def test_push_history_appends_same_price_different_day(self, mock_nyse):
+        mock_nyse.nyse_now.return_value = unittest.mock.Mock(
+            isoformat=lambda *args: "2026-06-17T10:00", strftime=lambda fmt: "2026-06-17"
         )
         entry = {
             "priceHistory": [
-                {"date": "2026-06-16 15:30", "price": 105.0},
+                {"date": "2026-06-16T15:30", "price": 105.0},
             ]
         }
         self.app.push_history(entry, 105.0)
         hist = entry["priceHistory"]
         self.assertEqual(len(hist), 2)
         self.assertEqual(hist[0], {"date": "2026-06-16", "price": 105.0})
-        self.assertEqual(hist[1], {"date": "2026-06-17 10:00", "price": 105.0})
+        self.assertEqual(hist[1], {"date": "2026-06-17T10:00", "price": 105.0})
 
 
     def test_get_entry_found_any_status(self):
@@ -196,7 +196,7 @@ class AddPickTest(unittest.TestCase):
         # Re-advising a ticker you already hold must refresh the position, not
         # spawn a lot-less 'watching' ghost that lingers in the Advice tab.
         self._seed([{
-            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "advice",
+            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "oversold",
             "rating": "A-", "priceAtAdvice": 133.2,
             "priceHistory": [{"date": "2026-06-18", "price": 133.2}],
             "notes": [], "lots": [{"positionID": 1, "openRate": 126.0}],
@@ -217,58 +217,67 @@ class AddPickTest(unittest.TestCase):
             "id": "ADBE-0001", "ticker": "ADBE", "status": "bought", "source": "import",
             "priceHistory": [], "notes": [], "lots": [],
         }])
-        self.app.cmd_add_pick(_pick_args("ADBE", 200.0, source="advice", rating="B"))
+        self.app.cmd_add_pick(_pick_args("ADBE", 200.0, source="oversold", rating="B"))
         entries = self._entries()
         self.assertEqual(len(entries), 2)             # import holding stays separate
         new = [x for x in entries if x["id"] != "ADBE-0001"][0]
         self.assertEqual(new["status"], "watching")
 
-    def test_remove_deletes_by_id(self):
+    def test_remove_marks_as_removed(self):
         self._seed([
             {"id": "ACN-0001", "ticker": "ACN", "status": "bought", "lots": []},
             {"id": "ACN-0002", "ticker": "ACN", "status": "watching", "lots": []},
         ])
         self.app.cmd_remove(SimpleNamespace(id="ACN-0002", force=False))
-        self.assertEqual([e["id"] for e in self._entries()], ["ACN-0001"])
+        entries = self._entries()
+        self.assertEqual(len(entries), 2)
+        e2 = next(e for e in entries if e["id"] == "ACN-0002")
+        self.assertEqual(e2["status"], "removed")
 
     def test_remove_guards_position_with_lots(self):
         self._seed([{"id": "ACN-0001", "ticker": "ACN", "status": "bought",
                      "lots": [{"positionID": 1}]}])
         with self.assertRaises(SystemExit):
             self.app.cmd_remove(SimpleNamespace(id="ACN-0001", force=False))
-        self.assertEqual(len(self._entries()), 1)     # guarded, not removed
+        self.assertEqual(self._entries()[0]["status"], "bought")  # guarded, not removed
 
     def test_new_pick_seeds_adviceEvents_with_today(self):
         self.app.cmd_add_pick(_pick_args("AAPL", 170.0))
+        from nyse import nyse_today
+        market_date = nyse_today().isoformat()
         self.assertEqual(self._entries()[0]["adviceEvents"],
-                         [{"date": date.today().isoformat(), "price": 170.0}])
+                         [{"date": market_date, "price": 170.0}])
 
     def test_readvise_accumulates_adviceEvents(self):
         # adviceEvents lets the Positions view show which advice (date + price)
         # prompted each lot.
         self._seed([{
-            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "advice",
+            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "oversold",
             "firstAdvised": "2026-01-01", "priceAtAdvice": 133.2,
             "priceHistory": [], "notes": [], "lots": [],
         }])
         self.app.cmd_add_pick(_pick_args("ACN", 127.0, source="aftermarket"))
         e = self._entries()[0]
+        from nyse import nyse_today
+        market_date = nyse_today().isoformat()
         self.assertEqual(e["adviceEvents"], [
             {"date": "2026-01-01", "price": 133.2},
-            {"date": date.today().isoformat(), "price": 127.0},
+            {"date": market_date, "price": 127.0},
         ])
 
     def test_readvise_migrates_legacy_adviceDates(self):
         # An entry created before adviceEvents existed must not keep the dead field.
         self._seed([{
-            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "advice",
+            "id": "ACN-0001", "ticker": "ACN", "status": "bought", "source": "oversold",
             "firstAdvised": "2026-01-01", "priceAtAdvice": 133.2, "adviceDates": ["2026-01-01"],
             "priceHistory": [], "notes": [], "lots": [],
         }])
         self.app.cmd_add_pick(_pick_args("ACN", 127.0, source="aftermarket"))
         e = self._entries()[0]
         self.assertNotIn("adviceDates", e)
-        self.assertEqual(e["adviceEvents"][-1], {"date": date.today().isoformat(), "price": 127.0})
+        from nyse import nyse_today
+        market_date = nyse_today().isoformat()
+        self.assertEqual(e["adviceEvents"][-1], {"date": market_date, "price": 127.0})
 
 
 if __name__ == "__main__":

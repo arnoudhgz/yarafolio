@@ -9,7 +9,15 @@ Before you begin, ensure that your system has **Python 3** installed (minimum ve
   git clone git@github.com:arnoudhgz/yarafolio.git
   cd yarafolio
   ```
-- **To really use it:** Click the **Fork** button on GitHub first to create your own copy of the repository. Then clone your forked version so you can customize the AI instructions (`GEMINI.md`, `CLAUDE.md`) to fit your own trading style!
+- **To really use it:** Click the **Fork** button on GitHub first to create your own copy of the repository.
+
+## Configure Your Personal Strategy
+Your personal trading parameters (like batch sizes, trailing stop targets, and sector biases) are stored in a private file so they aren't accidentally pushed back to GitHub.
+Copy the sample template to get started:
+```bash
+cp data/sample/STRATEGY.md data/private/STRATEGY.md
+```
+Open `data/private/STRATEGY.md` and customize the parameters to fit your trading style!
 
 ## Set up your environment variables (eToro API)
 Create a `.env` file in the root of the project. Copy the `.env.sample` to get started:
@@ -28,6 +36,10 @@ By default, your logs and portfolio snapshots are saved locally to `data/private
 - Create a separate, new GitHub repository to store your data and set the SSH URL as `PRIVATE_DATA_REPO` in your `.env` file.
 - Set `STOCKS_AUTOSYNC=1` in your `.env` to enable automatic pushing.
 - **CRITICAL WARNING:** Ensure the repository you create for this is explicitly set to **PRIVATE**. Your `data/private/` folder contains your personal financial holdings and history. Do not sync this data to a public repository!
+
+## Configure AI Timezone
+The AI agent uses your timezone to accurately interpret market hours and your commands based on your local time. 
+Set `USER_TIMEZONE` in your `.env` file to your specific timezone (e.g., `America/Mexico_City`, `Europe/Amsterdam`). If omitted, the agent will attempt to calculate it automatically, but explicitly setting it prevents translation errors.
 
 ## Provide mock data (Optional, for testing)
 If you don't want to start with a blank slate, you can set `DEMO_MODE=1` in your `.env` file. This tells the system to automatically load the provided sample data from the `data/sample/` directory instead of using your personal data in `data/private/`.

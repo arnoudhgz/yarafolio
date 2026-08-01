@@ -4,12 +4,12 @@ from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
-import learn_stats  # noqa: E402
+import review_stats  # noqa: E402
 
 
 class OutcomeTest(unittest.TestCase):
     def setUp(self):
-        self.app = learn_stats.LearnStats()
+        self.app = review_stats.LearnStats()
         self.today = date(2026, 6, 23)
 
     def test_entry_missing_status_does_not_crash(self):
@@ -37,13 +37,14 @@ class OutcomeTest(unittest.TestCase):
 
 class RsiBandTest(unittest.TestCase):
     def setUp(self):
-        self.app = learn_stats.LearnStats()
+        self.app = review_stats.LearnStats()
 
     def test_bands(self):
         self.assertEqual(self.app.rsi_band(18), "<20")
-        self.assertEqual(self.app.rsi_band(20), "20-25")
-        self.assertEqual(self.app.rsi_band(27), "25-30")
-        self.assertEqual(self.app.rsi_band(35), "30+")
+        self.assertEqual(self.app.rsi_band(20), "20-30")
+        self.assertEqual(self.app.rsi_band(27), "20-30")
+        self.assertEqual(self.app.rsi_band(35), "30-40")
+        self.assertEqual(self.app.rsi_band(75), "70+")
         self.assertEqual(self.app.rsi_band(0), "<20")
 
     def test_none(self):
@@ -52,7 +53,7 @@ class RsiBandTest(unittest.TestCase):
 
 class BucketStatsTest(unittest.TestCase):
     def setUp(self):
-        self.app = learn_stats.LearnStats()
+        self.app = review_stats.LearnStats()
 
     def test_groups_and_aggregates(self):
         out = self.app.bucket_stats([("A", 10.0), ("A", -5.0), ("B", 3.0)])

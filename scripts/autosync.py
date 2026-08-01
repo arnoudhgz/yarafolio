@@ -17,7 +17,7 @@ from datetime import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data", "private")
-PATHS = ["advice-log.json", "portfolio.json", "LEARNINGS.md", "eod.md", "news.md"]
+PATHS = ["advice-log.json", "portfolio.json", "REVIEWS.md", "eod.md", "news.md", "STRATEGY.md", "equity-history.json", "correlation.json", "custom_instruments.json"]
 
 os.makedirs(os.path.join(ROOT, "logs"), exist_ok=True)
 logging.basicConfig(
@@ -57,6 +57,11 @@ class AutoSync:
         if self.get_env("DEMO_MODE") == "1":
             return
 
+        try:
+            subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "record_equity.py")], cwd=ROOT)
+        except Exception as e:
+            logger.warning("Failed to record equity: %s", e)
+
         private_repo = self.get_env("PRIVATE_DATA_REPO")
         if not private_repo:
             # Silently keep data local if no private repo is configured.
@@ -76,11 +81,17 @@ class AutoSync:
         if not present:
             return
 
+        # Safely pull any changes made by the Mobile Companion before pushing
+        self.git("stash")
+        self.git("pull", "--rebase", "origin", "main")
+        self.git("stash", "pop")
+
         self.git("add", "--", *present)
         if self.git("diff", "--cached", "--quiet").returncode == 0:
             return  # nothing changed
 
-        msg = f"chore(data): {reason} ({datetime.now().strftime('%Y-%m-%d %H:%M')})"
+        import nyse
+        msg = f"chore(data): {reason} ({nyse.nyse_now().isoformat('T', 'minutes')})"
         if self.git("commit", "-m", msg).returncode != 0:
             logger.error("autosync: commit failed")
             return

@@ -12,7 +12,7 @@ POST /api/import  - runs scripts/etoro_import.py preview + merge (the "Update
 POST /api/refresh - scrapes live quotes for advised watching/bought tickers via
                     screen.py and writes them through advice_log.py touch-many
                     (the "Refresh quotes" button)
-GET  /api/stats   - learn_stats.py --json passthrough (the Analytics tab)
+GET  /api/stats   - review_stats.py --json passthrough (the Analytics tab)
 Stdlib only, no dependencies. Ctrl+C to stop.
 """
 import logging
@@ -29,6 +29,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from zoneinfo import ZoneInfo
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(ROOT, "scripts"))
 
 
 def get_env(key):
@@ -52,7 +53,7 @@ DATA_FILE = os.path.join(ROOT, "data", subdir, "advice-log.json")
 IMPORT_SCRIPT = os.path.join(ROOT, "scripts", "etoro_import.py")
 SCREEN_SCRIPT = os.path.join(ROOT, "scripts", "screen.py")
 ADVICE_LOG_SCRIPT = os.path.join(ROOT, "scripts", "advice_log.py")
-LEARN_SCRIPT = os.path.join(ROOT, "scripts", "learn_stats.py")
+LEARN_SCRIPT = os.path.join(ROOT, "scripts", "review_stats.py")
 AUTOSYNC_SCRIPT = os.path.join(ROOT, "scripts", "autosync.py")
 PID_FILE = os.path.join(ROOT, "tmp", "serve.pid")
 DEFAULT_PORT = int(get_env("PORT") or 8742)
@@ -88,6 +89,12 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ROOT, **kwargs)
 
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
+        super().end_headers()
+
 
     def do_POST(self):
         if self.path == "/api/save":
@@ -100,8 +107,23 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_error(404)
 
     def do_GET(self):
-        if self.path in ("/data/advice-log.json", "/data/portfolio.json", "/data/eod.md", "/data/news.md"):
+        if self.path in ("/data/advice-log.json", "/data/portfolio.json", "/data/eod.md", "/data/news.md", "/data/REVIEWS.md", "/data/equity-history.json", "/data/custom_instruments.json"):
             self.path = self.path.replace("/data/", f"/data/{subdir}/")
+
+        if self.path == f"/data/{subdir}/custom_instruments.json":
+            data = {}
+            base_path = os.path.join(ROOT, "data", "instruments.json")
+            cache_path = os.path.join(ROOT, "data", subdir, "custom_instruments.json")
+            if os.path.exists(base_path):
+                with open(base_path) as f:
+                    try: data.update(json.load(f))
+                    except: pass
+            if os.path.exists(cache_path):
+                with open(cache_path) as f:
+                    try: data.update(json.load(f))
+                    except: pass
+            self.respond_json(200, data)
+            return
 
         if self.path == "/api/status":
             self.respond_json(
@@ -109,6 +131,7 @@ class Handler(SimpleHTTPRequestHandler):
                     "ok": True, "pid": os.getpid(), "root": ROOT})
         elif self.path == "/api/stats":
             self.handle_stats()
+
         elif self.path.startswith("/api/news"):
             self.handle_news()
         elif self.path.startswith("/api/macro"):
@@ -262,8 +285,8 @@ class Handler(SimpleHTTPRequestHandler):
                 return
             # import holdings get their prices from the eToro sync, not from
             # scraping
-            tickers = [e["ticker"] for e in entries if e.get("source") != "import"
-                       and e.get("status") in ("watching", "bought")]
+            tickers = list({e["ticker"] for e in entries if e.get("source") != "import"
+                            and e.get("status") in ("watching", "dropped")})
             if not tickers:
                 self.respond_json(
                     200, {
@@ -290,8 +313,8 @@ class Handler(SimpleHTTPRequestHandler):
                 self.respond_json(502, {"ok": False, "step": "quote",
                                         "error": f"bad quote json: {exc}"})
                 return
-            market_today = datetime.now(
-                ZoneInfo("America/New_York")).date().isoformat()
+            import nyse
+            market_today = nyse.nyse_today().isoformat()
             price_map = {t: {"price": q["price"], "earningsDate": q.get("Earnings Date")}
                          for t, q in quotes.items()
                          if is_refreshable_quote(q, market_today)}
@@ -331,7 +354,7 @@ class Handler(SimpleHTTPRequestHandler):
     def handle_stats(self):
         if is_demo:
             try:
-                with open(os.path.join(ROOT, "data", "sample", "learn-stats.json")) as f:
+                with open(os.path.join(ROOT, "data", "sample", "review-stats.json")) as f:
                     self.respond_json(200, json.load(f))
                 return
             except OSError:
@@ -374,7 +397,7 @@ class Handler(SimpleHTTPRequestHandler):
 
         try:
             proc = subprocess.run(
-                [sys.executable, SCREEN_SCRIPT, "news", "--json", *tickers[:20]],
+                [sys.executable, SCREEN_SCRIPT, "news", "--json", *tickers[:45]],
                 capture_output=True, text=True, timeout=60, cwd=ROOT)
         except subprocess.TimeoutExpired:
             self.respond_json(

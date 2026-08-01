@@ -6,31 +6,41 @@
 <title>YaraFolio</title>
 <link rel="icon" type="image/png" href="static/img/yara-logo.png">
 <script src="static/js/vendor/chart.umd.min.js" defer></script>
-<link rel="stylesheet" href="static/css/styles.css">
+<script src="static/js/vendor/chartjs-chart-treemap.min.js" defer></script>
+<link rel="stylesheet" href="static/css/styles.css?v=1.1">
+<script>
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+</script>
 
 </head>
 <body>
   <h1 style="display: flex; align-items: center; gap: 16px; margin-bottom: 8px; font-size: 36px; font-weight: 800; letter-spacing: -0.5px;">
-    <img src="static/img/yara-logo.png" alt="Yara" style="width: 64px; height: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));" onclick="document.getElementById('yaraModal').hidden=false" title="YaraFolio">
+    <img src="static/img/yara-logo.png" alt="Yara" style="width: 64px; height: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));" onclick="document.getElementById('yaraModal').showModal()" title="YaraFolio">
     YaraFolio
   </h1>
   <div class="header-row">
     <p class="subtitle" id="lastUpdated">Loading...</p>
     <div id="marketTimer" style="margin-left: 12px; display: flex; align-items: center; white-space: nowrap; height: 26px;"></div>
-    <button id="syncBtn" style="margin-left:auto">&#x21bb; Sync Data</button>
-    <select id="locationSelect" style="display:none; padding: 6px 10px; border-radius: 8px; background: var(--card); border: 1px solid var(--border); color: var(--text); font-size: 13px;"></select>
+    <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+      <button id="syncBtn">&#x21bb; Sync Data</button>
+      <select id="locationSelect" style="display:none;" aria-label="Location Select"></select>
+      <button id="themeToggle" aria-label="Toggle Theme" title="Toggle Dark/Light Mode">◑</button>
+    </div>
   </div>
   <div id="banner"></div>
   <div class="cards" style="margin-bottom: 12px;">
-    <div class="card"><div class="label">Advised picks<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoAdvisedPicks').hidden=false" title="What are Advised Picks?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cTracked">0</div></div>
-    <div class="card"><div class="label">Open positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoOpenPositions').hidden=false" title="What are Open Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cOpen">0</div></div>
-    <div class="card"><div class="label">Watching<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWatching').hidden=false" title="What does Watching mean?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cWatching">0</div></div>
+    <div class="card"><div class="label">Open positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoOpenPositions').showModal()" title="What are Open Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cOpen">0</div></div>
+    <div class="card"><div class="label">Closed positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoClosedPositions').showModal()" title="What are Closed Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cClosed">0</div></div>
+    <div class="card"><div class="label">Watching<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWatching').showModal()" title="What does Watching mean?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cWatching">0</div></div>
+    <div class="card"><div class="label">Ignored positions<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoIgnoredPositions').showModal()" title="What are Ignored Positions?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cIgnored">0</div></div>
+    <div class="card"><div class="label">Advised picks<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoAdvisedPicks').showModal()" title="What are Advised Picks?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cTracked">0</div></div>
   </div>
   <div class="cards">
-    <div class="card"><div class="label">Win rate (closed)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWinRate').hidden=false" title="What is Win Rate?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pWinRate">-</div></div>
-    <div class="card"><div class="label">Realized P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoRealized').hidden=false" title="What is Realized P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pRealized">-</div></div>
-    <div class="card"><div class="label">Open P/L (unrealized)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoOpenPL').hidden=false" title="What is Open P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pOpen">-</div></div>
-    <div class="card"><div class="label">Total P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoTotalPL').hidden=false" title="What is Total P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pTotal">-</div></div>
+    <div class="card"><div class="label">Realized P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoRealized').showModal()" title="What is Realized P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pRealized">-</div></div>
+    <div class="card"><div class="label">Open P/L (unrealized)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoOpenPL').showModal()" title="What is Open P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pOpen">-</div></div>
+    <div class="card"><div class="label">Total P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoTotalPL').showModal()" title="What is Total P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pTotal">-</div></div>
+    <div class="card"><div class="label">Win rate (closed)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWinRate').showModal()" title="What is Win Rate?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="pWinRate">-</div></div>
   </div>
 
   <div class="search-row">
@@ -39,8 +49,7 @@
   </div>
 
   <div class="tabs" id="tabs">
-    <button data-tab="advice" class="active">Advice</button>
-
+    <button data-tab="advice">Advice</button>
     <button data-tab="positions">Positions</button>
     <button data-tab="portfolio">Portfolio</button>
     <button data-tab="analytics">Analytics</button>
@@ -49,13 +58,15 @@
     <button data-tab="rawnews">News Feed</button>
     <button data-tab="macro">Macro Calendar</button>
     <button data-tab="ipos">IPO Tracker</button>
+    <button data-tab="reviews">Learnings</button>
   </div>
 
-  <section id="tab-advice" class="tab-section active">
+  <section id="tab-advice" class="tab-section">
     <div class="panel">
       <h2 style="display:flex; align-items:center; gap:8px;">
         Watchlist (live advice)
-        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('adviceInfoModal').hidden=false" title="What do the ratings and levels mean?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('adviceInfoModal').showModal()" title="What do the ratings and levels mean?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <button id="btnManualBlacklist" class="refresh-btn" style="margin-left:auto;">+ Add to Blacklist</button>
       </h2>
       <div class="filters" id="filters">
         <button data-filter="watching" class="active">Watching</button>
@@ -65,6 +76,7 @@
         <button data-filter="gap">Sector gap</button>
         <button data-filter="under">Underweight</button>
         <button data-filter="dropped">Dropped</button>
+        <button data-filter="blacklisted">Blacklisted</button>
       </div>
       <table id="adviceTable">
         <thead>
@@ -96,7 +108,7 @@
     <div class="panel">
       <h2 style="display:flex; align-items:center; gap:8px;">
         Positions from advice (bought &amp; sold)
-        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('posInfoModal').hidden=false" title="What's this tab?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('posInfoModal').showModal()" title="What's this tab?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
       </h2>
       <div class="filters" id="posFilters">
         <button data-posfilter="all">All</button>
@@ -111,6 +123,7 @@
             <th data-key="openDate">Bought on</th>
             <th data-key="closedDate">Closed on</th>
             <th data-key="ticker">Ticker</th>
+            <th data-key="rating">Rating</th>
             <th data-key="priceAtAdvice">Advised At</th>
             <th data-key="boughtAt">Bought</th>
             <th data-key="units">Units</th>
@@ -132,10 +145,26 @@
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <h2 style="margin:0; display:flex; align-items:center; gap:8px;">
           eToro holdings
-          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('portfolioInfoModal').hidden=false" title="About portfolio"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('portfolioInfoModal').showModal()" title="About portfolio"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         </h2>
+        <div class="filters chart-toggles" id="portfolioTabModeToggles" style="margin:0;">
+          <button data-mode="table" class="active">Holdings</button>
+          <button data-mode="heatmap">Heatmap (AI Advised)</button>
+          <button data-mode="heatmap-all">Heatmap (Entire Portfolio)</button>
+        </div>
       </div>
-      <div class="filters view-toggle" style="margin-top: 16px;">
+
+      <div id="portfolioHeatmapContainer" style="margin-top: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+          <div id="heatmapSubtitle" style="font-size: 0.85rem; color: var(--text-muted);">Based on Open P/L</div>
+        </div>
+        <div class="chart-wrap" style="height: 600px;">
+          <canvas id="chartPortfolioHeatmap"></canvas>
+        </div>
+      </div>
+
+      <div id="portfolioTableContainer" style="display:none;">
+        <div class="filters view-toggle" style="margin-top: 16px;">
         <button id="btnCollapse" class="active">Collapse</button>
         <button id="btnSplit">Split</button>
       </div>
@@ -158,37 +187,154 @@
         <tbody></tbody>
       </table>
       <div class="empty" id="portfolioEmpty" style="display:none">No portfolio snapshot yet. Click "Update from eToro" or run /import in the AI CLI.</div>
-    </div>
-    <div class="panel">
-      <h2>Sector coverage vs full taxonomy</h2>
-      <div class="donut-row">
-        <div class="donut-wrap"><canvas id="sectorCoverageChart"></canvas></div>
-        <ul class="gap-list" id="sectorGaps"></ul>
-      </div>
-    </div>
-    <div class="panel">
-      <h2>Sector division (invested $)</h2>
-      <div class="donut-row">
-        <div class="donut-wrap"><canvas id="sectorChart"></canvas></div>
-        <ul class="sector-list" id="sectorList"></ul>
       </div>
     </div>
   </section>
 
   <section id="tab-analytics" class="tab-section">
     <div class="cards" id="analyticsCards"></div>
+
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Equity Curve <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoEquity').showModal()" title="About Equity Curve"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles" id="equityToggles" style="margin-top:0;">
+          <button data-tf="24h" class="active">24h</button>
+          <button data-tf="7d">7d</button>
+          <button data-tf="30d">30d</button>
+          <button data-tf="12m">12m</button>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="chartEquity"></canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Realized P/L <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRealized').showModal()" title="About Realized P/L"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles" id="pnlToggles" style="margin-top:0;">
+          <button data-tf="month" class="active">Month</button>
+          <button data-tf="year">Year</button>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:14px;">
+        <button id="pnlPrevBtn" class="refresh-btn">&larr; Prev</button>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span id="pnlLabel" style="font-weight:600; min-width:120px; text-align:center;"></span>
+          <div class="filters chart-toggles" id="pnlYearGroupToggles" style="margin:0; display:none;">
+            <button data-group="week">Week</button>
+            <button data-group="month" class="active">Month</button>
+            <button data-group="quarter">Quarter</button>
+          </div>
+        </div>
+        <button id="pnlNextBtn" class="refresh-btn">Next &rarr;</button>
+      </div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="chartRealizedPnl"></canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Underwater Drawdown <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDrawdown').showModal()" title="About Underwater Drawdown"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles" id="drawdownToggles" style="margin-top:0;">
+          <button data-tf="24h" class="active">24h</button>
+          <button data-tf="7d">7d</button>
+          <button data-tf="30d">30d</button>
+          <button data-tf="12m">12m</button>
+        </div>
+      </div>
+      <div class="chart-wrap" style="height:200px;">
+        <canvas id="chartDrawdown"></canvas>
+      </div>
+    </div>
+    <div class="panel">
+      <h2 style="margin:0; margin-bottom:16px; display:flex; align-items:center; gap:8px;">Sector Analysis <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSectorAnalysis').showModal()" title="About Sector Analysis"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+      <div style="display: flex; flex-wrap: wrap; gap: 24px;">
+        <div style="flex: 1 1 300px;">
+          <h3 style="margin-top:0; font-size: 14px; color: var(--muted); margin-bottom: 12px;">Coverage vs taxonomy</h3>
+          <div class="donut-row">
+            <div class="donut-wrap"><canvas id="sectorCoverageChart"></canvas></div>
+            <ul class="gap-list" id="sectorGaps"></ul>
+          </div>
+        </div>
+        <div style="flex: 1 1 300px;">
+          <h3 style="margin-top:0; font-size: 14px; color: var(--muted); margin-bottom: 12px;">Division (invested $)</h3>
+          <div class="donut-row">
+            <div class="donut-wrap"><canvas id="sectorChart"></canvas></div>
+            <ul class="sector-list" id="sectorList"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 24px;">
-        <h2 style="margin:0;">Analytics</h2>
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">~7 days after advice <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSevenDays').showModal()" title="About 7 days chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
         <div id="analyticsUpdated" style="color:var(--muted);font-size:12px;"></div>
       </div>
-      <h2>~7 days after advice <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSevenDays').hidden=false" title="About 7 days chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
       <div id="sevenDayBox"></div>
     </div>
-    <div class="panel"><h2>Win rate &amp; move by rating <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRating').hidden=false" title="About rating chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRating"></canvas></div><div id="chartRatingNote"></div></div>
-    <div class="panel"><h2>By RSI band <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRsi').hidden=false" title="About RSI band chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartRsiBand"></canvas></div><div id="chartRsiBandNote"></div></div>
-    <div class="panel"><h2>By sector <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSector').hidden=false" title="About sector chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div></div>
-    <div class="panel"><h2>By source <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSource').hidden=false" title="About source chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div></div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Trade Efficiency <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoGainVsDays').showModal()" title="About trade efficiency chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles toggle-bucket" data-target="chartGainVsDays" style="margin-top:0;">
+          <button class="active" data-type="pct">%</button>
+          <button data-type="dol">$</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartGainVsDays"></canvas></div><div id="chartGainVsDaysNote"></div>
+    </div>
+    <div class="panel"><h2>Win rate: over time <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoWinRateTrend').showModal()" title="About win rate trend chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartWinRateTrend"></canvas></div><div id="chartWinRateTrendNote"></div></div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Win rate: by rating <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRating').showModal()" title="About rating chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles toggle-bucket" data-target="chartRating" style="margin-top:0;">
+          <button data-type="pct" class="active">%</button>
+          <button data-type="dol">$</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartRating"></canvas></div><div id="chartRatingNote"></div>
+    </div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Win rate: by RSI <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoRsi').showModal()" title="About RSI band chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles toggle-bucket" data-target="chartRsiBand" style="margin-top:0;">
+          <button data-type="pct" class="active">%</button>
+          <button data-type="dol">$</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartRsiBand"></canvas></div><div id="chartRsiBandNote"></div>
+    </div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Win rate: by sector <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSector').showModal()" title="About sector chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles toggle-bucket" data-target="chartSector" style="margin-top:0;">
+          <button data-type="pct" class="active">%</button>
+          <button data-type="dol">$</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartSector"></canvas></div><div id="chartSectorNote"></div>
+    </div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">Win rate: by source <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoSource').showModal()" title="About source chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles toggle-bucket" data-target="chartSource" style="margin-top:0;">
+          <button data-type="pct" class="active">%</button>
+          <button data-type="dol">$</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartSource"></canvas></div><div id="chartSourceNote"></div>
+    </div>
+    <div class="panel"><h2>Entry Discipline <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoEntryDiscipline').showModal()" title="About entry discipline chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartEntryDiscipline"></canvas></div><div id="chartEntryDisciplineNote"></div></div>
+    <div class="panel"><h2>Days to Bounce vs RSI <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDaysVsRsi').showModal()" title="About days vs rsi chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2><div class="chart-wrap"><canvas id="chartDaysVsRsi"></canvas></div><div id="chartDaysVsRsiNote"></div></div>
+    <div class="panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="margin:0; display:flex; align-items:center; gap:8px;">By Day of the Week <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon am" onclick="document.getElementById('infoDayOfWeek').showModal()" title="About day of week chart"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></h2>
+        <div class="filters chart-toggles" id="dayOfWeekToggles" style="margin-top:0;">
+          <button data-type="bought" class="active">Bought</button>
+          <button data-type="advised">Advised</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="chartDayOfWeek"></canvas></div><div id="chartDayOfWeekNote"></div>
+    </div>
     <div class="empty" id="analyticsEmpty" style="display:none">Not enough finished advice yet to learn from. Outcomes appear once picks are sold, dropped, or 7+ days old.</div>
   </section>
 
@@ -196,7 +342,7 @@
     <div class="panel">
       <h2 style="display:flex; align-items:center; gap:8px;">
         End of Day Reports
-        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('eodInfoModal').hidden=false" title="About End of Day"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('eodInfoModal').showModal()" title="About End of Day"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
       </h2>
       <div id="eodList" style="margin-top: 16px;"></div>
       <div class="empty" id="eodEmpty" style="display:none">No EOD reports logged yet.</div>
@@ -208,7 +354,7 @@
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
         <h2 style="margin:0; display:flex; align-items:center; gap:8px;">
           This Week's Macro Economic Events
-          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('macroInfoModal').hidden=false" title="About Macro events"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('macroInfoModal').showModal()" title="About Macro events"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         </h2>
         <button id="refreshMacroBtn" class="refresh-btn">&#x21bb; Refresh Calendar</button>
       </div>
@@ -237,18 +383,18 @@
     <div class="panel">
       <h2 style="display:flex; align-items:center; gap:8px;">
         AI Summaries
-        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('newsInfoModal').hidden=false" title="About News"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('newsInfoModal').showModal()" title="About News"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
       </h2>
       <div id="newsSummary" style="margin-top: 16px;"></div>
     </div>
   </section>
 
-  <section id="tab-rawnews" class="tab-section" style="display:none;">
+  <section id="tab-rawnews" class="tab-section">
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
         <h2 style="display:flex; align-items:center; gap:8px;">
           News Feed (Last 48 Hours)
-          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('rawNewsInfoModal').hidden=false" title="What is the News Feed tab?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('rawNewsInfoModal').showModal()" title="What is the News Feed tab?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         </h2>
         <button id="refreshRawNewsBtn" style="display:inline-block">&#x21bb; Fetch Latest</button>
       </div>
@@ -263,12 +409,12 @@
     </div>
   </section>
 
-  <section id="tab-ipos" class="tab-section" style="display:none">
+  <section id="tab-ipos" class="tab-section">
     <div class="panel">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
         <h2 style="margin:0; display:flex; align-items:center; gap:8px;">
           Initial Public Offerings (IPOs)
-          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('iposInfoModal').hidden=false" title="How this works"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('iposInfoModal').showModal()" title="How this works"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
         </h2>
         <button id="refreshIposBtn" class="refresh-btn">&#x21bb; Refresh IPOs</button>
       </div>
@@ -290,6 +436,35 @@
     </div>
   </section>
 
+  <section id="tab-reviews" class="tab-section">
+    <div class="panel">
+      <h2 style="display:flex; align-items:center; gap:8px;">
+        Strategy Learnings &amp; Deep Dives
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('reviewsInfoModal').showModal()" title="About Learnings"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      </h2>
+      <div id="reviewsContent" style="margin-top: 16px;"></div>
+    </div>
+    </section>
+
+  <!-- Prevent FOUC by setting active tab synchronously before first paint -->
+  <script>
+    (function() {
+      var initialTab = window.location.hash.slice(1) || localStorage.getItem('activeTab') || 'advice';
+      var sec = document.getElementById('tab-' + initialTab);
+      var btn = document.querySelector('.tabs button[data-tab="' + initialTab + '"]');
+      if (sec) sec.style.display = 'block';
+      else {
+        var defaultSec = document.getElementById('tab-advice');
+        if (defaultSec) defaultSec.style.display = 'block';
+      }
+      if (btn) btn.classList.add('active');
+      else {
+        var defaultBtn = document.querySelector('.tabs button[data-tab="advice"]');
+        if (defaultBtn) defaultBtn.classList.add('active');
+      }
+    })();
+  </script>
+
   <footer style="margin-top: 60px; padding: 30px; text-align: center; color: var(--muted); font-size: 13px; border-top: 1px solid var(--border);">
     <a href="https://github.com/arnoudhgz/yarafolio" target="_blank" style="color: var(--muted); margin: 0 15px; text-decoration: none;">
       <svg viewBox="0 0 24 24" width="15" height="15" style="vertical-align: -2px; margin-right: 4px;" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
@@ -297,52 +472,43 @@
     </a>
     <a href="https://ko-fi.com/arnoudhgz" target="_blank" style="color: var(--muted); margin: 0 15px; text-decoration: none;">Buy me a coffee ☕</a>
     <a href="https://www.etoro.com/people/arnoudhgz" target="_blank" style="color: var(--muted); margin: 0 15px; text-decoration: none;">Follow me on eToro 📈</a>
-    <a href="https://etoro.tw/46AcIfc" target="_blank" style="color: var(--muted); margin: 0 15px; text-decoration: none;">Join eToro 🤝</a>
+    <a href="https://www.etoro.com/?ref=26106514" target="_blank" style="color: var(--muted); margin: 0 15px; text-decoration: none;">Join eToro 🤝</a>
     <div id="version-info" style="margin-top: 15px; font-size: 11px; opacity: 0.7;"></div>
   </footer>
 
-  <div id="modal" class="modal-backdrop" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true">
+  <dialog id="modal" class="modal-card" role="dialog" aria-modal="true">
       <button class="modal-close" aria-label="Close">&times;</button>
       <div id="modalBody" style="display: flex; gap: 40px; flex: 1; min-height: 0;"></div>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="macroModal" class="modal-backdrop" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(650px, 92vw); height: auto; max-height: 90vh; padding: 32px;">
-      <button class="modal-close" onclick="document.getElementById('macroModal').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="macroModal" class="modal-card" role="dialog" aria-modal="true" style="width: min(650px, 92vw); height: fit-content; max-height: 90vh; padding: 32px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('macroModal').close()" aria-label="Close">&times;</button>
       <div id="macroModalBody"></div>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="posInfoModal" class="modal-backdrop" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(600px, 92vw); height: auto; padding: 32px;">
-      <button class="modal-close" onclick="document.getElementById('posInfoModal').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="posInfoModal" class="modal-card" role="dialog" aria-modal="true" style="width: min(600px, 92vw); height: fit-content; padding: 32px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('posInfoModal').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">What is this tab?</h2>
-      <p style="margin-bottom:16px; color:var(--text); line-height:1.5;">This tab only tracks individual eToro lots that were opened <em>after</em> the stock was advised by the system. For a complete view of all your current eToro holdings (including unadvised stocks), see the <a href="#" onclick="document.getElementById('posInfoModal').hidden=true; document.querySelector('.tabs button[data-tab=\'portfolio\']').click(); return false;" style="color: var(--blue); text-decoration: none;">Portfolio tab</a>.</p>
+      <p style="margin-bottom:16px; color:var(--text); line-height:1.5;">This tab only tracks individual eToro lots that were opened <em>after</em> the stock was advised by the system. For a complete view of all your current eToro holdings (including unadvised stocks), see the <a href="#" onclick="document.getElementById('posInfoModal').close(); document.querySelector('.tabs button[data-tab=\'portfolio\']').click(); return false;" style="color: var(--blue); text-decoration: none;">Portfolio tab</a>.</p>
       <ul style="color:var(--muted); line-height:1.6; padding-left:20px; margin:0;">
         <li style="margin-bottom:8px;">One row per eToro lot, kept forever. Only lots opened on/after a pick's advice date count as the advice's trade.</li>
         <li style="margin-bottom:8px;"><strong>P/L $</strong> is real money, per lot: closed = (sold - bought) x units, open = (now - bought) x units.</li>
         <li>An <span class="badge est">est</span> badge means the lot was auto-closed when it vanished from eToro and the exit is the last price we saw. The <strong>Needs confirm</strong> filter lists those; click Confirm to set the real exit.</li>
       </ul>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="rawNewsInfoModal" class="modal-backdrop" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
-      <button class="modal-close" onclick="document.getElementById('rawNewsInfoModal').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="rawNewsInfoModal" class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: fit-content; padding: 32px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('rawNewsInfoModal').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">What is the News Feed tab?</h2>
       <ul style="color:var(--muted); line-height:1.6; padding-left:20px; margin:0;">
         <li style="margin-bottom:8px;">This tab displays unedited, real-time news headlines pulled directly from Yahoo Finance and other sources.</li>
         <li style="margin-bottom:8px;">These raw headlines serve as the foundation for the AI-generated summaries on the <strong>AI News</strong> tab.</li>
         <li style="margin-bottom:8px;">Use the filters (All, Advised, eToro) to narrow down the news stream to your current holdings or watchlist candidates.</li>
       </ul>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="adviceInfoModal" class="modal-backdrop" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(650px, 92vw); height: auto; padding: 32px;">
-      <button class="modal-close" onclick="document.getElementById('adviceInfoModal').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="adviceInfoModal" class="modal-card" role="dialog" aria-modal="true" style="width: min(650px, 92vw); height: fit-content; padding: 32px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('adviceInfoModal').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">What do the ratings and levels mean?</h2>
       <ul style="color:var(--muted); line-height:1.6; padding-left:20px; margin:0;">
         <li style="margin-bottom:8px;"><strong>A</strong> = clean overreaction: strong balance sheet, clear catalyst for recovery.</li>
@@ -356,12 +522,10 @@
         <li style="margin-bottom:8px;"><strong>Sector</strong>: <span style="color:var(--red);font-weight:600">red</span> = a sector you hold none of (a gap), <span style="color:var(--orange);font-weight:600">orange</span> = underweight (under 5% of your portfolio). The Sector gap / Underweight filters show only those. Same logic as the Portfolio sector-coverage view.</li>
         <li>This tab is your live watchlist. Once you buy a pick it moves to the <strong>Positions</strong> tab. If you drop a pick, it can be viewed by selecting the <strong>Dropped</strong> filter.</li>
       </ul>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="iposInfoModal" class="modal-backdrop" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
-      <button class="modal-close" onclick="document.getElementById('iposInfoModal').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="iposInfoModal" class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: fit-content; padding: 32px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('iposInfoModal').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">How this works</h2>
       <ul style="color:var(--muted); line-height:1.6; padding-left:20px; margin:0;">
         <li style="margin-bottom:8px;"><strong>Recent:</strong> IPOs from the last 2 months.</li>
@@ -369,47 +533,44 @@
         <li style="margin-bottom:8px;"><strong>eToro likely:</strong> We flag an IPO if it has a Deal Size > $200M or Market Cap > $1B. eToro almost exclusively lists well-capitalized or high-profile brands.</li>
         <li><strong>Drop:</strong> Hide an IPO if you are not interested in it so it won't show up in your advice runs anymore.</li>
       </ul>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="portfolioInfoModal" class="modal-backdrop" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
-      <button class="modal-close" onclick="document.getElementById('portfolioInfoModal').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="portfolioInfoModal" class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: fit-content; padding: 32px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('portfolioInfoModal').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">About eToro Holdings</h2>
       <p style="color:var(--muted); line-height:1.6; margin:0;">This tab shows your entire eToro portfolio, including both advised and unadvised positions. The sector charts help you quickly identify diversification gaps (red) or underweighted sectors (orange).</p>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="eodInfoModal" class="modal-backdrop" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
-      <button class="modal-close" onclick="document.getElementById('eodInfoModal').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="eodInfoModal" class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: fit-content; padding: 32px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('eodInfoModal').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">About End of Day</h2>
       <p style="color:var(--muted); line-height:1.6; margin:0; margin-bottom:12px;">The End of Day check helps you secure small profits on low-conviction picks before the market closes, minimizing overnight gap risk.</p>
       <p style="color:var(--muted); line-height:1.6; margin:0;"><strong>How to use:</strong> Run the <code>/eod</code> command in the AI CLI shortly before the US market closes to generate this report.</p>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="macroInfoModal" class="modal-backdrop" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
-      <button class="modal-close" onclick="document.getElementById('macroInfoModal').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="macroInfoModal" class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: fit-content; padding: 32px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('macroInfoModal').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">About Macro Events</h2>
       <p style="color:var(--muted); line-height:1.6; margin:0;">This tab displays major economic events for the week that could cause market volatility. It helps you stay aware of days where the market might act unpredictably due to macro data releases.</p>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="newsInfoModal" class="modal-backdrop" hidden>
-    <div class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: auto; padding: 32px;">
-      <button class="modal-close" onclick="document.getElementById('newsInfoModal').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="newsInfoModal" class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: fit-content; padding: 32px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('newsInfoModal').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">About News</h2>
       <p style="color:var(--muted); line-height:1.6; margin:0 0 16px 0;">This tab provides AI-generated summaries and a raw news feed for the tickers you are tracking, helping you quickly spot red flags or catalysts.</p>
       <p style="color:var(--muted); line-height:1.6; margin:0;"><strong>How to generate summaries:</strong> Open your terminal and type <code>/news</code> to run the standard news aggregation. You can also give the AI a specific focus by typing something like <code>/news focus on upcoming earnings</code>.</p>
-    </div>
-  </div>
+    </dialog>
+
+  <dialog id="reviewsInfoModal" class="modal-card" role="dialog" aria-modal="true" style="width: min(500px, 92vw); height: fit-content; padding: 32px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('reviewsInfoModal').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">About Learnings</h2>
+      <p style="color:var(--muted); line-height:1.6; margin:0;">This tab displays ad-hoc analysis, strategy review outcomes, and deep dives on specific tickers (like false-positives or IPO checks) generated by the AI to help refine our trading strategy over time.</p>
+    </dialog>
 
 <script src="static/js/vendor/marked.min.js"></script>
 <script type="module" src="static/js/main.js"></script>
 
-  <div id="yaraModal" class="modal-backdrop" hidden onclick="this.hidden=true" style="background: transparent; backdrop-filter: none; align-items: flex-start; padding-top: 8vh;">
+    <dialog id="yaraModal" style="width: 100vw; height: 100vh; max-width: none; max-height: none; margin: 0; padding: 0; background: transparent; border: none; display: flex; justify-content: center; align-items: flex-start; padding-top: 8vh;" onclick="if(event.target===this) this.close()">
     <div class="sparkle-bg">
       <!-- 4-pointed stars (Bigger!) -->
       <div class="sparkle" style="top: 10%; left: 15%; width: 40px; height: 40px; animation-duration: 4s; animation-delay: 0s;"></div>
@@ -451,106 +612,191 @@
       <div class="sparkle-dot" style="top: 40%; left: 70%; width: 6px; height: 6px; animation: sparkle-blink 4.6s infinite 1.7s;"></div>
       <div class="sparkle-dot" style="top: 70%; left: 55%; width: 8px; height: 8px; animation: sparkle-blink 3.1s infinite 0.6s;"></div>
     </div>
-    <div class="modal-card" style="width: auto; height: auto; padding: 24px; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; border: none; box-shadow: none; display: flex; flex-direction: column; align-items: center; z-index: 10;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('yaraModal').hidden=true" aria-label="Close" style="background: var(--card); border-radius: 50%; width: 32px; height: 32px; right: 0; top: 0;">&times;</button>
+    <div style="position: relative; display: flex; flex-direction: column; align-items: center; z-index: 10;">
+      <button class="modal-close" onclick="document.getElementById('yaraModal').close()" aria-label="Close" style="background: var(--card); border-radius: 50%; width: 32px; height: 32px; right: 0; top: 0;">&times;</button>
       <img src="static/img/yara-logo-large.png" alt="Yara (Princess)" style="width: min(600px, 90vw); height: auto; filter: drop-shadow(0 8px 32px rgba(0,0,0,0.5));">
     </div>
-  </div>
+  </dialog>
 
-  <div id="infoAdvisedPicks" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoAdvisedPicks').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="infoAdvisedPicks" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoAdvisedPicks').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Advised picks</h2>
       <p style="margin-bottom:0;">The total number of unique stock recommendations generated by Yara (the AI) via advice commands. It does not include positions manually imported without prior AI advice.</p>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="infoOpenPositions" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoOpenPositions').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="infoOpenPositions" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoOpenPositions').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Open positions</h2>
       <p style="margin-bottom:0;">The number of currently active eToro positions (lots) derived from Yara's advised picks.</p>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="infoWatching" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoWatching').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="infoClosedPositions" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoClosedPositions').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Closed positions</h2>
+      <p style="margin-bottom:0;">The number of eToro positions (lots) that have been successfully sold or closed.</p>
+    </dialog>
+
+  <dialog id="infoIgnoredPositions" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoIgnoredPositions').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Ignored positions</h2>
+      <p style="margin-bottom:0;">The number of advised picks that were dropped, avoided, or blacklisted without being bought.</p>
+    </dialog>
+
+  <dialog id="infoWatching" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoWatching').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Watching</h2>
       <p style="margin-bottom:0;">The number of advised picks that you are actively tracking but have not necessarily bought or dropped yet.</p>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="infoWinRate" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoWinRate').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="infoWinRate" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoWinRate').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Win rate (closed)</h2>
       <p style="margin-bottom:0;">The percentage of closed positions that ended with a positive return (profit).</p>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="infoRealized" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoRealized').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="infoEquity" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoEquity').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Equity Curve</h2>
+      <p style="margin-bottom:0;">Tracks your total Realized and Open P/L over time based on the active portfolio. Snapshots are recorded securely on each data update.</p>
+    </dialog>
+
+  <dialog id="infoDrawdown" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-body">
+      <h2 style="margin-top:0; margin-bottom:16px;">Underwater Drawdown</h2>
+      <p>Tracks the portfolio's percentage drop from its all-time high over time. This exposes the true psychological pain and market volatility you are enduring while holding these positions.</p>
+    </div>
+  </dialog>
+
+  <dialog id="infoRealized" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoRealized').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Realized P/L</h2>
       <p style="margin-bottom:0;">The total cumulative Profit/Loss in dollars from all closed positions.</p>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="infoOpenPL" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoOpenPL').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="infoOpenPL" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoOpenPL').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Open P/L (unrealized)</h2>
       <p style="margin-bottom:0;">The total current floating Profit/Loss in dollars from all active open positions.</p>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="infoTotalPL" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoTotalPL').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="infoTotalPL" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoTotalPL').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Total P/L</h2>
       <p style="margin-bottom:0;">The sum of Realized P/L and Open P/L, representing the total overall Profit/Loss from all positions.</p>
-    </div>
-  </div>
-  <div id="infoSevenDays" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoSevenDays').hidden=true" aria-label="Close">&times;</button>
+    </dialog>
+  <dialog id="infoSevenDays" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoSevenDays').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">~7 days after advice</h2>
       <p style="margin-bottom:0;">Tracks the median performance of picks specifically over their first 7 days following the AI recommendation. This highlights the short-term accuracy of the entry points.</p>
-    </div>
-  </div>
+    </dialog>
 
-  <div id="infoRating" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoRating').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="infoRating" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoRating').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Win rate &amp; move by rating</h2>
-      <p style="margin-bottom:0;">Breaks down the success rate and average profit/loss depending on the conviction rating assigned by the AI (e.g., 'Strong Buy' vs 'Buy'). This helps visualize if higher-conviction picks perform better.</p>
-    </div>
-  </div>
+      <p style="margin-bottom:12px; line-height: 1.6;">Breaks down the success rate depending on the conviction rating assigned by the AI. Toggle between <strong>%</strong> (average percentage move) and <strong>$</strong> (total absolute profit) to see which ratings actually harvest the most money.</p>
+      <ul style="color:var(--muted); line-height:1.6; padding-left:20px; margin:0;">
+        <li style="margin-bottom:8px;"><strong>A</strong> = Extreme conviction: clean overreaction, pristine balance sheet, immediate clear catalyst.</li>
+        <li style="margin-bottom:8px;"><strong>B</strong> = Decent bounce odds, some open questions. Default for most good setups.</li>
+        <li style="margin-bottom:8px;"><strong>C</strong> = Cheap for a reason, falling-knife risk.</li>
+        <li style="margin-bottom:0;"><strong>+ / -</strong> modifiers shade quality within the grade.</li>
+      </ul>
+    </dialog>
 
-  <div id="infoRsi" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoRsi').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="infoRsi" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoRsi').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">By RSI band</h2>
-      <p style="margin-bottom:0;">Analyzes performance based on how oversold a stock was when advised (its RSI). It helps determine whether catching stocks at more extreme oversold levels yields higher win rates.</p>
-    </div>
-  </div>
+      <p style="margin-bottom:0;">Analyzes performance based on how oversold a stock was when advised. Use the <strong>% / $</strong> toggle to flip between the average percentage move and the total realized dollar profit per band.</p>
+    </dialog>
 
-  <div id="infoSector" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoSector').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="infoSector" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoSector').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">By sector</h2>
-      <p style="margin-bottom:0;">Shows which specific sectors your strategy performs best or worst in. Useful for recognizing blindspots or avoiding perma-bear sectors.</p>
-    </div>
-  </div>
+      <p style="margin-bottom:0;">Shows which specific sectors your strategy performs best or worst in. The <strong>% / $</strong> toggle lets you see which sectors actually yield the highest absolute dollar returns.</p>
+    </dialog>
 
-  <div id="infoSource" class="modal-backdrop" hidden onclick="this.hidden=true">
-    <div class="modal-card" style="max-width: 500px;" onclick="event.stopPropagation()">
-      <button class="modal-close" onclick="document.getElementById('infoSource').hidden=true" aria-label="Close">&times;</button>
+  <dialog id="infoSource" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoSource').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">By source</h2>
-      <p style="margin-bottom:0;">Compares the performance between different types of runs (e.g., standard /advice vs. /premarket vs. /aftermarket vs. /diversify).</p>
-    </div>
-  </div>
+      <p style="margin-bottom:12px;">Compares the performance between different types of runs to identify which strategy is yielding the best results (toggleable between % and $):</p>
+      <ul style="margin: 0; padding-left: 20px; line-height: 1.6; font-size: 14px; color: var(--text);">
+        <li><strong style="color: var(--blue);">/advice:</strong> Standard intraday runs hunting for oversold bounces.</li>
+        <li><strong style="color: var(--blue);">/premarket:</strong> Early runs capitalizing on premarket movers before the bell.</li>
+        <li><strong style="color: var(--blue);">/aftermarket:</strong> Post-close runs targeting overreactions and earnings drops.</li>
+        <li><strong style="color: var(--blue);">/diversify:</strong> Picks specifically chosen to fill underweighted portfolio sectors.</li>
+        <li><strong style="color: var(--blue);">/momentum & others:</strong> Specialized strategies like breakouts or insider buying.</li>
+        <li><strong style="color: var(--blue);">manual:</strong> Custom tickers added manually via /check or direct import.</li>
+      </ul>
+    </dialog>
+
+  <dialog id="infoGainVsDays" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-body">
+      <button class="modal-close" onclick="document.getElementById('infoGainVsDays').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Trade Efficiency</h2>
+      <p>A scatter plot of every closed position, plotting <strong>Days Held</strong> against the return. Use the <strong>% / $</strong> toggle to visualize if you are efficiently taking absolute profits or if holding longer leads to diminishing returns.</p>
+    </dialog>
+
+  <dialog id="infoDayOfWeek" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoDayOfWeek').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">By Day of the Week</h2>
+      <p style="margin-bottom:0;">Groups performance by the weekday a trade was entered. Toggle between <strong>Bought</strong> (only trades actually executed) and <strong>Advised</strong> (all virtual AI recommendations) to evaluate if specific days offer better statistical edge for entry.</p>
+    </dialog>
+
+  <dialog id="infoWinRateTrend" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoWinRateTrend').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Win Rate Over Time</h2>
+      <p style="margin-bottom:0;">Line chart tracking the Win Rate % of advice generated per month. Highlights if the strategy is losing its edge in the current market regime.</p>
+    </dialog>
+
+  <dialog id="infoEntryDiscipline" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoEntryDiscipline').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Entry Discipline</h2>
+      <p style="margin-bottom:0;">Average Profit/Loss % comparing stocks bought inside the Buy Zone vs stocks chased above target, or bought outside the safety bounds (Above Drop Above, Below Drop Below).</p>
+    </dialog>
+
+  <dialog id="infoDaysVsRsi" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoDaysVsRsi').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Days to Bounce vs RSI</h2>
+      <p style="margin-bottom:0;">Average days held for WINNING trades, grouped by the RSI at the time of advice. Answers if deeply oversold stocks bounce faster.</p>
+    </dialog>
+
+  <dialog id="infoSectorAnalysis" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoSectorAnalysis').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Sector Analysis</h2>
+      <p style="margin-bottom:12px;"><strong>Coverage vs taxonomy:</strong> Shows your portfolio's sector distribution compared to the full 11 GICS sectors. We use true GICS sectors instead of eToro's labels for better accuracy.</p>
+      <p style="margin-bottom:0;"><strong>Division (invested $):</strong> Shows the invested dollar amount per sector.</p>
+    </dialog>
+
+  <dialog id="blacklistModal" class="modal-card" style="max-width: 400px; padding: 24px;" onclick="if(event.target===this) closeBlacklistModal()">
+      <button class="modal-close" onclick="closeBlacklistModal()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:20px; font-size: 20px;" id="blacklistModalTitle">Blacklist Stock</h2>
+      
+      <div style="margin-bottom: 20px;" id="blacklistTickerGroup">
+        <label style="display:block; margin-bottom: 8px; font-weight: 600; color: var(--muted);">TICKER SYMBOL</label>
+        <input type="text" id="blacklistTickerInput" style="width:100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; text-transform: uppercase;" placeholder="e.g. AAPL">
+      </div>
+
+      <div style="margin-bottom: 24px;">
+        <label style="display:block; margin-bottom: 8px; font-weight: 600; color: var(--muted);">REASON</label>
+        <div id="blacklistTags" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+        </div>
+        <input type="text" id="blacklistNewReason" style="width:100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px;" placeholder="Or type a new reason..." autocomplete="off">
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <button onclick="closeBlacklistModal()" style="padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-weight: 600; font-size: 13px;">Cancel</button>
+        <button onclick="submitBlacklist()" style="padding: 8px 16px; border-radius: 6px; border: none; background: var(--red); color: white; cursor: pointer; font-weight: 600; font-size: 13px;">Blacklist</button>
+      </div>
+    </dialog>
+
+  <dialog id="confirmModal" class="modal-card" style="max-width: 400px; padding: 24px;" onclick="if(event.target===this) closeConfirmModal()">
+      <button class="modal-close" onclick="closeConfirmModal()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px; font-size: 20px;" id="confirmModalTitle">Confirm Action</h2>
+      <p id="confirmModalMessage" style="margin-bottom: 24px; color: var(--text); line-height: 1.5;"></p>
+      <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <button onclick="closeConfirmModal()" style="padding: 8px 16px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; font-weight: 600; font-size: 13px;">Cancel</button>
+        <button id="confirmModalActionBtn" style="padding: 8px 16px; border-radius: 6px; border: none; background: var(--red); color: white; cursor: pointer; font-weight: 600; font-size: 13px;">Confirm</button>
+      </div>
+    </dialog>
 
 </body>
 </html>

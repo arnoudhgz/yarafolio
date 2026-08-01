@@ -34,6 +34,16 @@
       "status": "installed",
       "disabled": false,
       "error": null
+    },
+    "review": {
+      "status": "installed",
+      "disabled": false,
+      "error": null
+    },
+    "oversold": {
+      "status": "installed",
+      "disabled": false,
+      "error": null
     }
   }
 }

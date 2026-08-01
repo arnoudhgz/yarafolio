@@ -1,5 +1,5 @@
 // @ts-check
-import { DATA, setDATA, PORTFOLIO, setPORTFOLIO, setCanSave, LEARN, setLEARN } from './state.js';
+import { DATA, LEARN, setLEARN } from './state.js';
 import { banner } from './ui.js';
 import { today, nowStr, tickerLink, esc } from './utils.js';
 import { renderAll } from './renderers.js';
@@ -31,7 +31,7 @@ export async function applyChange(mutate) {
 
 export async function loadLearn() {
   if (LEARN) return;
-  for (const url of ['/api/stats', 'data/learn-stats.json']) {
+  for (const url of ['/api/stats', 'data/review-stats.json']) {
     try {
       const res = await fetch(url, { cache: 'no-store' });
       if (res.ok) { setLEARN(await res.json()); return; }
@@ -79,8 +79,9 @@ export async function fetchMacro(force = false) {
           const dateObj = new Date(Number(parts[2]), Number(parts[0]) - 1, Number(parts[1]));
           if (!isNaN(dateObj.getTime())) {
             displayDate = dateObj.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const nyStr = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
+            const nyDate = new Date(nyStr);
+            const today = new Date(nyDate.getFullYear(), nyDate.getMonth(), nyDate.getDate());
             if (dateObj < today) {
               isPast = true;
             } else if (dateObj.getTime() === today.getTime()) {
@@ -142,8 +143,10 @@ export async function fetchIpos(force = false) {
     
     let html = '';
     let hasNearIpo = false;
-    const now = new Date();
-    const tomorrow = new Date(); tomorrow.setDate(now.getDate() + 1);
+    const nyStr = new Date().toLocaleString("en-US", {timeZone: "America/New_York"});
+    const nyDate = new Date(nyStr);
+    const now = new Date(nyDate.getFullYear(), nyDate.getMonth(), nyDate.getDate());
+    const tomorrow = new Date(nyDate.getFullYear(), nyDate.getMonth(), nyDate.getDate() + 1);
     
     /**
      * @param {string} t
@@ -221,25 +224,32 @@ export async function fetchIpos(force = false) {
  */
 // @ts-ignore
 window.markNotListed = async function(ticker) {
-  if (confirm(`Mark ${ticker} as permanently NOT listed on eToro?`)) {
-    const existing = DATA.entries.find(e => e.ticker === ticker);
-    if (existing) {
-      existing.status = 'avoid';
-      existing.reason = 'Not listed on eToro';
-    } else {
-      DATA.entries.push({
-        id: crypto.randomUUID(),
-        ticker: ticker,
-        status: 'avoid',
-        reason: 'Not listed on eToro',
-        source: 'manual',
-        firstAdvised: today(),
-        priceAtAdvice: 0,
-        priceHistory: []
-      });
+  const openConfirmModal = /** @type {any} */ (window).openConfirmModal;
+  openConfirmModal(
+    'Mark Not Listed',
+    `Mark ${ticker} as permanently NOT listed on eToro?`,
+    'Mark',
+    'red',
+    async () => {
+      const existing = DATA.entries.find(e => e.ticker === ticker);
+      if (existing) {
+        existing.status = 'avoid';
+        existing.reason = 'Not listed on eToro';
+      } else {
+        DATA.entries.push({
+          id: crypto.randomUUID(),
+          ticker: ticker,
+          status: 'avoid',
+          reason: 'Not listed on eToro',
+          source: 'manual',
+          firstAdvised: today(),
+          priceAtAdvice: 0,
+          priceHistory: []
+        });
+      }
+      await save();
+      fetchIpos(); // Re-render IPO tables
+      renderAll(); // Re-render other tabs if needed
     }
-    await save();
-    fetchIpos(); // Re-render IPO tables
-    renderAll(); // Re-render other tabs if needed
-  }
+  );
 };

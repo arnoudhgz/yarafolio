@@ -1,0 +1,46 @@
+name: eToro Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      data_repo:
+        description: 'Name of the Data Repository'
+        required: true
+        default: 'etoro-portfolio-data'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Checkout Data Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/${{ github.event.inputs.data_repo }}
+          path: data/private
+          token: ${{ secrets.DATA_REPO_PAT }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run eToro Sync
+        env:
+          ETORO_API_KEY: ${{ secrets.ETORO_API_KEY }}
+          ETORO_USER_KEY: ${{ secrets.ETORO_USER_KEY }}
+        run: |
+          python3 scripts/etoro_import.py preview
+          python3 scripts/etoro_import.py merge
+
+      - name: Commit and Push Changes to Data Repo
+        run: |
+          cd data/private
+          git config --global user.name "Yarafolio Companion"
+          git config --global user.email "companion@yarafolio.local"
+          git add portfolio.json advice-log.json custom_instruments.json
+          # Only commit if there are changes
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-sync from eToro via Mobile Companion" && git push)

@@ -1,18 +1,21 @@
 // @ts-check
-import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
+import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, portfolioTabMode, setPortfolioTabMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
-import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot } from './renderers.js';
+import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart, renderDrawdownChart, renderRealizedPnlChart, setPnlTf, setPnlYearGroup, shiftPnlDate } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
 import { applyChange, fetchMacro, fetchIpos, loadLearn } from './api.js';
 import { marketHolidays } from './holidays.js';
 
 async function load() {
   try {
-    const [logRes, pfRes, eodRes, newsRes] = await Promise.all([
+    const [logRes, pfRes, eodRes, newsRes, revRes, equityRes, instrRes] = await Promise.all([
       fetch('data/advice-log.json', { cache: 'no-store' }),
       fetch('data/portfolio.json', { cache: 'no-store' }),
       fetch('data/eod.md', { cache: 'no-store' }).catch(() => null),
-      fetch('data/news.md', { cache: 'no-store' }).catch(() => null)
+      fetch('data/news.md', { cache: 'no-store' }).catch(() => null),
+      fetch('data/REVIEWS.md', { cache: 'no-store' }).catch(() => null),
+      fetch('data/equity-history.json', { cache: 'no-store' }).catch(() => null),
+      fetch('data/custom_instruments.json', { cache: 'no-store' }).catch(() => null)
     ]);
     if (!logRes.ok) throw new Error(logRes.statusText);
     const logData = await logRes.json();
@@ -39,6 +42,18 @@ async function load() {
         });
     } else { logData.newsSummaries = []; }
 
+    if (revRes && revRes.ok) {
+      /** @type {any} */ (logData).reviewsMd = await revRes.text();
+    } else { /** @type {any} */ (logData).reviewsMd = null; }
+
+    if (equityRes && equityRes.ok) {
+      /** @type {any} */ (logData).equityHistory = await equityRes.json();
+    }
+
+    if (instrRes && instrRes.ok) {
+      /** @type {any} */ (window).ETORO_CACHE = await instrRes.json();
+    }
+
     setDATA(logData);
     setPORTFOLIO(pfRes.ok ? await pfRes.json() : { lastUpdated: null, totalInvested: 0, holdings: [] });
     setCanSave(location.protocol.startsWith('http'));
@@ -52,11 +67,11 @@ async function load() {
           sel.style.display = 'block';
           
           const saved = localStorage.getItem('etoroLocation');
-          if (data.active !== undefined && data.active !== null) {
+          if (saved && data.prefixes.includes(saved)) {
+            sel.value = saved;
+          } else if (data.active !== undefined && data.active !== null) {
             sel.value = data.active;
             localStorage.setItem('etoroLocation', data.active);
-          } else if (saved && data.prefixes.includes(saved)) {
-            sel.value = saved;
           }
           sel.addEventListener('change', () => {
             localStorage.setItem('etoroLocation', sel.value);
@@ -90,11 +105,8 @@ async function load() {
   setFilterActive('#rawNewsFilters', newsFilter);
   setFilterActive('#ipoFilters', ipoFilter);
 
-  const savedTab = localStorage.getItem('activeTab');
-  if (savedTab && savedTab !== 'advice') {
-    const tabBtn = document.querySelector(`.tabs button[data-tab="${savedTab}"]`);
-    if (tabBtn instanceof HTMLElement) tabBtn.click();
-  }
+  const tabBtn = document.querySelector(`.tabs button[data-tab="${activeTab}"]`);
+  if (tabBtn instanceof HTMLElement) tabBtn.click();
 
   // Background check for near-term IPOs to update the tab dot
   if (/** @type {HTMLElement} */ (document.getElementById('iposBody')).innerHTML === '') {
@@ -110,6 +122,147 @@ if (portfolioViewMode === 'split') {
   /** @type {HTMLElement} */ (document.getElementById('btnSplit')).classList.remove('active');
 }
 
+document.querySelectorAll('#portfolioTabModeToggles button').forEach(b => {
+  b.classList.remove('active');
+  if (/** @type {HTMLButtonElement} */ (b).dataset.mode === portfolioTabMode) b.classList.add('active');
+});
+
+let currentBlacklistEntryId = null;
+
+let currentConfirmCallback = null;
+
+function closeConfirmModal() {
+  /** @type {HTMLDialogElement} */ (document.getElementById('confirmModal')).close();
+  currentConfirmCallback = null;
+}
+
+/**
+ * @param {string} title
+ * @param {string} message
+ * @param {string} actionText
+ * @param {string} [actionColor]
+ * @param {() => void} [callback]
+ */
+function openConfirmModal(title, message, actionText, actionColor, callback) {
+  document.getElementById('confirmModalTitle').textContent = title;
+  document.getElementById('confirmModalMessage').textContent = message;
+  const btn = document.getElementById('confirmModalActionBtn');
+  btn.textContent = actionText;
+  btn.style.background = actionColor ? (actionColor.startsWith('var') ? actionColor : `var(--${actionColor})`) : 'var(--red)';
+  
+  currentConfirmCallback = callback;
+  btn.onclick = function() {
+    if (currentConfirmCallback) currentConfirmCallback();
+    closeConfirmModal();
+  };
+  
+  /** @type {HTMLDialogElement} */ (document.getElementById('confirmModal')).showModal();
+  
+  // Set focus to the action button so the user can just hit Enter
+  setTimeout(() => btn.focus(), 0);
+}
+
+window['closeConfirmModal'] = closeConfirmModal;
+window['openConfirmModal'] = openConfirmModal;
+
+function closeBlacklistModal() {
+  const modal = /** @type {HTMLDialogElement|null} */ (document.getElementById('blacklistModal'));
+  if (modal) modal.close();
+  currentBlacklistEntryId = null;
+  const newReasonInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistNewReason'));
+  if (newReasonInput) newReasonInput.value = '';
+}
+window['closeBlacklistModal'] = closeBlacklistModal;
+
+function submitBlacklist() {
+  const tickerInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistTickerInput'));
+  const newReasonInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistNewReason'));
+  let ticker = (tickerInput?.value || '').toUpperCase().trim();
+  const selectedTag = document.querySelector('.reason-tag.selected');
+  const newReason = (newReasonInput?.value || '').trim();
+  let reason = newReason || (selectedTag ? selectedTag.textContent : '');
+  
+  if (!ticker) {
+    alert("Please provide a ticker symbol.");
+    return;
+  }
+  
+  let entry = /** @type {any} */ (currentBlacklistEntryId 
+    ? DATA.entries.find(e => e.id === currentBlacklistEntryId) 
+    : DATA.entries.find(e => e.ticker === ticker));
+
+  if (entry) {
+    applyChange(() => {
+      entry.status = 'blacklisted';
+      entry.droppedDate = today();
+      if (reason) entry.blacklistReason = reason;
+    });
+  } else {
+    applyChange(() => {
+      DATA.entries.push(/** @type {any} */ ({
+        id: crypto.randomUUID(),
+        ticker: ticker,
+        status: 'blacklisted',
+        blacklistReason: reason,
+        source: 'manual',
+        firstAdvised: today(),
+        priceAtAdvice: 0,
+        priceHistory: []
+      }));
+    });
+  }
+  closeBlacklistModal();
+}
+(/** @type {any} */ window)['submitBlacklist'] = submitBlacklist;
+
+function openBlacklistModal(entryId = null) {
+  currentBlacklistEntryId = entryId;
+  const modal = /** @type {HTMLDialogElement|null} */ (document.getElementById('blacklistModal'));
+  const tickerInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistTickerInput'));
+  const tagsContainer = /** @type {HTMLElement|null} */ (document.getElementById('blacklistTags'));
+  const tickerGroup = /** @type {HTMLElement|null} */ (document.getElementById('blacklistTickerGroup'));
+  
+  if (!modal || !tickerInput || !tagsContainer || !tickerGroup) return;
+
+  let defaultReasons = new Set(['paused', 'not listed']);
+  DATA.entries.forEach(e => {
+    const blacklistReason = /** @type {any} */ (e).blacklistReason;
+    if (blacklistReason) defaultReasons.add(blacklistReason);
+  });
+  
+  tagsContainer.innerHTML = '';
+  defaultReasons.forEach(reason => {
+    const tag = document.createElement('div');
+    tag.className = 'reason-tag';
+    tag.textContent = reason;
+    tag.onclick = () => {
+      document.querySelectorAll('.reason-tag').forEach(t => t.classList.remove('selected'));
+      tag.classList.add('selected');
+      const newReasonInput = /** @type {HTMLInputElement|null} */ (document.getElementById('blacklistNewReason'));
+      if (newReasonInput) newReasonInput.value = '';
+    };
+    tagsContainer.appendChild(tag);
+  });
+  
+  if (entryId) {
+    const entry = /** @type {any} */ (DATA.entries.find(e => e.id === entryId));
+    tickerGroup.style.display = 'block';
+    if (entry) tickerInput.value = entry.ticker;
+    tickerInput.disabled = true;
+  } else {
+    tickerGroup.style.display = 'block';
+    tickerInput.value = '';
+    tickerInput.disabled = false;
+  }
+  
+  modal.showModal();
+}
+(/** @type {any} */ window)['openBlacklistModal'] = openBlacklistModal;
+
+document.getElementById('btnManualBlacklist')?.addEventListener('click', () => {
+  openBlacklistModal();
+});
+
 /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).addEventListener('click', () => {
   setPortfolioViewMode('collapsed');
   /** @type {HTMLElement} */ (document.getElementById('btnCollapse')).classList.add('active');
@@ -123,8 +276,29 @@ if (portfolioViewMode === 'split') {
   renderPortfolioTable();
 });
 
-/** @type {HTMLElement} */ (document.getElementById('macroModal')).addEventListener('click', e => {
-  if (/** @type {HTMLElement} */ (e.target).id === 'macroModal') /** @type {HTMLElement} */ (document.getElementById('macroModal')).hidden = true;
+document.getElementById('macroModal')?.addEventListener('click', e => {
+  if (/** @type {HTMLElement} */ (e.target).id === 'macroModal') /** @type {HTMLDialogElement} */ (document.getElementById('macroModal')).close();
+});
+
+document.getElementById('portfolioHeatmapContainer').style.display = (portfolioTabMode === 'heatmap' || portfolioTabMode === 'heatmap-all') ? 'block' : 'none';
+
+
+
+document.getElementById('portfolioTabModeToggles')?.addEventListener('click', ev => {
+  const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
+  if (!btn) return;
+  setPortfolioTabMode(btn.dataset.mode);
+  document.querySelectorAll('#portfolioTabModeToggles button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const mode = btn.dataset.mode;
+  if (mode === 'heatmap' || mode === 'heatmap-all') {
+    document.getElementById('portfolioHeatmapContainer').style.display = 'block';
+  } else {
+    document.getElementById('portfolioHeatmapContainer').style.display = 'none';
+  }
+  
+  renderPortfolioTable();
 });
 
 document.querySelectorAll('.tabs button').forEach(b => {
@@ -151,6 +325,7 @@ document.querySelectorAll('.tabs button').forEach(b => {
     else if (activeTab === 'portfolio') { if (!portfolioRendered) renderPortfolio(); else renderPortfolioTable(); }
     else if (activeTab === 'eod') renderEOD();
     else if (activeTab === 'news') renderAINews();
+    else if (activeTab === 'reviews') renderReviews();
     else /** @type {HTMLElement} */ (document.getElementById('searchCount')).textContent = '';
     if (activeTab === 'analytics') { loadLearn().then(renderAnalytics); }
       if (activeTab === 'rawnews' && !/** @type {any} */ (window).rawNewsLoaded) {
@@ -168,7 +343,15 @@ document.querySelectorAll('.tabs button').forEach(b => {
   content.innerHTML = '';
   
   try {
-    const tickers = (DATA.entries || []).filter(e => e.status === 'watching' || e.status === 'bought').map(e => e.ticker).join(',');
+    const activeEntries = (DATA.entries || []).filter(e => e.status === 'watching' || e.status === 'bought');
+    activeEntries.sort((a, b) => {
+      if (a.status === 'watching' && b.status !== 'watching') return -1;
+      if (b.status === 'watching' && a.status !== 'watching') return 1;
+      const tA = new Date(a.firstAdvised || 0).getTime();
+      const tB = new Date(b.firstAdvised || 0).getTime();
+      return (isNaN(tB) ? 0 : tB) - (isNaN(tA) ? 0 : tA);
+    });
+    const tickers = activeEntries.map(e => e.ticker).join(',');
     if (!tickers) throw new Error("No active tickers to fetch news for.");
     
     const res = await fetch('/api/news?tickers=' + encodeURIComponent(tickers));
@@ -229,11 +412,22 @@ document.querySelectorAll('.tabs button').forEach(b => {
 
 /** @type {HTMLElement} */ (document.getElementById('refreshIposBtn')).addEventListener('click', () => fetchIpos(true));
 /** @type {HTMLElement} */ (document.getElementById('refreshMacroBtn')).addEventListener('click', () => fetchMacro(true));
+/** @type {HTMLElement} */ (document.getElementById('refreshReviewsBtn'))?.addEventListener('click', async () => {
+  try {
+    const revRes = await fetch('data/REVIEWS.md', { cache: 'no-store' });
+    if (revRes.ok) {
+      /** @type {any} */ (DATA).reviewsMd = await revRes.text();
+      renderReviews();
+    }
+  } catch (err) { }
+});
 
-function headerSortHandler(tableId, stateKey, render) {
+function headerSortHandler(tableId, stateKeyOrFn, render) {
   document.querySelector('#' + tableId + ' thead').addEventListener('click', (ev) => {
     const th = /** @type {HTMLElement} */ (ev.target).closest('th[data-key]');
     if (!th) return;
+    const stateKey = typeof stateKeyOrFn === 'function' ? stateKeyOrFn() : stateKeyOrFn;
+    if (!sortState[stateKey]) sortState[stateKey] = { key: 'firstAdvised', dir: -1 };
     const state = sortState[stateKey];
     const key = th.getAttribute('data-key');
     if (state.key === key) state.dir = -state.dir;
@@ -244,7 +438,7 @@ function headerSortHandler(tableId, stateKey, render) {
 }
 headerSortHandler('adviceTable', 'advice', renderTable);
 
-headerSortHandler('positionsTable', 'positions', renderPositions);
+headerSortHandler('positionsTable', () => 'positions_' + posFilter, renderPositions);
 headerSortHandler('portfolioTable', 'portfolio', renderPortfolioTable);
 
 const adviceClickHandler = (ev) => {
@@ -259,13 +453,23 @@ const adviceClickHandler = (ev) => {
   if (btn.dataset.act === 'drop') {
     const entry = DATA.entries.find(e => e.id === btn.dataset.id);
     applyChange(() => { entry.status = 'dropped'; entry.droppedDate = today(); });
+  } else if (btn.dataset.act === 'blacklist') {
+    openBlacklistModal(btn.dataset.id);
   } else if (btn.dataset.act === 'rewatch') {
     const entry = DATA.entries.find(e => e.id === btn.dataset.id);
     applyChange(() => { entry.status = 'watching'; delete entry.droppedDate; });
   } else if (btn.dataset.act === 'remove') {
-    if (confirm('Are you sure you want to completely remove ' + btn.dataset.id + ' from the log?')) {
-      applyChange(() => { DATA.entries = DATA.entries.filter(e => e.id !== btn.dataset.id); });
-    }
+    const entry = DATA.entries.find(e => e.id === btn.dataset.id);
+    const displayName = entry ? (entry.name ? `${entry.ticker} (${entry.name})` : entry.ticker) : btn.dataset.id;
+    openConfirmModal(
+      'Remove Entry',
+      `Are you sure you want to completely remove ${displayName} from the log?`,
+      'Remove',
+      'red',
+      () => {
+        applyChange(() => { entry.status = 'removed'; });
+      }
+    );
   }
 };
 /** @type {HTMLElement} */ (document.querySelector('#adviceTable tbody')).addEventListener('click', adviceClickHandler);
@@ -280,14 +484,80 @@ const adviceClickHandler = (ev) => {
   renderTable();
 });
 
-/** @type {HTMLElement} */ (document.getElementById('posFilters')).addEventListener('click', (ev) => {
-  const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
-  if (!btn) return;
-  document.querySelectorAll('#posFilters button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  setPosFilter(btn.dataset.posfilter);
-  renderPositions();
+/** @type {HTMLElement} */ (document.getElementById('posFilters')).addEventListener('click', ev => {
+  const t = /** @type {HTMLElement} */ (ev.target);
+  if (t.tagName === 'BUTTON' && t.dataset.posfilter) {
+    document.querySelectorAll('#posFilters button').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    setPosFilter(t.dataset.posfilter);
+    renderPositions();
+  }
 });
+
+/** @type {HTMLElement} */ (document.getElementById('equityToggles'))?.addEventListener('click', e => {
+  const t = /** @type {HTMLElement} */ (e.target);
+  if (t.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#equityToggles button').forEach(b => b.classList.remove('active'));
+  t.classList.add('active');
+  import('./renderers.js').then(r => r.renderEquityChart(t.dataset.tf));
+});
+
+/** @type {HTMLElement} */ (document.getElementById('drawdownToggles'))?.addEventListener('click', e => {
+  const t = /** @type {HTMLElement} */ (e.target);
+  if (t.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#drawdownToggles button').forEach(b => b.classList.remove('active'));
+  t.classList.add('active');
+  import('./renderers.js').then(r => r.renderDrawdownChart(t.dataset.tf));
+});
+
+/** @type {HTMLElement} */ (document.getElementById('dayOfWeekToggles'))?.addEventListener('click', e => {
+  const t = /** @type {HTMLElement} */ (e.target);
+  if (t.tagName !== 'BUTTON') return;
+  document.querySelectorAll('#dayOfWeekToggles button').forEach(b => b.classList.remove('active'));
+  t.classList.add('active');
+  import('./renderers.js').then(r => {
+    const soldLots = r.positionLotRows().filter(row => row.status === 'sold');
+    r.renderDayOfWeekChart('chartDayOfWeek', soldLots);
+  });
+});
+
+document.querySelectorAll('.toggle-bucket').forEach(el => {
+  const bucket = /** @type {HTMLElement} */ (el);
+  bucket.addEventListener('click', e => {
+    const t = /** @type {HTMLElement} */ (e.target);
+    if (t.tagName !== 'BUTTON') return;
+    bucket.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    const targetChart = bucket.dataset.target;
+    import('./renderers.js').then(r => {
+      if (r.bucketModes && targetChart) {
+        r.bucketModes[targetChart] = t.dataset.type;
+        r.reRenderAnalyticsChart(targetChart);
+      }
+    });
+  });
+});
+
+/** @type {HTMLElement} */ (document.getElementById('pnlToggles')).addEventListener('click', ev => {
+  const t = /** @type {HTMLElement} */ (ev.target);
+  if (t.tagName === 'BUTTON' && t.dataset.tf) {
+    document.querySelectorAll('#pnlToggles button').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    setPnlTf(t.dataset.tf);
+  }
+});
+
+/** @type {HTMLElement} */ (document.getElementById('pnlYearGroupToggles')).addEventListener('click', ev => {
+  const t = /** @type {HTMLElement} */ (ev.target);
+  if (t.tagName === 'BUTTON' && t.dataset.group) {
+    document.querySelectorAll('#pnlYearGroupToggles button').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    setPnlYearGroup(t.dataset.group);
+  }
+});
+
+/** @type {HTMLElement} */ (document.getElementById('pnlPrevBtn')).addEventListener('click', () => shiftPnlDate(-1));
+/** @type {HTMLElement} */ (document.getElementById('pnlNextBtn')).addEventListener('click', () => shiftPnlDate(1));
 
 /** @type {HTMLElement} */ (document.getElementById('rawNewsFilters')).addEventListener('click', (ev) => {
   const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
@@ -356,6 +626,27 @@ const adviceClickHandler = (ev) => {
   }
 });
 
+/** @type {HTMLElement} */ (document.getElementById('themeToggle')).addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  const next = current === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+
+  setTimeout(() => {
+    if (activeTab === 'advice') renderTable();
+    if (activeTab === 'positions') renderPositions();
+    if (activeTab === 'portfolio') renderPortfolio();
+    if (activeTab === 'analytics') {
+        renderAnalytics();
+        const tf = document.querySelector('#equityToggles button.active')?.getAttribute('data-tf') || '24h';
+        renderEquityChart(tf);
+        const dtf = document.querySelector('#drawdownToggles button.active')?.getAttribute('data-tf') || '24h';
+        renderDrawdownChart(dtf);
+        renderRealizedPnlChart();
+    }
+  }, 10);
+});
+
 /** @type {HTMLElement} */ (document.getElementById('syncBtn')).addEventListener('click', async () => {
   const btn = /** @type {HTMLElement} */ (document.getElementById('syncBtn'));
   const sel = /** @type {HTMLSelectElement} */ (document.getElementById('locationSelect'));
@@ -421,19 +712,19 @@ const adviceClickHandler = (ev) => {
   }, 180));
 });
 
-const modalEl = /** @type {HTMLElement} */ (document.getElementById('modal'));
+const modalEl = /** @type {HTMLDialogElement} */ (document.getElementById('modal'));
 modalEl.addEventListener('click', (ev) => {
   if (ev.target === modalEl || /** @type {HTMLElement} */ (ev.target).closest('.modal-close')) closeModal();
 });
 document.addEventListener('keydown', (ev) => {
   if (ev.key === 'Escape') {
-    if (!modalEl.hidden) closeModal();
-    document.querySelectorAll('.modal-backdrop:not([hidden])').forEach(m => /** @type {HTMLElement} */ (m).hidden = true);
+    if (modalEl.open) closeModal();
+    document.querySelectorAll('dialog[open]').forEach(m => /** @type {HTMLDialogElement} */ (m).close());
   }
 });
 document.addEventListener('click', (ev) => {
-  if (ev.target instanceof HTMLElement && ev.target.classList.contains('modal-backdrop')) {
-    ev.target.hidden = true;
+  if (/** @type {HTMLElement} */ (ev.target).tagName === 'DIALOG' && /** @type {HTMLElement} */ (ev.target).id !== 'modal') {
+    /** @type {HTMLDialogElement} */ (ev.target).close();
   }
 });
 

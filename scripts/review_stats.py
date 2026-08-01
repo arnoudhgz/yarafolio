@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Outcome stats for the advice tracker. Read-only, used by /learn.
+"""Outcome stats for the advice tracker. Read-only, used by /review.
 
 Usage:
-  python3 scripts/learn_stats.py               # human-readable bucket tables
-  python3 scripts/learn_stats.py --json        # machine output
-  python3 scripts/learn_stats.py --count-only  # just the measurable-outcome count
+  python3 scripts/review_stats.py               # human-readable bucket tables
+  python3 scripts/review_stats.py --json        # machine output
+  python3 scripts/review_stats.py --count-only  # just the measurable-outcome count
 
 Import-source entries are excluded: they're holdings, not advice, so they say
 nothing about advice quality.
@@ -19,6 +19,7 @@ import argparse
 import json
 import os
 import statistics
+import math
 import logging
 import sys
 from datetime import date, datetime, timedelta
@@ -56,15 +57,23 @@ def get_env(key: str) -> str | None:
 
 
 class LearnStats:
-    RSI_BANDS = (("<20", 0, 20), ("20-25", 20, 25),
-                 ("25-30", 25, 30), ("30+", 30, 10 ** 6))
+    RSI_BANDS = (
+        ("<20", 0, 20),
+        ("20-30", 20, 30),
+        ("30-40", 30, 40),
+        ("40-50", 40, 50),
+        ("50-60", 50, 60),
+        ("60-70", 60, 70),
+        ("70+", 70, 10 ** 6)
+    )
     MIN_BUCKET = 1
 
     def __init__(self):
         is_demo = get_env("DEMO_MODE") == "1"
         subdir = "sample" if is_demo else "private"
         self.log_file = os.path.join(ROOT, "data", subdir, "advice-log.json")
-        self.out_file = os.path.join(ROOT, "data", subdir, "learn-stats.json")
+        self.equity_file = os.path.join(ROOT, "data", subdir, "equity-history.json")
+        self.out_file = os.path.join(ROOT, "data", subdir, "review-stats.json")
 
     def parse_date(self, s: str) -> date:
         return datetime.strptime(s[:10], "%Y-%m-%d").date()
@@ -126,7 +135,13 @@ class LearnStats:
         for key, pct in rows:
             grouped.setdefault(key, []).append(pct)
         out = {}
-        for key, pcts in sorted(grouped.items(), key=lambda kv: str(kv[0])):
+        def sort_key(kv):
+            k = str(kv[0])
+            if k.startswith('<'): return f"000_{k}"
+            if '-' in k and k.split('-')[0].isdigit(): return f"{int(k.split('-')[0]):03d}_{k}"
+            if k.endswith('+') and k[:-1].isdigit(): return f"{int(k[:-1]):03d}_{k}"
+            return k
+        for key, pcts in sorted(grouped.items(), key=sort_key):
             if len(pcts) < self.MIN_BUCKET:
                 out[key] = {"n": len(pcts), "insufficient": True}
             else:
@@ -138,10 +153,69 @@ class LearnStats:
                 }
         return out
 
+    def portfolio_metrics(self) -> dict:
+        try:
+            with open(self.equity_file) as f:
+                history = json.load(f)
+        except (OSError, ValueError):
+            return {"mdd": None, "sharpe": None}
+            
+        if not history or len(history) < 2:
+            return {"mdd": None, "sharpe": None}
+            
+        current_index = 100.0
+        peak = 100.0
+        mdd = 0.0
+        for i in range(len(history)):
+            h = history[i]
+            if i > 0:
+                prev = history[i-1]
+                delta = h.get("total", 0) - prev.get("total", 0)
+                active_capital = max(h.get("invested", 0), prev.get("invested", 0))
+                r = (delta / active_capital) if active_capital > 0 else 0
+                current_index = current_index * (1 + r)
+            
+            if current_index > peak:
+                peak = current_index
+            dd = (peak - current_index) / peak if peak > 0 else 0
+            if dd > mdd:
+                mdd = dd
+                
+        daily_equity = {}
+        for h in history:
+            try:
+                dt = datetime.strptime(h["timestamp"][:16], "%Y-%m-%dT%H:%M")
+                day_str = dt.strftime("%Y-%m-%d")
+                daily_equity[day_str] = h.get("invested", 0) + h.get("total", 0)
+            except ValueError:
+                continue
+        
+        daily_values = list(daily_equity.values())
+        if len(daily_values) < 2:
+            return {"mdd": round(mdd * 100, 2), "sharpe": None}
+            
+        daily_returns = [(daily_values[i] - daily_values[i-1]) / daily_values[i-1] 
+                         for i in range(1, len(daily_values)) if daily_values[i-1] > 0]
+                         
+        if not daily_returns:
+            return {"mdd": round(mdd * 100, 2), "sharpe": None}
+            
+        avg_ret = statistics.mean(daily_returns)
+        std_ret = statistics.pstdev(daily_returns) if len(daily_returns) > 1 else 0
+        risk_free = 0.04 / 252
+        
+        sharpe = (avg_ret - risk_free) / std_ret * math.sqrt(252) if std_ret > 0 else None
+        
+        return {
+            "mdd": round(mdd * 100, 2),
+            "sharpe": round(sharpe, 2) if sharpe is not None else None
+        }
+
     def collect(self) -> dict:
         with open(self.log_file) as f:
             data = json.load(f)
-        today = date.today()
+        import nyse
+        today = nyse.nyse_today()
         advised = [e for e in data["entries"] if e.get("source") != "import"]
 
         measurable = []
@@ -187,6 +261,7 @@ class LearnStats:
                     statistics.median(seven),
                     2) if seven else None,
             },
+            "portfolio": self.portfolio_metrics(),
         }
 
     def print_human(self, stats: dict) -> None:
@@ -208,6 +283,12 @@ class LearnStats:
                     logger.info(
                         f"  {key:16} n={s['n']:<3} win {s['winRate']:5.1f}%  "
                         f"avg {s['avg']:+7.2f}%  median {s['median']:+7.2f}%")
+        p = stats.get("portfolio", {})
+        if p.get("mdd") is not None:
+            sharpe_str = f"{p['sharpe']:.2f}" if p.get("sharpe") is not None else "N/A"
+            logger.info(f"\nPortfolio metrics:")
+            logger.info(f"  Maximum Drawdown: {p['mdd']}%")
+            logger.info(f"  Sharpe Ratio:     {sharpe_str}")
 
 
 def main():

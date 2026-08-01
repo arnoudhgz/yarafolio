@@ -15,6 +15,7 @@ from datetime import date, datetime
 
 import price_history
 import entries
+import nyse
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -50,17 +51,15 @@ def get_env(key: str) -> str | None:
 
 class AdviceLog:
     SECTORS = (
-        "Basic Materials",
-        "Conglomerates",
-        "Consumer Goods",
-        "Financial",
+        "Materials", "Industrials", "Communication Services", "Energy", "Real Estate",
+        "Consumer Staples", "Consumer Discretionary",
+        "Financials",
         "Healthcare",
-        "Industrial Goods",
-        "Services",
+        "Consumer Discretionary",
         "Technology",
         "Utilities",
         "ETF / Other")
-    NEW_PICK_SOURCES = ("advice", "premarket", "diversify", "aftermarket", "manual")
+    NEW_PICK_SOURCES = ("oversold", "diversify", "manual", "momentum", "earnings", "insider", "market-rotation")
 
     def __init__(self):
         is_demo = get_env("DEMO_MODE") == "1"
@@ -75,7 +74,7 @@ class AdviceLog:
             return entries.normalize_entries(json.load(f))
 
     def save_log(self, data: dict) -> None:
-        data["lastUpdated"] = datetime.now().strftime("%Y-%m-%d %H:%M")
+        data["lastUpdated"] = nyse.nyse_now().isoformat("T", "minutes")
         tmp = self.log_file + ".tmp"
         with open(tmp, "w") as f:
             json.dump(data, f, indent=2)
@@ -119,15 +118,43 @@ class AdviceLog:
 
     def push_history(self, e: dict, price: float) -> None:
         hist = e.setdefault("priceHistory", [])
-        price_history.push_price_point(hist, price, now=datetime.now())
+        price_history.push_price_point(hist, price, now=nyse.nyse_now())
 
     def push_note(self, e: dict, text: str) -> None:
-        e.setdefault("notes", []).append(
-            {"date": date.today().isoformat(), "text": text})
+        today_str = nyse.nyse_today().isoformat()
+        notes = e.setdefault("notes", [])
+        if not any(n.get("date") == today_str and n.get("text") == text for n in notes):
+            notes.append({"date": today_str, "text": text})
+
+    def replace_advice_note(self, e: dict, text: str) -> None:
+        """One 'Advised (...)' note per ticker per day.
+
+        Re-running add-pick to reword a thesis used to stack a second note on top
+        of the first, so the drill-down modal showed both the draft and the edit.
+        """
+        today_str = nyse.nyse_today().isoformat()
+        notes = e.setdefault("notes", [])
+        e["notes"] = [n for n in notes
+                      if not (n.get("date") == today_str
+                              and str(n.get("text", "")).startswith("Advised ("))]
+        self.push_note(e, text)
 
     def cmd_add_pick(self, args: argparse.Namespace):
         data = self.load_log()
-        today = date.today().isoformat()
+        today = nyse.nyse_today().isoformat()
+
+        def parse_float(val):
+            if val is None or str(val).lower() in ("n/a", "none", "null", ""):
+                return None
+            try:
+                return float(val)
+            except ValueError:
+                sys.exit(f"Invalid float value: {val}")
+
+        rsi_val = parse_float(args.rsi)
+        buy_below_val = parse_float(args.buy_below)
+        drop_below_val = parse_float(args.drop_below)
+        drop_above_val = parse_float(args.drop_above)
 
         e = None
         for x in data["entries"]:
@@ -137,22 +164,40 @@ class AdviceLog:
                 break
 
         if e is None:
-            if not args.source:
-                sys.exit(
-                    f"{args.ticker} is new: --source ({'|'.join(self.NEW_PICK_SOURCES)}) is required")
+            for x in data["entries"]:
+                if x["ticker"] == args.ticker and x.get("status") in ("blacklisted", "avoid"):
+                    sys.exit(f"Addition aborted: {args.ticker} is already marked as {x.get('status')} in the log.")
+            
+            missing = []
+            if args.source is None: missing.append("--source")
+            if args.rating is None: missing.append("--rating")
+            if args.sector is None: missing.append("--sector")
+            if args.buy_below is None: missing.append("--buy-below")
+            if args.drop_below is None: missing.append("--drop-below")
+            if args.name is None: missing.append("--name")
+            if args.reason is None: missing.append("--reason")
+            if args.risk is None: missing.append("--risk")
+            if args.open_note is None: missing.append("--open-note")
+            if args.rsi is None: missing.append("--rsi")
+            if args.drop_above is None: missing.append("--drop-above")
+
+            if missing:
+                sys.exit(f"{args.ticker} is new: The following parameters are strictly mandatory: {', '.join(missing)}. Use 'N/A' if not applicable.")
+
             count = sum(1 for x in data["entries"]
                         if x["ticker"] == args.ticker) + 1
             e = {
                 "id": f"{args.ticker}-{count:04d}",
                 "ticker": args.ticker,
                 "name": args.name or "",
-                "firstAdvised": date.today().isoformat(),
+                "firstAdvised": today,
                 "source": args.source,
                 "rating": None,
                 "rsiAtAdvice": None,
                 "priceAtAdvice": args.price,
                 "reason": None,
                 "risk": None,
+                "openNote": None,
                 "sector": None,
                 "buyBelow": None,
                 "dropBelow": None,
@@ -180,16 +225,24 @@ class AdviceLog:
         events.sort(key=lambda ev: ev["date"])
         e["adviceEvents"] = events
         self.push_history(e, args.price)
-        for field, value in (("rating", args.rating), ("rsiAtAdvice", args.rsi),
-                             ("sector", args.sector), ("buyBelow", args.buy_below),
-                             ("dropBelow", args.drop_below), ("dropAbove", args.drop_above),
-                             ("name", args.name), ("reason", args.reason), ("risk", args.risk)):
-            if value is not None:
+        for field, arg_raw, value in (
+            ("rating", args.rating, args.rating),
+            ("rsiAtAdvice", args.rsi, rsi_val),
+            ("sector", args.sector, args.sector),
+            ("buyBelow", args.buy_below, buy_below_val),
+            ("dropBelow", args.drop_below, drop_below_val),
+            ("dropAbove", args.drop_above, drop_above_val),
+            ("name", args.name, args.name),
+            ("source", args.source, args.source),
+            ("reason", args.reason, args.reason),
+            ("risk", args.risk, args.risk),
+            ("openNote", args.open_note, args.open_note)
+        ):
+            if arg_raw is not None:
                 e[field] = value
         if args.reason:
             advised = f"Advised ({args.source or e.get('source')}): {args.reason}"
-            if not any(n.get("text") == advised for n in e.get("notes", [])):
-                self.push_note(e, advised)
+            self.replace_advice_note(e, advised)
         if args.note:
             self.push_note(e, args.note)
         self.save_log(data)
@@ -232,12 +285,12 @@ class AdviceLog:
         self.save_log(data)
 
     def cmd_add_eod(self, args: argparse.Namespace):
-        date_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        date_str = nyse.nyse_now().isoformat("T", "minutes")
         self._append_to_md("eod.md", date_str, args.summary)
         logger.info("EOD report added.")
 
     def cmd_add_news_summary(self, args: argparse.Namespace):
-        date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        date_str = nyse.nyse_now().isoformat("T", "seconds")
         self._append_to_md("news.md", date_str, args.summary)
         logger.info("News summary added.")
 
@@ -289,6 +342,34 @@ class AdviceLog:
             msg += f" (skipped untracked: {', '.join(skipped)})"
         logger.info(msg)
 
+    def cmd_open_profits(self, args: argparse.Namespace):
+        data = self.load_log()
+        green = []
+        for e in data.get("entries", []):
+            if e.get("status") == "bought":
+                lots = e.get("lots", [])
+                if not lots:
+                    continue
+                open_lots = [l for l in lots if not l.get("exitEstimated")]
+                if not open_lots:
+                    continue
+                history = e.get("priceHistory", [])
+                current_price = history[-1].get("price", 0) if history else 0
+                if current_price <= 0:
+                    continue
+                total_invested = sum(l.get("openRate", 0) * l.get("units", 0) for l in open_lots)
+                total_value = sum(current_price * l.get("units", 0) for l in open_lots)
+                if total_invested > 0:
+                    pl_pct = ((total_value - total_invested) / total_invested) * 100
+                    if pl_pct > 0:
+                        green.append((e.get("ticker"), pl_pct, current_price, e.get("sector", "?")))
+        if not green:
+            logger.info("No open positions in profit.")
+            return
+        logger.info("Open positions currently in profit:")
+        for ticker, pl, p, sec in sorted(green, key=lambda x: x[1], reverse=True):
+            logger.info(f"- {ticker}: +{pl:.2f}% (Price: {p}, Sector: {sec})")
+
     def cmd_set_status(self, args: argparse.Namespace):
         data = self.load_log()
         e = self.require(data, args.ticker)
@@ -301,7 +382,11 @@ class AdviceLog:
             e["soldAt"] = price
             e.pop("exitEstimated", None)
         elif args.status == "dropped":
-            e["droppedDate"] = date.today().isoformat()
+            e["droppedDate"] = nyse.nyse_today().isoformat()
+        elif args.status == "blacklisted":
+            e["droppedDate"] = nyse.nyse_today().isoformat()
+            if hasattr(args, "reason") and args.reason:
+                e["blacklistReason"] = args.reason
         e["status"] = args.status
         self.push_note(e, f"Status changed to {args.status} @ ${price}")
         self.save_log(data)
@@ -318,7 +403,7 @@ class AdviceLog:
 
     def cmd_checkin_candidates(self, args: argparse.Namespace):
         data = self.load_log()
-        today = date.today()
+        today = nyse.nyse_today()
         rows = []
         for e in data["entries"]:
             est_lots = [lot for lot in e.get("lots", []) if lot.get("exitEstimated")]
@@ -339,7 +424,7 @@ class AdviceLog:
                         datetime.strptime(
                             e["firstAdvised"],
                             "%Y-%m-%d").date()).days
-                    if age > 7:
+                    if age > 3:
                         rows.append(
                             (1, -age, f"{e['ticker']}: watching {age}d, advised @ ${e.get('priceAtAdvice')}, "
                              f"now ${self.latest_price(e)}"))
@@ -428,10 +513,10 @@ class AdviceLog:
         if lots and not args.force:
             sys.exit(
                 f"{args.id} ({e.get('ticker')}) has {len(lots)} eToro lot(s); "
-                "refusing to delete a tracked position without --force")
-        data["entries"] = [x for x in data["entries"] if x.get("id") != args.id]
+                "refusing to remove a tracked position without --force")
+        e["status"] = "removed"
         self.save_log(data)
-        logger.info(f"removed {args.id} ({e.get('ticker')}, {e.get('status')})")
+        logger.info(f"marked as removed {args.id} ({e.get('ticker')})")
 
 
 def main():
@@ -446,18 +531,19 @@ def main():
     p.add_argument("ticker")
     p.add_argument("--price", type=float, required=True)
     p.add_argument("--source", choices=app.NEW_PICK_SOURCES)
-    p.add_argument("--rating")
-    p.add_argument("--rsi", type=float)
+    p.add_argument("--rating", choices=["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-"])
+    p.add_argument("--rsi", type=str)
     p.add_argument("--sector", choices=app.SECTORS)
-    p.add_argument("--buy-below", type=float)
-    p.add_argument("--drop-below", type=float)
+    p.add_argument("--buy-below", type=str)
+    p.add_argument("--drop-below", type=str)
     p.add_argument(
         "--drop-above",
-        type=float,
+        type=str,
         help="ceiling: above this the oversold bounce already ran, drop the watch")
     p.add_argument("--name")
     p.add_argument("--reason")
     p.add_argument("--risk")
+    p.add_argument("--open-note")
     p.add_argument(
         "--note",
         help="dated commentary for the notes history (news, what happened)")
@@ -472,6 +558,9 @@ def main():
         "touch-many",
         help='batch price update from a {"TICKER": price} JSON map on stdin')
     p.set_defaults(func=app.cmd_touch_many)
+
+    p = sub.add_parser("open-profits", help="list open advice positions currently in profit")
+    p.set_defaults(func=app.cmd_open_profits)
 
     p = sub.add_parser(
         "add-note",
@@ -492,8 +581,9 @@ def main():
 
     p = sub.add_parser("set-status", help="change entry status")
     p.add_argument("ticker")
-    p.add_argument("status", choices=("watching", "bought", "sold", "dropped"))
+    p.add_argument("status", choices=("watching", "bought", "sold", "dropped", "blacklisted"))
     p.add_argument("--price", type=float)
+    p.add_argument("--reason", help="Reason for blacklisting (e.g. paused, not listed)")
     p.set_defaults(func=app.cmd_set_status)
 
     p = sub.add_parser(

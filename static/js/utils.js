@@ -11,7 +11,7 @@ export const cssVar = (name) => getComputedStyle(document.documentElement).getPr
 
 /** @returns {string} */
 export const today = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); };
-export const nowStr = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); };
+export const nowStr = () => new Date().toISOString();
 
 /**
  * Render an ISO/UTC instant as a YYYY-MM-DD date in the viewer's own timezone.
@@ -24,6 +24,18 @@ export const localDate = (iso) => {
   if (!iso) return '-';
   const d = new Date(iso);
   return isNaN(d.getTime()) ? String(iso).slice(0, 10) : d.toLocaleDateString('en-CA');
+};
+
+/**
+ * Render an ISO/UTC instant as a YYYY-MM-DD HH:MM string in local time.
+ * @param {string|null|undefined} iso
+ * @returns {string}
+ */
+export const localDateTime = (iso) => {
+  if (!iso) return '-';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return String(iso);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
 };
 
 /**
@@ -61,6 +73,91 @@ export const changePct = (e) => {
   const base = (e.status === 'bought' || e.status === 'sold') && e.boughtAt ? e.boughtAt : e.priceAtAdvice;
   const now = e.status === 'sold' && e.soldAt ? e.soldAt : latestPrice(e);
   return ((now - base) / base) * 100;
+};
+
+/** 
+ * @param {import('./state.js').AdviceEntry} e 
+ * @param {string} timeframe
+ * @returns {number} 
+ */
+export const periodChangePct = (e, timeframe) => {
+  if (timeframe === 'all') return changePct(e);
+
+  if (!e || !e.priceHistory || e.priceHistory.length < 2) return 0;
+  const hist = e.priceHistory;
+
+  if (timeframe === 'yesterday') {
+    const distinctDates = [];
+    for (let i = hist.length - 1; i >= 0; i--) {
+      const dStr = hist[i].date.substring(0, 10);
+      if (distinctDates.length === 0 || distinctDates[distinctDates.length - 1] !== dStr) {
+        distinctDates.push(dStr);
+      }
+    }
+    if (distinctDates.length < 2) return 0;
+    
+    const t1Date = distinctDates[1];
+    const t2Date = distinctDates.length >= 3 ? distinctDates[2] : null;
+
+    let currentPrice = null;
+    for (let i = hist.length - 1; i >= 0; i--) {
+      if (hist[i].date.substring(0, 10) === t1Date) {
+        currentPrice = hist[i].price;
+        break;
+      }
+    }
+
+    let prevClose = null;
+    if (t2Date) {
+      for (let i = hist.length - 1; i >= 0; i--) {
+        if (hist[i].date.substring(0, 10) === t2Date) {
+          prevClose = hist[i].price;
+          break;
+        }
+      }
+    } else {
+      prevClose = hist[0].price;
+    }
+
+    if (!currentPrice || !prevClose || prevClose === 0) return 0;
+    return ((currentPrice - prevClose) / prevClose) * 100;
+  }
+
+  const latestDateStr = hist[hist.length - 1].date.substring(0, 10);
+  const latestDate = new Date(latestDateStr);
+  let targetDate = new Date(latestDate);
+
+  if (timeframe === 'week') {
+    targetDate.setDate(targetDate.getDate() - 7);
+  } else if (timeframe === 'month') {
+    targetDate.setMonth(targetDate.getMonth() - 1);
+  }
+
+  const targetDateStr = targetDate.toISOString().split('T')[0];
+  let prevClose = null;
+
+  for (let i = hist.length - 1; i >= 0; i--) {
+    const dStr = hist[i].date.substring(0, 10);
+    if (timeframe === 'today') {
+      if (dStr < latestDateStr) {
+        prevClose = hist[i].price;
+        break;
+      }
+    } else {
+      if (dStr <= targetDateStr) {
+        prevClose = hist[i].price;
+        break;
+      }
+    }
+  }
+
+  if (prevClose == null) {
+    prevClose = hist[0].price;
+  }
+  
+  if (prevClose === 0) return 0;
+  const currentPrice = hist[hist.length - 1].price;
+  return ((currentPrice - prevClose) / prevClose) * 100;
 };
 
 /** 
@@ -106,7 +203,17 @@ export const tickerLink = (t, display) => {
       }
     }
   }
-  return '<a class="tlink" style="font-weight: 800;" href="https://www.etoro.com/markets/' + encodeURIComponent(t.toLowerCase()) +
+  let etoroTicker = t;
+  const cache = /** @type {any} */ (window).ETORO_CACHE;
+  if (cache) {
+    for (const key in cache) {
+      if (cache[key].mappedTicker === t) {
+        etoroTicker = cache[key].ticker;
+        break;
+      }
+    }
+  }
+  return '<a class="tlink" style="font-weight: 800;" href="https://www.etoro.com/markets/' + encodeURIComponent(etoroTicker.toLowerCase()) +
     '" target="_blank" rel="noopener"><strong>' + esc(display || t) + '</strong></a>' + warning;
 };
 
@@ -135,19 +242,28 @@ export const fmtPL = (v) => v == null ? '-' : (v >= 0 ? '+' : '-') + '$' + Math.
 export const matchesSearch = (fields) =>
   !searchQuery || fields.some(v => v && String(v).toLowerCase().includes(searchQuery));
 
-/** 
- * @template T 
- * @param {T[]} rows 
- * @param {{key: string, dir: number}} options 
- * @returns {T[]} 
+/**
+ * @template {Record<string, any>} T
+ * @param {T[]} rows
+ * @param {{key: string, dir: number}} options
+ * @returns {T[]}
  */
 export function sortRows(rows, { key, dir }) {
   return [...rows].sort((a, b) => {
-    const av = a[key], bv = b[key];
+    const aAny = /** @type {any} */ (a);
+    const bAny = /** @type {any} */ (b);
+    const av = aAny[key];
+    const bv = bAny[key];
     if (av == null && bv == null) return 0;
     if (av == null) return 1;
     if (bv == null) return -1;
-    return (typeof av === 'number' && typeof bv === 'number'
-      ? av - bv : String(av).localeCompare(String(bv))) * dir;
+    let cmp = (typeof av === 'number' && typeof bv === 'number')
+      ? (av - bv) * dir : String(av).localeCompare(String(bv)) * dir;
+    if (cmp === 0) {
+      const an = a.name || (a.e && a.e.name) || a.ticker || (a.e && a.e.ticker) || '';
+      const bn = b.name || (b.e && b.e.name) || b.ticker || (b.e && b.e.ticker) || '';
+      cmp = String(an).localeCompare(String(bn));
+    }
+    return cmp;
   });
 }

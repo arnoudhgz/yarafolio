@@ -1,16 +1,18 @@
 // @ts-check
-import { DATA, PORTFOLIO, currentFilter, posFilter, activeTab, portfolioViewMode, LEARN, analyticsCharts, canSave, SECTORS, SECTOR_COLORS, sortState, setSectorChart, setSectorCoverageChart, sectorChart, sectorCoverageChart, setPortfolioRendered, Chart, marked, searchQuery } from './state.js';
-import { advised, latestPrice, changePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, cssVar, localDate, advisedFor } from './utils.js';
+import { DATA, PORTFOLIO, currentFilter, posFilter, activeTab, portfolioViewMode, portfolioTabMode, heatmapTimeframe, LEARN, analyticsCharts, canSave, SECTORS, SECTOR_COLORS, sortState, setSectorChart, setSectorCoverageChart, portfolioHeatmapChart, setPortfolioHeatmapChart, sectorChart, sectorCoverageChart, setPortfolioRendered, Chart, marked, searchQuery } from './state.js';
+import { advised, latestPrice, changePct, periodChangePct, fmtPct, esc, tickerLink, fmtPrice, fmtMoney, fmtPL, matchesSearch, sortRows, cssVar, localDate, localDateTime, advisedFor } from './utils.js';
 import { markSortedHeader, setSearchCount } from './ui.js';
 
 export function renderAll() {
   const entries = advised();
   /** @type {HTMLElement} */ (document.getElementById('lastUpdated')).textContent =
-    'Last updated: ' + DATA.lastUpdated + ' · ' + entries.length + ' advised picks · ' +
+    'Last updated: ' + localDateTime(DATA.lastUpdated) + ' · ' + entries.length + ' advised picks · ' +
     PORTFOLIO.holdings.length + ' holdings';
   /** @type {HTMLElement} */ (document.getElementById('cTracked')).textContent = String(entries.length);
   /** @type {HTMLElement} */ (document.getElementById('cOpen')).textContent = String(entries.filter(e => e.status === 'bought').length);
+  /** @type {HTMLElement} */ (document.getElementById('cClosed')).textContent = String(entries.filter(e => e.status === 'sold').length);
   /** @type {HTMLElement} */ (document.getElementById('cWatching')).textContent = String(entries.filter(e => e.status === 'watching').length);
+  /** @type {HTMLElement} */ (document.getElementById('cIgnored')).textContent = String(entries.filter(e => ['dropped', 'avoid', 'blacklisted', 'removed'].includes(e.status)).length);
   renderTable();
   renderPositions();
   if (activeTab === 'portfolio') renderPortfolio();
@@ -27,6 +29,7 @@ export function adviceRows() {
       priceThen: (e.status === 'bought' || e.status === 'sold') ? (e.boughtAt ?? e.priceAtAdvice) : e.priceAtAdvice,
       priceNow,
       changePct: changePct(e),
+      todayChangePct: periodChangePct(e, 'today'),
       rating: e.rating || null,
       rsi: e.rsiAtAdvice ?? null,
       sector: e.sector || null,
@@ -84,21 +87,35 @@ export function actionButtons(e) {
   // positions come from the eToro import now; the watchlist only needs Drop
   if (!canSave) return '';
   if (e.status === 'watching') {
-    return '<button class="drop" data-act="drop" data-id="' + e.id + '">Drop</button>';
+    return '<button class="drop" data-act="drop" data-id="' + e.id + '">Drop</button>' +
+           '<button class="drop" data-act="blacklist" data-id="' + e.id + '">Blacklist</button>';
   }
-  if (e.status === 'dropped') {
+  if (e.status === 'dropped' || e.status === 'blacklisted') {
     return '<button class="buy" data-act="rewatch" data-id="' + e.id + '">Re-watch</button>' +
            '<button class="drop" data-act="remove" data-id="' + e.id + '">Remove</button>';
   }
   return '';
 }
 
+export function mapSector(sector) {
+  if (!sector) return 'ETF / Other';
+  if (SECTORS.includes(sector)) return sector;
+  const legacy = {
+    'Basic Materials': 'Materials', 'Conglomerates': 'Industrials',
+    'Consumer Goods': 'Consumer Staples', 'Financial': 'Financials',
+    'Industrial Goods': 'Industrials', 'Services': 'Consumer Discretionary'
+  };
+  return legacy[sector] || 'ETF / Other';
+}
+
+
 export function sectorPctMap() {
+  if (!PORTFOLIO || !PORTFOLIO.holdings) return null;
   const total = PORTFOLIO.holdings.reduce((s, h) => s + (h.invested || 0), 0);
   if (!total) return null;
   const invested = {};
   PORTFOLIO.holdings.forEach(h => {
-    const s = h.sector || 'ETF / Other';
+    const s = mapSector(h.sector);
     invested[s] = (invested[s] || 0) + (h.invested || 0);
   });
   const pct = {};
@@ -123,6 +140,8 @@ export function renderTable() {
     adviceRows().filter(r => {
       if (currentFilter === 'dropped') {
         if (r.status !== 'dropped') return false;
+      } else if (currentFilter === 'blacklisted') {
+        if (r.status !== 'blacklisted') return false;
       } else {
         if (r.status !== 'watching') return false;
         if (r.e.lots && r.e.lots.length) return false;
@@ -142,6 +161,7 @@ export function renderTable() {
   
   let msg = 'No watched picks yet. Run /advice, /premarket or /import in the AI CLI to fill this in.';
   if (currentFilter === 'dropped') msg = 'No dropped picks yet.';
+  else if (currentFilter === 'blacklisted') msg = 'No blacklisted picks yet.';
   else if (currentFilter === 'buyzone') msg = 'No watched picks currently in the buy zone.';
   else if (currentFilter === 'drophit') msg = 'No watched picks have hit their drop alert level.';
   else if (currentFilter === 'missed') msg = 'No watched picks have hit their drop above level (missed).';
@@ -173,13 +193,13 @@ export function renderTable() {
       '<td>' + fmtPrice(r.priceNow) + '</td>' +
       '<td class="' + (r.changePct >= 0 ? 'pos' : 'neg') + '">' + fmtPct(r.changePct) + '</td>' +
       '<td>' + (r.rating || '-') + '</td>' +
-      '<td>' + (r.rsi ?? '-') + '</td>' +
+      '<td>' + (r.rsi != null ? Math.round(r.rsi) : '-') + '</td>' +
       '<td' + (sf ? ' class="sec-' + sf + '"' : '') + '>' + (r.sector || '-') + '</td>' +
       '<td>' + fmtPrice(r.buyBelow) + '</td>' +
       '<td>' + fmtPrice(r.dropBelow) + '</td>' +
       '<td class="' + (e.status === 'watching' && e.dropAbove && latestPrice(e) >= e.dropAbove ? 'sec-gap' : '') + '">' + fmtPrice(e.dropAbove) + '</td>' +
       '<td class="spark-col"><div style="width:70px; height:30px;"><canvas class="spark"></canvas></div></td>' +
-      '<td><span class="badge ' + r.status + '">' + r.status + '</span></td>' +
+      '<td><span class="badge ' + r.status + '" title="' + esc(r.status) + '">' + (r.status === 'blacklisted' && e['blacklistReason'] ? esc(e['blacklistReason']) : r.status) + '</span></td>' +
       '<td class="actions">' + actionButtons(e) + '</td>';
     tbody.appendChild(tr);
     sparkline(tr.querySelector('canvas'), e);
@@ -205,10 +225,11 @@ export function positionLotRows() {
     rows.push({
       e, positionID: lot.positionID,
       firstAdvised: adv.date,
-      openDate: lot.openDate,
+      openDate: lot.openDateTime || lot.openDate,
       openDateTime: lot.openDateTime,
       closedDate: lot.closedDate,
       ticker: e.ticker,
+      rating: e.rating,
       priceAtAdvice: adv.price != null ? adv.price : e.priceAtAdvice,
       boughtAt: open,                 // matches the Bought column's data-key
       units: lot.units,
@@ -257,15 +278,16 @@ export function renderPositions() {
   pTotal.innerHTML = hasPositions ? fmtPL(totalSum) + ' <span style="font-size:13px;opacity:0.8;margin-left:4px">(' + (totalPct > 0 ? '+' : '') + totalPct.toFixed(2) + '%)</span>' : '-';
   pTotal.className = 'value ' + (hasPositions && totalSum < 0 ? 'neg' : hasPositions ? 'pos' : '');
 
+  const activeSortState = sortState['positions_' + posFilter] || { key: 'firstAdvised', dir: -1 };
   const rows = sortRows(all.filter(r => {
     if (!matchesSearch([r.ticker, r.e.name, r.e.reason, r.e.sector])) return false;
     if (posFilter === 'open') return r.status === 'bought';
     if (posFilter === 'closed') return r.status === 'sold';
     if (posFilter === 'needsconfirm') return r.exitEstimated;
     return true;
-  }), sortState.positions);
+  }), activeSortState);
   if (activeTab === 'positions') setSearchCount(rows.length);
-  markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('positionsTable')), sortState.positions);
+  markSortedHeader(/** @type {HTMLElement} */ (document.getElementById('positionsTable')), activeSortState);
   const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('positionsEmpty'));
   let msg = 'No open positions linked to advice yet.';
   if (posFilter === 'closed') msg = 'No closed positions yet.';
@@ -294,6 +316,7 @@ export function renderPositions() {
       '<td>' + (r.status === 'sold' && r.closedDate ? r.closedDate : '-') + '</td>' +
       '<td title="' + esc(r.e.reason || '') + '">' + tickerLink(r.ticker) +
         (r.e.name ? '<span class="sub">' + esc(r.e.name) + '</span>' : '') + '</td>' +
+      '<td>' + (r.e.rating || '-') + '</td>' +
       '<td>' + fmtPrice(r.priceAtAdvice) + '</td>' +
       '<td>' + fmtPrice(r.boughtAt) + '</td>' +
       '<td>' + r.units + '</td>' +
@@ -304,16 +327,31 @@ export function renderPositions() {
       '<td class="actions">' + confirmBtn + '</td>';
     tbody.appendChild(tr);
   });
+  
+  renderEquityChart('7d');
 }
 
 export function renderPortfolio() {
-  renderSectorCoverage();
-  renderSectorChart();
   renderPortfolioTable();
   setPortfolioRendered(true);
 }
 
 export function renderPortfolioTable() {
+  const table = /** @type {HTMLElement} */ (document.getElementById('portfolioTable'));
+  const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('portfolioEmpty'));
+
+  const tableContainer = document.getElementById('portfolioTableContainer');
+  const heatmapContainer = document.getElementById('portfolioHeatmapContainer');
+  if (tableContainer && heatmapContainer) {
+    if (portfolioTabMode === 'table') {
+      tableContainer.style.display = 'block';
+      heatmapContainer.style.display = 'none';
+    } else {
+      tableContainer.style.display = 'none';
+      heatmapContainer.style.display = 'block';
+    }
+  }
+
   let holdings = PORTFOLIO.holdings.filter(h => matchesSearch([h.ticker, h.name, h.sector]));
   
   if (portfolioViewMode === 'split') {
@@ -329,11 +367,11 @@ export function renderPortfolioTable() {
             name: h.name,
             sector: h.sector,
             units: lot.units,
-            invested: lot.units * lot.openRate,
+            invested: lot.invested || (lot.units * lot.openRate),
             avgOpen: lot.openRate,
             currentPrice: h.currentPrice,
             plDollar: lot.units * (h.currentPrice - lot.openRate),
-            plPct: lot.openRate > 0.01 ? (h.currentPrice - lot.openRate) / lot.openRate * 100 : 0,
+            plPct: (lot.invested || (lot.units * lot.openRate)) > 0 ? (lot.units * (h.currentPrice - lot.openRate)) / (lot.invested || (lot.units * lot.openRate)) * 100 : 0,
             firstOpen: lot.openDate,
             positions: 1
           });
@@ -344,7 +382,6 @@ export function renderPortfolioTable() {
   }
   
   const empty = !holdings.length;
-  const emptyMsgEl = /** @type {HTMLElement} */ (document.getElementById('portfolioEmpty'));
   let msg = 'No portfolio snapshot yet. Click "Update from eToro" or run /import in the AI CLI.';
   if (searchQuery && holdings.length === 0) {
     msg = `No results with your current filter ('${esc(searchQuery)}'). <a href="#" onclick="document.getElementById('search').value=''; document.getElementById('search').dispatchEvent(new Event('input')); return false;">Clear filter</a>`;
@@ -373,13 +410,130 @@ export function renderPortfolioTable() {
       '<td>' + h.positions + '</td>';
     tbody.appendChild(tr);
   });
+
+  const advisedMap = new Map();
+  if (DATA && DATA.entries) {
+    DATA.entries.forEach(e => advisedMap.set(e.ticker, e));
+  }
+  holdings.forEach(h => {
+    h.heatmapPct = h.plPct || 0;
+    h.heatmapDollar = h.plDollar || 0;
+  });
+
+  renderPortfolioTreemap(holdings);
+}
+
+function renderPortfolioTreemap(holdings) {
+  const ctx = /** @type {HTMLCanvasElement} */ (document.getElementById('chartPortfolioHeatmap'));
+  if (Chart.getChart(ctx)) Chart.getChart(ctx).destroy();
+  if (portfolioHeatmapChart) { portfolioHeatmapChart.destroy(); setPortfolioHeatmapChart(null); }
+  if (portfolioTabMode === 'table') return;
+
+  const filteredHoldings = holdings.filter(h => h.invested > 0);
+  let treeData = filteredHoldings;
+  if (portfolioTabMode === 'heatmap') {
+    // AI Advised Only: filter out holdings not actively held in advice DB (exclude 'import', 'sold', 'dropped', 'blacklisted')
+    const activeAdvisedTickers = new Set(
+      advised()
+        .filter(e => e.status === 'bought' || e.status === 'watching')
+        .map(e => e.ticker)
+    );
+    treeData = filteredHoldings.filter(h => activeAdvisedTickers.has(h.ticker));
+  }
+
+  if (treeData.length === 0) return;
+
+  // Group by sector, then ticker
+  treeData.forEach(h => {
+    h.cleanSector = h.sector || 'ETF / Other';
+  });
+
+  setPortfolioHeatmapChart(new Chart(ctx, {
+    type: 'treemap',
+    data: {
+      datasets: [{
+        tree: treeData,
+        key: 'invested',
+        groups: ['cleanSector', 'ticker'],
+        spacing: 1,
+        borderWidth: 0,
+        backgroundColor: (ctx) => {
+          if (ctx.type !== 'data') return 'transparent';
+          if (ctx.raw.l === 0) return 'rgba(255, 255, 255, 0.03)'; // sector background
+          
+          const raw = ctx.raw;
+          const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
+          
+          const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
+          const totalHeatmapDollar = items.reduce((sum, item) => sum + (item.heatmapDollar || 0), 0);
+          const plPct = totalInvested > 0 ? (totalHeatmapDollar / totalInvested) * 100 : 0;
+          
+          let thresholds = [15.0, 0];
+
+          if (plPct > thresholds[0]) return '#10b981'; // bright green
+          if (plPct > thresholds[1]) return '#059669'; // dark green
+          if (plPct < -thresholds[0]) return '#ef4444'; // bright red
+          if (plPct < thresholds[1]) return '#b91c1c'; // dark red
+          return '#374151'; // flat gray
+        },
+        labels: {
+          display: true,
+          color: '#fff',
+          font: [{ size: 14, weight: 'bold' }, { size: 12 }],
+          formatter: (ctx) => {
+            if (ctx.type !== 'data') return '';
+            if (ctx.raw.l === 0) return ''; // We use captions for sector names
+            const raw = ctx.raw;
+            const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
+            const ticker = raw.g || (items[0] && (items[0].displayTicker || items[0].ticker)) || '';
+            const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
+            const totalHeatmapDollar = items.reduce((sum, item) => sum + (item.heatmapDollar || 0), 0);
+            const plPct = totalInvested > 0 ? (totalHeatmapDollar / totalInvested) * 100 : 0;
+            return [ticker, fmtPct(plPct)];
+          }
+        },
+        captions: {
+          display: true,
+          color: 'rgba(255, 255, 255, 0.8)',
+          font: { size: 14, weight: 'bold' }
+        }
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (items) => {
+              const raw = items[0].raw;
+              if (raw.l === 0) return raw.g; // sector
+              const dataItems = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
+              return raw.g || (dataItems[0] && (dataItems[0].displayTicker || dataItems[0].ticker)) || '';
+            },
+            label: (ctx) => {
+              const raw = ctx.raw;
+              if (raw.l === 0) return '';
+              const items = Array.isArray(raw._data) ? raw._data : (raw._data && Array.isArray(raw._data.children) ? raw._data.children : [raw._data]);
+              const name = (items[0] && items[0].name) || '';
+              const totalInvested = items.reduce((sum, item) => sum + (item.invested || 0), 0);
+              const totalHeatmapDollar = items.reduce((sum, item) => sum + (item.heatmapDollar || 0), 0);
+              const plPct = totalInvested > 0 ? (totalHeatmapDollar / totalInvested) * 100 : 0;
+              let labelPrefix = "Open P/L";
+              return [name, `Invested: ${fmtPrice(totalInvested)}`, `${labelPrefix}: ${fmtPrice(totalHeatmapDollar)} (${fmtPct(plPct)})`];
+            }
+          }
+        }
+      }
+    }
+  }));
 }
 
 function renderSectorChart() {
   if (sectorChart) { sectorChart.destroy(); setSectorChart(null); }
   const bySector = new Map();
   PORTFOLIO.holdings.forEach(h => {
-    const s = h.sector || 'ETF / Other';
+    const s = mapSector(h.sector);
     bySector.set(s, (bySector.get(s) || 0) + h.invested);
   });
   const sorted = [...bySector.entries()].sort((a, b) => b[1] - a[1]);
@@ -421,11 +575,16 @@ export function renderSectorCoverage() {
   const invested = {};
   const total = PORTFOLIO.holdings.reduce((s, h) => s + (h.invested || 0), 0);
   PORTFOLIO.holdings.forEach(h => {
-    const s = h.sector || 'ETF / Other';
+    const s = mapSector(h.sector);
     invested[s] = (invested[s] || 0) + (h.invested || 0);
   });
   const adviceCount = {};
-  advised().forEach(e => { if (e.sector) adviceCount[e.sector] = (adviceCount[e.sector] || 0) + 1; });
+  advised().forEach(e => {
+    const s = mapSector(e.sector);
+    if (s !== 'ETF / Other' || e.sector) {
+      adviceCount[s] = (adviceCount[s] || 0) + 1;
+    }
+  });
   const pct = (s) => total ? (invested[s] || 0) / total * 100 : 0;
   /** @type {HTMLElement} */ (document.getElementById('sectorGaps')).innerHTML = SECTORS.map(s => {
     const p = pct(s), ac = adviceCount[s] || 0;
@@ -454,8 +613,8 @@ export function renderSectorCoverage() {
           ctx.parsed.x.toFixed(1) + '% · ' + (adviceCount[ctx.label] || 0) + ' advice pick(s)' } }
       },
       scales: {
-        x: { min: 0, ticks: { color: '#8b98a5', callback: (v) => v + '%' }, grid: { color: '#2a3441' } },
-        y: { ticks: { color: '#e6edf3' }, grid: { display: false } }
+        x: { min: 0, ticks: { color: cssVar('--muted'), callback: (v) => v + '%' }, grid: { color: cssVar('--border') } },
+        y: { ticks: { color: cssVar('--text') }, grid: { display: false } }
       }
     }
   }));
@@ -463,14 +622,61 @@ export function renderSectorCoverage() {
 
 let analyticsRendered = false;
 
+export const bucketModes = {
+  chartRating: 'pct',
+  chartRsiBand: 'pct',
+  chartSector: 'pct',
+  chartSource: 'pct',
+  chartGainVsDays: 'pct'
+};
+
+export function reRenderAnalyticsChart(targetChart) {
+  const allLots = positionLotRows();
+  const soldLots = allLots.filter(r => r.status === 'sold');
+  
+  const b = (LEARN && LEARN.buckets) ? LEARN.buckets : {};
+
+  if (targetChart === 'chartGainVsDays') {
+    renderGainVsDaysChart(targetChart, soldLots);
+  } else if (targetChart === 'chartWinRateTrend') {
+    renderWinRateTrendChart(targetChart, soldLots);
+  } else if (targetChart === 'chartRating') {
+    renderBucketChart('chartRating', b.rating, r => r.e.rating, soldLots);
+  } else if (targetChart === 'chartSector') {
+    renderBucketChart('chartSector', b.sector, r => r.e.sector, soldLots);
+  } else if (targetChart === 'chartSource') {
+    renderBucketChart('chartSource', b.source, r => r.e.source, soldLots);
+  } else if (targetChart === 'chartRsiBand') {
+    renderBucketChart('chartRsiBand', b.rsiBand, r => {
+      const v = r.e.rsiAtAdvice;
+      if (v == null) return null;
+      if (v < 20) return '<20';
+      if (v < 30) return '20-30';
+      if (v < 40) return '30-40';
+      if (v < 50) return '40-50';
+      if (v < 60) return '50-60';
+      if (v < 70) return '60-70';
+      return '70+';
+    }, soldLots);
+  }
+}
+
 export function renderAnalytics() {
   analyticsRendered = true;
+  renderEquityChart('24h');
+  renderDrawdownChart('24h');
+  renderRealizedPnlChart();
+  renderSectorCoverage();
+  renderSectorChart();
   const empty = /** @type {HTMLElement} */ (document.getElementById('analyticsEmpty'));
   if (!LEARN) {
     /** @type {HTMLElement} */ (document.getElementById('analyticsCards')).innerHTML = '';
     /** @type {HTMLElement} */ (document.getElementById('sevenDayBox')).innerHTML = '';
     ['chartRating', 'chartRsiBand', 'chartSector', 'chartSource'].forEach(id => renderBucketChart(id, {}));
-    empty.textContent = canSave ? 'No stats available yet. Run /learn to generate outcomes.'
+    ['chartGainVsDays', 'chartDayOfWeek', 'chartWinRateTrend', 'chartEntryDiscipline', 'chartDaysVsRsi'].forEach(id => {
+      if (analyticsCharts[id]) { analyticsCharts[id].destroy(); delete analyticsCharts[id]; }
+    });
+    empty.textContent = canSave ? 'No stats available yet. Run /review to generate outcomes.'
       : 'Analytics needs the server. Start it with: python3 yarafolio.py';
     empty.style.display = 'block';
     return;
@@ -485,67 +691,147 @@ export function renderAnalytics() {
       (sd.median >= 0 ? 'pos' : 'neg') + '">' + fmtPct(sd.median) + '</span> (n=' + sd.n + ')'
     : '<div class="insufficient">No 7-day windows yet.</div>';
   const b = LEARN.buckets || {};
-  renderBucketChart('chartRating', b.rating);
-  renderBucketChart('chartRsiBand', b.rsiBand);
-  renderBucketChart('chartSector', b.sector);
-  renderBucketChart('chartSource', b.source);
+  const allLots = positionLotRows();
+  const soldLots = allLots.filter(r => r.status === 'sold');
+  renderBucketChart('chartRating', b.rating, r => r.e.rating, soldLots);
+  renderBucketChart('chartRsiBand', b.rsiBand, r => {
+    const v = r.e.rsiAtAdvice;
+    if (v == null) return null;
+    if (v < 20) return '<20';
+    if (v < 30) return '20-30';
+    if (v < 40) return '30-40';
+    if (v < 50) return '40-50';
+    if (v < 60) return '50-60';
+    if (v < 70) return '60-70';
+    return '70+';
+  }, soldLots);
+  renderBucketChart('chartSector', b.sector, r => r.e.sector, soldLots);
+  renderBucketChart('chartSource', b.source, r => r.e.source, soldLots);
+  
+  
+  renderGainVsDaysChart('chartGainVsDays', soldLots);
+  renderDayOfWeekChart('chartDayOfWeek', soldLots);
+  renderWinRateTrendChart('chartWinRateTrend', soldLots);
+  renderEntryDisciplineChart('chartEntryDiscipline', soldLots);
+  renderDaysVsRsiChart('chartDaysVsRsi', soldLots);
   empty.textContent = 'Not enough finished advice yet to learn from. Outcomes appear once picks are sold, dropped, or 7+ days old.';
   empty.style.display = LEARN.measurableOutcomes ? 'none' : 'block';
 }
 
-export function renderBucketChart(canvasId, buckets) {
-  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+export function renderBucketChart(canvasId, buckets, keyFn = null, allLots = null) {
   buckets = buckets || {};
   const note = document.getElementById(canvasId + 'Note');
   const canvas = document.getElementById(canvasId);
-  const keys = Object.keys(buckets);
+  let keys = Object.keys(buckets);
+  if (canvasId === 'chartRating') {
+    const order = { 'A+': 1, 'A': 2, 'A-': 3, 'B+': 4, 'B': 5, 'B-': 6, 'C+': 7, 'C': 8, 'C-': 9 };
+    keys.sort((a, b) => (order[a] || 99) - (order[b] || 99));
+  }
   const ok = keys.filter(k => !buckets[k].insufficient);
   const weak = keys.filter(k => buckets[k].insufficient);
+  const toggle = document.querySelector(`.toggle-bucket[data-target="${canvasId}"]`);
+  
   if (note) note.innerHTML = weak.length
     ? '<div class="insufficient">Insufficient (n&lt;3): ' + weak.map(k => k + ' (n=' + buckets[k].n + ')').join(', ') + '</div>'
     : '';
+    
   if (!ok.length) {
     canvas.style.display = 'none';
+    if (toggle instanceof HTMLElement) toggle.style.display = 'none';
     if (note && !weak.length) note.innerHTML = '<div class="insufficient">No finished outcomes in this dimension yet.</div>';
+    if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
     return;
   }
+  
+  if (toggle instanceof HTMLElement) toggle.style.display = '';
+  
+  const dols = {};
+  ok.forEach(k => dols[k] = 0);
+  if (allLots && keyFn) {
+    allLots.forEach(r => {
+      const k = keyFn(r);
+      if (k && dols[k] !== undefined) dols[k] += (r.plDollar || 0);
+    });
+  }
+
+  const isDol = bucketModes[canvasId] === 'dol';
+  const barData = isDol ? ok.map(k => dols[k]) : ok.map(k => buckets[k].avg);
+  const barColors = isDol 
+    ? ok.map(k => dols[k] >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)')
+    : ok.map(k => buckets[k].avg >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)');
+
   canvas.style.display = '';
+
+  if (analyticsCharts[canvasId]) {
+    const chart = analyticsCharts[canvasId];
+    chart.data.labels = ok;
+    chart.data.datasets[0].data = ok.map(k => buckets[k].winRate);
+    chart.data.datasets[1].data = barData;
+    chart.data.datasets[1].backgroundColor = barColors;
+    chart.data.datasets[1].label = isDol ? 'Total Profit $' : 'Avg move %';
+    chart.options.scales.y1.title.text = isDol ? 'Total $' : 'Avg %';
+    chart.options.scales.y1.ticks.callback = isDol ? (v => '$' + v) : undefined;
+    chart.update();
+    return;
+  }
+
   analyticsCharts[canvasId] = new Chart(canvas, {
     data: {
       labels: ok,
       datasets: [
-        { type: 'line', label: 'Win rate %', yAxisID: 'y', data: ok.map(k => buckets[k].winRate), borderColor: '#3498db', backgroundColor: '#3498db', borderWidth: 3, pointBackgroundColor: '#fff', pointBorderWidth: 2, pointRadius: 5, tension: 0.3 },
-        { type: 'bar', label: 'Avg move %', yAxisID: 'y1', data: ok.map(k => buckets[k].avg),
-          backgroundColor: ok.map(k => buckets[k].avg >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)'), borderRadius: 6, maxBarThickness: 50 },
+        { type: 'line', label: 'Win rate %', yAxisID: 'y', data: ok.map(k => buckets[k].winRate), borderColor: '#3498db', backgroundColor: '#3498db', borderWidth: 3, pointBackgroundColor: '#fff', pointBorderWidth: 2, pointRadius: 5, tension: 0.3, fill: false },
+        { type: 'bar', label: isDol ? 'Total Profit $' : 'Avg move %', yAxisID: 'y1', data: barData,
+          backgroundColor: barColors, borderRadius: 6, maxBarThickness: 50 },
       ]
     },
     options: {
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       scales: {
-        y: { position: 'left', min: 0, max: 100, title: { display: true, text: 'Win %', color: '#8b98a5' },
-             ticks: { color: '#8b98a5' }, grid: { color: '#2a3441', drawBorder: false } },
-        y1: { position: 'right', grid: { display: false }, title: { display: true, text: 'Avg %', color: '#8b98a5' },
-              ticks: { color: '#8b98a5' } },
-        x: { ticks: { color: '#8b98a5' }, grid: { display: false, drawBorder: false } }
+        y: { position: 'left', min: 0, max: 100, title: { display: true, text: 'Win %', color: cssVar('--muted') },
+             ticks: { color: cssVar('--muted') }, grid: { color: cssVar('--border'), drawBorder: false } },
+        y1: { position: 'right', grid: { display: false }, title: { display: true, text: isDol ? 'Total $' : 'Avg %', color: cssVar('--muted') },
+              ticks: { color: cssVar('--muted'), callback: isDol ? (v => '$' + v) : undefined } },
+        x: { ticks: { color: cssVar('--muted') }, grid: { display: false, drawBorder: false } }
       },
       plugins: {
-        legend: { labels: { color: '#e6edf3', usePointStyle: true, boxWidth: 10 } },
+        legend: { labels: { color: cssVar('--text'), usePointStyle: true, boxWidth: 10 } },
         tooltip: {
-          backgroundColor: 'rgba(13, 17, 23, 0.9)',
-          titleColor: '#e6edf3',
-          bodyColor: '#e6edf3',
-          borderColor: '#30363d',
+          backgroundColor: cssVar('--card'),
+          titleColor: cssVar('--text'),
+          bodyColor: cssVar('--text'),
+          borderColor: cssVar('--border'),
           borderWidth: 1,
           padding: 12,
           callbacks: { afterBody: (items) => {
-            const s = buckets[items[0].label];
-            return ['n = ' + s.n, 'median: ' + fmtPct(s.median)];
+            const label = items[0].label;
+            const s = buckets[label];
+            const arr = ['n = ' + s.n, 'median: ' + fmtPct(s.median)];
+            if (dols[label] !== undefined) {
+              const dol = dols[label];
+              const dollarStr = dol >= 0 ? '+$' + dol.toFixed(2) : '-$' + Math.abs(dol).toFixed(2);
+              arr.push('Total Profit: ' + dollarStr);
+            }
+            return arr;
           } }
         }
       }
     }
   });
+}
+
+function linkifyHtml(html) {
+  const parts = html.split(/(<[^>]*>)/);
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 0) {
+      parts[i] = parts[i].replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
+        const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
+        const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
+        return (isAdvised || isHolding) ? tickerLink(ticker) : match;
+      });
+    }
+  }
+  return parts.join('');
 }
 
 export function renderAINews() {
@@ -562,22 +848,13 @@ export function renderAINews() {
         contentStr = contentStr.replace(/^###\s*(.*?)(\n|$)/, '');
       }
 
-      let linkedSummary = contentStr.replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
-        const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
-        const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
-        if (isAdvised || isHolding) {
-          return tickerLink(ticker);
-        }
-        return match;
-      });
-
-      let content = marked.parse(linkedSummary.trim());
+      let content = linkifyHtml(marked.parse(contentStr.trim()));
 
       html += `
         <div class="ai-article">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
             <h3 style="margin:0; font-size:16px;">${title}</h3>
-            <span style="font-size:12px; color:var(--muted);">${esc(s.timestamp || s.date || '')}</span>
+            <span style="font-size:12px; color:var(--muted);">${esc(s.timestamp ? localDateTime(s.timestamp) : (s.date ? localDateTime(s.date) : ''))}</span>
           </div>
           <div style="line-height: 1.6; font-size: 14px;" class="article-content news-markdown">${content}</div>
         </div>
@@ -607,26 +884,991 @@ export function renderEOD() {
         contentStr = contentStr.replace(/^###\s*(.*?)(\n|$)/, '');
       }
 
-      let linkedSummary = contentStr.replace(/\b([A-Z]{1,5}(?:\.[A-Z]{1,2})?)\b/g, (match, ticker) => {
-        const isAdvised = DATA.entries && DATA.entries.some(e => e.ticker === ticker);
-        const isHolding = PORTFOLIO.holdings && PORTFOLIO.holdings.some(h => h.ticker === ticker);
-        if (isAdvised || isHolding) {
-          return tickerLink(ticker);
-        }
-        return match;
-      });
-
-      let content = marked.parse(linkedSummary.trim());
+      let content = linkifyHtml(marked.parse(contentStr.trim()));
 
       return `
         <div class="ai-article">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
             <h3 style="margin:0; font-size:16px;">${title}</h3>
-            <span style="font-size:12px; color:var(--muted);">${esc(r.date || '')}</span>
+            <span style="font-size:12px; color:var(--muted);">${esc(r.date ? localDateTime(r.date) : '')}</span>
           </div>
           <div style="line-height: 1.6; font-size: 14px;" class="article-content news-markdown">${content}</div>
         </div>
       `;
     }).join('');
   }
+}
+
+export function renderReviews() {
+  const container = /** @type {HTMLElement} */ (document.getElementById('reviewsContent'));
+  const reviewsMd = DATA['reviewsMd'];
+  if (reviewsMd ?? false) {
+    let contentStr = /** @type {string} */ (reviewsMd);
+    
+    const blocks = contentStr.split(/(?=^##\s+\[)/m);
+    let html = '';
+    
+    blocks.forEach(block => {
+      block = block.trim();
+      if (!block.startsWith('## [')) return;
+      
+      const lines = block.split('\n');
+      const header = lines.shift().trim();
+      const dateMatch = header.match(/\[(.*?)\]/);
+      let dateStr = dateMatch ? dateMatch[1] : '';
+      const extraMatch = header.match(/\]\s+(.*)/);
+      if (extraMatch) {
+         dateStr += ' ' + extraMatch[1];
+      }
+      
+      let bodyText = lines.join('\n').trim();
+      if (!bodyText.startsWith('###')) {
+         bodyText = '### Strategy Review\n' + bodyText;
+      }
+      
+      const subBlocks = bodyText.split(/(?=^###\s+)/m);
+      subBlocks.forEach(sub => {
+         sub = sub.trim();
+         if (!sub.startsWith('###')) return;
+         
+         const subLines = sub.split('\n');
+         const titleLine = subLines.shift().trim();
+         const title = titleLine.replace(/^###\s*/, '');
+         const subContent = subLines.join('\n').trim();
+         
+         html += `
+        <div class="ai-article">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; border-bottom: 1px solid var(--border); padding-bottom: 12px;">
+            <h3 style="margin:0; font-size:16px;">${esc(title)}</h3>
+            <span style="font-size:12px; color:var(--muted);">${esc(localDateTime(dateStr))}</span>
+          </div>
+          <div style="line-height: 1.6; font-size: 14px;" class="article-content news-markdown">${linkifyHtml(marked.parse(subContent))}</div>
+        </div>
+      `;
+      });
+    });
+    
+    container.innerHTML = html || '<div class="empty">No learnings or deep dives logged yet. Run /review or ask the AI to analyze a specific ticker!</div>';
+  } else {
+    container.innerHTML = '<div class="empty">No learnings or deep dives logged yet. Run /review or ask the AI to analyze a specific ticker!</div>';
+  }
+}
+
+export function renderGainVsDaysChart(canvasId, rows) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const note = document.getElementById(canvasId + 'Note');
+  const toggle = document.querySelector(`.toggle-bucket[data-target="${canvasId}"]`);
+  
+  if (!rows || !rows.length) {
+    canvas.style.display = 'none';
+    if (toggle instanceof HTMLElement) toggle.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No closed positions available for this chart yet.</div>';
+    if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+    return;
+  }
+  
+  if (toggle instanceof HTMLElement) toggle.style.display = '';
+
+  const isDol = bucketModes[canvasId] === 'dol';
+  const scatterData = [];
+  rows.forEach(r => {
+    const d1 = new Date(r.openDate).getTime();
+    const d2 = new Date(r.closedDate).getTime();
+    let days = Math.round((d2 - d1) / (1000 * 3600 * 24));
+    if (isNaN(days)) return;
+    if (days < 0) days = 0;
+    const yVal = isDol ? (r.plDollar || 0) : r.plPct;
+    scatterData.push({ x: days, y: yVal, ticker: r.ticker, plDollar: r.plDollar || 0, plPct: r.plPct });
+  });
+
+  if (!scatterData.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No closed positions with valid dates yet.</div>';
+    return;
+  }
+
+  canvas.style.display = '';
+  if (note) note.innerHTML = '';
+
+  if (analyticsCharts[canvasId]) {
+    const chart = analyticsCharts[canvasId];
+    chart.data.datasets[0].data = scatterData;
+    chart.data.datasets[0].backgroundColor = scatterData.map(d => d.plPct >= 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)');
+    chart.data.datasets[0].borderColor = scatterData.map(d => d.plPct >= 0 ? 'rgba(46, 204, 113, 1)' : 'rgba(231, 76, 60, 1)');
+    chart.options.scales.y.title.text = isDol ? 'Realized Profit $' : 'Realized Return %';
+    chart.options.scales.y.ticks.callback = isDol ? (v => '$' + v) : (v => v + '%');
+    chart.update();
+    return;
+  }
+
+  analyticsCharts[canvasId] = new Chart(canvas, {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        label: 'Trades',
+        data: scatterData,
+        backgroundColor: scatterData.map(d => d.plPct >= 0 ? 'rgba(46, 204, 113, 0.6)' : 'rgba(231, 76, 60, 0.6)'),
+        borderColor: scatterData.map(d => d.plPct >= 0 ? 'rgba(46, 204, 113, 1)' : 'rgba(231, 76, 60, 1)'),
+        borderWidth: 1,
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: cssVar('--card'),
+          titleColor: cssVar('--text'),
+          bodyColor: cssVar('--text'),
+          borderColor: cssVar('--border'),
+          borderWidth: 1,
+          padding: 12,
+          callbacks: {
+            label: (ctx) => {
+              const d = ctx.raw;
+              const yStr = d.plPct > 0 ? '+' + d.plPct.toFixed(2) : d.plPct.toFixed(2);
+              const dollarStr = d.plDollar >= 0 ? '+$' + d.plDollar.toFixed(2) : '-$' + Math.abs(d.plDollar).toFixed(2);
+              return `${d.ticker}: ${yStr}% (${dollarStr}) in ${d.x} days`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { 
+          title: { display: true, text: 'Days Held', color: cssVar('--muted') },
+          ticks: { color: cssVar('--muted') },
+          grid: { color: cssVar('--border') }
+        },
+        y: { 
+          title: { display: true, text: isDol ? 'Realized Profit $' : 'Realized Return %', color: cssVar('--muted') },
+          ticks: { color: cssVar('--muted'), callback: isDol ? (v => '$' + v) : (v => v + '%') },
+          grid: { color: cssVar('--border') }
+        }
+      }
+    }
+  });
+}
+
+export function renderDayOfWeekChart(canvasId, rows) {
+  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const note = document.getElementById(canvasId + 'Note');
+  if (!rows || !rows.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No closed positions available for this chart yet.</div>';
+    return;
+  }
+
+  const daysStr = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const buckets = [0,1,2,3,4,5,6].map(i => ({ sum: 0, count: 0, plSum: 0, name: daysStr[i] }));
+  
+  const activeToggle = document.querySelector('#dayOfWeekToggles button.active');
+  const type = activeToggle instanceof HTMLElement ? activeToggle.dataset.type || 'bought' : 'bought';
+
+  rows.forEach(r => {
+    let dateStr = type === 'bought' ? r.openDateTime : r.firstAdvised;
+    if (!dateStr) return;
+    const d = new Date(dateStr).getDay();
+    if (isNaN(d)) return;
+    buckets[d].sum += r.plPct;
+    buckets[d].count += 1;
+    buckets[d].plSum += (r.plDollar || 0);
+  });
+
+  const validBuckets = buckets.filter(b => b.count > 0);
+  if (!validBuckets.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No valid advice dates found.</div>';
+    return;
+  }
+  canvas.style.display = '';
+  if (note) note.innerHTML = '';
+
+  const labels = validBuckets.map(b => b.name);
+  const averages = validBuckets.map(b => b.sum / b.count);
+  const counts = validBuckets.map(b => b.count);
+  const plSums = validBuckets.map(b => b.plSum);
+
+  analyticsCharts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Avg P/L %',
+        data: averages,
+        backgroundColor: averages.map(y => y >= 0 ? 'rgba(46, 204, 113, 0.8)' : 'rgba(231, 76, 60, 0.8)'),
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const y = ctx.raw;
+              const n = counts[ctx.dataIndex];
+              const dol = plSums[ctx.dataIndex];
+              const dollarStr = dol >= 0 ? '+$' + dol.toFixed(2) : '-$' + Math.abs(dol).toFixed(2);
+              return [
+                `Avg: ${y > 0 ? '+' : ''}${y.toFixed(2)}%`,
+                `Total: ${dollarStr} (n=${n})`
+              ];
+            }
+          }
+        }
+      },
+      scales: { y: { title: { display: true, text: 'Avg P/L %' } } }
+    }
+  });
+}
+
+export function renderWinRateTrendChart(canvasId, rows) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const note = document.getElementById(canvasId + 'Note');
+  const toggle = /** @type {HTMLElement | null} */ (document.querySelector(`.toggle-bucket[data-target="${canvasId}"]`));
+  
+  if (!rows || !rows.length) {
+    canvas.style.display = 'none';
+    if (toggle) toggle.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No closed positions available for this chart yet.</div>';
+    if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+    return;
+  }
+  if (toggle) toggle.style.display = '';
+
+  const buckets = {};
+  rows.forEach(r => {
+    if (!r.firstAdvised) return;
+    const d = new Date(r.firstAdvised);
+    if (isNaN(d.getTime())) return;
+    const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    if (!buckets[month]) buckets[month] = { wins: 0, total: 0, plSum: 0, dolSum: 0 };
+    if (r.plPct > 0) buckets[month].wins += 1;
+    buckets[month].total += 1;
+    buckets[month].plSum += r.plPct;
+    buckets[month].dolSum += (r.plDollar || 0);
+  });
+
+  const sortedMonths = Object.keys(buckets).sort();
+  if (!sortedMonths.length) {
+    canvas.style.display = 'none';
+    if (toggle) toggle.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No valid advice dates found.</div>';
+    if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+    return;
+  }
+  canvas.style.display = '';
+  if (note) note.innerHTML = '';
+
+  const labels = sortedMonths;
+  const winRates = sortedMonths.map(m => (buckets[m].wins / buckets[m].total) * 100);
+  const counts = sortedMonths.map(m => buckets[m].total);
+
+  if (analyticsCharts[canvasId]) {
+    const chart = analyticsCharts[canvasId];
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = winRates;
+    chart.update();
+    return;
+  }
+
+  analyticsCharts[canvasId] = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Win Rate %',
+        data: winRates,
+        borderColor: '#3498db',
+        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+        fill: true,
+        tension: 0.2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            afterBody: (items) => {
+              const label = items[0].label;
+              const idx = sortedMonths.indexOf(label);
+              if (idx === -1) return '';
+              return 'n = ' + counts[idx];
+            }
+          }
+        }
+      },
+      scales: {
+        y: { 
+          title: { display: true, text: 'Win Rate %', color: cssVar('--muted') }, 
+          min: 0, max: 100,
+          ticks: { color: cssVar('--muted') },
+          grid: { color: cssVar('--border') }
+        },
+        x: { ticks: { color: cssVar('--muted') }, grid: { display: false } }
+      }
+    }
+  });
+}
+
+export function renderEntryDisciplineChart(canvasId, rows) {
+  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const note = document.getElementById(canvasId + 'Note');
+  if (!rows || !rows.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No closed positions available for this chart yet.</div>';
+    return;
+  }
+
+  const buckets = {
+    'Below Drop Below': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity, dolSum: 0 },
+    'In Buy Zone': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity, dolSum: 0 },
+    'Chased': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity, dolSum: 0 },
+    'Above Drop Above': { plSum: 0, total: 0, minPl: Infinity, maxPl: -Infinity, dolSum: 0 }
+  };
+  
+  rows.forEach(r => {
+    const buyBelow = r.e.buyBelow;
+    if (buyBelow == null || !r.boughtAt) return;
+    
+    let category = 'In Buy Zone';
+    if (r.e.dropBelow && r.boughtAt < r.e.dropBelow) {
+      category = 'Below Drop Below';
+    } else if (r.boughtAt <= buyBelow + 0.01) {
+      category = 'In Buy Zone';
+    } else if (r.e.dropAbove && r.boughtAt > r.e.dropAbove) {
+      category = 'Above Drop Above';
+    } else {
+      category = 'Chased';
+    }
+    
+    buckets[category].plSum += r.plPct;
+    buckets[category].total += 1;
+    buckets[category].dolSum += (r.plDollar || 0);
+    if (r.plPct < buckets[category].minPl) buckets[category].minPl = r.plPct;
+    if (r.plPct > buckets[category].maxPl) buckets[category].maxPl = r.plPct;
+  });
+
+  const labels = Object.keys(buckets).filter(k => buckets[k].total > 0);
+  if (!labels.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">Not enough buy target data available.</div>';
+    return;
+  }
+  
+  canvas.style.display = '';
+  if (note) note.innerHTML = '';
+
+  const avgPls = labels.map(l => buckets[l].plSum / buckets[l].total);
+  const counts = labels.map(l => buckets[l].total);
+  const mins = labels.map(l => buckets[l].minPl);
+  const maxes = labels.map(l => buckets[l].maxPl);
+  const dols = labels.map(l => buckets[l].dolSum);
+
+  const colors = {
+    'Below Drop Below': 'rgba(231, 76, 60, 0.8)',
+    'In Buy Zone': 'rgba(46, 204, 113, 0.8)',
+    'Chased': 'rgba(243, 156, 18, 0.8)',
+    'Above Drop Above': 'rgba(231, 76, 60, 0.8)'
+  };
+
+  analyticsCharts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Avg P/L %',
+        data: avgPls,
+        backgroundColor: labels.map(l => colors[l]),
+        borderRadius: 6,
+        maxBarThickness: 60
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const y = ctx.raw;
+              const n = counts[ctx.dataIndex];
+              const min = mins[ctx.dataIndex];
+              const max = maxes[ctx.dataIndex];
+              const dol = dols[ctx.dataIndex];
+              const dollarStr = dol >= 0 ? '+$' + dol.toFixed(2) : '-$' + Math.abs(dol).toFixed(2);
+              return [
+                `Avg P/L: ${y > 0 ? '+' : ''}${y.toFixed(2)}% | Total: ${dollarStr}`,
+                `Range: ${min > 0 ? '+' : ''}${min.toFixed(2)}% to ${max > 0 ? '+' : ''}${max.toFixed(2)}%`,
+                `Trades: n=${n}`
+              ];
+            }
+          }
+        }
+      },
+      scales: { y: { title: { display: true, text: 'Average P/L %' } } }
+    }
+  });
+}
+
+export function renderDaysVsRsiChart(canvasId, rows) {
+  if (analyticsCharts[canvasId]) { analyticsCharts[canvasId].destroy(); delete analyticsCharts[canvasId]; }
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const note = document.getElementById(canvasId + 'Note');
+  
+  const winningRows = (rows || []).filter(r => r.plPct > 0);
+  if (!winningRows.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No winning trades available for this chart yet.</div>';
+    return;
+  }
+
+  const buckets = {};
+  winningRows.forEach(r => {
+    let rsiBand = 'Unknown';
+    if (r.e.rsiAtAdvice != null) {
+      const v = r.e.rsiAtAdvice;
+      if (v < 20) rsiBand = '< 20 (Deep)';
+      else if (v < 25) rsiBand = '20 - 25';
+      else if (v < 30) rsiBand = '25 - 30';
+      else if (v < 35) rsiBand = '30 - 35';
+      else if (v < 40) rsiBand = '35 - 40';
+      else rsiBand = '40+';
+    } else {
+      return;
+    }
+    
+    const d1 = new Date(r.openDate).getTime();
+    const d2 = new Date(r.closedDate).getTime();
+    let days = Math.round((d2 - d1) / (1000 * 3600 * 24));
+    if (isNaN(days)) return;
+    if (days < 0) days = 0;
+    
+    if (!buckets[rsiBand]) buckets[rsiBand] = { sum: 0, count: 0, dolSum: 0 };
+    buckets[rsiBand].sum += days;
+    buckets[rsiBand].count += 1;
+    buckets[rsiBand].dolSum += (r.plDollar || 0);
+  });
+
+  const order = ['< 20 (Deep)', '20 - 25', '25 - 30', '30 - 35', '35 - 40', '40+'];
+  const labels = Object.keys(buckets).sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  
+  if (!labels.length) {
+    canvas.style.display = 'none';
+    if (note) note.innerHTML = '<div class="insufficient">No RSI data available for winning trades.</div>';
+    return;
+  }
+  
+  canvas.style.display = '';
+  if (note) note.innerHTML = '';
+
+  const averages = labels.map(l => buckets[l].sum / buckets[l].count);
+  const counts = labels.map(l => buckets[l].count);
+  const dols = labels.map(l => buckets[l].dolSum);
+
+  analyticsCharts[canvasId] = new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Avg Days to Bounce',
+        data: averages,
+        backgroundColor: 'rgba(155, 89, 182, 0.8)',
+        borderRadius: 6
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const y = ctx.raw;
+              const n = counts[ctx.dataIndex];
+              const dol = dols[ctx.dataIndex];
+              const dollarStr = dol >= 0 ? '+$' + dol.toFixed(2) : '-$' + Math.abs(dol).toFixed(2);
+              return [
+                `Avg Days Held: ${y.toFixed(1)} (n=${n})`,
+                `Total Profit: ${dollarStr}`
+              ];
+            }
+          }
+        }
+      },
+      scales: { y: { title: { display: true, text: 'Avg Days Held' } } }
+    }
+  });
+}
+let equityChart = null;
+export function renderEquityChart(tf = '7d') {
+  const equityHistory = /** @type {any} */ (DATA).equityHistory;
+  if (!equityHistory || equityHistory.length === 0) {
+    const wrap = document.getElementById('chartEquity')?.parentElement;
+    if (wrap) wrap.innerHTML = '<div class="insufficient" style="height:100%; display:flex; align-items:center; justify-content:center;">Waiting for more data points. Chart will appear soon.</div>';
+    return;
+  }
+  
+  const now = new Date();
+  let msAgo = 0;
+  if (tf === '24h') msAgo = 24 * 3600 * 1000;
+  else if (tf === '7d') msAgo = 7 * 86400 * 1000;
+  else if (tf === '30d') msAgo = 30 * 86400 * 1000;
+  else if (tf === '12m') msAgo = 365 * 86400 * 1000;
+  
+  let pts = equityHistory;
+  if (msAgo > 0) {
+    const cutoff = new Date(now.getTime() - msAgo);
+    pts = pts.filter((p) => new Date(p.timestamp) >= cutoff);
+    if (pts.length < equityHistory.length) {
+      const earlier = equityHistory.slice(0, equityHistory.length - pts.length);
+      if (earlier.length) pts.unshift(earlier[earlier.length - 1]);
+    }
+  }
+
+  let bucketMs = 0;
+  if (tf === '24h') bucketMs = 60 * 60 * 1000; // 1 hour buckets
+  else if (tf === '7d') bucketMs = 4 * 3600 * 1000;
+  else if (tf === '30d') bucketMs = 86400 * 1000;
+  else if (tf === '12m') bucketMs = 7 * 86400 * 1000;
+  
+  if (bucketMs > 0) {
+      const buckets = {};
+      const recentPoints = [];
+      const oneHourAgo = now.getTime() - 60 * 60 * 1000;
+      
+      pts.forEach(p => {
+          const d = new Date(p.timestamp);
+          const t = d.getTime();
+          if (tf === '24h' && t >= oneHourAgo) {
+              recentPoints.push(p);
+          } else {
+              let bucket;
+              if (tf === '30d') {
+                  bucket = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+              } else {
+                  bucket = Math.floor(t / bucketMs) * bucketMs;
+              }
+              buckets[bucket] = p; // keep last in bucket
+          }
+      });
+      pts = Object.keys(buckets).sort().map(k => buckets[k]).concat(recentPoints);
+      pts = pts.filter((item, pos, ary) => pos === 0 || item !== ary[pos - 1]);
+  }
+
+  const wrap = document.getElementById('chartEquity')?.parentElement;
+  if (!wrap) return;
+
+  if (pts.length < 2) {
+    if (!wrap.querySelector('.insufficient')) {
+        wrap.innerHTML = '<canvas id="chartEquity"></canvas><div class="insufficient" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100%; text-align:center;">Not enough data points yet.</div>';
+    }
+  } else {
+    if (wrap.querySelector('.insufficient')) {
+        wrap.innerHTML = '<canvas id="chartEquity"></canvas>';
+    }
+  }
+  
+  const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById('chartEquity'));
+  if (!canvas) return;
+  
+  if (equityChart) equityChart.destroy();
+
+  const labels = pts.map((p) => {
+      const d = new Date(p.timestamp);
+      if (tf === '24h') return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      if (tf === '7d') return d.toLocaleDateString([], {month: 'short', day: 'numeric'}) + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      if (tf === '30d') return d.toLocaleDateString([], {month: 'short', day: 'numeric'});
+      return d.toLocaleDateString([], {year: 'numeric', month: 'short'});
+  });
+
+  const green = cssVar('--green');
+  const blue = cssVar('--blue');
+  const text = cssVar('--text');
+  const cyan = cssVar('--cyan');
+  const yellow = cssVar('--yellow');
+
+  const basePoint = pts.find(p => p.invested);
+  const nasdaqBase = pts.find(p => p.nasdaq);
+  const sp500Base = pts.find(p => p.sp500);
+  const dowBase = pts.find(p => p.dow);
+
+  const nasdaqData = pts.map(p => (nasdaqBase && p.nasdaq) ? ((p.nasdaq - nasdaqBase.nasdaq) / nasdaqBase.nasdaq * 100) : null);
+  const sp500Data = pts.map(p => (sp500Base && p.sp500) ? ((p.sp500 - sp500Base.sp500) / sp500Base.sp500 * 100) : null);
+  const dowData = pts.map(p => (dowBase && p.dow) ? ((p.dow - dowBase.dow) / dowBase.dow * 100) : null);
+
+  // Calculate portfolio return over the timeframe by looking at the change in Total P/L relative to the starting invested capital
+  const totalPctData = pts.map(p => (basePoint && basePoint.invested) ? ((p.total - basePoint.total) / basePoint.invested * 100) : null);
+
+  equityChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Total P/L', data: pts.map(p => p.total), yAxisID: 'y', borderColor: text, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'Realized P/L', data: pts.map(p => p.realized), yAxisID: 'y', borderColor: green, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'Open P/L', data: pts.map(p => p.open), yAxisID: 'y', borderColor: blue, borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'Portfolio Return %', data: totalPctData, yAxisID: 'y1', borderColor: yellow, borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'Nasdaq %', data: nasdaqData, yAxisID: 'y1', borderColor: cyan, borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'S&P 500 %', data: sp500Data, yAxisID: 'y1', borderColor: cssVar('--orange'), borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true },
+        { label: 'Dow %', data: dowData, yAxisID: 'y1', borderColor: cssVar('--red'), borderDash: [5, 5], borderWidth: 2, pointRadius: 0, pointHoverRadius: 4, tension: 0.1, spanGaps: true }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { color: cssVar('--muted') } },
+        tooltip: { 
+            mode: 'index', intersect: false, 
+            callbacks: { 
+                label: c => {
+                    if (c.dataset.yAxisID === 'y1') return c.dataset.label + ': ' + (c.raw != null ? c.raw.toFixed(2) + '%' : 'N/A');
+                    return c.dataset.label + ': $' + (c.raw != null ? c.raw.toFixed(2) : 'N/A');
+                }
+            } 
+        }
+      },
+      scales: {
+        x: { grid: { color: cssVar('--border') }, ticks: { color: cssVar('--muted'), maxTicksLimit: 8 } },
+        y: { 
+            type: 'linear', display: true, position: 'left',
+            grid: { color: cssVar('--border') }, 
+            ticks: { color: cssVar('--muted'), callback: v => '$' + v } 
+        },
+        y1: { 
+            type: 'linear', display: true, position: 'right',
+            grid: { drawOnChartArea: false },
+            ticks: { color: cssVar('--muted'), callback: v => (typeof v === 'number' ? parseFloat(v.toFixed(2)) : v) + '%' } 
+        }
+      }
+    }
+  });
+}
+
+let drawdownChart = null;
+export function renderDrawdownChart(tf = '24h') {
+  const equityHistory = /** @type {any} */ (DATA).equityHistory;
+  if (!equityHistory || equityHistory.length === 0) {
+    const wrap = document.getElementById('chartDrawdown')?.parentElement;
+    if (wrap) wrap.innerHTML = '<div class="insufficient" style="height:100%; display:flex; align-items:center; justify-content:center;">Waiting for more data points.</div>';
+    return;
+  }
+  
+  const now = new Date();
+  let msAgo = 0;
+  if (tf === '24h') msAgo = 24 * 3600 * 1000;
+  else if (tf === '7d') msAgo = 7 * 86400 * 1000;
+  else if (tf === '30d') msAgo = 30 * 86400 * 1000;
+  else if (tf === '12m') msAgo = 365 * 86400 * 1000;
+  
+  let pts = equityHistory;
+  if (msAgo > 0) {
+    const cutoff = new Date(now.getTime() - msAgo);
+    pts = pts.filter((p) => new Date(p.timestamp) >= cutoff);
+    if (pts.length < equityHistory.length) {
+      const earlier = equityHistory.slice(0, equityHistory.length - pts.length);
+      if (earlier.length) pts.unshift(earlier[earlier.length - 1]);
+    }
+  }
+
+  let bucketMs = 0;
+  if (tf === '24h') bucketMs = 60 * 60 * 1000;
+  else if (tf === '7d') bucketMs = 4 * 3600 * 1000;
+  else if (tf === '30d') bucketMs = 86400 * 1000;
+  else if (tf === '12m') bucketMs = 7 * 86400 * 1000;
+  
+  if (bucketMs > 0) {
+      const buckets = {};
+      const recentPoints = [];
+      const oneHourAgo = now.getTime() - 60 * 60 * 1000;
+      
+      pts.forEach(p => {
+          const d = new Date(p.timestamp);
+          const t = d.getTime();
+          if (tf === '24h' && t >= oneHourAgo) {
+              recentPoints.push(p);
+          } else {
+              let bucket;
+              if (tf === '30d') {
+                  bucket = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+              } else {
+                  bucket = Math.floor(t / bucketMs) * bucketMs;
+              }
+              buckets[bucket] = p; // keep last in bucket
+          }
+      });
+      pts = Object.keys(buckets).sort().map(k => buckets[k]).concat(recentPoints);
+      pts = pts.filter((item, pos, ary) => pos === 0 || item !== ary[pos - 1]);
+  }
+
+  const wrap = document.getElementById('chartDrawdown')?.parentElement;
+  if (!wrap) return;
+
+  if (pts.length < 2) {
+    if (!wrap.querySelector('.insufficient')) {
+        wrap.innerHTML = '<canvas id="chartDrawdown"></canvas><div class="insufficient" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100%; text-align:center;">Not enough data points yet.</div>';
+    }
+  } else {
+    if (wrap.querySelector('.insufficient')) {
+        wrap.innerHTML = '<canvas id="chartDrawdown"></canvas>';
+    }
+  }
+  
+  const canvas = /** @type {HTMLCanvasElement} */ (document.getElementById('chartDrawdown'));
+  if (!canvas) return;
+  
+  if (drawdownChart) drawdownChart.destroy();
+
+  const labels = pts.map((p) => {
+      const d = new Date(p.timestamp);
+      if (tf === '24h') return d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      if (tf === '7d') return d.toLocaleDateString([], {month: 'short', day: 'numeric'}) + ' ' + d.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+      if (tf === '30d') return d.toLocaleDateString([], {month: 'short', day: 'numeric'});
+      return d.toLocaleDateString([], {year: 'numeric', month: 'short'});
+  });
+
+  // Build an indexed equity curve immune to cash deposits/withdrawals
+  // We track the percentage change in Total P/L relative to the Invested capital at that moment.
+  const eqMap = new Map();
+  let currentIndex = 100;
+  let runningPeak = 100;
+  
+  for (let i = 0; i < equityHistory.length; i++) {
+      const p = equityHistory[i];
+      if (i > 0) {
+          const prev = equityHistory[i - 1];
+          const delta = (p.total || 0) - (prev.total || 0);
+          // If there is active capital, calculate the return. Otherwise 0.
+          // We use the max of current or previous invested to be conservative during trades.
+          const activeCapital = Math.max(p.invested || 0, prev.invested || 0);
+          const r = activeCapital > 0 ? (delta / activeCapital) : 0;
+          currentIndex = currentIndex * (1 + r);
+      }
+      
+      if (currentIndex > runningPeak) runningPeak = currentIndex;
+      const dd = runningPeak > 0 ? ((currentIndex - runningPeak) / runningPeak) * 100 : 0;
+      eqMap.set(p.timestamp, dd);
+  }
+  
+  const ddData = pts.map(p => eqMap.get(p.timestamp) || 0);
+
+  drawdownChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { 
+          label: 'Drawdown %', 
+          data: ddData, 
+          borderColor: 'rgba(231, 76, 60, 1)', 
+          backgroundColor: 'rgba(231, 76, 60, 0.2)',
+          fill: true,
+          borderWidth: 2, 
+          pointRadius: 0, 
+          pointHoverRadius: 4, 
+          tension: 0.1 
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { 
+            mode: 'index', intersect: false, 
+            callbacks: { 
+                label: c => {
+                    return c.dataset.label + ': ' + c.raw.toFixed(2) + '%';
+                }
+            } 
+        }
+      },
+      scales: {
+        x: { grid: { color: cssVar('--border') }, ticks: { color: cssVar('--muted'), maxTicksLimit: 8 } },
+        y: { 
+            type: 'linear', display: true, position: 'left',
+            grid: { color: cssVar('--border') }, 
+            ticks: { color: cssVar('--muted'), callback: v => (typeof v === 'number' ? parseFloat(v.toFixed(2)) : v) + '%' },
+            max: 0
+        }
+      }
+    }
+  });
+}
+
+let pnlChart = null;
+let pnlTf = 'month'; // 'month', 'year'
+let pnlYearGroup = 'month'; // 'week', 'month', 'quarter'
+let pnlCurrentDate = new Date(); // To track current month/year being viewed
+
+export function setPnlTf(tf) { pnlTf = tf; renderRealizedPnlChart(); }
+export function setPnlYearGroup(group) { pnlYearGroup = group; renderRealizedPnlChart(); }
+export function shiftPnlDate(dir) {
+    if (pnlTf === 'month') {
+        pnlCurrentDate.setMonth(pnlCurrentDate.getMonth() + dir);
+    } else {
+        pnlCurrentDate.setFullYear(pnlCurrentDate.getFullYear() + dir);
+    }
+    renderRealizedPnlChart();
+}
+
+function getWeekNumber(d) {
+    const dStr = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = dStr.getUTCDay() || 7;
+    dStr.setUTCDate(dStr.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(dStr.getUTCFullYear(),0,1));
+    return Math.ceil((((dStr.getTime() - yearStart.getTime()) / 86400000) + 1)/7);
+}
+
+export function renderRealizedPnlChart() {
+    if (!DATA || !DATA.entries) return;
+    
+    // 1. Gather all closed lots and compute P/L
+    let allLots = [];
+    DATA.entries.forEach(e => {
+        if (e.lots) {
+            e.lots.forEach(lot => {
+                if (lot.closedDate && lot.soldAt && lot.openRate && lot.units) {
+                    const pl = (lot.soldAt - lot.openRate) * lot.units;
+                    allLots.push({ date: new Date(lot.closedDate), pl: pl });
+                }
+            });
+        }
+    });
+    
+    // Sort lots by date
+    allLots.sort((a, b) => a.date - b.date);
+
+    const canvas = document.getElementById('chartRealizedPnl');
+    if (!canvas) return;
+
+    // 2. Filter by timeframe
+    let filteredLots = [];
+    const year = pnlCurrentDate.getFullYear();
+    const month = pnlCurrentDate.getMonth();
+    
+    if (pnlTf === 'month') {
+        filteredLots = allLots.filter(l => l.date.getFullYear() === year && l.date.getMonth() === month);
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+        document.getElementById('pnlLabel').textContent = `${monthNames[month]} ${year}`;
+        /** @type {HTMLButtonElement} */ (document.getElementById('pnlPrevBtn')).disabled = allLots.length === 0 || (allLots[0].date.getFullYear() > year || (allLots[0].date.getFullYear() === year && allLots[0].date.getMonth() >= month));
+        /** @type {HTMLButtonElement} */ (document.getElementById('pnlNextBtn')).disabled = allLots.length === 0 || (allLots[allLots.length-1].date.getFullYear() < year || (allLots[allLots.length-1].date.getFullYear() === year && allLots[allLots.length-1].date.getMonth() <= month));
+        document.getElementById('pnlYearGroupToggles').style.display = 'none';
+    } else {
+        filteredLots = allLots.filter(l => l.date.getFullYear() === year);
+        document.getElementById('pnlLabel').textContent = `${year}`;
+        /** @type {HTMLButtonElement} */ (document.getElementById('pnlPrevBtn')).disabled = allLots.length === 0 || allLots[0].date.getFullYear() >= year;
+        /** @type {HTMLButtonElement} */ (document.getElementById('pnlNextBtn')).disabled = allLots.length === 0 || allLots[allLots.length-1].date.getFullYear() <= year;
+        document.getElementById('pnlYearGroupToggles').style.display = 'flex';
+    }
+
+    // 3. Group by bucket
+    const buckets = {};
+    if (pnlTf === 'month') {
+        // Group by Day
+        // Pre-fill all days in the month
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        for (let i = 1; i <= daysInMonth; i++) {
+            buckets[`${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`] = 0;
+        }
+        filteredLots.forEach(l => {
+            const dayStr = `${l.date.getFullYear()}-${String(l.date.getMonth()+1).padStart(2,'0')}-${String(l.date.getDate()).padStart(2,'0')}`;
+            buckets[dayStr] += l.pl;
+        });
+    } else { // Year view
+        if (pnlYearGroup === 'week') {
+            // Group by Week
+            for (let i = 1; i <= 52; i++) buckets[`W${i}`] = 0;
+            filteredLots.forEach(l => {
+                const w = getWeekNumber(l.date);
+                if (buckets[`W${w}`] !== undefined) buckets[`W${w}`] += l.pl;
+                else buckets[`W${w}`] = l.pl;
+            });
+        } else if (pnlYearGroup === 'month') {
+            // Group by Month
+            const shortMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            shortMonths.forEach(m => buckets[m] = 0);
+            filteredLots.forEach(l => {
+                const m = shortMonths[l.date.getMonth()];
+                buckets[m] += l.pl;
+            });
+        } else if (pnlYearGroup === 'quarter') {
+            // Group by Quarter
+            ['Q1', 'Q2', 'Q3', 'Q4'].forEach(q => buckets[q] = 0);
+            filteredLots.forEach(l => {
+                const q = Math.floor(l.date.getMonth() / 3) + 1;
+                buckets[`Q${q}`] += l.pl;
+            });
+        }
+    }
+
+    const labels = Object.keys(buckets);
+    const data = labels.map(k => buckets[k]);
+    const bgColors = data.map(v => v >= 0 ? cssVar('--green') : cssVar('--red'));
+
+    if (pnlChart) pnlChart.destroy();
+    
+    // Check if there is data
+    const wrap = canvas.parentElement;
+    if (data.every(v => v === 0)) {
+        if (!wrap.querySelector('.insufficient')) {
+            wrap.innerHTML = '<canvas id="chartRealizedPnl"></canvas><div class="insufficient" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:100%; text-align:center;">No realized P/L for this period.</div>';
+        }
+    } else {
+        if (wrap.querySelector('.insufficient')) {
+            wrap.innerHTML = '<canvas id="chartRealizedPnl"></canvas>';
+        }
+    }
+
+    const newCanvas = document.getElementById('chartRealizedPnl');
+    pnlChart = new Chart(newCanvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Realized P/L',
+                data: data,
+                backgroundColor: bgColors,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: c => '$' + c.raw.toFixed(2)
+                    }
+                }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: cssVar('--muted') } },
+                y: { 
+                    type: 'linear', display: true, position: 'left',
+                    grid: { color: cssVar('--border') }, 
+                    ticks: { color: cssVar('--muted'), callback: v => '$' + v } 
+                }
+            }
+        }
+    });
 }
