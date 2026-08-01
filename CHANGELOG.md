@@ -7,151 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.0] - 2026-08-01
 
-- Bugfix: `advice_log.py add-pick` now updates `source` on an existing entry. Previously `source` was only set at creation, so a mislabelled tactic could not be corrected through the CLI.
-- Bugfix: `advice_log.py add-pick` now replaces the same-day `Advised (...)` note instead of appending a second one. Rewording a thesis used to stack the draft and the edit on top of each other in the drill-down modal.
-- Documentation: Corrected the research workflow in `CLAUDE.md` and `GEMINI.md`. It documented all six tactics as `screen.py <tactic>` subcommands, but only `oversold` and `momentum` exist there. The other four (`earnings`, `insider`, `market-rotation`, `diversify`) are WebSearch-driven skills, which had led to them being skipped as unavailable.
-- Documentation: Resynced `GEMINI.md` with `CLAUDE.md`. It was missing the Changelog Rule section and omitted `/diversify` from the autosync command list.
-- Strategy update: Added 'No Result is a Result' rule to the advice orchestrator skill to ensure every tactical sub-skill is explicitly reported, even when yielding zero candidates.
-- Bugfix: Removed legacy oversold-biased terminology from the stock-researcher agent prompt to allow clean evaluation of non-oversold tactics.
-- Documentation: Finalized the public sample STRATEGY.md template with serious quantitative metrics (ROE, Debt/Equity, Piotroski, Beneish M-Score) and appended a realistic self-learning entry to REVIEWS.md.
-- Strategy update: Added ATR trailing stops, Bollinger Band mean reversion, and OBV volume confirmation requirements to the trading strategy and AI researcher prompts.
-- Bugfix: Fixed an issue where the AI stock-researcher would incorrectly reject 'insider' or 'momentum' candidates by blindly holding them to the 'oversold' RSI criteria.
-- Security: Scrubbed hardcoded personal quantitative thresholds from the open-source stock-researcher agent to strictly comply with the Open-Source Privacy Rule.
-- Documentation: Overhauled the sample STRATEGY.md template to showcase advanced institutional metrics while maintaining generic formatting.
-- Documentation: Overhauled the sample REVIEWS.md template with realistic fake self-learning outputs to showcase the AI's correlation matrix and statistical capabilities.
-- Configuration: Added `USER_TIMEZONE` to `.env.sample` for configurable AI timezone handling.
-- Documentation: Added explicit configuration instructions for `USER_TIMEZONE` to `docs/SETUP.md`.
-- Architecture: Added new Git Hygiene, Timezone Communication, Atomic Commits, UI Modal Fidelity, and Strict DOM Type-Checking rules to `.agents/AGENTS.md`, `GEMINI.md`, and `CLAUDE.md`.
-- Documentation: Updated `docs/MANUAL.md` to reflect new 0.10.0 features (Open Notes, GICS Sectors, Top Bar Summaries).
-- Strategy update: Upgraded the vague 'Consistent Free Cash Flow' requirement in the Buffett Moat matrix to a hard 'FCF Yield > 5%' metric in `STRATEGY.md`.
-- Analytics: Added total portfolio Maximum Drawdown (MDD) and Sharpe Ratio calculation to `review_stats.py` using `equity-history.json` to properly weight the varying position sizes.
-- Dashboard: Reordered the Analytics tab charts to prioritize Equity Curve and Realized P/L at the top, followed by Underwater Drawdown and Sector Analysis.
-- Dashboard: Added an "Underwater Drawdown" area chart beneath the Equity Curve to visualize the percentage drop from the portfolio's all-time high over time.
-- Dashboard: Upgraded the "Gain vs Days Held" bar chart into a "Trade Efficiency" scatter plot, mapping every individual closed position to visually expose behavioral habits like holding losers too long.
-- Dashboard: Introduced a `%` vs `$` toggle on most Win Rate and Trade Efficiency charts to instantly switch between average percentage returns and absolute realized dollars without reloading the dashboard.
-- Analytics: Re-engineered Maximum Drawdown (MDD) calculation to use a compounding return index, ensuring cash deposits/withdrawals no longer falsely register as portfolio drawdowns.
-- Dashboard: Grouped all Win Rate charts (over time, by rating, by RSI, by sector, by source) sequentially in the UI and updated titles for clarity.
-- Dashboard: Set the "Bought" view as the default active toggle for the Day of the Week chart.
-- Dashboard: Updated all chart info modals to clearly document the new `%`/`$` toggle behaviors and accurately describe the new Drawdown metric.
-- Bugfix: Corrected floating-point precision noise on the Y-axis ticks of the Equity Curve and Drawdown charts.
-- Bugfix: Fixed an issue where ticker hyperlinks inside markdown code blocks (e.g. \`DUOL\`) would render as raw HTML strings in the News, EOD, and Learnings UI.
-- Bugfix: The \`/review\` skill now generates strict ISO 8601 timestamps in \`REVIEWS.md\` (e.g., \`[YYYY-MM-DDTHH:MM-04:00]\`), and the dashboard now correctly parses them into the user's local timezone instead of displaying raw New York time.
-- Feature: Added a Treemap/Heatmap visualizer to the Portfolio tab, complete with a toggle to view "AI Advised Only" or "Entire Portfolio".
-- Architecture: Refactored to a Meta-Advisor pattern, extracting `oversold` into a dedicated tactical skill and decoupling it from the `advice`, `premarket`, and `aftermarket` workflow skills.
-- Architecture: Updated all skill manifests (`.claude/` and `.gemini/`) to support the new modular strategy-agnostic approach.
-- Feature: Implemented an `--open-note` parameter in `advice_log.py add-pick` to persist actionable premarket/aftermarket timing advice directly into the database.
-- Dashboard: Added visual rendering of the `openNote` property in the dashboard drill-down modal (displayed in orange below the Risk section).
-- Pipeline: Updated the CLI to parse and accept GICS sectors exclusively instead of the legacy eToro sectors.
-- Dashboard: Fixed a bug causing a DOM Exception for disabled buttons in `renderers.js` by explicitly casting to `HTMLButtonElement`.
-- Dashboard: Removed the redundant "Analytics" overarching title to fix the double title display above the "~7 days after advice" card.
-- Dashboard: Added "Advised" and "Bought" toggles to the "By Day of the Week" chart to allow bucketing by either the AI advice date or the eToro trade execution date.
-- Security: Moved the `instruments_cache.json` file into the `data/private` folder so that it is properly backed up by `autosync.py` without risking public exposure of trading history.
-- Script: Added a new `scripts/publish_instruments.py` utility to safely merge your private cached instruments into the public `instruments.json` on-demand for community releases.
-
 ### Added
-- Dashboard: Combined the Sector division and Sector coverage charts into a single "Sector Analysis" card on the Analytics tab and added explanatory modals regarding sector accuracy.
-- Dashboard: Updated the sector charts with a distinct 12-color palette for improved legibility.
-- Sample Data: Added missing dummy files (`equity-history.json`, `correlation.json`, `REVIEWS.md`) and updated sectors to the GICS standard to match the real data structure.
-- Pipeline: Implemented true GICS sector extraction from StockAnalysis in `screen.py` to replace broad eToro industry labels (e.g., misclassified "Consumer Goods").
-- Pipeline: Updated `etoro_import.py` to prioritize cached GICS sectors over eToro industry IDs to prevent sector accuracy regressions.
-- Feature: Added support for blacklisting stocks. Blacklisted stocks can be added manually or flagged from the dashboard, are tagged with customizable reasons (e.g., 'not listed', 'paused'), and are automatically ignored by the advice workflow.
-- Dashboard: Added "Closed positions" and "Ignored positions" summary cards to the top bar layout.
-- Dashboard: Fixed an issue where "Removed" items were completely deleted and no longer counted towards the "Ignored positions" and "Total adviced picks" totals. "Removed" items are now marked with a `removed` status instead.
-- Dashboard: Fixed an issue on the Equity Curve where the "30d" view could sometimes display duplicate dates on the x-axis due to UTC boundary overlap. The chart now properly buckets by local calendar days.
-- Dashboard: Fixed an issue where the Realized P/L chart would not load the current month view automatically on page load.
-- Dashboard: Fixed an issue where legacy eToro sectors could cause discrepancies and missing values in the sector charts, by mapping them to GICS at render time.
-- Dashboard: Re-styled the Prev/Next pagination buttons on the Realized P/L chart to match the standard refresh button style and added a visual disabled state.
-- CLI: Added `open-profits` command to `scripts/advice_log.py` to quickly list open positions currently in profit.
-- Pipeline: Added `--min-rsi`, `--exclude-held`, and `--exclude-advised` native filtering flags to `scripts/screen.py oversold`.
-- Pipeline: Fixed a bug in `scripts/screen.py oversold` where `--min-rsi` incorrectly acted as a maximum bound instead of a lower bound.
-- Added 4 new analytics charts to the dashboard for deep strategy insights:
-  - **Performance by Day of the Week**: Bar chart showing average P/L% by the day of the week a stock was advised.
-  - **Win Rate Over Time**: Line chart tracking the win rate % of advice generated each month.
-  - **Entry Discipline**: Bar chart comparing the win rate of stocks bought "In Buy Zone" (<= target) versus "Chased" (> target).
-  - **Days to Bounce vs RSI**: Bar chart showing the average days held for winning trades grouped by RSI band at advice.
-- Added a new "Gain vs Days Held" bar chart to the Analytics tab to visualize the average percentage gain of closed positions grouped by the number of days they were held. Tooltips include the sample size, maximum gain, and maximum loss for that specific holding period. (Also strips out any NaN dates).
-- Added a new "Learnings" tab to the dashboard to organize strategy reviews, ad-hoc analysis, and ticker deep dives using a masonry grid layout.
-- Review headers generated by the `/review` skill now include exact timestamps (`[YYYY-MM-DD HH:MM]`).
-- Added historical account equity tracking, automatically recording total Realized and Open P/L on data syncs.
-- Added a new "Equity Curve" chart to the Analytics tab, visualizing Realized, Open, and Total P/L across 24h (1-hour buckets), 7-day, 4-week, and 12-month timeframes.
-- Added S&P 500 (SPX) and Dow Jones (DJI) percentage benchmarks alongside the Nasdaq on the Equity Curve chart.
-- Added `correlation.json` to the automated backup paths in `scripts/autosync.py`.
-- Added 11 new stock instruments to the tracking dataset (`data/instruments.json`).
-- CLI: Added new `momentum` subparser to `scripts/screen.py` to identify stocks with extreme relative strength (RSI > 70).
-- AI Skills: Introduced `/momentum`, `/insider`, and `/earnings-play` workflows to both `.claude/skills` and `.gemini/skills` for identifying non-oversold market opportunities.
-- AI Skills: Introduced `/market-rotation` workflow to both `.claude/skills` and `.gemini/skills` for finding opportunities in sectors gaining relative momentum using systematic tactics.
-- Dashboard: Implemented a Light/Dark mode toggle (using `localStorage`) for better accessibility.
+- Advanced Analytics: Added a new "Equity Curve" chart to track total portfolio Maximum Drawdown (MDD), compounding returns, Sharpe Ratio, and benchmarks (S&P 500, Dow Jones).
+- Strategy Analytics: Added "Trade Efficiency" scatter plot (Hold Times vs Realized Gains), "Performance by Day of the Week", "Win Rate Over Time", and "Entry Discipline" charts.
+- Deep Market Tactics: Introduced 5 specialized AI sub-skills (`oversold`, `momentum`, `earnings`, `insider`, `market-rotation`) to dynamically adapt to market posture.
+- Dashboard Features: Introduced a new "Learnings" tab, a Portfolio Treemap/Heatmap visualizer, and a `%` vs `$` toggle on all performance charts for instant realized dollar conversions.
+- Blacklisting: Added support for manually flagging and blacklisting stocks so they are permanently ignored by the advice workflow.
+- Open-Source Privacy: Added `STRATEGY.md` file separation to safely isolate personal quantitative thresholds from public repositories.
 
 ### Changed
-- Architecture: Integrated `/diversify` as a tactical sub-skill under the master `/advice` orchestrator (removed as a standalone command).
-- Docs: Added a non-negotiable rule to `GEMINI.md` and `CLAUDE.md` requiring the `/advice` orchestrator to explicitly list all executed sub-skills and explain any picks or rejections after the main advice table.
-- Architecture: Unified the `/premarket` and `/aftermarket` skills into a single time-aware `/advice` orchestrator.
-- Architecture: Renamed the `/earnings-play` skill to `/earnings` across all skills and CLI to ensure consistency.
-- Docs: Exposed the available tactical sub-skills (`oversold`, `momentum`, `earnings`, `insider`, `market-rotation`) directly in the `GEMINI.md` and `CLAUDE.md` workflow documentation so orchestrators explicitly know they exist.
-- Docs: Removed redundant UI and blacklist text rules from AI instructions to save tokens, as they are now strictly enforced in the python backend.
-- Docs: Updated `GEMINI.md` and `CLAUDE.md` to document the asynchronous nature of the Equity Curve graph updates vs the live DOM update for Top Cards.
-- Docs: Updated `.agents/AGENTS.md` to explicitly forbid hardcoding strategy thresholds in skill files and added a strict Ticker Validation Rule for generic stock symbols.
-- Changed: Split the RSI bands in `scripts/review_stats.py` into more granular buckets (`<20`, `20-30`, `30-40`, `40-50`, `50-60`, `60-70`, `70+`) to better represent momentum and rotation plays.
-- Strategy update: Updated `/diversify` skill criteria to require strict quality standards (A rating, zero Tech exposure) given recent underperformance.
-- Workflow update: Updated `/diversify`, `/insider`, and `/earnings-play` skills to always fetch and log the exact RSI at the time of advice, ensuring better data quality for downstream analytics even on non-oversold strategies.
-- Dashboard: Fixed RSI rendering to consistently display rounded integers across tables and modals.
-- Analytics: Overhauled the "Entry Discipline" chart to show Average P/L % instead of Win Rate %, plotting positions across 4 distinct entry bounds ("Below Drop Below", "In Buy Zone", "Chased", "Above Drop Above") and tracking Min/Max range in tooltips.
-- Dashboard: Reordered the second row of summary cards to place "Win rate (closed)" at the end for better logical flow.
-- Dashboard: Replaced the native `confirm()` dialog with a custom modal (`confirmModal`) for the drop and remove actions to improve UI consistency.
-- Dashboard: Fixed an issue where clicking table headers on identical values (like positions closed on the same day) resulted in unpredictable sorting. It now uses the company name or ticker as a stable alphabetical tie-breaker.
-- Docs: Updated the eToro sign-up link to use the new referral URL.
-- Strategy update: Updated GEMINI.md/CLAUDE.md to advise actively avoiding Tech stocks unless the setup is pristine, due to significant underperformance.
-- Strategy update: Banned all new Tech sector recommendations until performance recovers due to heavy underperformance and extreme systemic correlation.
-- Strategy update: Updated GEMINI.md/CLAUDE.md to remove C-rated stocks from the outperformance claim and flag them as falling-knife risks, due to poor performance.
-- Workflow update: Updated GEMINI.md/CLAUDE.md to utilize the new native filtering parameters for `screen.py oversold` instead of manual post-filtering.
-- Strategy update: Clarified in GEMINI.md/CLAUDE.md that B/C rated stocks historically outperform A-rated stocks in the base strategy.
-- Standardized all logged timestamps (`lastUpdated`, EOD/News dates, price history) to exclusively use the `America/New_York` timezone formatted as ISO 8601 strings with offsets (e.g. `YYYY-MM-DDTHH:MM-04:00`).
-- The frontend dashboard now automatically parses these ISO strings to correctly display dates in the user's local timezone.
-- Replaced timezone-hacky local `date.today()` calls with a dedicated `nyse_now()` and `nyse_today()` helper across all python scripts.
-- Extracted all personal strategy parameters (batch sizes, trailing stops) and learned trading rules out of the public repo files (`GEMINI.md`, `CLAUDE.md`, and skill files) into a git-ignored `data/private/STRATEGY.md` file. A generic `STRATEGY.sample.md` template is now provided for new users.
-- Updated the `/review` skill to strictly propose strategy updates to the private `data/private/STRATEGY.md` file rather than modifying the open-source instructions.
-- Strategy update: Broadened Tech warning in GEMINI.md/CLAUDE.md to require exceptional setups and marked 'A-rated' stocks as highly skeptical.
-- **Renamed the custom `/learn` strategy-evaluation command to `/review`** across all scripts (`review_stats.py`), skills, and log files (`REVIEWS.md`) to avoid naming collisions with Antigravity's built-in `/learn` slash command.
-- Strategy update: Updated GEMINI.md/CLAUDE.md to reverse the claim that B-rated stocks outperform A-rated stocks, as A-rated stocks have shown renewed strength and are now outperforming.
-- Strategy update: Updated advice.md to require exceptionally strong conviction (stronger catalysts or deeper oversold indicators) before finalizing standard intraday picks, as intraday advice historically underperforms premarket and aftermarket runs.
-- Dashboard: Updated the Rating Info modal to explicitly explain the A/B/C rating taxonomy instead of outdated wording.
-- Dashboard: Fixed an issue where the Rating bucket chart in the Analytics tab sorted grades alphabetically (e.g. A, A+, A-, B...) rather than logically (A+, A, A-, B+, B...).
-- Dashboard: Migrated all modals from pseudo-backdrop `div`s to native HTML `<dialog>` elements for better structural semantics and simplified CSS.
+- Strategy Architecture: Refactored the core AI strategy into a Meta-Advisor pattern, where a master `/advice` skill orchestrates the tactical sub-skills.
+- GICS Sector Standardization: Fully replaced legacy eToro industry labels with the standard 11 GICS sectors for strict consistency across all portfolio analytics and gap analyses.
+- Dashboard: Upgraded all modal overlays to native HTML `<dialog>` elements for better structural semantics and simplified CSS.
+- Timezone Handling: Standardized all logged timestamps to strictly use the `America/New_York` timezone formatted as ISO 8601 strings, parsed locally by the frontend.
 
 ### Fixed
-- Fixed test failures in `tests/test_advice_log.py` caused by missing mandatory parameters for new picks by updating the `_pick_args` helper.
-- CLI: Enforced `--reason` and `--risk` as strictly mandatory parameters in `scripts/advice_log.py add-pick` to prevent blank UI modals.
-- CLI: Added strict blacklist enforcement to `scripts/advice_log.py add-pick` to prevent adding blacklisted tickers.
-- Fixed an issue where manual eToro imports permanently remained "Bought" and continued to display an active open P/L, even after being fully closed out in eToro. The sync process now properly auto-closes them.
-- Fixed a duplicated ID collision between manual imports and subsequent advice runs for the same ticker.
-- Fixed `advice_log.py checkin-candidates` using a hardcoded >7 days threshold instead of respecting the 3-day drop rule.
-- Fixed an alphabetical sorting bug on the dashboard Analytics "By RSI band" chart that caused `<20` to render incorrectly on the right side of numerical buckets.
-- Fixed `etoro_import.py` and dashboard P/L calculations to correctly use the position's `avg_open` price and `initialAmountInDollars` (invested amount) rather than dynamically recalculating invested amount, preventing discrepancies.
-- Dashboard: Prevented smaller confirmation modals from stretching with an empty space at the bottom by isolating the `min-height: 40vh` CSS rule strictly to the main chart modal.
-- Workflow: `etoro_import.py` now writes to `data/instruments_cache.json` instead of the version-controlled `data/instruments.json` file, preventing instrument list updates from dirtying the git status.
-- Fixed an issue where identical notes could be duplicated multiple times on the same day when a ticker was repeatedly re-advised.
-- Fixed date sorting so that identical local dates properly use their underlying timestamp for chronological sorting.
-- Separated column sorting states per Positions filter (Open, Closed, Needs Confirm, All) so that each tab remembers its own sort order independently.
-- Fixed an issue where the Macro Calendar and IPO Tracker would calculate the "current day" using the local timezone (e.g., European time) rather than New York market time, causing events from the next market day to be incorrectly flagged as happening "today" and prematurely shown as "Passed".
-- Fixed an issue where the location API key dropdown in the dashboard would incorrectly reset to the backend's startup location choice across page reloads and data syncs, rather than remembering the user's explicit selection.
-- Fixed an issue in the News Feed where the "Advised" filter would only show a couple of tickers (like PTC and SR). This was caused by a backend 20-ticker fetch limit intersecting with an unsorted ticker list. Tickers are now prioritized (Watchlist first, then freshest eToro positions) and the limit was increased to 45 to ensure all active advice gets news coverage.
-- Fixed an edge case where aftermarket advice logs generated past midnight local time wouldn't match with eToro trades opened during the previous day's US market session. This was achieved by accurately evaluating market sessions via the `America/New_York` timezone directly instead of brittle local hour comparisons.
-- Fixed `ModuleNotFoundError` for `nyse` in `yarafolio.py` by appending the `scripts` directory to `sys.path`.
-- Fixed an issue where invalid ratings (like "Buy") could be added to the advice log by enforcing strict A/B/C letter grade validation via argparse choices in `advice_log.py`.
-- Fixed an issue in `advice_log.py` where the new `/momentum`, `/earnings-play`, and `/insider` workflows failed to log picks due to missing source whitelists.
-- Fixed `autosync.py` to include `STRATEGY.md` in the private backup sync so personal rules are safely persisted.
-- Fixed `STRATEGY.md` and related AI skills to ensure strategy parameters (like minimum price and volume) apply globally and are not hardcoded into public skill files.
-- Fixed `scripts/etoro_import.py` to iterate through all available `ETORO_USER_KEY` variables until a successful authentication is found, instead of failing on the first attempt.
-- Fixed the dashboard Equity Curve chart to accurately update during premarket and after-hours by switching the Nasdaq reference from `^IXIC` (which only updates during the regular session) to Nasdaq 100 Futures (`NQ=F`), and by pulling live prices from the active session into the open P/L calculation.
-- Fixed duplicate date labels on the 7d Equity Curve chart by including intraday time in the X-axis formatter.
-- Pipeline: `etoro_import.py` now targets `data/private/instruments_cache.json` to prevent local data loss if the project is cloned to a new machine.
-- Dashboard: Fixed a Flash of Unstyled Content (FOUC) when reloading the page on non-default tabs by using an inline synchronous script.
-- Dashboard: Restored the animated starry sky (sparkles) behind the Yara popup that was accidentally removed during the `<dialog>` migration.
-- Dashboard: Updated chart colors to use CSS variables so axes, ticks, grids, and legend text are visible in both light and dark themes.
-- Fixed an issue in `etoro_import.py` where eToro's industry metadata would aggressively overwrite custom sectors set by the advice workflow. The advice tracker's sector categorization now correctly takes precedence for both the advice log and the imported portfolio data.
-- Scrubbed legacy eToro sector strings (like "Consumer Goods", "Services", "Basic Materials") from the `instruments.json` database and replaced them with standard GICS sectors to ensure consistency across UI charts.
-- Fixed an issue where eToro's `.US` suffixed tickers (e.g. CVX.US) caused duplicated advice entries and tracking breaks. `etoro_import.py` now supports and respects `mappedTicker` in `instruments_cache.json`.
-- Fixed the dashboard ticker links to properly use the original eToro ticker (e.g. `CVX.US`) when generating the eToro URL, rather than the stripped symbol, so the URLs resolve correctly.
+- Fixed an edge case where aftermarket advice logs generated past midnight local time wouldn't match with eToro trades opened during the previous day's US market session.
+- Fixed the dashboard Equity Curve chart to accurately update during premarket and after-hours by switching the Nasdaq reference to Nasdaq 100 Futures (`NQ=F`).
+- Resolved an issue in `etoro_import.py` where eToro's industry metadata would aggressively overwrite custom sectors set by the advice workflow.
 
 ## [0.9.0] - 2026-06-25
 

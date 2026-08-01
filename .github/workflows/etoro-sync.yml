@@ -2,7 +2,11 @@ name: eToro Sync
 
 on:
   workflow_dispatch:
-    # Allows you to trigger this workflow manually from the Actions tab or via GitHub API
+    inputs:
+      data_repo:
+        description: 'Name of the Data Repository'
+        required: true
+        default: 'etoro-portfolio-data'
 
 jobs:
   sync:
@@ -15,7 +19,7 @@ jobs:
       - name: Checkout Data Repository
         uses: actions/checkout@v4
         with:
-          repository: ${{ github.repository_owner }}/etoro-portfolio-data
+          repository: ${{ github.repository_owner }}/${{ github.event.inputs.data_repo }}
           path: data/private
           token: ${{ secrets.DATA_REPO_PAT }}
 
