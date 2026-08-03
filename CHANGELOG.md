@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.1] - 2026-08-03
 
+### Changed
+- Strategy Update: The `/advice` orchestrator is now strictly required to run the `market-rotation` sub-skill whenever there is a major macro or geopolitical shift, ensuring capital flow shifts are automatically captured.
+
 ### Fixed
 - Upgraded `autosync.py` to automatically resolve JSON merge conflicts without manual intervention. If both the desktop and Mobile Companion make offline changes, the sync process will now intelligently merge `advice-log.json`, `portfolio.json`, and `equity-history.json` by combining new entries and favoring the most recent timestamp, completely preventing dashboard crashes from Git conflict markers.
 
