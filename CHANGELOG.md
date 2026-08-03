@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.10.1] - 2026-08-03
+
+### Fixed
+- Upgraded `autosync.py` to automatically resolve JSON merge conflicts without manual intervention. If both the desktop and Mobile Companion make offline changes, the sync process will now intelligently merge `advice-log.json`, `portfolio.json`, and `equity-history.json` by combining new entries and favoring the most recent timestamp, completely preventing dashboard crashes from Git conflict markers.
+
 ## [0.10.0] - 2026-08-01
 
 ### Added

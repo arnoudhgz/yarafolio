@@ -13,6 +13,7 @@ import logging
 import os
 import subprocess
 import sys
+import json
 from datetime import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -53,6 +54,76 @@ class AutoSync:
         return subprocess.run(["git", *args], cwd=cwd,
                               capture_output=True, text=True)
 
+    def resolve_json_conflict(self, filepath: str) -> bool:
+        """Attempts to smartly merge a conflicted JSON file by favoring the most recently updated version."""
+        ours_res = self.git("show", f":2:{filepath}")
+        theirs_res = self.git("show", f":3:{filepath}")
+        
+        if ours_res.returncode != 0 or theirs_res.returncode != 0:
+            return False
+            
+        try:
+            ours = json.loads(ours_res.stdout)
+            theirs = json.loads(theirs_res.stdout)
+        except json.JSONDecodeError:
+            return False
+
+        # Smart merge strategy:
+        # Determine which one is newer based on lastUpdated
+        ours_ts = ours.get("lastUpdated", "")
+        theirs_ts = theirs.get("lastUpdated", "")
+        
+        is_theirs_newer = theirs_ts > ours_ts
+        
+        merged = {}
+        if filepath == "advice-log.json":
+            merged["lastUpdated"] = theirs_ts if is_theirs_newer else ours_ts
+            entries = {}
+            for e in ours.get("entries", []):
+                entries[e.get("id") or e.get("ticker")] = e
+            for e in theirs.get("entries", []):
+                key = e.get("id") or e.get("ticker")
+                if key not in entries or is_theirs_newer:
+                    entries[key] = e
+            merged["entries"] = list(entries.values())
+            
+        elif filepath == "portfolio.json":
+            merged["lastUpdated"] = theirs_ts if is_theirs_newer else ours_ts
+            holdings = {}
+            for h in ours.get("holdings", []):
+                holdings[h.get("ticker")] = h
+            for h in theirs.get("holdings", []):
+                key = h.get("ticker")
+                if key not in holdings or is_theirs_newer:
+                    holdings[key] = h
+            merged["totalInvested"] = sum(h.get("invested", 0) for h in holdings.values())
+            merged["holdings"] = list(holdings.values())
+            
+        elif filepath == "equity-history.json":
+            # For equity history, it's an array of data points. We can just union and deduplicate by timestamp.
+            history = {}
+            for pt in ours if isinstance(ours, list) else []:
+                if "timestamp" in pt: history[pt["timestamp"]] = pt
+            for pt in theirs if isinstance(theirs, list) else []:
+                if "timestamp" in pt: history[pt["timestamp"]] = pt
+            merged = sorted(list(history.values()), key=lambda x: x["timestamp"])
+            
+        else:
+            # Fallback for other JSON files: just take the newer one entirely, or ours if we can't tell
+            merged = theirs if is_theirs_newer else ours
+
+        # Write resolved
+        full_path = os.path.join(self.data_dir, filepath)
+        with open(full_path, "w") as f:
+            if isinstance(merged, list):
+                json.dump(merged, f)
+            else:
+                json.dump(merged, f, indent=2)
+                f.write("\n")
+        
+        self.git("add", filepath)
+        return True
+
     def sync(self, reason: str = "data update") -> None:
         if self.get_env("DEMO_MODE") == "1":
             return
@@ -64,7 +135,6 @@ class AutoSync:
 
         private_repo = self.get_env("PRIVATE_DATA_REPO")
         if not private_repo:
-            # Silently keep data local if no private repo is configured.
             return
 
         os.makedirs(self.data_dir, exist_ok=True)
@@ -81,26 +151,56 @@ class AutoSync:
         if not present:
             return
 
-        # Safely pull any changes made by the Mobile Companion before pushing
-        self.git("stash")
-        self.git("pull", "--rebase", "origin", "main")
-        self.git("stash", "pop")
-
+        # 1. Commit local changes FIRST
         self.git("add", "--", *present)
-        if self.git("diff", "--cached", "--quiet").returncode == 0:
-            return  # nothing changed
+        has_changes = self.git("diff", "--cached", "--quiet").returncode != 0
 
         import nyse
         msg = f"chore(data): {reason} ({nyse.nyse_now().isoformat('T', 'minutes')})"
-        if self.git("commit", "-m", msg).returncode != 0:
-            logger.error("autosync: commit failed")
-            return
 
+        if has_changes:
+            if self.git("commit", "-m", msg).returncode != 0:
+                logger.error("autosync: commit failed")
+                return
+
+        # 2. Pull remote changes with standard merge (not rebase) to allow automated conflict resolution
+        pull = self.git("pull", "--no-rebase", "origin", "main")
+        
+        if pull.returncode != 0:
+            # Check if there are conflicted files
+            status = self.git("ls-files", "-u")
+            conflicted_files = set([line.split("\t")[1] for line in status.stdout.splitlines() if line])
+            
+            resolved_all = True
+            for file in conflicted_files:
+                if file.endswith(".json"):
+                    if not self.resolve_json_conflict(file):
+                        resolved_all = False
+                else:
+                    # For markdown files, favor ours
+                    self.git("checkout", "--ours", file)
+                    self.git("add", file)
+            
+            if resolved_all:
+                # Finalize merge
+                merge_commit = self.git("commit", "--no-edit")
+                if merge_commit.returncode == 0:
+                    logger.info("autosync: Automatically resolved merge conflicts.")
+                else:
+                    logger.error(f"autosync: Failed to finalize merge commit: {merge_commit.stderr}")
+                    self.git("merge", "--abort")
+                    return
+            else:
+                self.git("merge", "--abort")
+                logger.error(f"autosync: pull failed due to conflicts that couldn't be auto-resolved. Merge aborted. Data safe locally.")
+                return
+
+        # 3. Push to remote
         push = self.git("push", "-u", "origin", "main")
         if push.returncode != 0:
             logger.error(
                 f"autosync: committed locally, push failed (offline?): {push.stderr.strip()[-200:]}")
-        else:
+        elif has_changes or pull.returncode != 0:
             logger.info(f"autosync: {msg}")
 
 
