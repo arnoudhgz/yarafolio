@@ -77,15 +77,32 @@ class AutoSync:
         
         merged = {}
         if filepath == "advice-log.json":
+            merged = ours.copy() if isinstance(ours, dict) else {}
             merged["lastUpdated"] = theirs_ts if is_theirs_newer else ours_ts
+            
+            def get_key(e):
+                return e.get("id") or f"{e.get('ticker', '')}_{e.get('firstAdvised', '')}_{e.get('status', '')}"
+                
             entries = {}
             for e in ours.get("entries", []):
-                entries[e.get("id") or e.get("ticker")] = e
+                entries[get_key(e)] = e
             for e in theirs.get("entries", []):
-                key = e.get("id") or e.get("ticker")
+                key = get_key(e)
                 if key not in entries or is_theirs_newer:
                     entries[key] = e
             merged["entries"] = list(entries.values())
+            
+            for k in set(ours.keys() if isinstance(ours, dict) else []).union(theirs.keys() if isinstance(theirs, dict) else []):
+                if k in ("lastUpdated", "entries"): continue
+                if isinstance(ours.get(k, []), list) and isinstance(theirs.get(k, []), list):
+                    seen = set()
+                    uniq = []
+                    for item in ours.get(k, []) + theirs.get(k, []):
+                        rep = json.dumps(item, sort_keys=True) if isinstance(item, dict) else str(item)
+                        if rep not in seen:
+                            uniq.append(item)
+                            seen.add(rep)
+                    merged[k] = uniq
             
         elif filepath == "portfolio.json":
             merged["lastUpdated"] = theirs_ts if is_theirs_newer else ours_ts
@@ -164,7 +181,7 @@ class AutoSync:
                 return
 
         # 2. Pull remote changes with standard merge (not rebase) to allow automated conflict resolution
-        pull = self.git("pull", "--no-rebase", "origin", "main")
+        pull = self.git("pull", "--no-rebase", "--no-edit", "origin", "main")
         
         if pull.returncode != 0:
             # Check if there are conflicted files
