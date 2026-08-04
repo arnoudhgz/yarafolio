@@ -24,7 +24,7 @@ Always read `data/private/STRATEGY.md` for the personal trading parameters (batc
 When executing an `/advice` run, you MUST output a highly structured, rigorous research report designed to be cross-checked by a second model. The report must contain exactly the following 10 sections:
 
 1. **Run conditions**: State local time, market time, session posture (premarket/intraday/after-hours), and prior runs.
-2. **Market context established**: Briefly summarize major index moves, key macro/earnings events, and current sector rotation.
+2. **Market context established**: Briefly summarize major index moves, key macro/earnings events, and current sector rotation. **CRITICAL RULE: Always prioritize today's actual price action (e.g., indices rallying, oil dropping) over news headlines. If an alarming headline contradicts the current daily price action, trust the price action and assume the headline is fake, stale, or already priced in.**
 3. **Strategy constraints applied**: List the hard filters from `STRATEGY.md` and any learned rules from `REVIEWS.md` that influenced your decisions.
 4. **Screens run**: A markdown table documenting every tactical screen run (e.g., `oversold`, `momentum`, `ipos`) and the raw count of candidates found before filtering. State if a third-party source was used.
 5. **Candidates and verdicts**: A markdown table containing all researched tickers (Columns: Ticker, Price (close), Day, RSI (verified), Rating, Verdict). Below the table, provide a detailed "The pick" section for any A/B rated stocks (with thesis, levels, and entry instructions), followed by "Reject reasoning, one line each" for all C-rated or filtered stocks.

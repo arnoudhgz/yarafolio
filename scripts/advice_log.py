@@ -90,6 +90,9 @@ class AdviceLog:
     def get_entry(self, data: dict, ticker: str) -> dict | None:
         ticker = ticker.upper()
         for e in data["entries"]:
+            if (e.get("ticker") or "").upper() == ticker and e.get("status") in ("watching", "bought"):
+                return e
+        for e in data["entries"]:
             if (e.get("ticker") or "").upper() == ticker:
                 return e
         return None
