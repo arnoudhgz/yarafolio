@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.10.1] - 2026-08-04
 
 ### Changed
+- Strategy Update: The `/momentum` skill now strictly requires A-tier ratings (A-, A, A+) to combat historical underperformance of momentum trades.
 - Strategy Update: Enforced a strict rule across `GEMINI.md`, `CLAUDE.md`, and `STRATEGY.md` that real-time price action and index momentum strictly override news headlines to prevent hallucinating market panic from stale or fake RSS feeds.
 - Strategy Update: The `/advice` orchestrator is now strictly required to run the `market-rotation` sub-skill whenever there is a major macro or geopolitical shift, ensuring capital flow shifts are automatically captured.
 
