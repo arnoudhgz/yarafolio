@@ -30,4 +30,4 @@
 - **Position Sizing:** Only average down if the stock has dropped at least 25% from the first entry and the RSI has fallen back into the 15-30 range.
 - **Cluster Risk:** Treat highly correlated clusters (e.g. cloud/software) as a single exposure block. Do not add new names to a saturated cluster.
 - **Earnings Risk:** Avoid initiating new positions in oversold stocks if they report earnings within the next 7 days, to avoid unpredictable binary risk.
-- **IPO Risk:** Never buy an IPO or a stock that has been public for less than a year. They lack sufficient technical history to support a reliable setup.
+- **Avoid IPOs:** De-prioritize the `ipos` tactic and completely avoid recommending new IPOs (including SPACs and PE-style rollups). They are too volatile and lack a clear trading range or established RSI baseline. Only consider them if explicitly requested.
