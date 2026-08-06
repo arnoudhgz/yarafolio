@@ -42,10 +42,48 @@ export function adviceRows() {
   });
 }
 
+function hasPendingAdvice(e) {
+  if (e.status !== 'bought') return true;
+  if (!e.lots || !e.lots.length) return false; // If bought but no lots, it's manually marked bought. We don't want it stuck forever. Wait, actually if no lots, let's say false to hide it? If they just bought it, it's fulfilled.
+  if (!e.adviceEvents || !e.adviceEvents.length) return false;
+  
+  let maxAdv = '';
+  for (const ev of e.adviceEvents) {
+    if (ev.date > maxAdv) maxAdv = ev.date.substring(0, 10);
+  }
+  
+  let maxLot = '';
+  for (const l of e.lots) {
+    const ld = l.openDate ? l.openDate.substring(0, 10) : '';
+    if (ld > maxLot) maxLot = ld;
+  }
+  
+  return maxAdv > maxLot;
+}
+
 export function tippingFlags(r) {
   const p = latestPrice(r.e);
-  const dropHit = r.dropBelow != null && p <= r.dropBelow && (r.status === 'watching' || r.status === 'bought');
-  const buyHit = !dropHit && (r.status === 'watching' || r.status === 'bought') && r.buyBelow != null && p <= r.buyBelow;
+  
+  let pending = r.status === 'watching';
+  if (r.status === 'bought') {
+    if (!r.e.lots || !r.e.lots.length) {
+      pending = false; 
+    } else {
+      let maxAdv = '';
+      for (const ev of (r.e.adviceEvents || [])) {
+        if (ev.date > maxAdv) maxAdv = ev.date.substring(0, 10);
+      }
+      let maxLot = '';
+      for (const l of r.e.lots) {
+        const ld = l.openDate ? l.openDate.substring(0, 10) : '';
+        if (ld > maxLot) maxLot = ld;
+      }
+      pending = maxAdv > maxLot;
+    }
+  }
+
+  const dropHit = r.dropBelow != null && p <= r.dropBelow && pending;
+  const buyHit = !dropHit && pending && r.buyBelow != null && p <= r.buyBelow;
   // missed: a watching pick whose price ran above the entry band, the oversold bounce already happened
   const missedHit = r.status === 'watching' && r.dropAbove != null && p >= r.dropAbove;
   return { dropHit, buyHit, missedHit };
