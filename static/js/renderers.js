@@ -45,7 +45,7 @@ export function adviceRows() {
 export function tippingFlags(r) {
   const p = latestPrice(r.e);
   const dropHit = r.dropBelow != null && p <= r.dropBelow && (r.status === 'watching' || r.status === 'bought');
-  const buyHit = !dropHit && r.status === 'watching' && r.buyBelow != null && p <= r.buyBelow;
+  const buyHit = !dropHit && (r.status === 'watching' || r.status === 'bought') && r.buyBelow != null && p <= r.buyBelow;
   // missed: a watching pick whose price ran above the entry band, the oversold bounce already happened
   const missedHit = r.status === 'watching' && r.dropAbove != null && p >= r.dropAbove;
   return { dropHit, buyHit, missedHit };
@@ -142,6 +142,8 @@ export function renderTable() {
         if (r.status !== 'dropped') return false;
       } else if (currentFilter === 'blacklisted') {
         if (r.status !== 'blacklisted') return false;
+      } else if (currentFilter === 'buyzone' || currentFilter === 'drophit') {
+        if (r.status !== 'watching' && r.status !== 'bought') return false;
       } else {
         if (r.status !== 'watching') return false;
         if (r.e.lots && r.e.lots.length) return false;

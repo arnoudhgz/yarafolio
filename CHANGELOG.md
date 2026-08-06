@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strategy Update: The `/advice` orchestrator is now strictly required to run the `market-rotation` sub-skill whenever there is a major macro or geopolitical shift, ensuring capital flow shifts are automatically captured.
 
 ### Fixed
+- Fixed an issue in the dashboard UI where `bought` stocks would not appear on the Advice tab even when the 'Buy zone' or 'Drop alert' filters were selected, which previously hid newly advised average-down opportunities.
 - Upgraded `autosync.py` to automatically resolve JSON merge conflicts without manual intervention. If both the desktop and Mobile Companion make offline changes, the sync process will now intelligently merge `advice-log.json`, `portfolio.json`, and `equity-history.json` by combining new entries and favoring the most recent timestamp, completely preventing dashboard crashes from Git conflict markers. Fixed an issue where the JSON merge logic could inadvertently drop additional keys in `advice-log.json`. Also added `--no-edit` to the background git pull command to prevent silent hangs that could leave orphaned `.git/index.lock` files behind.
 
 ## [0.10.0] - 2026-08-01
