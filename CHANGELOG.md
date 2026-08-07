@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.1] - 2026-08-06
+## [0.10.1] - 2026-08-07
 
 ### Changed
 - Strategy Update: De-prioritized and skipped the `ipos` tactic across all workflows (GEMINI.md, CLAUDE.md, STRATEGY.md) due to extreme volatility and lack of clear trading ranges.
@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strategy Update: The `/advice` orchestrator is now strictly required to run the `market-rotation` sub-skill whenever there is a major macro or geopolitical shift, ensuring capital flow shifts are automatically captured.
 
 ### Fixed
+- Fixed dashboard UI to completely hide `bought` positions from the Watchlist/Advice tab, even when 'Buy zone' or 'Drop alert' filters are active, enforcing a strict separation between live advice and active positions.
+- Modified `advice_log.py add-pick` logic so that new advice for an already `bought` ticker creates a new, independent advice record (e.g. TICKER-0002) instead of upserting into the active position.
 - Fixed an issue in the dashboard UI where `bought` stocks would not appear on the Advice tab even when the 'Buy zone' or 'Drop alert' filters were selected. They will now appear on the Advice tab, but *only* if they have a pending average-down advice (meaning the latest advice date is newer than the open date of their most recent eToro lot). Once the new lot is bought and imported, the ticker will correctly disappear from the Advice tab again to avoid cluttering the view with old fulfilled advice.
 - Upgraded `autosync.py` to automatically resolve JSON merge conflicts without manual intervention. If both the desktop and Mobile Companion make offline changes, the sync process will now intelligently merge `advice-log.json`, `portfolio.json`, and `equity-history.json` by combining new entries and favoring the most recent timestamp, completely preventing dashboard crashes from Git conflict markers. Fixed an issue where the JSON merge logic could inadvertently drop additional keys in `advice-log.json`. Also added `--no-edit` to the background git pull command to prevent silent hangs that could leave orphaned `.git/index.lock` files behind.
 

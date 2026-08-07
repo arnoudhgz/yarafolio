@@ -180,8 +180,6 @@ export function renderTable() {
         if (r.status !== 'dropped') return false;
       } else if (currentFilter === 'blacklisted') {
         if (r.status !== 'blacklisted') return false;
-      } else if (currentFilter === 'buyzone' || currentFilter === 'drophit') {
-        if (r.status !== 'watching' && r.status !== 'bought') return false;
       } else {
         if (r.status !== 'watching') return false;
         if (r.e.lots && r.e.lots.length) return false;
