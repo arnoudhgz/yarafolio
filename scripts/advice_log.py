@@ -522,6 +522,32 @@ class AdviceLog:
         logger.info(f"marked as removed {args.id} ({e.get('ticker')})")
 
 
+    def cmd_prune_text(self, args: argparse.Namespace):
+        data = self.load_log()
+        pruned_count = 0
+        for e in data.get("entries", []):
+            if e.get("status") in ("sold", "blacklisted"):
+                pruned = False
+                if e.get("reason"):
+                    e["reason"] = None
+                    pruned = True
+                if e.get("risk"):
+                    e["risk"] = None
+                    pruned = True
+                if e.get("notes") and len(e["notes"]) > 0:
+                    e["notes"] = []
+                    pruned = True
+                
+                if pruned:
+                    pruned_count += 1
+        
+        if pruned_count > 0:
+            self.save_log(data)
+            logger.info(f"Pruned text fields (reason, risk, notes) from {pruned_count} sold/blacklisted entries.")
+        else:
+            logger.info("No sold/blacklisted entries needed text pruning.")
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -625,6 +651,11 @@ def main():
     p.add_argument("--force", action="store_true",
                    help="remove even if the entry has attributed eToro lots")
     p.set_defaults(func=app.cmd_remove)
+
+    p = sub.add_parser(
+        "prune-text",
+        help="strip reason, risk, and notes from all sold or blacklisted positions")
+    p.set_defaults(func=app.cmd_prune_text)
 
     args = parser.parse_args()
     args.func(args)

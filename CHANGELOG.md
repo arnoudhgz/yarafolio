@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.1] - 2026-08-07
+## [0.10.1] - 2026-08-11
+
+### Added
+- Added `scripts/advice_log.py prune-text` command to strip heavy text fields (`reason`, `risk`, `notes`) from inactive positions (sold or blacklisted) to reduce JSON log bloat, while keeping notes intact for dropped positions that might be re-advised.
 
 ### Changed
 - Strategy Update: De-prioritized and skipped the `ipos` tactic across all workflows (GEMINI.md, CLAUDE.md, STRATEGY.md) due to extreme volatility and lack of clear trading ranges.
