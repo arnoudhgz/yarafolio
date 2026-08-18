@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strategy Update: The `/momentum` skill now strictly requires A-tier ratings (A-, A, A+) to combat historical underperformance of momentum trades.
 - Strategy Update: Enforced a strict rule across `GEMINI.md`, `CLAUDE.md`, and `STRATEGY.md` that real-time price action and index momentum strictly override news headlines to prevent hallucinating market panic from stale or fake RSS feeds.
 - Strategy Update: The `/advice` orchestrator is now strictly required to run the `market-rotation` sub-skill whenever there is a major macro or geopolitical shift, ensuring capital flow shifts are automatically captured.
-- Updated instrument metadata for Gold and Oil to map correctly to the 'Materials' sector.
+- Updated instrument metadata for Gold (Materials) and Oil (Energy) to map correctly to standard GICS sectors.
 
 ### Fixed
 - Fixed dashboard UI to completely hide `bought` positions from the Watchlist/Advice tab, even when 'Buy zone' or 'Drop alert' filters are active, enforcing a strict separation between live advice and active positions.
