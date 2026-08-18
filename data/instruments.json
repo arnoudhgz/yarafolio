@@ -811,12 +811,12 @@
   "17": {
     "ticker": "OIL",
     "name": "Oil (Non Expiry)",
-    "sector": "ETF / Other"
+    "sector": "Materials"
   },
   "18": {
     "ticker": "GOLD",
     "name": "Gold (Non Expiry)",
-    "sector": "Financials"
+    "sector": "Materials"
   },
   "1136": {
     "ticker": "LMT",

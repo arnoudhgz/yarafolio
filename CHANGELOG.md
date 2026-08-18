@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.1] - 2026-08-11
+## [0.10.1] - 2026-08-18
 
 ### Added
 - Added `scripts/advice_log.py prune-text` command to strip heavy text fields (`reason`, `risk`, `notes`) from inactive positions (sold or blacklisted) to reduce JSON log bloat, while keeping notes intact for dropped positions that might be re-advised.
@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Strategy Update: The `/momentum` skill now strictly requires A-tier ratings (A-, A, A+) to combat historical underperformance of momentum trades.
 - Strategy Update: Enforced a strict rule across `GEMINI.md`, `CLAUDE.md`, and `STRATEGY.md` that real-time price action and index momentum strictly override news headlines to prevent hallucinating market panic from stale or fake RSS feeds.
 - Strategy Update: The `/advice` orchestrator is now strictly required to run the `market-rotation` sub-skill whenever there is a major macro or geopolitical shift, ensuring capital flow shifts are automatically captured.
+- Updated instrument metadata for Gold and Oil to map correctly to the 'Materials' sector.
 
 ### Fixed
 - Fixed dashboard UI to completely hide `bought` positions from the Watchlist/Advice tab, even when 'Buy zone' or 'Drop alert' filters are active, enforcing a strict separation between live advice and active positions.
