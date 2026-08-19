@@ -5,9 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.1] - 2026-08-18
+## [0.10.1] - 2026-08-19
 
 ### Added
+- Added "Ban Re-evaluation" rule to the review skill to automatically propose lifting stale tactics/sector bans older than 3-4 weeks for test batches.
 - Added `scripts/advice_log.py prune-text` command to strip heavy text fields (`reason`, `risk`, `notes`) from inactive positions (sold or blacklisted) to reduce JSON log bloat, while keeping notes intact for dropped positions that might be re-advised.
 
 ### Changed

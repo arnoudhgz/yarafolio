@@ -22,6 +22,7 @@ Compare past advice against what actually happened, then improve the advice pipe
 - Small-n caveats are mandatory. Buckets the script marks "insufficient data" support no conclusions.
 - Look for actionable patterns, for example: a rating grade that consistently loses (tighten the rating guide or drop the grade from advice), an RSI band that underperforms (falling knives live under some threshold, adjust the screen floor), a sector where theses keep breaking, a source (/advice vs /premarket vs /diversify) with structurally worse outcomes, dropped picks that kept falling (drops were right) or recovered (drops were too eager), or highly correlated holdings (> 0.70) in the correlation matrix that suggest concentrated systemic risk.
 - Distinguish strategy problems (the rules are wrong) from execution problems (the rules weren't followed). Only the first kind warrants a skill edit.
+- **Ban Re-evaluation:** Strict bans on tactics (e.g., `market-rotation`) or sectors create data blind spots because they stop generating new data. Always cross-reference current bans in `STRATEGY.md` with their date of origin in `REVIEWS.md`. If a ban is older than 3-4 weeks, automatically propose lifting it for a "test batch" so we can gather fresh outcome data in future reviews.
 
 ## Step 3: Propose (max 3 per run)
 
