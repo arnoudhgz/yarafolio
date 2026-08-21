@@ -408,8 +408,8 @@ export function renderPortfolioTable() {
             invested: lot.invested || (lot.units * lot.openRate),
             avgOpen: lot.openRate,
             currentPrice: h.currentPrice,
-            plDollar: lot.units * (h.currentPrice - lot.openRate),
-            plPct: (lot.invested || (lot.units * lot.openRate)) > 0 ? (lot.units * (h.currentPrice - lot.openRate)) / (lot.invested || (lot.units * lot.openRate)) * 100 : 0,
+            plDollar: lot.isBuy === false ? lot.units * (lot.openRate - h.currentPrice) : lot.units * (h.currentPrice - lot.openRate),
+            plPct: (lot.invested || (lot.units * lot.openRate)) > 0 ? (lot.isBuy === false ? (lot.units * (lot.openRate - h.currentPrice)) : (lot.units * (h.currentPrice - lot.openRate))) / (lot.invested || (lot.units * lot.openRate)) * 100 : 0,
             firstOpen: lot.openDate,
             positions: 1
           });

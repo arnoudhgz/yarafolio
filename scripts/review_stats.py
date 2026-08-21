@@ -46,7 +46,7 @@ def get_env(key: str) -> str | None:
     if v is not None:
         return v
     try:
-        with open(os.path.join(ROOT, ".env")) as f:
+        with open(os.path.join(ROOT, ".env"), encoding="utf-8") as f:
             for line in f:
                 k, _, val = line.partition("=")
                 if k.replace("export", "").strip() == key:
@@ -155,7 +155,7 @@ class LearnStats:
 
     def portfolio_metrics(self) -> dict:
         try:
-            with open(self.equity_file) as f:
+            with open(self.equity_file, encoding="utf-8") as f:
                 history = json.load(f)
         except (OSError, ValueError):
             return {"mdd": None, "sharpe": None}
@@ -212,7 +212,7 @@ class LearnStats:
         }
 
     def collect(self) -> dict:
-        with open(self.log_file) as f:
+        with open(self.log_file, encoding="utf-8") as f:
             data = json.load(f)
         import nyse
         today = nyse.nyse_today()

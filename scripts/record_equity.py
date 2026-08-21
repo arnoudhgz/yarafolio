@@ -15,7 +15,7 @@ def main():
         return
 
     try:
-        with open(log_path) as f:
+        with open(log_path, encoding="utf-8") as f:
             data = json.load(f)
     except json.JSONDecodeError:
         return
@@ -49,7 +49,7 @@ def main():
     pf_path = os.path.join(ROOT, "data", "private", "portfolio.json")
     if os.path.exists(pf_path):
         try:
-            with open(pf_path) as f:
+            with open(pf_path, encoding="utf-8") as f:
                 pf = json.load(f)
                 invested = pf.get("totalInvested", 0.0)
         except:
@@ -91,7 +91,7 @@ def main():
     
     history = []
     if os.path.exists(hist_path):
-        with open(hist_path) as f:
+        with open(hist_path, encoding="utf-8") as f:
             try:
                 history = json.load(f)
             except json.JSONDecodeError:
@@ -102,7 +102,7 @@ def main():
 
     history.append(snapshot)
     
-    with open(hist_path, "w") as f:
+    with open(hist_path, "w", encoding="utf-8") as f:
         json.dump(history, f)
 
 if __name__ == "__main__":

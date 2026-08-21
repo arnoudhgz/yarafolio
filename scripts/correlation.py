@@ -35,7 +35,7 @@ def pearson_corr(x, y):
 
 def main():
     try:
-        with open(os.path.join(ROOT, "data", "private", "portfolio.json")) as f:
+        with open(os.path.join(ROOT, "data", "private", "portfolio.json"), encoding="utf-8") as f:
             port = json.load(f)
             tickers = [h['ticker'] for h in port.get('holdings', [])]
     except Exception:
@@ -65,7 +65,7 @@ def main():
     out = {"tickers": valid_tickers, "matrix": matrix}
     out_path = os.path.join(ROOT, "data", "private", "correlation.json")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    with open(out_path, "w") as f:
+    with open(out_path, "w", encoding="utf-8") as f:
         json.dump(out, f)
     
     print(json.dumps(out))

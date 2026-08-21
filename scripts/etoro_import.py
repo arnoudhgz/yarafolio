@@ -17,7 +17,7 @@ import os
 import sys
 import uuid
 import logging
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import price_history
 import nyse
@@ -45,7 +45,7 @@ def get_env(key: str) -> str | None:
     if v is not None:
         return v
     try:
-        with open(os.path.join(ROOT, ".env")) as f:
+        with open(os.path.join(ROOT, ".env"), encoding="utf-8") as f:
             for line in f:
                 k, _, val = line.partition("=")
                 if k.replace("export", "").strip() == key:
@@ -71,7 +71,7 @@ class EtoroImport:
         env_vars = {}
         env_file = os.path.join(ROOT, ".env")
         try:
-            with open(env_file) as f:
+            with open(env_file, encoding="utf-8") as f:
                 for line in f:
                     line = line.strip()
                     if not line or line.startswith("#") or "=" not in line:
@@ -159,7 +159,7 @@ class EtoroImport:
     def atomic_write(self, path, payload):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         tmp = path + ".tmp"
-        with open(tmp, "w") as f:
+        with open(tmp, "w", encoding="utf-8") as f:
             json.dump(payload, f, indent=2)
             f.write("\n")
         os.replace(tmp, path)
@@ -212,7 +212,7 @@ class EtoroImport:
 
         cache = {}
         if os.path.exists(self.instruments_cache):
-            with open(self.instruments_cache) as f:
+            with open(self.instruments_cache, encoding="utf-8") as f:
                 cache = json.load(f)
 
         entries = []
@@ -225,9 +225,14 @@ class EtoroImport:
             m = meta.get(iid, {})
             rate = rates.get(iid, {})
             current = rate.get("bid") or rate.get("lastExecution")
-            pl_dollar = round(
-                units * (current - avg_open),
-                2) if current else None
+            if current:
+                pl_dollar = round(sum(
+                    p["units"] * (current - p["openRate"]) if p.get("isBuy", True) 
+                    else p["units"] * (p["openRate"] - current)
+                    for p in plist
+                ), 2)
+            else:
+                pl_dollar = None
             pl_pct = round(pl_dollar / invested * 100,
                            2) if pl_dollar is not None and invested else None
             
@@ -258,6 +263,7 @@ class EtoroImport:
                     "units": round(p["units"], 6),
                     "invested": round(p["initialAmountInDollars"], 2),
                     "tslEnabled": bool(p.get("isTslEnabled")),
+                    "isBuy": p.get("isBuy", True),
                 } for p in plist],
             })
 
@@ -266,12 +272,12 @@ class EtoroImport:
         base_cache = {}
         base_instruments = os.path.join(ROOT, "data", "instruments.json")
         if os.path.exists(base_instruments):
-            with open(base_instruments) as f:
+            with open(base_instruments, encoding="utf-8") as f:
                 base_cache = json.load(f)
                 
         custom_cache = {}
         if os.path.exists(self.instruments_cache):
-            with open(self.instruments_cache) as f:
+            with open(self.instruments_cache, encoding="utf-8") as f:
                 custom_cache = json.load(f)
                 
         full_cache = {**base_cache, **custom_cache}
@@ -313,9 +319,11 @@ class EtoroImport:
             } for i in preview],
         })
 
-    def reconcile_lots(self, entry, item, today, claimed_lots=None):
+    def reconcile_lots(self, entry, item, today, claimed_lots=None, history_by_pid=None):
         if claimed_lots is None:
             claimed_lots = set()
+        if history_by_pid is None:
+            history_by_pid = {}
         first = entry.get("firstAdvised") or ""
         dropped = entry.get("droppedDate")
         live = {}
@@ -344,6 +352,7 @@ class EtoroImport:
                              "units": lot["units"],
                              "lastPrice": current or lot["openRate"],
                              "tslEnabled": bool(lot.get("tslEnabled")),
+                             "isBuy": lot.get("isBuy", True),
                              "soldAt": None,
                              "exitEstimated": False})
                 claimed_lots.add(pid)
@@ -356,15 +365,24 @@ class EtoroImport:
         closed = 0
         for lot in lots:
             if lot.get("soldAt") is None and lot["positionID"] not in live:
-                lot["soldAt"] = lot.get("lastPrice") or lot["openRate"]
-                lot["exitEstimated"] = True
-                lot["closedDate"] = today
+                pid = lot["positionID"]
+                h_lot = history_by_pid.get(pid) or history_by_pid.get(int(pid)) if pid else None
+                if h_lot and h_lot.get("closeRate"):
+                    lot["soldAt"] = h_lot["closeRate"]
+                    lot["exitEstimated"] = False
+                    # e.g. "2026-08-20T14:30:00Z" -> "2026-08-20"
+                    lot["closedDate"] = h_lot.get("closeTimestamp", today)[:10]
+                    if h_lot.get("netProfit") is not None:
+                        lot["netProfit"] = h_lot["netProfit"]
+                else:
+                    lot["soldAt"] = lot.get("lastPrice") or lot["openRate"]
+                    lot["exitEstimated"] = True
+                    lot["closedDate"] = today
                 closed += 1
         if closed:
             entry.setdefault("notes", []).append({
                 "date": today,
-                "text": f"Auto-closed {closed} lot(s) gone from eToro on {today}; exit estimated at "
-                        f"last-seen price, confirm the real exit."})
+                "text": f"Auto-closed {closed} lot(s) gone from eToro on {today} (resolved exact prices via API history where available)."})
         if lots:
             self.rollup_entry(entry, current)
         return closed
@@ -391,10 +409,24 @@ class EtoroImport:
             hist = entry.setdefault("priceHistory", [])
             price_history.push_price_point(hist, current_price, now=nyse.nyse_now())
 
+    def fetch_trading_history(self, min_date):
+        try:
+            creds = self.credentials()
+            url = f"/trading/info/trade/history?pageSize=200&minDate={min_date}"
+            res = self.get(url, creds)
+            if isinstance(res, dict):
+                return res.get("history", [])
+            elif isinstance(res, list):
+                return res
+            return []
+        except Exception as e:
+            logger.warning(f"Could not fetch trading history: {e}")
+            return []
+
     def merge(self):
-        with open(self.preview_file) as f:
+        with open(self.preview_file, encoding="utf-8") as f:
             preview = json.load(f)
-        with open(self.log_file) as f:
+        with open(self.log_file, encoding="utf-8") as f:
             data = json.load(f)
 
         known_sectors = {e["ticker"]: e["sector"] for e in data["entries"] if e.get("sector")}
@@ -407,6 +439,11 @@ class EtoroImport:
 
         by_ticker = {item["ticker"]: item for item in preview}
 
+        # Fetch recent trading history to match exact closed prices
+        three_months_ago = (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d")
+        history = self.fetch_trading_history(three_months_ago)
+        history_by_pid = {t["positionId"]: t for t in history} if history else {}
+
         closed_lots = 0
         claimed_lots = set()
         
@@ -414,7 +451,7 @@ class EtoroImport:
         advised_entries.sort(key=lambda x: x.get("firstAdvised", ""), reverse=True)
         
         for e in advised_entries:
-            closed_lots += self.reconcile_lots(e, by_ticker.get(e["ticker"]), today, claimed_lots)
+            closed_lots += self.reconcile_lots(e, by_ticker.get(e["ticker"]), today, claimed_lots, history_by_pid)
 
         import_by_ticker = {
             e["ticker"]: e for e in data["entries"] if e.get("source") == "import"}
@@ -480,12 +517,12 @@ class EtoroImport:
         sector_by_ticker = {}
         base_instruments = os.path.join(ROOT, "data", "instruments.json")
         if os.path.exists(base_instruments):
-            with open(base_instruments) as f:
+            with open(base_instruments, encoding="utf-8") as f:
                 for record in json.load(f).values():
                     if record.get("sector"):
                         sector_by_ticker[record["ticker"]] = record["sector"]
         if os.path.exists(self.instruments_cache):
-            with open(self.instruments_cache) as f:
+            with open(self.instruments_cache, encoding="utf-8") as f:
                 for record in json.load(f).values():
                     if record.get("sector"):
                         sector_by_ticker[record["ticker"]] = record["sector"]

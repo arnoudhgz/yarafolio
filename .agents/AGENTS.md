@@ -35,3 +35,6 @@ Whenever modifying the underlying logic of a chart (such as swapping between % a
 
 ## Strict DOM Type-Checking Rule
 When writing or refactoring JavaScript in this project, always use strict JSDoc type casting (e.g., `/** @type {HTMLElement} */`) and explicit runtime checks (`instanceof HTMLElement`) when interacting with DOM elements, otherwise the strict type-checker will throw implicit `any` errors.
+
+## Plan Artifacts Rule
+When using the /plan command to generate an Implementation Plan artifact, ALWAYS save a copy of the plan markdown file directly to the project's 	mp/ directory (e.g., 	mp/plan_name.md) so the user can easily read it in their IDE without it being committed.

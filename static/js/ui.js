@@ -184,8 +184,8 @@ export function openModal(id, positionID) {
         if (pfH && pfH.lots && pfH.lots.length) {
           return '<h4>Current eToro Holdings</h4><ul class="note-list">' +
             pfH.lots.map(l => {
-              const pl = (pfH.currentPrice - l.openRate) * l.units;
-              const pct = (pfH.currentPrice - l.openRate) / l.openRate * 100;
+              const pl = l.isBuy === false ? (l.openRate - pfH.currentPrice) * l.units : (pfH.currentPrice - l.openRate) * l.units;
+              const pct = l.isBuy === false ? (l.openRate - pfH.currentPrice) / l.openRate * 100 : (pfH.currentPrice - l.openRate) / l.openRate * 100;
               return '<li><span class="nd">' + (l.openDateTime ? localDate(l.openDateTime) : l.openDate) + '</span><span>' + l.units + ' @ ' +
                 fmtPrice(l.openRate) + ' <span class="' + (pl >= 0 ? 'pos' : 'neg') +
                 '">' + fmtPL(pl) + ' (' + fmtPct(pct) + ')</span></span></li>';

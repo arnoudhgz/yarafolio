@@ -109,3 +109,6 @@ When analyzing the user's overall portfolio performance or open P/L, be aware of
 
 ## Advice Tracking Multi-Entry Rule
 When checking a stock's status or reading its data from the log, you MUST filter for active states (`watching` or `bought`) rather than pulling the first historical entry. A single ticker can have multiple entries in the log (e.g., previously `sold`, now `watching` again).
+
+## Plan Artifacts Rule
+When using the /plan command to generate an Implementation Plan artifact, ALWAYS save a copy of the plan markdown file directly to the project's 	mp/ directory (e.g., 	mp/plan_name.md) so the user can easily read it in their IDE without it being committed.

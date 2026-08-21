@@ -163,7 +163,7 @@ class AddPickTest(unittest.TestCase):
         Path(self.tmp.name).unlink(missing_ok=True)
 
     def _entries(self):
-        with open(self.tmp.name) as f:
+        with open(self.tmp.name, encoding="utf-8") as f:
             return json.load(f)["entries"]
 
     def test_add_new_pick(self):
@@ -189,7 +189,7 @@ class AddPickTest(unittest.TestCase):
         self.assertEqual(entries[0]["priceAtAdvice"], 170.0)
 
     def _seed(self, entries):
-        with open(self.tmp.name, "w") as f:
+        with open(self.tmp.name, "w", encoding="utf-8") as f:
             json.dump({"entries": entries, "lastUpdated": ""}, f)
 
     def test_readvise_bought_ticker_upserts_not_duplicates(self):

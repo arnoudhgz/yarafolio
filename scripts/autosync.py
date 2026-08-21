@@ -39,7 +39,7 @@ class AutoSync:
         if v is not None:
             return v
         try:
-            with open(os.path.join(ROOT, ".env")) as f:
+            with open(os.path.join(ROOT, ".env"), encoding="utf-8") as f:
                 for line in f:
                     k, _, val = line.partition("=")
                     if k.replace("export", "").strip() == key:
@@ -51,7 +51,12 @@ class AutoSync:
     def git(self, *args: str, cwd: str | None = None) -> subprocess.CompletedProcess:
         if cwd is None:
             cwd = self.data_dir
-        return subprocess.run(["git", *args], cwd=cwd,
+        env = os.environ.copy()
+        env["GIT_AUTHOR_NAME"] = "YaraFolio AutoSync"
+        env["GIT_AUTHOR_EMAIL"] = "autosync@yarafolio.local"
+        env["GIT_COMMITTER_NAME"] = "YaraFolio AutoSync"
+        env["GIT_COMMITTER_EMAIL"] = "autosync@yarafolio.local"
+        return subprocess.run(["git", *args], cwd=cwd, env=env,
                               capture_output=True, text=True)
 
     def resolve_json_conflict(self, filepath: str) -> bool:
@@ -131,7 +136,7 @@ class AutoSync:
 
         # Write resolved
         full_path = os.path.join(self.data_dir, filepath)
-        with open(full_path, "w") as f:
+        with open(full_path, "w", encoding="utf-8") as f:
             if isinstance(merged, list):
                 json.dump(merged, f)
             else:
@@ -145,10 +150,14 @@ class AutoSync:
         if self.get_env("DEMO_MODE") == "1":
             return
 
-        try:
-            subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "record_equity.py")], cwd=ROOT)
-        except Exception as e:
-            logger.warning("Failed to record equity: %s", e)
+        if self.get_env("STOCKS_AUTOSYNC") != "1":
+            return
+
+        if reason != "startup":
+            try:
+                subprocess.run([sys.executable, os.path.join(ROOT, "scripts", "record_equity.py")], cwd=ROOT)
+            except Exception as e:
+                logger.warning("Failed to record equity: %s", e)
 
         private_repo = self.get_env("PRIVATE_DATA_REPO")
         if not private_repo:
@@ -165,12 +174,11 @@ class AutoSync:
             p for p in self.paths if os.path.exists(
                 os.path.join(
                     self.data_dir, p))]
-        if not present:
-            return
-
         # 1. Commit local changes FIRST
-        self.git("add", "--", *present)
-        has_changes = self.git("diff", "--cached", "--quiet").returncode != 0
+        has_changes = False
+        if present:
+            self.git("add", "--", *present)
+            has_changes = self.git("diff", "--cached", "--quiet").returncode != 0
 
         import nyse
         msg = f"chore(data): {reason} ({nyse.nyse_now().isoformat('T', 'minutes')})"

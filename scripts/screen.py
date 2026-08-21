@@ -166,7 +166,7 @@ class Screen:
         exclude = set()
         if args.exclude_held:
             try:
-                with open(os.path.join(ROOT, "data", "private", "portfolio.json")) as f:
+                with open(os.path.join(ROOT, "data", "private", "portfolio.json"), encoding="utf-8") as f:
                     port = json.load(f)
                     for item in port.get("holdings", []):
                         exclude.add(item.get("ticker", ""))
@@ -175,7 +175,7 @@ class Screen:
         
         if args.exclude_advised:
             try:
-                with open(os.path.join(ROOT, "data", "private", "advice-log.json")) as f:
+                with open(os.path.join(ROOT, "data", "private", "advice-log.json"), encoding="utf-8") as f:
                     adv = json.load(f)
                     for e in adv.get("entries", []):
                         exclude.add(e.get("ticker", ""))
@@ -280,84 +280,101 @@ class Screen:
             data["Sector"] = sector_match.group(1)
         return data
 
-    def cmd_quote(self, args: argparse.Namespace):
-        results = {}
-
-        def fetch_wrapper(ticker):
+    def get_etoro_creds(self):
+        def get_env(key):
+            v = os.environ.get(key)
+            if v is not None:
+                return v
             try:
-                return ticker, self.parse_quote(ticker)
-            except Exception as exc:
-                return ticker, {"error": str(exc)}
+                with open(os.path.join(ROOT, ".env"), encoding="utf-8") as f:
+                    for line in f:
+                        k, _, val = line.partition("=")
+                        if k.replace("export", "").strip() == key:
+                            return val.strip().strip("\"'")
+            except OSError:
+                pass
+            return None
+        api_key = get_env("ETORO_API_KEY")
+        user_key = get_env("ETORO_USER_KEY")
+        if not api_key or not user_key:
+            return None
+        return {"ETORO_API_KEY": api_key, "ETORO_USER_KEY": user_key}
 
-        with concurrent.futures.ThreadPoolExecutor(max_workers=20) as executor:
-            futures = {
-                executor.submit(
-                    fetch_wrapper,
-                    ticker): ticker for ticker in args.tickers}
-            for future in concurrent.futures.as_completed(futures):
-                ticker, data = future.result()
-                results[ticker] = data
+    def fetch_etoro_api(self, path, creds):
+        import uuid
+        req = urllib.request.Request("https://public-api.etoro.com/api/v1" + path, headers={
+            "x-api-key": creds["ETORO_API_KEY"],
+            "x-user-key": creds["ETORO_USER_KEY"],
+            "x-request-id": str(uuid.uuid4()),
+            "Accept": "application/json",
+            "User-Agent": "curl/8.7.1",
+        })
+        try:
+            with urllib.request.urlopen(req, timeout=15) as res:
+                return json.loads(res.read())
+        except Exception as e:
+            logger.error(f"eToro API error for {path}: {e}")
+            return {}
+
+    def cmd_quote(self, args: argparse.Namespace):
+        creds = self.get_etoro_creds()
+        if not creds:
+            sys.exit("Missing ETORO_API_KEY or ETORO_USER_KEY in .env. Needed for direct API quotes.")
+
+        results = {}
+        
+        ticker_to_id = {}
+        for path in [
+            os.path.join(ROOT, "data", "instruments.json"),
+            os.path.join(ROOT, "data", "private", "custom_instruments.json")
+        ]:
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    try:
+                        for k, v in json.load(f).items():
+                            ticker_to_id[v["ticker"]] = k
+                    except:
+                        pass
+        
+        valid_ids = []
+        id_to_ticker = {}
+        for t in args.tickers:
+            if t in ticker_to_id:
+                valid_ids.append(ticker_to_id[t])
+                id_to_ticker[ticker_to_id[t]] = t
+            else:
+                results[t] = {"error": "Ticker not found in local instruments mapping"}
+        
+        if valid_ids:
+            chunked_ids = [valid_ids[i:i + 100] for i in range(0, len(valid_ids), 100)]
+            for chunk in chunked_ids:
+                param = ",".join(chunk)
+                rates_res = self.fetch_etoro_api(f"/market-data/instruments/rates?instrumentIds={param}", creds)
+                for r in rates_res.get("rates", []):
+                    iid = str(r["instrumentID"])
+                    t = id_to_ticker.get(iid)
+                    if not t:
+                        continue
+                    price = r.get("bid") or r.get("lastExecution")
+                    results[t] = {
+                        "price": price,
+                        "regularPrice": price,
+                        "session": "regular",
+                    }
+                    if r.get("lastExecution"):
+                        results[t]["Previous Close"] = str(r["lastExecution"])
 
         if args.json:
             logger.info(json.dumps(results))
             return
+            
         for ticker, data in results.items():
             if "error" in data:
                 logger.info(f"{ticker}: fetch failed ({data['error']})")
                 continue
             price = data.get("price")
-            note = quote_session_note(data)
-            price_label = f"price {price}" if price is not None else "price ?"
-            if note:
-                price_label += f" ({note})"
-            stats = [price_label]
-            regular_price = data.get("regularPrice")
-            if note and regular_price is not None and regular_price != price:
-                stats.append(f"regular close {regular_price}")
-            stats += [f"{label} {data[label]}" for label in QUOTE_FIELDS if label in data]
+            logger.info(f"price {price} (API exact)")
 
-            if price is not None and "52-Week Range" in data:
-                try:
-                    low_val = float(
-                        data["52-Week Range"].split("-")[0].strip().replace(',', ''))
-                    if low_val > 0:
-                        stats.append(
-                            f"% above 52W Low {((price - low_val) / low_val * 100):.1f}%")
-                except Exception:
-                    pass
-
-            if "Earnings Date" in data and data["Earnings Date"] not in (
-                    "", "-"):
-                try:
-                    edate = datetime.strptime(
-                        data["Earnings Date"], "%b %d, %Y").date()
-                    days_until = (edate - datetime.today().date()).days
-                    if 0 <= days_until <= 7:
-                        stats.append(
-                            f"[⚠️ WARNING: EARNINGS IN {days_until} DAYS]")
-                except Exception:
-                    pass
-
-            if "Volume" in data and "Average Volume" in data:
-                try:
-                    def parse_vol(v):
-                        v = v.replace(',', '').upper()
-                        if v.endswith('M'):
-                            return float(v[:-1]) * 1e6
-                        if v.endswith('B'):
-                            return float(v[:-1]) * 1e9
-                        if v.endswith('K'):
-                            return float(v[:-1]) * 1e3
-                        return float(v)
-                    vol = parse_vol(data["Volume"])
-                    avg_vol = parse_vol(data["Average Volume"])
-                    if avg_vol > 0 and vol >= avg_vol * 3:
-                        stats.append(
-                            f"[🔥 CAPITULATION: Volume is {vol/avg_vol:.1f}x average]")
-                except Exception:
-                    pass
-
-            logger.info(f"{ticker}: " + " | ".join(stats))
 
     def cmd_forecast(self, args: argparse.Namespace):
         results = {}

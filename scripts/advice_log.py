@@ -39,7 +39,7 @@ def get_env(key: str) -> str | None:
     if v is not None:
         return v
     try:
-        with open(os.path.join(ROOT, ".env")) as f:
+        with open(os.path.join(ROOT, ".env"), encoding="utf-8") as f:
             for line in f:
                 k, _, val = line.partition("=")
                 if k.replace("export", "").strip() == key:
@@ -70,13 +70,13 @@ class AdviceLog:
             ROOT, "data", self.subdir, "portfolio.json")
 
     def load_log(self) -> dict:
-        with open(self.log_file) as f:
+        with open(self.log_file, encoding="utf-8") as f:
             return entries.normalize_entries(json.load(f))
 
     def save_log(self, data: dict) -> None:
         data["lastUpdated"] = nyse.nyse_now().isoformat("T", "minutes")
         tmp = self.log_file + ".tmp"
-        with open(tmp, "w") as f:
+        with open(tmp, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
             f.write("\n")
         os.replace(tmp, self.log_file)
@@ -265,7 +265,7 @@ class AdviceLog:
         entry = f"# {title_date}\n\n{content.strip()}\n"
         
         if os.path.exists(md_file):
-            with open(md_file, "r") as f:
+            with open(md_file, "r", encoding="utf-8") as f:
                 existing = f.read().strip()
             
             if existing:
@@ -280,7 +280,7 @@ class AdviceLog:
         else:
             new_content = entry
             
-        with open(md_file, "w") as f:
+        with open(md_file, "w", encoding="utf-8") as f:
             f.write(new_content)
         
         # We also need to bump lastUpdated on the main log to trigger autosync/refresh
@@ -447,7 +447,7 @@ class AdviceLog:
     def load_portfolio(self) -> dict:
         if not os.path.exists(self.portfolio_file):
             sys.exit("data/portfolio.json missing: run the eToro import first")
-        with open(self.portfolio_file) as f:
+        with open(self.portfolio_file, encoding="utf-8") as f:
             return json.load(f)
 
     def cmd_compare(self, args: argparse.Namespace):

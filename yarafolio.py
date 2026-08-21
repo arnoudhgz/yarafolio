@@ -37,7 +37,7 @@ def get_env(key):
     if v is not None:
         return v
     try:
-        with open(os.path.join(ROOT, ".env")) as f:
+        with open(os.path.join(ROOT, ".env"), encoding="utf-8") as f:
             for line in f:
                 k, _, val = line.partition("=")
                 if k.replace("export", "").strip() == key:
@@ -115,11 +115,11 @@ class Handler(SimpleHTTPRequestHandler):
             base_path = os.path.join(ROOT, "data", "instruments.json")
             cache_path = os.path.join(ROOT, "data", subdir, "custom_instruments.json")
             if os.path.exists(base_path):
-                with open(base_path) as f:
+                with open(base_path, encoding="utf-8") as f:
                     try: data.update(json.load(f))
                     except: pass
             if os.path.exists(cache_path):
-                with open(cache_path) as f:
+                with open(cache_path, encoding="utf-8") as f:
                     try: data.update(json.load(f))
                     except: pass
             self.respond_json(200, data)
@@ -145,7 +145,7 @@ class Handler(SimpleHTTPRequestHandler):
             if os.path.exists(cache_file) and not force:
                 age = time.time() - os.path.getmtime(cache_file)
                 if age < 4 * 3600:
-                    with open(cache_file) as f:
+                    with open(cache_file, encoding="utf-8") as f:
                         self.respond_json(200, json.load(f))
                         return
             try:
@@ -158,7 +158,7 @@ class Handler(SimpleHTTPRequestHandler):
                                      capture_output=True,
                                      text=True,
                                      check=True)
-                with open(cache_file, "w") as f:
+                with open(cache_file, "w", encoding="utf-8") as f:
                     f.write(res.stdout)
                 self.send_response(200)
                 self.send_header("Content-Type", "application/json")
@@ -198,7 +198,7 @@ class Handler(SimpleHTTPRequestHandler):
             return
         tmp = DATA_FILE + ".tmp"
         with DATA_LOCK:
-            with open(tmp, "w") as f:
+            with open(tmp, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
                 f.write("\n")
             os.replace(tmp, DATA_FILE)
@@ -276,7 +276,7 @@ class Handler(SimpleHTTPRequestHandler):
             return
         try:
             try:
-                with open(DATA_FILE) as f:
+                with open(DATA_FILE, encoding="utf-8") as f:
                     entries = json.load(f).get("entries", [])
             except (OSError, ValueError) as exc:
                 self.respond_json(
@@ -354,7 +354,7 @@ class Handler(SimpleHTTPRequestHandler):
     def handle_stats(self):
         if is_demo:
             try:
-                with open(os.path.join(ROOT, "data", "sample", "review-stats.json")) as f:
+                with open(os.path.join(ROOT, "data", "sample", "review-stats.json"), encoding="utf-8") as f:
                     self.respond_json(200, json.load(f))
                 return
             except OSError:
@@ -431,7 +431,7 @@ class Handler(SimpleHTTPRequestHandler):
                 cache_time = os.path.getmtime(cache_file)
                 age = time.time() - cache_time
                 if age < 2 * 3600:
-                    with open(cache_file) as f:
+                    with open(cache_file, encoding="utf-8") as f:
                         cached_events = json.load(f)
                     
                     import datetime
@@ -484,13 +484,13 @@ class Handler(SimpleHTTPRequestHandler):
                     event[key] = m.group(1).strip() if m else ''
                 events.append(event)
 
-            with open(cache_file, "w") as f:
+            with open(cache_file, "w", encoding="utf-8") as f:
                 json.dump(events, f)
 
             self.respond_json(200, {"ok": True, "events": events})
         except Exception as exc:
             if os.path.exists(cache_file):
-                with open(cache_file) as f:
+                with open(cache_file, encoding="utf-8") as f:
                     return self.respond_json(
                         200, {"ok": True, "events": json.load(f), "cached": True, "stale": True})
             self.respond_json(500, {"ok": False, "error": str(exc)})
@@ -532,7 +532,7 @@ class Handler(SimpleHTTPRequestHandler):
         env_file = os.path.join(ROOT, ".env")
         suffixes = []
         try:
-            with open(env_file) as f:
+            with open(env_file, encoding="utf-8") as f:
                 for line in f:
                     line = line.strip()
                     if line.startswith("#"):
@@ -573,7 +573,7 @@ logger.addHandler(ch)
 class YaraFolioApp:
     def read_pid(self):
         try:
-            with open(PID_FILE) as f:
+            with open(PID_FILE, encoding="utf-8") as f:
                 return int(f.read().strip())
         except (OSError, ValueError):
             return None
@@ -586,6 +586,8 @@ class YaraFolioApp:
             return False
         except PermissionError:
             return True
+        except OSError:
+            return False
 
     def stop_server(self):
         pid = self.read_pid()
@@ -641,7 +643,7 @@ class YaraFolioApp:
                     "Please choose another port by setting PORT=... in your .env file.")
             raise
 
-        with open(PID_FILE, "w") as f:
+        with open(PID_FILE, "w", encoding="utf-8") as f:
             f.write(f"{os.getpid()}\n")
 
         def request_shutdown(_signum, _frame):
@@ -674,7 +676,7 @@ class YaraFolioApp:
             
             locations = []
             try:
-                with open(os.path.join(ROOT, ".env")) as f:
+                with open(os.path.join(ROOT, ".env"), encoding="utf-8") as f:
                     content = f.read()
                     for m in re.finditer(r"ETORO_USER_KEY_([A-Z0-9_]+)=", content):
                         suffix = m.group(1)
@@ -683,6 +685,13 @@ class YaraFolioApp:
             except OSError: pass
             if not locations:
                 locations = [""]
+
+            # 0.5. Sync data (pulls from git if empty)
+            try:
+                import subprocess
+                subprocess.run([sys.executable, AUTOSYNC_SCRIPT, "startup"], cwd=ROOT)
+            except Exception as e:
+                logger.error(f"Initial git sync failed: {e}")
 
             # 1. Refresh quotes
             try:

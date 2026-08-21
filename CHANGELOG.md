@@ -5,13 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.1] - 2026-08-19
+## [0.10.1] - 2026-08-21
 
 ### Added
+- Added Antigravity plugin for eToro Public API MCP server in `.agents/plugins/etoro-mcp/`.
+- `etoro_import.py` now fetches closed trade history from `GET /trading/info/trade/history` to record exact exit rates (`soldAt`) instead of estimating them using the last seen price.
+- Added a new project rule explicitly instructing agents to output `/plan` artifacts directly to the `tmp/` folder for immediate user review without cluttering the repository.
 - Added "Ban Re-evaluation" rule to the review skill to automatically propose lifting stale tactics/sector bans older than 3-4 weeks for test batches.
 - Added `scripts/advice_log.py prune-text` command to strip heavy text fields (`reason`, `risk`, `notes`) from inactive positions (sold or blacklisted) to reduce JSON log bloat, while keeping notes intact for dropped positions that might be re-advised.
 
 ### Changed
+- Migrated real-time quotes in `screen.py quote` away from fragile HTML scraping of `stockanalysis.com` to native bulk queries against the eToro Public API (`/market-data/instruments/rates`), resulting in significantly faster and more reliable dashboard updates.
 - Strategy Update: De-prioritized and skipped the `ipos` tactic across all workflows (GEMINI.md, CLAUDE.md, STRATEGY.md) due to extreme volatility and lack of clear trading ranges.
 - Strategy Update: The `/momentum` skill now strictly requires A-tier ratings (A-, A, A+) to combat historical underperformance of momentum trades.
 - Strategy Update: Enforced a strict rule across `GEMINI.md`, `CLAUDE.md`, and `STRATEGY.md` that real-time price action and index momentum strictly override news headlines to prevent hallucinating market panic from stale or fake RSS feeds.
