@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `scripts/advice_log.py prune-text` command to strip heavy text fields (`reason`, `risk`, `notes`) from inactive positions (sold or blacklisted) to reduce JSON log bloat, while keeping notes intact for dropped positions that might be re-advised.
 
 ### Fixed
+- Fixed the EOD skill (`/eod`) instructions to strictly enforce markdown formatting (using `###` headings and bulleted lists) so the dashboard properly parses report titles and action items instead of rendering them as a raw text block.
 - Fixed a bug where Windows line endings (`\r\n`) in `news.md` and `eod.md` prevented markdown block splitting, causing the EOD Reports and AI News tabs to render as a single large column instead of the intended 2-column masonry grid.
 - Fixed an issue where hidden tabs in the settings modal would automatically reappear after a page refresh due to aggressive auto-enable logic.
 
