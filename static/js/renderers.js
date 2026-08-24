@@ -2146,6 +2146,27 @@ export function renderCommoditiesTab() {
         const comms = ['GOLD', 'SILVER', 'OIL', 'COPPER', 'PLATINUM', 'PALLADIUM', 'NATGAS', 'COFFEE.FUT', 'COTTON.FUT', 'WHEAT', 'CORN', 'SUGAR', 'COCOA.FUT'];
         return p.sector === 'Commodities' || comms.includes(p.ticker) || (window.ETORO_CACHE && window.ETORO_CACHE[p.ticker] && (window.ETORO_CACHE[p.ticker].Industry === 'Commodities' || window.ETORO_CACHE[p.ticker].Sector === 'Commodities'));
       });
+      let expandedActive = [];
+      for (const p of active) {
+        if (p.lots && p.lots.length > 0) {
+          for (const lot of p.lots) {
+            const isBuy = lot.isBuy !== false;
+            const pl = isBuy ? (p.currentPrice - lot.openRate) * lot.units : (lot.openRate - p.currentPrice) * lot.units;
+            expandedActive.push({
+              ...p,
+              firstOpen: lot.openDate || p.firstOpen,
+              avgOpen: lot.openRate || p.avgOpen,
+              units: lot.units,
+              plDollar: pl,
+              positionID: lot.positionID,
+              isBuy: isBuy
+            });
+          }
+        } else {
+          expandedActive.push(p);
+        }
+      }
+      active = expandedActive;
       if (searchQuery) active = active.filter(t => matchesSearch(t, searchQuery));
       const state = sortState.commActive || { key: 'firstOpen', dir: -1 };
       markSortedHeader(actTable, state);
@@ -2160,6 +2181,7 @@ export function renderCommoditiesTab() {
       for (const p of active) {
         let name = getTickerName(p.ticker);
         let tickerHtml = tickerLink(p.ticker);
+        if (p.isBuy === false) tickerHtml += ' <span style="font-size:10px; padding:2px 4px; border-radius:3px; background:var(--neg-bg); color:var(--neg); margin-left:6px; vertical-align:middle; line-height:1;">SHORT</span>';
         if (name) tickerHtml += '<span class="sub">' + esc(name) + '</span>';
         actHtml += `<tr>
           <td>${tickerHtml}</td>

@@ -23,7 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fixed an issue where hidden tabs in the settings modal would automatically reappear after a page refresh due to aggressive auto-enable logic.
 
 ### Changed
-- Refactored `renderHistoryTab` and `renderCommoditiesTab` styling: negative fees (CFD rebates) now explicitly render in green, and total fees are aggregated.
+
+- Active Commodities tab now unrolls grouped holdings to display individual lots separately (e.g. multiple open OIL trades are shown individually).- Refactored `renderHistoryTab` and `renderCommoditiesTab` styling: negative fees (CFD rebates) now explicitly render in green, and total fees are aggregated.
 - Reordered the Commodities tab layout to prioritize "Active Commodity Positions" at the top.
 - Standardized `dashboard.html` info modals to use the native `<dialog class="modal-card">` layout with a proper close button.
 - Migrated real-time quotes in `screen.py quote` away from fragile HTML scraping of `stockanalysis.com` to native bulk queries against the eToro Public API (`/market-data/instruments/rates`), resulting in significantly faster and more reliable dashboard updates.
