@@ -29,8 +29,8 @@ async function load() {
     
     if (eodRes && eodRes.ok) {
         const eodText = await eodRes.text();
-        logData.eodReports = eodText.split("\n---\n\n").filter(b => b.trim()).map(block => {
-            const lines = block.trim().split("\n");
+        logData.eodReports = eodText.split(/\r?\n---\r?\n+/).filter(b => b.trim()).map(block => {
+            const lines = block.trim().split(/\r?\n/);
             if (lines[0].startsWith("# ")) {
                 return { date: lines[0].substring(2).trim(), summary: lines.slice(1).join("\n").trim() };
             }
@@ -40,8 +40,8 @@ async function load() {
 
     if (newsRes && newsRes.ok) {
         const newsText = await newsRes.text();
-        logData.newsSummaries = newsText.split("\n---\n\n").filter(b => b.trim()).map(block => {
-            const lines = block.trim().split("\n");
+        logData.newsSummaries = newsText.split(/\r?\n---\r?\n+/).filter(b => b.trim()).map(block => {
+            const lines = block.trim().split(/\r?\n/);
             if (lines[0].startsWith("# ")) {
                 return { timestamp: lines[0].substring(2).trim(), summary: lines.slice(1).join("\n").trim() };
             }

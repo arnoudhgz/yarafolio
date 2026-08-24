@@ -20,9 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `scripts/advice_log.py prune-text` command to strip heavy text fields (`reason`, `risk`, `notes`) from inactive positions (sold or blacklisted) to reduce JSON log bloat, while keeping notes intact for dropped positions that might be re-advised.
 
 ### Fixed
+- Fixed a bug where Windows line endings (`\r\n`) in `news.md` and `eod.md` prevented markdown block splitting, causing the EOD Reports and AI News tabs to render as a single large column instead of the intended 2-column masonry grid.
 - Fixed an issue where hidden tabs in the settings modal would automatically reappear after a page refresh due to aggressive auto-enable logic.
 
 ### Changed
+- Removed interactive sk_question requirement from /advice workflow in GEMINI.md and CLAUDE.md to ensure a 100% fire-and-forget experience.
 
 - Active Commodities tab now unrolls grouped holdings to display individual lots separately (e.g. multiple open OIL trades are shown individually).- Refactored `renderHistoryTab` and `renderCommoditiesTab` styling: negative fees (CFD rebates) now explicitly render in green, and total fees are aggregated.
 - Reordered the Commodities tab layout to prioritize "Active Commodity Positions" at the top.

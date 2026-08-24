@@ -882,10 +882,10 @@ export function renderAINews() {
     for (const s of summaries) {
       let contentStr = s.article || s.summary || '';
       let title = 'News Summary';
-      const titleMatch = contentStr.match(/^###\s*(.*?)(\n|$)/);
+      const titleMatch = contentStr.match(/^###\s*(.*?)(\r?\n|$)/);
       if (titleMatch) {
         title = esc(titleMatch[1]);
-        contentStr = contentStr.replace(/^###\s*(.*?)(\n|$)/, '');
+        contentStr = contentStr.replace(/^###\s*(.*?)(\r?\n|$)/, '');
       }
 
       let content = linkifyHtml(marked.parse(contentStr.trim()));
@@ -918,10 +918,10 @@ export function renderEOD() {
     eodList.innerHTML = reports.map(r => {
       let contentStr = r.summary || '';
       let title = 'EOD Report';
-      const titleMatch = contentStr.match(/^###\s*(.*?)(\n|$)/);
+      const titleMatch = contentStr.match(/^###\s*(.*?)(\r?\n|$)/);
       if (titleMatch) {
         title = esc(titleMatch[1]);
-        contentStr = contentStr.replace(/^###\s*(.*?)(\n|$)/, '');
+        contentStr = contentStr.replace(/^###\s*(.*?)(\r?\n|$)/, '');
       }
 
       let content = linkifyHtml(marked.parse(contentStr.trim()));
