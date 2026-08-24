@@ -5,9 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.1] - 2026-08-21
+## [0.10.1] - 2026-08-24
 
 ### Added
+- Added Settings gear in the top right of the dashboard to configure visible tabs, with `localStorage` persistence.
+- Mapped 8 missing specific instrument IDs (including LLY, ETOR, AEP, WTW, BTC) to their proper tickers in `custom_instruments.json`.
+- Added Commodities Totals table to aggregate day trading metrics (max profit/loss, win rate, total fees).
+- Added `getTickerName` fallback logic in `renderers.js` to gracefully resolve names when instruments aren't in the eToro cache.
+- Added a dynamic start date indicator to the Trading History info modal, derived from the earliest imported ledger entry.
 - Added Antigravity plugin for eToro Public API MCP server in `.agents/plugins/etoro-mcp/`.
 - `etoro_import.py` now fetches closed trade history from `GET /trading/info/trade/history` to record exact exit rates (`soldAt`) instead of estimating them using the last seen price.
 - Added a new project rule explicitly instructing agents to output `/plan` artifacts directly to the `tmp/` folder for immediate user review without cluttering the repository.
@@ -15,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `scripts/advice_log.py prune-text` command to strip heavy text fields (`reason`, `risk`, `notes`) from inactive positions (sold or blacklisted) to reduce JSON log bloat, while keeping notes intact for dropped positions that might be re-advised.
 
 ### Changed
+- Refactored `renderHistoryTab` and `renderCommoditiesTab` styling: negative fees (CFD rebates) now explicitly render in green, and total fees are aggregated.
+- Reordered the Commodities tab layout to prioritize "Active Commodity Positions" at the top.
+- Standardized `dashboard.html` info modals to use the native `<dialog class="modal-card">` layout with a proper close button.
 - Migrated real-time quotes in `screen.py quote` away from fragile HTML scraping of `stockanalysis.com` to native bulk queries against the eToro Public API (`/market-data/instruments/rates`), resulting in significantly faster and more reliable dashboard updates.
 - Strategy Update: De-prioritized and skipped the `ipos` tactic across all workflows (GEMINI.md, CLAUDE.md, STRATEGY.md) due to extreme volatility and lack of clear trading ranges.
 - Strategy Update: The `/momentum` skill now strictly requires A-tier ratings (A-, A, A+) to combat historical underperformance of momentum trades.

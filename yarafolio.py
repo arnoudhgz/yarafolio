@@ -131,6 +131,17 @@ class Handler(SimpleHTTPRequestHandler):
                     "ok": True, "pid": os.getpid(), "root": ROOT})
         elif self.path == "/api/stats":
             self.handle_stats()
+        elif self.path == "/api/history":
+            history_file = os.path.join(ROOT, "data", subdir, "history.json")
+            if os.path.exists(history_file):
+                with open(history_file, encoding="utf-8") as f:
+                    try:
+                        data = json.load(f)
+                    except:
+                        data = []
+            else:
+                data = []
+            self.respond_json(200, data)
 
         elif self.path.startswith("/api/news"):
             self.handle_news()

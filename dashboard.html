@@ -26,6 +26,7 @@
       <button id="syncBtn">&#x21bb; Sync Data</button>
       <select id="locationSelect" style="display:none;" aria-label="Location Select"></select>
       <button id="themeToggle" aria-label="Toggle Theme" title="Toggle Dark/Light Mode">◑</button>
+      <button id="btnSettings" aria-label="Tab Settings" title="Configure Tabs" onclick="window.openSettingsModal()">⚙</button>
     </div>
   </div>
   <div id="banner"></div>
@@ -53,6 +54,8 @@
     <button data-tab="positions">Positions</button>
     <button data-tab="portfolio">Portfolio</button>
     <button data-tab="analytics">Analytics</button>
+    <button data-tab="history">History</button>
+    <button data-tab="commodities">Commodities</button>
     <button data-tab="eod">EOD Reports</button>
     <button data-tab="news">AI News</button>
     <button data-tab="rawnews">News Feed</button>
@@ -188,6 +191,97 @@
       </table>
       <div class="empty" id="portfolioEmpty" style="display:none">No portfolio snapshot yet. Click "Update from eToro" or run /import in the AI CLI.</div>
       </div>
+    </div>
+  </section>
+
+  <section id="tab-history" class="tab-section">
+    <div class="panel">
+      <h2 style="display:flex; align-items:center; gap:8px;">
+        Trading History (API Ledger)
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoHistTab').showModal()"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      </h2>
+      <div class="cards" style="margin-bottom: 12px;" id="historyCards">
+        <div class="card"><div class="label">Win rate<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWinRate').showModal()" title="What is Win Rate?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="hWinRate">-</div></div>
+        <div class="card"><div class="label">Realized P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoRealized').showModal()" title="What is Realized P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="hRealized">-</div></div>
+        <div class="card"><div class="label">Total Fees<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoTotalFees').showModal()"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="hFees">-</div></div>
+        <div class="card"><div class="label">Total Trades<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoTotalTrades').showModal()"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="hTrades">-</div></div>
+      </div>
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th data-key="ticker">Ticker</th>
+            <th data-key="isBuy">Direction</th>
+            <th data-key="openTimestamp">Open Date</th>
+            <th data-key="closeTimestamp">Close Date</th>
+            <th data-key="openRate">Open Price</th>
+            <th data-key="closeRate">Close Price</th>
+            <th data-key="units">Units</th>
+            <th data-key="netProfit">P/L ($)</th>
+            <th data-key="fees">Fees</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="tab-commodities" class="tab-section">
+    <div class="panel">
+      <h2 style="display:flex; align-items:center; gap:8px;">
+        Commodities Insights (Day Trading)
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoCommTab').showModal()"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      </h2>
+      <div class="cards" style="margin-bottom: 12px;" id="commCards">
+        <div class="card"><div class="label">Win rate<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWinRate').showModal()" title="What is Win Rate?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cWinRate">-</div></div>
+        <div class="card"><div class="label">Realized P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoRealized').showModal()" title="What is Realized P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cRealized">-</div></div>
+        <div class="card"><div class="label">Morning Win Rate (before 12:00)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoMorningWin').showModal()"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cMorning">-</div></div>
+        <div class="card"><div class="label">Afternoon Win Rate<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoAfternoonWin').showModal()"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cAfternoon">-</div></div>
+        <div class="card"><div class="label">Quick Flips (< 1 hr) Win Rate<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoQuickFlips').showModal()"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cQuick">-</div></div>
+      </div>
+      
+      <h3 style="margin-top:20px; font-size:16px;">Active Commodity Positions</h3>
+      <table id="commActiveTable">
+        <thead>
+          <tr>
+            <th data-key="ticker">Ticker</th>
+            <th data-key="firstOpen">Buy Date</th>
+            <th data-key="avgOpen">Buy Price</th>
+            <th data-key="currentPrice">Current Price</th>
+            <th data-key="units">Units</th>
+            <th data-key="plDollar">Open P/L</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <h3 style="margin-top:20px; font-size:16px;">Totals per Commodity</h3>
+      <table id="commTotalsTable">
+        <thead>
+          <tr>
+            <th data-key="ticker">Commodity</th>
+            <th data-key="realized">Realized P/L</th>
+            <th data-key="maxProfit">Max Profit</th>
+            <th data-key="maxLoss">Max Loss</th>
+            <th data-key="winRate">Win Rate</th>
+            <th data-key="trades">Trades</th>
+            <th data-key="fees">Total Fees</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <h3 style="margin-top:20px; font-size:16px;">Recent Commodity Trades</h3>
+      <table id="commHistoryTable">
+        <thead>
+          <tr>
+            <th data-key="ticker">Ticker</th>
+            <th data-key="isBuy">Direction</th>
+            <th data-key="duration">Duration</th>
+            <th data-key="netProfit">P/L ($)</th>
+            <th data-key="fees">Fees</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
   </section>
 
@@ -798,5 +892,103 @@
       </div>
     </dialog>
 
+
+  <dialog id="infoTotalFees" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="document.getElementById('infoTotalFees').close()" aria-label="Close">&times;</button>
+      <div class="modal-header">
+        <h3>Total Fees</h3>
+      </div>
+      <div class="modal-body">
+        <p>The total accumulated rollover and weekend fees charged by eToro across all closed trades in this period.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="infoTotalTrades" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="document.getElementById('infoTotalTrades').close()" aria-label="Close">&times;</button>
+      <div class="modal-header">
+        <h3>Total Trades</h3>
+      </div>
+      <div class="modal-body">
+        <p>The number of trades executed and closed within the historical window.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="infoMorningWin" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="document.getElementById('infoMorningWin').close()" aria-label="Close">&times;</button>
+      <div class="modal-header">
+        <h3>Morning Win Rate</h3>
+      </div>
+      <div class="modal-body">
+        <p>The percentage of profitable commodity trades that were opened before 12:00 PM local time.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="infoAfternoonWin" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="document.getElementById('infoAfternoonWin').close()" aria-label="Close">&times;</button>
+      <div class="modal-header">
+        <h3>Afternoon Win Rate</h3>
+      </div>
+      <div class="modal-body">
+        <p>The percentage of profitable commodity trades that were opened after 12:00 PM local time.</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="infoQuickFlips" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="document.getElementById('infoQuickFlips').close()" aria-label="Close">&times;</button>
+      <div class="modal-header">
+        <h3>Quick Flips Win Rate</h3>
+      </div>
+      <div class="modal-body">
+        <p>The percentage of profitable commodity trades that were held for less than 1 hour before closing.</p>
+      </div>
+    </div>
+  </dialog>
+
+
+  <dialog id="modalSettings" class="modal-card" style="max-width: 400px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="document.getElementById('modalSettings').close()" aria-label="Close">&times;</button>
+      <div class="modal-header">
+        <h3>Tab Settings</h3>
+      </div>
+      <div class="modal-body" id="tabSettingsBody" style="margin-top: 15px;">
+      </div>
+    </div>
+  </dialog>
+
+
+  <dialog id="infoHistTab" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="document.getElementById('infoHistTab').close()" aria-label="Close">&times;</button>
+      <div class="modal-header">
+        <h3>Trading History</h3>
+      </div>
+      <div class="modal-body">
+        <p>This tab contains a full ledger of all closed trades imported from the eToro API.</p>
+        <p id="infoHistStartDate" style="font-style:italic; margin-top:8px;"></p>
+      </div>
+    </div>
+  </dialog>
+  
+  <dialog id="infoCommTab" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+    <div class="modal-content">
+      <button class="modal-close" onclick="document.getElementById('infoCommTab').close()" aria-label="Close">&times;</button>
+      <div class="modal-header">
+        <h3>Commodities Insights</h3>
+      </div>
+      <div class="modal-body">
+        <p>This tab filters your trading history exclusively for commodities, helping you analyze day-trading performance and duration.</p>
+      </div>
+    </div>
+  </dialog>
 </body>
 </html>

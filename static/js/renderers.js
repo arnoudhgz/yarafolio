@@ -17,6 +17,8 @@ export function renderAll() {
   renderPositions();
   if (activeTab === 'portfolio') renderPortfolio();
   if (activeTab === 'analytics' && LEARN) renderAnalytics();
+  if (activeTab === 'history') renderHistoryTab();
+  if (activeTab === 'commodities') renderCommoditiesTab();
 }
 
 export function adviceRows() {
@@ -1909,4 +1911,269 @@ export function renderRealizedPnlChart() {
             }
         }
     });
+}
+
+
+function getTickerName(ticker) {
+  if (window.ETORO_CACHE && window.ETORO_CACHE[ticker] && window.ETORO_CACHE[ticker].name) return window.ETORO_CACHE[ticker].name;
+  if (DATA && DATA.entries) {
+    const e = DATA.entries.find(x => x.ticker === ticker);
+    if (e && e.name) return e.name;
+  }
+  if (typeof PORTFOLIO !== 'undefined' && PORTFOLIO && PORTFOLIO.holdings) {
+    const h = PORTFOLIO.holdings.find(x => x.ticker === ticker);
+    if (h && h.name) return h.name;
+  }
+  return '';
+}
+
+export function renderHistoryTab() {
+  const table = document.getElementById('historyTable');
+  if (!table) return;
+  const tbody = table.querySelector('tbody');
+  if (!tbody) return;
+
+  const state = sortState.history || { key: 'closeTimestamp', dir: -1 };
+  markSortedHeader(table, state);
+
+  let h = DATA.tradeHistory || [];
+  if (window.ETORO_CACHE) {
+    const rev = {};
+    for (const [k, v] of Object.entries(window.ETORO_CACHE)) {
+        rev[v.InstrumentID] = k;
+    }
+    for (const t of h) {
+      if (!t.ticker && t.instrumentId && rev[t.instrumentId]) {
+        t.ticker = rev[t.instrumentId];
+      }
+    }
+  }
+
+  if (searchQuery) h = h.filter(t => matchesSearch(t, searchQuery));
+
+  let wins = 0, total = 0, profit = 0, fees = 0;
+  for (const t of h) {
+    total++;
+    if (t.netProfit > 0) wins++;
+    profit += (t.netProfit || 0);
+    fees += (t.fees || 0);
+  }
+
+  h = [...h].sort((a, b) => {
+    let va = a[state.key];
+    let vb = b[state.key];
+    if (state.key === 'ticker') {
+        va = a.ticker || String(a.instrumentId);
+        vb = b.ticker || String(b.instrumentId);
+    }
+    if (va < vb) return -state.dir;
+    if (va > vb) return state.dir;
+    return 0;
+  });
+
+  let html = '';
+  for (const t of h) {
+    let name = getTickerName(t.ticker);
+    let tickerHtml = t.ticker ? tickerLink(t.ticker) : esc(String(t.instrumentId));
+    if (name) tickerHtml += '<span class="sub">' + esc(name) + '</span>';
+    html += `<tr>
+      <td>${tickerHtml}</td>
+      <td>${t.isBuy ? 'Buy' : 'Sell'}</td>
+      <td>${localDate(t.openTimestamp)}</td>
+      <td>${localDate(t.closeTimestamp)}</td>
+      <td>${fmtPrice(t.openRate)}</td>
+      <td>${fmtPrice(t.closeRate)}</td>
+      <td>${(t.units || 0).toFixed(2)}</td>
+      <td class="${t.netProfit >= 0 ? 'pos' : 'neg'}">${fmtMoney(t.netProfit)}</td>
+      <td class="${t.fees > 0 ? 'neg' : (t.fees < 0 ? 'pos' : '')}">${fmtMoney(t.fees)}</td>
+    </tr>`;
+  }
+  tbody.innerHTML = html;
+
+  const vWin = document.getElementById('hWinRate');
+  if (vWin) vWin.textContent = total > 0 ? (wins / total * 100).toFixed(1) + '%' : '-';
+  const vReal = document.getElementById('hRealized');
+  if (vReal) { vReal.textContent = fmtMoney(profit); vReal.className = 'value ' + (profit >= 0 ? 'pos' : 'neg'); }
+  const vFees = document.getElementById('hFees');
+  if (vFees) vFees.textContent = fmtMoney(fees);
+  const vTrades = document.getElementById('hTrades');
+  if (vTrades) vTrades.textContent = String(total);
+  setSearchCount(total);
+  
+  const vHistDate = document.getElementById('infoHistStartDate');
+  if (vHistDate && (DATA.tradeHistory || []).length > 0) {
+     const earliest = DATA.tradeHistory.reduce((min, t) => t.closeTimestamp < min ? t.closeTimestamp : min, DATA.tradeHistory[0].closeTimestamp);
+     vHistDate.textContent = 'Historical data goes back to: ' + localDate(earliest);
+  }
+}
+
+export function renderCommoditiesTab() {
+  let h = DATA.tradeHistory || [];
+  if (window.ETORO_CACHE) {
+    const rev = {};
+    for (const [k, v] of Object.entries(window.ETORO_CACHE)) {
+        rev[v.InstrumentID] = k;
+    }
+    for (const t of h) {
+      if (!t.ticker && t.instrumentId && rev[t.instrumentId]) {
+        t.ticker = rev[t.instrumentId];
+      }
+      const comms = ['GOLD', 'SILVER', 'OIL', 'COPPER', 'PLATINUM', 'PALLADIUM', 'NATGAS', 'COFFEE.FUT', 'COTTON.FUT', 'WHEAT', 'CORN', 'SUGAR', 'COCOA.FUT'];
+      if (comms.includes(t.ticker) || (window.ETORO_CACHE[t.ticker] && (window.ETORO_CACHE[t.ticker].Industry === 'Commodities' || window.ETORO_CACHE[t.ticker].Sector === 'Commodities'))) {
+        t.sector = 'Commodities';
+      }
+    }
+  }
+  h = h.filter(t => t.sector === 'Commodities');
+  if (searchQuery) h = h.filter(t => matchesSearch(t, searchQuery));
+
+  let wins = 0, total = 0, profit = 0;
+  let mornW = 0, mornT = 0;
+  let aftW = 0, aftT = 0;
+  let qW = 0, qT = 0;
+  
+  for (const t of h) {
+    total++;
+    if (t.netProfit > 0) wins++;
+    profit += (t.netProfit || 0);
+    
+    const dOpen = new Date(t.openTimestamp);
+    const dClose = new Date(t.closeTimestamp);
+    const isMorn = dOpen.getHours() < 12;
+    if (isMorn) { mornT++; if (t.netProfit > 0) mornW++; }
+    else { aftT++; if (t.netProfit > 0) aftW++; }
+    
+    const hrs = (dClose.getTime() - dOpen.getTime()) / 3600000;
+    if (hrs < 1) { qT++; if (t.netProfit > 0) qW++; }
+    t.duration = hrs;
+  }
+  
+  const commHistoryTable = document.getElementById('commHistoryTable');
+  if (commHistoryTable) {
+      const state = sortState.commHistory || { key: 'closeTimestamp', dir: -1 };
+      markSortedHeader(commHistoryTable, state);
+      h = [...h].sort((a, b) => {
+        let va = a[state.key];
+        let vb = b[state.key];
+        if (state.key === 'ticker') {
+            va = a.ticker || String(a.instrumentId);
+            vb = b.ticker || String(b.instrumentId);
+        }
+        if (va < vb) return -state.dir;
+        if (va > vb) return state.dir;
+        return 0;
+      });
+      let histHtml = '';
+      for (const t of h) {
+        let name = getTickerName(t.ticker);
+        let tickerHtml = tickerLink(t.ticker);
+        if (name) tickerHtml += '<span class="sub">' + esc(name) + '</span>';
+        let durStr = t.duration < 1 ? Math.round(t.duration * 60) + 'm' : (t.duration < 24 ? Math.round(t.duration) + 'h' : Math.round(t.duration/24) + 'd');
+        histHtml += `<tr>
+          <td>${tickerHtml}</td>
+          <td>${t.isBuy ? 'Buy' : 'Sell'}</td>
+          <td>${durStr}</td>
+          <td class="${t.netProfit >= 0 ? 'pos' : 'neg'}">${fmtMoney(t.netProfit)}</td>
+          <td class="${t.fees > 0 ? 'neg' : (t.fees < 0 ? 'pos' : '')}">${fmtMoney(t.fees)}</td>
+        </tr>`;
+      }
+      const tbodyHist = commHistoryTable.querySelector('tbody');
+      if (tbodyHist) tbodyHist.innerHTML = histHtml;
+  }
+  
+  const vWin = document.getElementById('cWinRate');
+  if(vWin) vWin.textContent = total > 0 ? (wins / total * 100).toFixed(1) + '%' : '-';
+  const vPnl = document.getElementById('cRealized');
+  if(vPnl) { vPnl.textContent = fmtMoney(profit); vPnl.className = 'value ' + (profit >= 0 ? 'pos' : 'neg'); }
+  const vMorn = document.getElementById('cMorning');
+  if(vMorn) vMorn.textContent = mornT > 0 ? (mornW / mornT * 100).toFixed(1) + '%' + ' (' + mornT + ')' : '-';
+  const vAft = document.getElementById('cAfternoon');
+  if(vAft) vAft.textContent = aftT > 0 ? (aftW / aftT * 100).toFixed(1) + '%' + ' (' + aftT + ')' : '-';
+  const vQuick = document.getElementById('cQuick');
+  if(vQuick) vQuick.textContent = qT > 0 ? (qW / qT * 100).toFixed(1) + '%' + ' (' + qT + ')' : '-';
+  
+  const totalsMap = {};
+  for (const t of (DATA.tradeHistory || [])) {
+    if (t.sector !== 'Commodities') continue;
+    if (!totalsMap[t.ticker]) totalsMap[t.ticker] = { ticker: t.ticker, realized: 0, maxProfit: 0, maxLoss: 0, wins: 0, trades: 0, fees: 0 };
+    const m = totalsMap[t.ticker];
+    m.trades++;
+    m.realized += (t.netProfit || 0);
+    m.fees += (t.fees || 0);
+    if ((t.netProfit || 0) > m.maxProfit) m.maxProfit = t.netProfit;
+    if ((t.netProfit || 0) < m.maxLoss) m.maxLoss = t.netProfit;
+    if (t.netProfit > 0) m.wins++;
+  }
+  let totalsArr = Object.values(totalsMap);
+  const tTable = document.getElementById('commTotalsTable');
+  if (tTable) {
+      const state = sortState.commTotals || { key: 'realized', dir: -1 };
+      markSortedHeader(tTable, state);
+      totalsArr = totalsArr.sort((a, b) => {
+        let va = a[state.key];
+        let vb = b[state.key];
+        if (state.key === 'winRate') {
+            va = a.trades ? (a.wins/a.trades) : 0;
+            vb = b.trades ? (b.wins/b.trades) : 0;
+        }
+        if (va < vb) return -state.dir;
+        if (va > vb) return state.dir;
+        return 0;
+      });
+      let totHtml = '';
+      for (const m of totalsArr) {
+        let name = getTickerName(m.ticker);
+        let tickerHtml = tickerLink(m.ticker);
+        if (name) tickerHtml += '<span class="sub">' + esc(name) + '</span>';
+        let winStr = m.trades ? (m.wins / m.trades * 100).toFixed(1) + '%' : '-';
+        totHtml += `<tr>
+          <td>${tickerHtml}</td>
+          <td class="${m.realized >= 0 ? 'pos' : 'neg'}">${fmtMoney(m.realized)}</td>
+          <td class="pos">${fmtMoney(m.maxProfit)}</td>
+          <td class="neg">${fmtMoney(m.maxLoss)}</td>
+          <td>${winStr}</td>
+          <td>${m.trades}</td>
+          <td class="${m.fees > 0 ? 'neg' : (m.fees < 0 ? 'pos' : '')}">${fmtMoney(m.fees)}</td>
+        </tr>`;
+      }
+      const tbodyTot = tTable.querySelector('tbody');
+      if (tbodyTot) tbodyTot.innerHTML = totHtml;
+  }
+  
+  const actTable = document.getElementById('commActiveTable');
+  if (actTable) {
+      let active = (PORTFOLIO.holdings || []).filter(p => {
+        const comms = ['GOLD', 'SILVER', 'OIL', 'COPPER', 'PLATINUM', 'PALLADIUM', 'NATGAS', 'COFFEE.FUT', 'COTTON.FUT', 'WHEAT', 'CORN', 'SUGAR', 'COCOA.FUT'];
+        return p.sector === 'Commodities' || comms.includes(p.ticker) || (window.ETORO_CACHE && window.ETORO_CACHE[p.ticker] && (window.ETORO_CACHE[p.ticker].Industry === 'Commodities' || window.ETORO_CACHE[p.ticker].Sector === 'Commodities'));
+      });
+      if (searchQuery) active = active.filter(t => matchesSearch(t, searchQuery));
+      const state = sortState.commActive || { key: 'firstOpen', dir: -1 };
+      markSortedHeader(actTable, state);
+      active = [...active].sort((a, b) => {
+        let va = a[state.key];
+        let vb = b[state.key];
+        if (va < vb) return -state.dir;
+        if (va > vb) return state.dir;
+        return 0;
+      });
+      let actHtml = '';
+      for (const p of active) {
+        let name = getTickerName(p.ticker);
+        let tickerHtml = tickerLink(p.ticker);
+        if (name) tickerHtml += '<span class="sub">' + esc(name) + '</span>';
+        actHtml += `<tr>
+          <td>${tickerHtml}</td>
+          <td>${localDate(p.firstOpen)}</td>
+          <td>${fmtPrice(p.avgOpen)}</td>
+          <td>${fmtPrice(p.currentPrice)}</td>
+          <td>${(p.units || 0).toFixed(2)}</td>
+          <td class="${p.plDollar >= 0 ? 'pos' : 'neg'}">${fmtMoney(p.plDollar)}</td>
+        </tr>`;
+      }
+      const tbodyAct = actTable.querySelector('tbody');
+      if (tbodyAct) tbodyAct.innerHTML = actHtml;
+      setSearchCount(total + active.length);
+  } else {
+      setSearchCount(total);
+  }
 }

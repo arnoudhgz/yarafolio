@@ -74,13 +74,13 @@
     display: flex; align-items: center; justify-content: center;
   }
   #syncBtn:hover { background: rgba(52,152,219,0.12); }
-  #themeToggle {
+  #themeToggle, #btnSettings {
     display: flex; align-items: center; justify-content: center;
     width: 32px; height: 32px; padding: 0; font-weight: 600; color: var(--blue);
     background: transparent; border: 1px solid rgba(52,152,219,0.4);
     border-radius: 6px; cursor: pointer; font-size: 15px; transition: all 0.2s;
   }
-  #themeToggle:hover { background: rgba(52,152,219,0.12); }
+  #themeToggle:hover, #btnSettings:hover { background: rgba(52,152,219,0.12); }
   #locationSelect {
     height: 32px; padding: 0 30px 0 10px; font-weight: 600; color: var(--blue);
     background: transparent; border: 1px solid rgba(52,152,219,0.4);

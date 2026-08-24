@@ -64,6 +64,7 @@ class EtoroImport:
         self.portfolio_file = os.path.join(
             ROOT, "data", self.subdir, "portfolio.json")
         self.instruments_cache = os.path.join(ROOT, "data", self.subdir, "custom_instruments.json")
+        self.history_file = os.path.join(ROOT, "data", self.subdir, "history.json")
         self.preview_file = os.path.join(
             ROOT, "tmp", "etoro-import-preview.json")
 
@@ -439,10 +440,47 @@ class EtoroImport:
 
         by_ticker = {item["ticker"]: item for item in preview}
 
+        # Build instrument ID mapping
+        inst_by_id = {}
+        for path in [os.path.join(ROOT, "data", "instruments.json"), self.instruments_cache]:
+            if os.path.exists(path):
+                try:
+                    with open(path, encoding="utf-8") as f:
+                        for k, v in json.load(f).items():
+                            inst_by_id[int(k)] = v
+                            inst_by_id[str(k)] = v
+                except:
+                    pass
+
         # Fetch recent trading history to match exact closed prices
         three_months_ago = (datetime.now() - timedelta(days=90)).strftime("%Y-%m-%d")
         history = self.fetch_trading_history(three_months_ago)
         history_by_pid = {t["positionId"]: t for t in history} if history else {}
+
+        # Accumulate history
+        if history:
+            existing_history = []
+            if os.path.exists(self.history_file):
+                try:
+                    with open(self.history_file, encoding="utf-8") as f:
+                        existing_history = json.load(f)
+                except:
+                    pass
+            existing_by_pid = {t["positionId"]: t for t in existing_history}
+            
+            for t in history:
+                pid = t["positionId"]
+                if pid not in existing_by_pid:
+                    iid = t.get("instrumentId")
+                    if iid and iid in inst_by_id:
+                        t["ticker"] = inst_by_id[iid].get("ticker", "")
+                        t["sector"] = inst_by_id[iid].get("sector", "")
+                    existing_by_pid[pid] = t
+                    
+            merged_history = list(existing_by_pid.values())
+            # Sort descending by close timestamp
+            merged_history.sort(key=lambda x: x.get("closeTimestamp", ""), reverse=True)
+            self.atomic_write(self.history_file, merged_history)
 
         closed_lots = 0
         claimed_lots = set()

@@ -1,24 +1,31 @@
 // @ts-check
 import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, portfolioTabMode, setPortfolioTabMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
-import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart, renderDrawdownChart, renderRealizedPnlChart, setPnlTf, setPnlYearGroup, shiftPnlDate } from './renderers.js';
+import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart, renderDrawdownChart, renderRealizedPnlChart, setPnlTf, setPnlYearGroup, shiftPnlDate, renderHistoryTab, renderCommoditiesTab } from './renderers.js';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
 import { applyChange, fetchMacro, fetchIpos, loadLearn } from './api.js';
 import { marketHolidays } from './holidays.js';
 
 async function load() {
   try {
-    const [logRes, pfRes, eodRes, newsRes, revRes, equityRes, instrRes] = await Promise.all([
+    const [logRes, pfRes, eodRes, newsRes, revRes, equityRes, instrRes, histRes] = await Promise.all([
       fetch('data/advice-log.json', { cache: 'no-store' }),
       fetch('data/portfolio.json', { cache: 'no-store' }),
       fetch('data/eod.md', { cache: 'no-store' }).catch(() => null),
       fetch('data/news.md', { cache: 'no-store' }).catch(() => null),
       fetch('data/REVIEWS.md', { cache: 'no-store' }).catch(() => null),
       fetch('data/equity-history.json', { cache: 'no-store' }).catch(() => null),
-      fetch('data/custom_instruments.json', { cache: 'no-store' }).catch(() => null)
+      fetch('data/custom_instruments.json', { cache: 'no-store' }).catch(() => null),
+      fetch('/api/history', { cache: 'no-store' }).catch(() => null)
     ]);
     if (!logRes.ok) throw new Error(logRes.statusText);
     const logData = await logRes.json();
+    
+    if (histRes && histRes.ok) {
+        logData.tradeHistory = await histRes.json();
+    } else {
+        logData.tradeHistory = [];
+    }
     
     if (eodRes && eodRes.ok) {
         const eodText = await eodRes.text();
@@ -316,7 +323,7 @@ document.querySelectorAll('.tabs button').forEach(b => {
       fetchIpos();
     }
     const _tab = (/** @type {HTMLButtonElement} */ (b)).dataset.tab;
-    const searchable = _tab === 'advice' || _tab === 'archive' || _tab === 'positions' || _tab === 'portfolio';
+    const searchable = _tab === 'advice' || _tab === 'archive' || _tab === 'positions' || _tab === 'portfolio' || _tab === 'history' || _tab === 'commodities';
     /** @type {HTMLInputElement} */ (document.getElementById('search')).disabled = !searchable;
     setActiveTab(_tab);
     if (activeTab === 'advice') renderTable();
@@ -326,6 +333,8 @@ document.querySelectorAll('.tabs button').forEach(b => {
     else if (activeTab === 'eod') renderEOD();
     else if (activeTab === 'news') renderAINews();
     else if (activeTab === 'reviews') renderReviews();
+    else if (activeTab === 'history') renderHistoryTab();
+    else if (activeTab === 'commodities') renderCommoditiesTab();
     else /** @type {HTMLElement} */ (document.getElementById('searchCount')).textContent = '';
     if (activeTab === 'analytics') { loadLearn().then(renderAnalytics); }
       if (activeTab === 'rawnews' && !/** @type {any} */ (window).rawNewsLoaded) {
@@ -440,6 +449,10 @@ headerSortHandler('adviceTable', 'advice', renderTable);
 
 headerSortHandler('positionsTable', () => 'positions_' + posFilter, renderPositions);
 headerSortHandler('portfolioTable', 'portfolio', renderPortfolioTable);
+headerSortHandler('historyTable', 'history', renderHistoryTab);
+headerSortHandler('commTotalsTable', 'commTotals', renderCommoditiesTab);
+  headerSortHandler('commActiveTable', 'commActive', renderCommoditiesTab);
+headerSortHandler('commHistoryTable', 'commHistory', renderCommoditiesTab);
 
 const adviceClickHandler = (ev) => {
   const btn = /** @type {HTMLElement} */ (ev.target).closest('button');
@@ -807,3 +820,80 @@ fetch('/api/version').then(r => r.json()).then(data => {
   const el = document.getElementById('version-info');
   if (el) el.innerHTML = vHTML;
 }).catch(e => console.error("Failed to fetch version", e));
+
+
+const TABS_DEF = [
+  { id: 'advice', label: 'Advice' },
+  { id: 'positions', label: 'Positions' },
+  { id: 'portfolio', label: 'Portfolio' },
+  { id: 'analytics', label: 'Analytics' },
+  { id: 'history', label: 'History' },
+  { id: 'commodities', label: 'Commodities' },
+  { id: 'eod', label: 'EOD Reports' },
+  { id: 'news', label: 'AI News' },
+  { id: 'rawnews', label: 'News Feed' },
+  { id: 'macro', label: 'Macro Calendar' },
+  { id: 'ipos', label: 'IPO Tracker' },
+  { id: 'reviews', label: 'Learnings' }
+];
+
+let enabledTabs = JSON.parse(localStorage.getItem('enabledTabs') || 'null');
+if (!enabledTabs) {
+  enabledTabs = TABS_DEF.map(t => t.id);
+  localStorage.setItem('enabledTabs', JSON.stringify(enabledTabs));
+} else {
+  // Automatically add any new tabs that might be missing from an older save
+  let changed = false;
+  for (const t of TABS_DEF) {
+    if (!enabledTabs.includes(t.id) && t.id !== 'archive') {
+      enabledTabs.push(t.id);
+      changed = true;
+    }
+  }
+  // Remove 'archive' if it got saved
+  if (enabledTabs.includes('archive')) {
+    enabledTabs = enabledTabs.filter(id => id !== 'archive');
+    changed = true;
+  }
+  if (changed) {
+    localStorage.setItem('enabledTabs', JSON.stringify(enabledTabs));
+  }
+}
+
+function applyEnabledTabs() {
+  document.querySelectorAll('.tabs button').forEach(b => {
+    b.style.display = enabledTabs.includes(b.dataset.tab) ? '' : 'none';
+  });
+  if (!enabledTabs.includes(activeTab)) {
+    setActiveTab(enabledTabs[0] || 'advice');
+  }
+}
+
+window.openSettingsModal = () => {
+  const body = document.getElementById('tabSettingsBody');
+  let html = '<p style="margin-bottom:10px;">Select tabs to show:</p>';
+  for (const t of TABS_DEF) {
+    const checked = enabledTabs.includes(t.id) ? 'checked' : '';
+    html += `<label style="display:flex; align-items:center; margin: 10px 0;"><input type="checkbox" value="${t.id}" ${checked} class="tab-toggle" style="margin-right:10px;"> ${t.label}</label>`;
+  }
+  body.innerHTML = html;
+  
+  body.querySelectorAll('.tab-toggle').forEach(chk => {
+    chk.addEventListener('change', (e) => {
+      const cb = e.target;
+      if (cb.checked) {
+        if (!enabledTabs.includes(cb.value)) enabledTabs.push(cb.value);
+      } else {
+        enabledTabs = enabledTabs.filter(id => id !== cb.value);
+      }
+      localStorage.setItem('enabledTabs', JSON.stringify(enabledTabs));
+      applyEnabledTabs();
+    });
+  });
+  
+  document.getElementById('modalSettings').showModal();
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyEnabledTabs();
+});
