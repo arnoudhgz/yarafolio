@@ -19,6 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added "Ban Re-evaluation" rule to the review skill to automatically propose lifting stale tactics/sector bans older than 3-4 weeks for test batches.
 - Added `scripts/advice_log.py prune-text` command to strip heavy text fields (`reason`, `risk`, `notes`) from inactive positions (sold or blacklisted) to reduce JSON log bloat, while keeping notes intact for dropped positions that might be re-advised.
 
+### Fixed
+- Fixed an issue where hidden tabs in the settings modal would automatically reappear after a page refresh due to aggressive auto-enable logic.
+
 ### Changed
 - Refactored `renderHistoryTab` and `renderCommoditiesTab` styling: negative fees (CFD rebates) now explicitly render in green, and total fees are aggregated.
 - Reordered the Commodities tab layout to prioritize "Active Commodity Positions" at the top.
@@ -31,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated instrument metadata for Gold (Materials) and Oil (Energy) to map correctly to standard GICS sectors.
 
 ### Fixed
+- Fixed an issue where hidden tabs in the settings modal would automatically reappear after a page refresh due to aggressive auto-enable logic.
+
 - Fixed dashboard UI to completely hide `bought` positions from the Watchlist/Advice tab, even when 'Buy zone' or 'Drop alert' filters are active, enforcing a strict separation between live advice and active positions.
 - Modified `advice_log.py add-pick` logic so that new advice for an already `bought` ticker creates a new, independent advice record (e.g. TICKER-0002) instead of upserting into the active position.
 - Fixed an issue in the dashboard UI where `bought` stocks would not appear on the Advice tab even when the 'Buy zone' or 'Drop alert' filters were selected. They will now appear on the Advice tab, but *only* if they have a pending average-down advice (meaning the latest advice date is newer than the open date of their most recent eToro lot). Once the new lot is bought and imported, the ticker will correctly disappear from the Advice tab again to avoid cluttering the view with old fulfilled advice.

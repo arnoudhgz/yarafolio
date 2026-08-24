@@ -837,35 +837,24 @@ const TABS_DEF = [
   { id: 'reviews', label: 'Learnings' }
 ];
 
-let enabledTabs = JSON.parse(localStorage.getItem('enabledTabs') || 'null');
-if (!enabledTabs) {
-  enabledTabs = TABS_DEF.map(t => t.id);
-  localStorage.setItem('enabledTabs', JSON.stringify(enabledTabs));
-} else {
-  // Automatically add any new tabs that might be missing from an older save
-  let changed = false;
-  for (const t of TABS_DEF) {
-    if (!enabledTabs.includes(t.id) && t.id !== 'archive') {
-      enabledTabs.push(t.id);
-      changed = true;
-    }
+let disabledTabs = JSON.parse(localStorage.getItem('disabledTabs') || 'null');
+if (!disabledTabs) {
+  const enabledTabs = JSON.parse(localStorage.getItem('enabledTabs') || 'null');
+  if (enabledTabs) {
+    disabledTabs = TABS_DEF.map(t => t.id).filter(id => !enabledTabs.includes(id));
+  } else {
+    disabledTabs = [];
   }
-  // Remove 'archive' if it got saved
-  if (enabledTabs.includes('archive')) {
-    enabledTabs = enabledTabs.filter(id => id !== 'archive');
-    changed = true;
-  }
-  if (changed) {
-    localStorage.setItem('enabledTabs', JSON.stringify(enabledTabs));
-  }
+  localStorage.setItem('disabledTabs', JSON.stringify(disabledTabs));
 }
 
 function applyEnabledTabs() {
   document.querySelectorAll('.tabs button').forEach(b => {
-    b.style.display = enabledTabs.includes(b.dataset.tab) ? '' : 'none';
+    b.style.display = disabledTabs.includes(b.dataset.tab) ? 'none' : '';
   });
-  if (!enabledTabs.includes(activeTab)) {
-    setActiveTab(enabledTabs[0] || 'advice');
+  if (disabledTabs.includes(activeTab)) {
+    const firstEnabled = TABS_DEF.find(t => !disabledTabs.includes(t.id));
+    setActiveTab(firstEnabled ? firstEnabled.id : 'advice');
   }
 }
 
@@ -873,7 +862,7 @@ window.openSettingsModal = () => {
   const body = document.getElementById('tabSettingsBody');
   let html = '<p style="margin-bottom:10px;">Select tabs to show:</p>';
   for (const t of TABS_DEF) {
-    const checked = enabledTabs.includes(t.id) ? 'checked' : '';
+    const checked = disabledTabs.includes(t.id) ? '' : 'checked';
     html += `<label style="display:flex; align-items:center; margin: 10px 0;"><input type="checkbox" value="${t.id}" ${checked} class="tab-toggle" style="margin-right:10px;"> ${t.label}</label>`;
   }
   body.innerHTML = html;
@@ -882,11 +871,11 @@ window.openSettingsModal = () => {
     chk.addEventListener('change', (e) => {
       const cb = e.target;
       if (cb.checked) {
-        if (!enabledTabs.includes(cb.value)) enabledTabs.push(cb.value);
+        disabledTabs = disabledTabs.filter(id => id !== cb.value);
       } else {
-        enabledTabs = enabledTabs.filter(id => id !== cb.value);
+        if (!disabledTabs.includes(cb.value)) disabledTabs.push(cb.value);
       }
-      localStorage.setItem('enabledTabs', JSON.stringify(enabledTabs));
+      localStorage.setItem('disabledTabs', JSON.stringify(disabledTabs));
       applyEnabledTabs();
     });
   });
