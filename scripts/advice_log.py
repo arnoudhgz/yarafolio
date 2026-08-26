@@ -58,6 +58,7 @@ class AdviceLog:
         "Consumer Discretionary",
         "Technology",
         "Utilities",
+        "Commodities",
         "ETF / Other")
     NEW_PICK_SOURCES = ("oversold", "diversify", "manual", "momentum", "earnings", "insider", "market-rotation")
 
