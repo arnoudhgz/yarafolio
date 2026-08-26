@@ -2076,8 +2076,10 @@ export function renderCommoditiesTab() {
         if (name) tickerHtml += '<span class="sub">' + esc(name) + '</span>';
         let durStr = t.duration < 1 ? Math.round(t.duration * 60) + 'm' : (t.duration < 24 ? Math.round(t.duration) + 'h' : Math.round(t.duration/24) + 'd');
         histHtml += `<tr>
+          <td>${localDateTime(t.closeTimestamp)}</td>
           <td>${tickerHtml}</td>
           <td>${t.isBuy ? 'Buy' : 'Sell'}</td>
+          <td>${localDateTime(t.openTimestamp)}</td>
           <td>${durStr}</td>
           <td class="${(t.netProfit - (t.fees || 0)) >= 0 ? 'pos' : 'neg'}">${fmtMoney(t.netProfit - (t.fees || 0))}</td>
           <td class="${t.fees < 0 ? 'pos' : (t.fees > 0 ? 'neg' : '')}">${fmtMoney(t.fees)}</td>
