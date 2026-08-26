@@ -2,21 +2,7 @@
 
 ## Strategy parameters
 
-| Parameter | Value |
-|---|---|
-| Broker | eToro |
-| Batch size | $1000 per position |
-| Trailing stop loss | Use a multiple of Average True Range (e.g., 2x ATR) instead of a fixed percentage to allow for normal volatility. Start around +5% profit or when technical resistance is hit. |
-| Minimum stock price | $20 (applies to all skills: advice, earnings, insider) |
-| Minimum daily volume | > 400k shares |
-| Focus | Oversold stocks with bounce potential (strictly require RSI between 15 and 50, confirm entry with a positive MACD histogram reversal/crossover, verify stabilization by closing back inside the lower Bollinger Band, and demand Volume Confirmation / rising OBV to ensure institutional support) |
-| Quality metrics (Buffett Moat) | High ROE (> 15%), Low Debt-to-Equity (< 0.5), FCF Yield > 5% |
-| Financial Health (Piotroski) | Piotroski F-Score >= 7 (Strong financial trend, not a dying company) |
-| Bankruptcy Risk (Altman Z) | Altman Z-Score > 2.99 (Safe Zone, minimal risk of bankruptcy within 2 years) |
-| Fraud Detection (Beneish M) | Beneish M-Score < -1.78 (Mathematically unlikely to be a manipulator) |
-| Value metrics (Greenblatt & GARP) | High Earnings Yield (EBIT/EV), High ROIC, PEG Ratio < 1.5 |
-| Catalyst metrics (Lynch) | Strong Shareholder Yield (Share Buybacks) or active Insider Buying |
-| Bearish / geopolitical stress | Switch to defensive picks (staples, utilities, defense) |
+(See data/private/STRATEGY.md for actual trading parameters. Provide dummy thresholds here if publishing a public version, but never commit personal thresholds.)
 
 ## Learned strategy rules
 
