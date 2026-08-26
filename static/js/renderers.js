@@ -1954,8 +1954,8 @@ export function renderHistoryTab() {
   let wins = 0, total = 0, profit = 0, fees = 0;
   for (const t of h) {
     total++;
-    if (t.netProfit > 0) wins++;
-    profit += (t.netProfit || 0);
+    profit += (t.netProfit || 0) - (t.fees || 0);
+    if (t.netProfit - (t.fees || 0) > 0) wins++;
     fees += (t.fees || 0);
   }
 
@@ -1984,8 +1984,8 @@ export function renderHistoryTab() {
       <td>${fmtPrice(t.openRate)}</td>
       <td>${fmtPrice(t.closeRate)}</td>
       <td>${(t.units || 0).toFixed(2)}</td>
-      <td class="${t.netProfit >= 0 ? 'pos' : 'neg'}">${fmtMoney(t.netProfit)}</td>
-      <td class="${t.fees > 0 ? 'neg' : (t.fees < 0 ? 'pos' : '')}">${fmtMoney(t.fees)}</td>
+      <td class="${((t.netProfit || 0) - (t.fees || 0)) >= 0 ? 'pos' : 'neg'}">${fmtMoney((t.netProfit || 0) - (t.fees || 0))}</td>
+      <td class="${t.fees < 0 ? 'pos' : (t.fees > 0 ? 'neg' : '')}">${fmtMoney(t.fees)}</td>
     </tr>`;
   }
   tbody.innerHTML = html;
@@ -1996,7 +1996,7 @@ export function renderHistoryTab() {
   if (vReal) { vReal.textContent = fmtMoney(profit); vReal.className = 'value ' + (profit >= 0 ? 'pos' : 'neg'); }
   const vFees = document.getElementById('hFees');
   if (vFees) {
-      vFees.textContent = fmtMoney(-fees);
+      vFees.textContent = fmtMoney(fees);
       vFees.className = 'value ' + (fees < 0 ? 'pos' : (fees > 0 ? 'neg' : ''));
   }
   const vTrades = document.getElementById('hTrades');
@@ -2037,17 +2037,20 @@ export function renderCommoditiesTab() {
   
   for (const t of h) {
     total++;
-    if (t.netProfit > 0) wins++;
-    profit += (t.netProfit || 0);
+    const net = (t.netProfit || 0) - (t.fees || 0);
+    if (net > 0) wins++;
+    profit += net;
     
-    const dOpen = new Date(t.openTimestamp);
-    const dClose = new Date(t.closeTimestamp);
-    const isMorn = dOpen.getHours() < 12;
-    if (isMorn) { mornT++; if (t.netProfit > 0) mornW++; }
-    else { aftT++; if (t.netProfit > 0) aftW++; }
+    let isMorn = false;
+    try {
+      const d = new Date(t.openTimestamp);
+      isMorn = d.getUTCHours() < 16 || (d.getUTCHours() === 16 && d.getUTCMinutes() < 30);
+    } catch (e) {}
+    if (isMorn) { mornT++; if (net > 0) mornW++; }
+    else { aftT++; if (net > 0) aftW++; }
     
-    const hrs = (dClose.getTime() - dOpen.getTime()) / 3600000;
-    if (hrs < 1) { qT++; if (t.netProfit > 0) qW++; }
+    const hrs = (new Date(t.closeTimestamp) - new Date(t.openTimestamp)) / 36e5;
+    if (hrs < 1) { qT++; if (net > 0) qW++; }
     t.duration = hrs;
   }
   
@@ -2076,8 +2079,8 @@ export function renderCommoditiesTab() {
           <td>${tickerHtml}</td>
           <td>${t.isBuy ? 'Buy' : 'Sell'}</td>
           <td>${durStr}</td>
-          <td class="${t.netProfit >= 0 ? 'pos' : 'neg'}">${fmtMoney(t.netProfit)}</td>
-          <td class="${t.fees < 0 ? 'pos' : (t.fees > 0 ? 'neg' : '')}">${fmtMoney(-t.fees)}</td>
+          <td class="${(t.netProfit - (t.fees || 0)) >= 0 ? 'pos' : 'neg'}">${fmtMoney(t.netProfit - (t.fees || 0))}</td>
+          <td class="${t.fees < 0 ? 'pos' : (t.fees > 0 ? 'neg' : '')}">${fmtMoney(t.fees)}</td>
         </tr>`;
       }
       const tbodyHist = commHistoryTable.querySelector('tbody');
@@ -2101,11 +2104,12 @@ export function renderCommoditiesTab() {
     if (!totalsMap[t.ticker]) totalsMap[t.ticker] = { ticker: t.ticker, realized: 0, maxProfit: 0, maxLoss: 0, wins: 0, trades: 0, fees: 0 };
     const m = totalsMap[t.ticker];
     m.trades++;
-    m.realized += (t.netProfit || 0);
+    const net = (t.netProfit || 0) - (t.fees || 0);
+    m.realized += net;
     m.fees += (t.fees || 0);
-    if ((t.netProfit || 0) > m.maxProfit) m.maxProfit = t.netProfit;
-    if ((t.netProfit || 0) < m.maxLoss) m.maxLoss = t.netProfit;
-    if (t.netProfit > 0) m.wins++;
+    if (net > m.maxProfit) m.maxProfit = net;
+    if (net < m.maxLoss) m.maxLoss = net;
+    if (net > 0) m.wins++;
   }
   let totalsArr = Object.values(totalsMap);
   const tTable = document.getElementById('commTotalsTable');
@@ -2136,7 +2140,7 @@ export function renderCommoditiesTab() {
           <td class="neg">${fmtMoney(m.maxLoss)}</td>
           <td>${winStr}</td>
           <td>${m.trades}</td>
-          <td class="${m.fees < 0 ? 'pos' : (m.fees > 0 ? 'neg' : '')}">${fmtMoney(-m.fees)}</td>
+          <td class="${m.fees < 0 ? 'pos' : (m.fees > 0 ? 'neg' : '')}">${fmtMoney(m.fees)}</td>
         </tr>`;
       }
       const tbodyTot = tTable.querySelector('tbody');
@@ -2193,7 +2197,7 @@ export function renderCommoditiesTab() {
           <td>${fmtPrice(p.avgOpen)}</td>
           <td>${fmtPrice(p.currentPrice)}</td>
           <td>${(p.units || 0).toFixed(2)}</td>
-          <td class="${(p.fees || 0) < 0 ? 'pos' : ((p.fees || 0) > 0 ? 'neg' : '')}">${fmtMoney(-(p.fees || 0))}</td>
+          <td class="${(p.fees || 0) < 0 ? 'pos' : ((p.fees || 0) > 0 ? 'neg' : '')}">${fmtMoney(p.fees || 0)}</td>
           <td class="${p.plDollar >= 0 ? 'pos' : 'neg'}">${fmtMoney(p.plDollar)}</td>
         </tr>`;
       }
