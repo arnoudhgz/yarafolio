@@ -654,7 +654,7 @@ export function renderSectorCoverage() {
       },
       scales: {
         x: { min: 0, ticks: { color: cssVar('--muted'), callback: (v) => v + '%' }, grid: { color: cssVar('--border') } },
-        y: { ticks: { color: cssVar('--text') }, grid: { display: false } }
+        y: { ticks: { autoSkip: false, color: cssVar('--text') }, grid: { display: false } }
       }
     }
   }));
