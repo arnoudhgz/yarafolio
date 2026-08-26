@@ -27,7 +27,7 @@
 - **Buffett Quality Matrix:** To combine high upside with market stability, researchers must reject value traps that lack a competitive moat. An oversold stock must demonstrate high and consistent margins (ROE > 15%), low financial leverage, and strong cash generation.
 - **Piotroski & Altman Z:** Since the strategy buys heavily beaten-down stocks, survival is key. Seek out companies with an F-Score of 7 or higher. Require a Z-Score > 2.99 for industrial/manufacturing stocks to ensure balance sheet strength.
 - **Beneish M-Score (Fraud Detection):** Use as a hard veto. If an oversold stock flags a high M-Score (> -1.78), drop it immediately to avoid catching falling knives manipulated by accounting fraud.
-- **Time-based stop (Watchlist only):** The strategy relies on quick oversold bounces. If a "watching" pick has not bounced within 3 days, list it in the report and SUGGEST dropping it, but NEVER automatically drop it by yourself. The user will review and drop manually if desired. (Do not apply to open 'bought' positions; we do not sell in the red).
+- **Time-based stop (Watchlist only):** The strategy relies on quick oversold bounces. If a "watching" pick has not bounced within 3 days, it should be dropped from the watchlist. (Do not apply to open 'bought' positions; we do not sell in the red).
 - **Position Sizing:** Only average down if the stock has dropped at least 25% from the first entry and the RSI has fallen back into the 15-30 range.
 - **Cluster Risk:** Treat highly correlated clusters (e.g. cloud/software) as a single exposure block. Do not add new names to a saturated cluster.
 - **Earnings Risk:** Avoid initiating new positions in oversold stocks if they report earnings within the next 7 days, to avoid unpredictable binary risk.
