@@ -1995,7 +1995,10 @@ export function renderHistoryTab() {
   const vReal = document.getElementById('hRealized');
   if (vReal) { vReal.textContent = fmtMoney(profit); vReal.className = 'value ' + (profit >= 0 ? 'pos' : 'neg'); }
   const vFees = document.getElementById('hFees');
-  if (vFees) vFees.textContent = fmtMoney(-fees);
+  if (vFees) {
+      vFees.textContent = fmtMoney(-fees);
+      vFees.className = 'value ' + (fees < 0 ? 'neg' : (fees > 0 ? 'pos' : ''));
+  }
   const vTrades = document.getElementById('hTrades');
   if (vTrades) vTrades.textContent = String(total);
   setSearchCount(total);
