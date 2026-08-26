@@ -112,7 +112,7 @@ export const SECTOR_COLORS = {
   'Industrials': '#84cc16', 'Technology': '#ec4899', 'Materials': '#6366f1',
   'Real Estate': '#06b6d4', 'Utilities': '#14b8a6', 'Commodities': '#facc15', 'ETF / Other': '#64748b',
 };
-export const SECTORS = ['Communication Services', 'Consumer Discretionary', 'Consumer Staples', 'Energy', 'Financials', 'Healthcare', 'Industrials', 'Materials', 'Real Estate', 'Technology', 'Utilities', 'Commodities', 'ETF / Other'];
+export const SECTORS = ['Commodities', 'Communication Services', 'Consumer Discretionary', 'Consumer Staples', 'Energy', 'Financials', 'Healthcare', 'Industrials', 'Materials', 'Real Estate', 'Technology', 'Utilities', 'ETF / Other'];
 
 /** @type {string} */
 export let portfolioViewMode = localStorage.getItem('portfolioViewMode') || 'collapsed';

@@ -51,14 +51,18 @@ def get_env(key: str) -> str | None:
 
 class AdviceLog:
     SECTORS = (
-        "Materials", "Industrials", "Communication Services", "Energy", "Real Estate",
-        "Consumer Staples", "Consumer Discretionary",
+        "Commodities",
+        "Communication Services",
+        "Consumer Discretionary",
+        "Consumer Staples",
+        "Energy",
         "Financials",
         "Healthcare",
-        "Consumer Discretionary",
+        "Industrials",
+        "Materials",
+        "Real Estate",
         "Technology",
         "Utilities",
-        "Commodities",
         "ETF / Other")
     NEW_PICK_SOURCES = ("oversold", "diversify", "manual", "momentum", "earnings", "insider", "market-rotation")
 
