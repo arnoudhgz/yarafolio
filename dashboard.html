@@ -233,7 +233,7 @@
       </h2>
       <div class="cards" style="margin-bottom: 12px;" id="commCards">
         <div class="card"><div class="label">Win rate<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoWinRate').showModal()" title="What is Win Rate?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cWinRate">-</div></div>
-        <div class="card"><div class="label">Realized P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoRealized').showModal()" title="What is Realized P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cRealized">-</div></div>
+        <div class="card"><div class="label">Realized P/L<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoCommRealized').showModal()" title="What is Realized P/L?"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cRealized">-</div></div>
         <div class="card"><div class="label">Morning Win Rate (before 12:00)<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoMorningWin').showModal()"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cMorning">-</div></div>
         <div class="card"><div class="label">Afternoon Win Rate<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoAfternoonWin').showModal()"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cAfternoon">-</div></div>
         <div class="card"><div class="label">Quick Flips (< 1 hr) Win Rate<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" class="info-icon" onclick="document.getElementById('infoQuickFlips').showModal()"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></div><div class="value" id="cQuick">-</div></div>
@@ -767,19 +767,24 @@
   <dialog id="infoRealized" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoRealized').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Realized P/L</h2>
+      <p style="margin-bottom:0;">The total cumulative Profit/Loss in dollars from all closed positions.</p>
+    </dialog>
+  <dialog id="infoCommRealized" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
+      <button class="modal-close" onclick="document.getElementById('infoCommRealized').close()" aria-label="Close">&times;</button>
+      <h2 style="margin-top:0; margin-bottom:16px;">Realized P/L</h2>
       <p style="margin-bottom:0;">The total cumulative Profit/Loss in dollars from all closed positions (including overnight fees and refunds).</p>
     </dialog>
 
   <dialog id="infoOpenPL" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoOpenPL').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Open P/L (unrealized)</h2>
-      <p style="margin-bottom:0;">The total current floating Profit/Loss in dollars from all active open positions (including overnight fees and refunds).</p>
+      <p style="margin-bottom:0;">The total current floating Profit/Loss in dollars from all active open positions.</p>
     </dialog>
 
   <dialog id="infoTotalPL" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoTotalPL').close()" aria-label="Close">&times;</button>
       <h2 style="margin-top:0; margin-bottom:16px;">Total P/L</h2>
-      <p style="margin-bottom:0;">The combined total of Realized and Open Profit/Loss (including all fees and refunds).</p>
+      <p style="margin-bottom:0;">The sum of Realized P/L and Open P/L, representing the total overall Profit/Loss from all positions.</p>
     </dialog>
   <dialog id="infoSevenDays" class="modal-card" style="max-width: 500px;" onclick="if(event.target===this) this.close()">
       <button class="modal-close" onclick="document.getElementById('infoSevenDays').close()" aria-label="Close">&times;</button>
