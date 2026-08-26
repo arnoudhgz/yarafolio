@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.10.1] - 2026-08-24
+- Fixed fee color logic: eToro API returns negative values for rollover refunds and positive for expenses. Refunds are now properly colored green, and expenses red.
 - Fixed an issue where the UI was displaying overnight fee deductions as negative numbers (making them look like refunds). Fees are now displayed as positive expenses in red, and actual credits/refunds as negative values in green.
 - Updated toro_import.py to extract 	otalFees (e.g., overnight/weekend rollover fees) for open positions.
 - Added a Fees column to the Active Commodity Positions table in the dashboard.

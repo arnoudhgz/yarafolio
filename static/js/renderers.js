@@ -1997,7 +1997,7 @@ export function renderHistoryTab() {
   const vFees = document.getElementById('hFees');
   if (vFees) {
       vFees.textContent = fmtMoney(-fees);
-      vFees.className = 'value ' + (fees < 0 ? 'neg' : (fees > 0 ? 'pos' : ''));
+      vFees.className = 'value ' + (fees < 0 ? 'pos' : (fees > 0 ? 'neg' : ''));
   }
   const vTrades = document.getElementById('hTrades');
   if (vTrades) vTrades.textContent = String(total);
@@ -2077,7 +2077,7 @@ export function renderCommoditiesTab() {
           <td>${t.isBuy ? 'Buy' : 'Sell'}</td>
           <td>${durStr}</td>
           <td class="${t.netProfit >= 0 ? 'pos' : 'neg'}">${fmtMoney(t.netProfit)}</td>
-          <td class="${t.fees < 0 ? 'neg' : (t.fees > 0 ? 'pos' : '')}">${fmtMoney(-t.fees)}</td>
+          <td class="${t.fees < 0 ? 'pos' : (t.fees > 0 ? 'neg' : '')}">${fmtMoney(-t.fees)}</td>
         </tr>`;
       }
       const tbodyHist = commHistoryTable.querySelector('tbody');
@@ -2136,7 +2136,7 @@ export function renderCommoditiesTab() {
           <td class="neg">${fmtMoney(m.maxLoss)}</td>
           <td>${winStr}</td>
           <td>${m.trades}</td>
-          <td class="${m.fees < 0 ? 'neg' : (m.fees > 0 ? 'pos' : '')}">${fmtMoney(-m.fees)}</td>
+          <td class="${m.fees < 0 ? 'pos' : (m.fees > 0 ? 'neg' : '')}">${fmtMoney(-m.fees)}</td>
         </tr>`;
       }
       const tbodyTot = tTable.querySelector('tbody');
@@ -2193,7 +2193,7 @@ export function renderCommoditiesTab() {
           <td>${fmtPrice(p.avgOpen)}</td>
           <td>${fmtPrice(p.currentPrice)}</td>
           <td>${(p.units || 0).toFixed(2)}</td>
-          <td class="${(p.fees || 0) < 0 ? 'neg' : ((p.fees || 0) > 0 ? 'pos' : '')}">${fmtMoney(-(p.fees || 0))}</td>
+          <td class="${(p.fees || 0) < 0 ? 'pos' : ((p.fees || 0) > 0 ? 'neg' : '')}">${fmtMoney(-(p.fees || 0))}</td>
           <td class="${p.plDollar >= 0 ? 'pos' : 'neg'}">${fmtMoney(p.plDollar)}</td>
         </tr>`;
       }
