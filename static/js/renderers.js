@@ -2159,7 +2159,8 @@ export function renderCommoditiesTab() {
               units: lot.units,
               plDollar: pl,
               positionID: lot.positionID,
-              isBuy: isBuy
+              isBuy: isBuy,
+              fees: lot.fees || 0
             });
           }
         } else {
@@ -2189,6 +2190,7 @@ export function renderCommoditiesTab() {
           <td>${fmtPrice(p.avgOpen)}</td>
           <td>${fmtPrice(p.currentPrice)}</td>
           <td>${(p.units || 0).toFixed(2)}</td>
+          <td class="${(p.fees || 0) < 0 ? 'neg' : ''}">${fmtMoney(p.fees || 0)}</td>
           <td class="${p.plDollar >= 0 ? 'pos' : 'neg'}">${fmtMoney(p.plDollar)}</td>
         </tr>`;
       }

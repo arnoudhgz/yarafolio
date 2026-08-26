@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.10.1] - 2026-08-24
+- Updated toro_import.py to extract 	otalFees (e.g., overnight/weekend rollover fees) for open positions.
+- Added a Fees column to the Active Commodity Positions table in the dashboard.
 - Sorted the SECTORS list alphabetically (with ETF / Other at the end) so it renders logically on the Portfolio tabs.
 - Fixed auto-skipping of Y-axis labels in the Sector Analysis coverage chart so all 13 sectors are always visible.
 - Updated Portfolio sector colors to provide better visual distinction between Energy (Orange), Financials (Dark Yellow), Utilities (Teal), and Commodities (Bright Gold).

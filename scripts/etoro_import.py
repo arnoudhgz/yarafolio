@@ -268,6 +268,7 @@ class EtoroImport:
                     "invested": round(p["initialAmountInDollars"], 2),
                     "tslEnabled": bool(p.get("isTslEnabled")),
                     "isBuy": p.get("isBuy", True),
+                    "fees": round(p.get("totalFees", 0), 2),
                 } for p in plist],
             })
 
