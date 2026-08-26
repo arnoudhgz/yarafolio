@@ -331,8 +331,10 @@ class Screen:
             if os.path.exists(path):
                 with open(path, encoding="utf-8") as f:
                     try:
-                        for k, v in json.load(f).items():
-                            ticker_to_id[v["ticker"]] = k
+                        d = json.load(f)
+                        for k, v in d.items():
+                            t = v.get("ticker") or v.get("mappedTicker") or k
+                            ticker_to_id[t] = k
                     except:
                         pass
         
