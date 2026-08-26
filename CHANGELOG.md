@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.10.1] - 2026-08-24
+- Updated Portfolio sector colors to provide better visual distinction between Energy (Orange), Financials (Dark Yellow), Utilities (Teal), and Commodities (Bright Gold).
 - Elevated Commodities to a first-class sector in the dashboard state.js and dvice_log.py so it receives its own distinct slice/color in the Portfolio pie chart and properly filters into the Commodities tab.
 - Fixed Coffee.FUT and other commodities incorrectly being assigned to ETF / Other in toro_import.py.
 - Updated toro-mcp/mcp_config.json to securely map .env credentials (ETORO_API_KEY, ETORO_USER_KEY) via header expansion for the remote SSE endpoint.

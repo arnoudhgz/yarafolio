@@ -108,9 +108,9 @@ export let modalChart = null;
 
 export const SECTOR_COLORS = {
   'Communication Services': '#8b5cf6', 'Consumer Discretionary': '#3b82f6', 'Consumer Staples': '#10b981',
-  'Energy': '#f59e0b', 'Financials': '#eab308', 'Healthcare': '#ef4444',
+  'Energy': '#f97316', 'Financials': '#ca8a04', 'Healthcare': '#ef4444',
   'Industrials': '#84cc16', 'Technology': '#ec4899', 'Materials': '#6366f1',
-  'Real Estate': '#06b6d4', 'Utilities': '#f97316', 'Commodities': '#d97706', 'ETF / Other': '#64748b',
+  'Real Estate': '#06b6d4', 'Utilities': '#14b8a6', 'Commodities': '#facc15', 'ETF / Other': '#64748b',
 };
 export const SECTORS = ['Communication Services', 'Consumer Discretionary', 'Consumer Staples', 'Energy', 'Financials', 'Healthcare', 'Industrials', 'Materials', 'Real Estate', 'Technology', 'Utilities', 'Commodities', 'ETF / Other'];
 
