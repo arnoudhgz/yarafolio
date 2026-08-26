@@ -1,7 +1,11 @@
 {
   "mcpServers": {
     "etoro-public-api": {
-      "serverUrl": "https://mcp.public-api.etoro.com"
+      "serverUrl": "https://mcp.public-api.etoro.com",
+      "headers": {
+        "x-api-key": "${ETORO_API_KEY}",
+        "x-user-key": "${ETORO_USER_KEY}"
+      }
     }
   }
 }

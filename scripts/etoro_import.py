@@ -179,7 +179,10 @@ class EtoroImport:
     def sector_for(self, meta_record: dict, industries: dict) -> str:
         if not meta_record or industries is None:
             return None
-        if meta_record.get("instrumentTypeID") != 5:
+        type_id = meta_record.get("instrumentTypeID")
+        if type_id == 2:
+            return "Commodities"
+        if type_id != 5:
             return "ETF / Other"
         return industries.get(
             meta_record.get("stocksIndustryID"),
@@ -389,18 +392,22 @@ class EtoroImport:
         return closed
 
     def rollup_entry(self, entry: dict, current_price: float | None) -> None:
-        lots = entry["lots"]
+        lots = entry.get("lots", [])
+        if not lots:
+            return
+            
         open_lots = [lot for lot in lots if lot.get("soldAt") is None]
-        total_units = sum(lot["units"] for lot in lots) or 1
-        entry["boughtAt"] = round(sum(lot["openRate"] * lot["units"]
-                                  for lot in lots) / total_units, 4)
         if open_lots:
+            total_units = sum(lot["units"] for lot in open_lots) or 1
+            entry["boughtAt"] = round(sum(lot["openRate"] * lot["units"] for lot in open_lots) / total_units, 4)
             entry["status"] = "bought"
             entry["units"] = round(sum(lot["units"] for lot in open_lots), 6)
             entry["soldAt"] = None
             entry["tslSet"] = any(lot.get("tslEnabled") for lot in open_lots)
             entry.pop("exitEstimated", None)
         else:
+            total_units = sum(lot["units"] for lot in lots) or 1
+            entry["boughtAt"] = round(sum(lot["openRate"] * lot["units"] for lot in lots) / total_units, 4)
             entry["status"] = "sold"
             entry["units"] = round(sum(lot["units"] for lot in lots), 6)
             entry["soldAt"] = round(
