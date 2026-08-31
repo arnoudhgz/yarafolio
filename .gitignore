@@ -13,3 +13,5 @@ news_output.json
 data/*_cache.json
 logs/
 .tokensave
+
+*.log

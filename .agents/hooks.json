@@ -1,0 +1,15 @@
+{
+  "auto-approve-scripts": {
+    "PreToolUse": [
+      {
+        "matcher": "run_command|invoke_subagent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python auto_approve.py"
+          }
+        ]
+      }
+    ]
+  }
+}

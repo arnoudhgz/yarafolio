@@ -811,12 +811,12 @@
   "17": {
     "ticker": "OIL",
     "name": "Oil (Non Expiry)",
-    "sector": "Energy"
+    "sector": "Commodities"
   },
   "18": {
     "ticker": "GOLD",
     "name": "Gold (Non Expiry)",
-    "sector": "Materials"
+    "sector": "Commodities"
   },
   "1136": {
     "ticker": "LMT",
@@ -923,5 +923,249 @@
     "ticker": "RTO.US",
     "name": "Rentokil Initial",
     "mappedTicker": "RTO"
+  },
+  "custom_cake": {
+    "ticker": "CAKE.US",
+    "name": "The Cheesecake Factory",
+    "sector": "Consumer Discretionary",
+    "mappedTicker": "CAKE"
+  },
+  "custom_mcs": {
+    "ticker": "MCS.US",
+    "name": "The Marcus Corporation",
+    "sector": "Consumer Discretionary",
+    "mappedTicker": "MCS"
+  },
+  "2595": {
+    "ticker": "RTO.US",
+    "name": "Rentokil Initial PLC ADR",
+    "mappedTicker": "RTO",
+    "sector": "Consumer Goods"
+  },
+  "6401": {
+    "ticker": "CHEF",
+    "name": "The Chefs' Warehouse Inc",
+    "sector": "Consumer Goods"
+  },
+  "4186": {
+    "ticker": "WTW",
+    "name": "Willis Towers Watson Public Limited Company",
+    "sector": "Services"
+  },
+  "8845": {
+    "ticker": "ROL",
+    "name": "Rollins Inc.",
+    "sector": "Consumer Goods"
+  },
+  "5662": {
+    "ticker": "ZBRA",
+    "name": "Zebra Technologies Corp.",
+    "sector": "Technology"
+  },
+  "10400": {
+    "ticker": "GIC",
+    "name": "Global Industrial Company",
+    "sector": "Consumer Goods"
+  },
+  "4306": {
+    "ticker": "APTV",
+    "name": "Aptiv PLC",
+    "sector": "Consumer Goods"
+  },
+  "1632": {
+    "ticker": "DVA",
+    "name": "DaVita HealthCare Partners Inc",
+    "sector": "Healthcare"
+  },
+  "1595": {
+    "ticker": "AEP",
+    "name": "American Electric Power Inc",
+    "sector": "Utilities"
+  },
+  "1567": {
+    "ticker": "LLY",
+    "name": "Eli Lilly & Co",
+    "sector": "Healthcare"
+  },
+  "12200": {
+    "ticker": "ETOR",
+    "name": "eToro Group LTD",
+    "sector": "Financial"
+  },
+  "12164": {
+    "ticker": "ECG",
+    "name": "Everus Construction Group Inc",
+    "sector": "Services"
+  },
+  "1535": {
+    "ticker": "TJX",
+    "name": "TJX Companies Inc",
+    "sector": "Services"
+  },
+  "COFFEE.FUT": {
+    "InstrumentID": 334,
+    "IndustryID": 9,
+    "Industry": "Commodities",
+    "Sector": "Commodities"
+  },
+  "COTTON.FUT": {
+    "InstrumentID": 93,
+    "IndustryID": 9,
+    "Industry": "Commodities",
+    "Sector": "Commodities"
+  },
+  "LLY": {
+    "InstrumentID": 1567,
+    "IndustryID": 0,
+    "Industry": "Healthcare",
+    "Sector": "Healthcare"
+  },
+  "AEP": {
+    "InstrumentID": 1595,
+    "IndustryID": 0,
+    "Industry": "Utilities",
+    "Sector": "Utilities"
+  },
+  "WTW": {
+    "InstrumentID": 4186,
+    "IndustryID": 0,
+    "Industry": "Financials",
+    "Sector": "Financials"
+  },
+  "ZBRA": {
+    "InstrumentID": 5662,
+    "IndustryID": 0,
+    "Industry": "Technology",
+    "Sector": "Technology"
+  },
+  "APTV": {
+    "InstrumentID": 4306,
+    "IndustryID": 0,
+    "Industry": "Consumer Discretionary",
+    "Sector": "Consumer Discretionary"
+  },
+  "RTO.US": {
+    "InstrumentID": 2595,
+    "IndustryID": 0,
+    "Industry": "Industrials",
+    "Sector": "Industrials"
+  },
+  "BTC": {
+    "InstrumentID": 100000,
+    "IndustryID": 0,
+    "Industry": "Crypto",
+    "Sector": "Crypto"
+  },
+  "ETOR": {
+    "InstrumentID": 12200,
+    "IndustryID": 0,
+    "Industry": "Financials",
+    "Sector": "Financials"
+  },
+  "334": {
+    "ticker": "Coffee.FUT",
+    "name": "Coffee Arabica (Expiring Future)",
+    "sector": "ETF / Other",
+    "mappedTicker": "COFFEE.FUT"
+  },
+  "1767": {
+    "ticker": "DKS",
+    "name": "Dicks Sporting Goods Inc",
+    "sector": "ETF / Other"
+  },
+  "8803": {
+    "ticker": "SFD",
+    "name": "Smithfield Foods Inc",
+    "sector": "ETF / Other"
+  },
+  "9132": {
+    "ticker": "DY",
+    "name": "Dycom Industries Inc.",
+    "sector": "ETF / Other"
+  },
+  "9664": {
+    "ticker": "LZB",
+    "name": "La-Z-Boy Incorporated",
+    "sector": "ETF / Other"
+  },
+  "9909": {
+    "ticker": "LMB",
+    "name": "Limbach Holdings Inc",
+    "sector": "ETF / Other"
+  },
+  "10271": {
+    "ticker": "LINC",
+    "name": "Lincoln Educational Services Corporation",
+    "sector": "ETF / Other"
+  },
+  "11090": {
+    "ticker": "UTI",
+    "name": "Universal Technical Institut",
+    "sector": "ETF / Other"
+  },
+  "1049992": {
+    "ticker": "ELMD",
+    "name": "Electromed Inc",
+    "sector": "ETF / Other"
+  },
+  "1590": {
+    "ticker": "AES",
+    "name": "AES Corp",
+    "sector": "Utilities"
+  },
+  "1604": {
+    "ticker": "NRG",
+    "name": "NRG Energy Inc",
+    "sector": "Utilities"
+  },
+  "1629": {
+    "ticker": "EIX",
+    "name": "Edison International",
+    "sector": "Utilities"
+  },
+  "4363": {
+    "ticker": "VST",
+    "name": "Vistra Corp",
+    "sector": "Utilities"
+  },
+  "14406": {
+    "ticker": "BIPC",
+    "name": "Brookfield Infrastructure Corp",
+    "sector": "Utilities"
+  },
+  "custom_fbin": {
+    "ticker": "FBIN.US",
+    "name": "Fortune Brands Innovations",
+    "mappedTicker": "FBIN",
+    "sector": "Unknown"
+  },
+  "custom_ttmi": {
+    "ticker": "TTMI.US",
+    "name": "TTM Technologies",
+    "mappedTicker": "TTMI",
+    "sector": "Unknown"
+  },
+  "custom_opln": {
+    "ticker": "OPLN.US",
+    "name": "Openlane",
+    "mappedTicker": "OPLN",
+    "sector": "Unknown"
+  },
+  "custom_ldi": {
+    "ticker": "LDI.US",
+    "name": "loanDepot",
+    "mappedTicker": "LDI",
+    "sector": "Unknown"
+  },
+  "custom_npb": {
+    "ticker": "NPB.US",
+    "name": "Northpointe Bancshares",
+    "mappedTicker": "NPB",
+    "sector": "Unknown"
+  },
+  "6037": {
+    "ticker": "CRUS",
+    "name": "Cirrus Logic",
+    "sector": "Technology"
   }
 }

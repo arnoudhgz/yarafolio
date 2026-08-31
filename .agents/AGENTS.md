@@ -43,3 +43,8 @@ When using the /plan command to generate an Implementation Plan artifact, ALWAYS
 When documenting constraints or updating workflows, strictly maintain the boundary between financial strategy and AI execution:
 *   `data/private/STRATEGY.md` (and `data/sample/STRATEGY.md`) is strictly reserved for **financial, quantitative, and trading rules** (e.g., RSI thresholds, profit targets, or the mathematical definitions of when a stock qualifies as a buy or drop).
 *   `GEMINI.md` and `CLAUDE.md` are the system instructions that govern **AI workflow, autonomy, and execution boundaries**. Any constraints regarding what the AI is allowed to do *autonomously* (like "never execute a script by yourself to drop a ticker") or how it should present data to the user must be documented here, never in the trading strategy files.
+
+## Windows PowerShell & Python Execution Rule
+1. **Python UTF-8 Encoding**: Always ensure Python scripts output in UTF-8 to avoid UnicodeEncodeError crashes on Windows. Prefix commands with $env:PYTHONUTF8=1; (e.g., $env:PYTHONUTF8=1; python3 scripts/screen.py news ...) or explicitly set PYTHONIOENCODING=utf-8 when executing scripts that scrape or print web data.
+2. **PowerShell Argument Arrays**: When passing a list of arguments (like multiple tickers) to a Python script in PowerShell, pass the array variable directly (e.g., python3 script.py ). Do NOT join the array into a single space-separated string first, as Python will interpret the entire string as a single argument.
+3. **Multiline Payloads**: When passing multiline strings (like markdown reports or JSON payloads) as arguments to a CLI, always use PowerShell Here-Strings (@""@ or @''@) and assign them to a variable first to avoid quote-escaping corruption.
