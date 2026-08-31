@@ -14,4 +14,6 @@ data/*_cache.json
 logs/
 .tokensave
 
-*.log
+
+logs/*
+!logs/.gitkeep

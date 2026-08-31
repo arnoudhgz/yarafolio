@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.10.1] - 2026-08-31
 - Added Windows PowerShell & Python Execution Guidelines to AGENTS.md.
 - Cleaned up scratch/tmp files from the root directory into the scratch/ and tmp/ folders.
+- Added a dedicated logs/ directory and updated .gitignore to ignore log contents.
 - Updated local instruments cache with new tickers.
 - Fixed a bug in `scripts/screen.py` where a single missing `ticker` key in the local instruments cache would trigger a `KeyError` and silently abort the parsing of all remaining cached instruments.
 - Updated `STRATEGY.md` rules to never automatically drop "watching" tickers that exceed the 3-day bounce window. The system will now only suggest drops in the advice report, requiring explicit manual user action to drop.
