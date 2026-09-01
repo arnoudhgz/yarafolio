@@ -1954,8 +1954,8 @@ export function renderHistoryTab() {
   let wins = 0, total = 0, profit = 0, fees = 0;
   for (const t of h) {
     total++;
-    profit += (t.netProfit || 0) - (t.fees || 0);
-    if (t.netProfit - (t.fees || 0) > 0) wins++;
+    profit += (t.netProfit || 0);
+    if ((t.netProfit || 0) > 0) wins++;
     fees += (t.fees || 0);
   }
 
@@ -1984,7 +1984,7 @@ export function renderHistoryTab() {
       <td>${fmtPrice(t.openRate)}</td>
       <td>${fmtPrice(t.closeRate)}</td>
       <td>${(t.units || 0).toFixed(2)}</td>
-      <td class="${((t.netProfit || 0) - (t.fees || 0)) >= 0 ? 'pos' : 'neg'}">${fmtMoney((t.netProfit || 0) - (t.fees || 0))}</td>
+      <td class="${((t.netProfit || 0)) >= 0 ? 'pos' : 'neg'}">${fmtMoney((t.netProfit || 0))}</td>
       <td class="${t.fees < 0 ? 'pos' : (t.fees > 0 ? 'neg' : '')}">${fmtMoney(t.fees)}</td>
     </tr>`;
   }
@@ -2037,7 +2037,7 @@ export function renderCommoditiesTab() {
   
   for (const t of h) {
     total++;
-    const net = (t.netProfit || 0) - (t.fees || 0);
+    const net = (t.netProfit || 0);
     if (net > 0) wins++;
     profit += net;
     
@@ -2081,7 +2081,7 @@ export function renderCommoditiesTab() {
           <td>${t.isBuy ? 'Buy' : 'Sell'}</td>
           <td>${localDateTime(t.openTimestamp)}</td>
           <td>${durStr}</td>
-          <td class="${(t.netProfit - (t.fees || 0)) >= 0 ? 'pos' : 'neg'}">${fmtMoney(t.netProfit - (t.fees || 0))}</td>
+          <td class="${((t.netProfit || 0)) >= 0 ? 'pos' : 'neg'}">${fmtMoney((t.netProfit || 0))}</td>
           <td class="${t.fees < 0 ? 'pos' : (t.fees > 0 ? 'neg' : '')}">${fmtMoney(t.fees)}</td>
         </tr>`;
       }
@@ -2106,7 +2106,7 @@ export function renderCommoditiesTab() {
     if (!totalsMap[t.ticker]) totalsMap[t.ticker] = { ticker: t.ticker, realized: 0, maxProfit: 0, maxLoss: 0, wins: 0, trades: 0, fees: 0 };
     const m = totalsMap[t.ticker];
     m.trades++;
-    const net = (t.netProfit || 0) - (t.fees || 0);
+    const net = (t.netProfit || 0);
     m.realized += net;
     m.fees += (t.fees || 0);
     if (net > m.maxProfit) m.maxProfit = net;
@@ -2138,8 +2138,8 @@ export function renderCommoditiesTab() {
         totHtml += `<tr>
           <td>${tickerHtml}</td>
           <td class="${m.realized >= 0 ? 'pos' : 'neg'}">${fmtMoney(m.realized)}</td>
-          <td class="pos">${fmtMoney(m.maxProfit)}</td>
-          <td class="neg">${fmtMoney(m.maxLoss)}</td>
+          <td class="${m.maxProfit > 0 ? 'pos' : ''}">${fmtMoney(m.maxProfit)}</td>
+          <td class="${m.maxLoss < 0 ? 'neg' : ''}">${fmtMoney(m.maxLoss)}</td>
           <td>${winStr}</td>
           <td>${m.trades}</td>
           <td class="${m.fees < 0 ? 'pos' : (m.fees > 0 ? 'neg' : '')}">${fmtMoney(m.fees)}</td>
@@ -2210,3 +2210,7 @@ export function renderCommoditiesTab() {
       setSearchCount(total);
   }
 }
+
+
+
+
