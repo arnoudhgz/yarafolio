@@ -1063,7 +1063,7 @@
     "Sector": "Financials"
   },
   "334": {
-    "ticker": "Coffee.FUT",
+    "ticker": "COFFEE.FUT",
     "name": "Coffee Arabica (Expiring Future)",
     "sector": "ETF / Other",
     "mappedTicker": "COFFEE.FUT"

@@ -5,7 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.1] - 2026-09-01
+## [0.10.1] - 2026-09-02
+- Normalized Coffee.FUT to fully capitalized COFFEE.FUT across the app.
 - Added a placeholder 'Costs' column to the Active, Recent, and Totals tables in the Commodities tab.
 - Fixed P/L calculation double-counting fees (P/L now reflects gross profit to separate it from the fees column).
 - Fixed maxLoss 0.00 rendering red instead of white.
@@ -218,5 +219,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Refactored UI to match a sleek dark-mode, glassmorphism design with an emphasis on clarity and performance.
 - Upgraded the documentation structure (`SETUP.md`, `MANUAL.md`, `DEMO_MODE.md`) to clearly distinguish setup guides from user manuals.
+
 
 
