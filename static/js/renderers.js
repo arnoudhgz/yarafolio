@@ -2214,12 +2214,12 @@ export function renderCommoditiesTab() {
       for (const p of active) {
         openProfit += (p.plDollar || 0) + (p.fees || 0) + (p.costs || 0);
       }
-      const vOpen = document.getElementById('cOpen');
+      const vOpen = document.getElementById('cCommOpen');
       if (vOpen) {
           vOpen.textContent = fmtMoney(openProfit);
           vOpen.className = 'value ' + (openProfit >= 0 ? 'pos' : 'neg');
       }
-      const vTotal = document.getElementById('cTotal');
+      const vTotal = document.getElementById('cCommTotal');
       if (vTotal) {
           const totalProfit = profit + openProfit;
           vTotal.textContent = fmtMoney(totalProfit);
