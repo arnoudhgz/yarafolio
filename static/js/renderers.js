@@ -2083,7 +2083,7 @@ export function renderCommoditiesTab() {
           <td>${durStr}</td>
           <td class="${((t.netProfit || 0)) >= 0 ? 'pos' : 'neg'}">${fmtMoney((t.netProfit || 0))}</td>
           <td class="${t.fees < 0 ? 'pos' : (t.fees > 0 ? 'neg' : '')}">${fmtMoney(t.fees)}</td>
-          <td>$0.00</td>
+          <td class="${(t.costs || 0) < 0 ? 'neg' : ''}">${fmtMoney(t.costs || 0)}</td>
         </tr>`;
       }
       const tbodyHist = commHistoryTable.querySelector('tbody');
@@ -2104,12 +2104,13 @@ export function renderCommoditiesTab() {
   const totalsMap = {};
   for (const t of (DATA.tradeHistory || [])) {
     if (t.sector !== 'Commodities') continue;
-    if (!totalsMap[t.ticker]) totalsMap[t.ticker] = { ticker: t.ticker, realized: 0, maxProfit: 0, maxLoss: 0, wins: 0, trades: 0, fees: 0 };
+    if (!totalsMap[t.ticker]) totalsMap[t.ticker] = { ticker: t.ticker, realized: 0, maxProfit: 0, maxLoss: 0, wins: 0, trades: 0, fees: 0, costs: 0 };
     const m = totalsMap[t.ticker];
     m.trades++;
     const net = (t.netProfit || 0);
     m.realized += net;
     m.fees += (t.fees || 0);
+    m.costs += (t.costs || 0);
     if (net > m.maxProfit) m.maxProfit = net;
     if (net < m.maxLoss) m.maxLoss = net;
     if (net > 0) m.wins++;
@@ -2144,7 +2145,7 @@ export function renderCommoditiesTab() {
           <td>${winStr}</td>
           <td>${m.trades}</td>
           <td class="${m.fees < 0 ? 'pos' : (m.fees > 0 ? 'neg' : '')}">${fmtMoney(m.fees)}</td>
-          <td>$0.00</td>
+          <td class="${(m.costs || 0) < 0 ? 'neg' : ''}">${fmtMoney(m.costs || 0)}</td>
         </tr>`;
       }
       const tbodyTot = tTable.querySelector('tbody');
@@ -2171,7 +2172,8 @@ export function renderCommoditiesTab() {
               plDollar: pl,
               positionID: lot.positionID,
               isBuy: isBuy,
-              fees: lot.fees || 0
+              fees: lot.fees || 0,
+              costs: lot.costs || 0
             });
           }
         } else {
@@ -2202,7 +2204,7 @@ export function renderCommoditiesTab() {
           <td>${fmtPrice(p.currentPrice)}</td>
           <td>${(p.units || 0).toFixed(2)}</td>
           <td class="${(p.fees || 0) < 0 ? 'pos' : ((p.fees || 0) > 0 ? 'neg' : '')}">${fmtMoney(p.fees || 0)}</td>
-          <td>$0.00</td>
+          <td class="${(p.costs || 0) < 0 ? 'neg' : ''}">${fmtMoney(p.costs || 0)}</td>
           <td class="${p.plDollar >= 0 ? 'pos' : 'neg'}">${fmtMoney(p.plDollar)}</td>
         </tr>`;
       }

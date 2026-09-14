@@ -118,7 +118,7 @@ class EtoroImport:
                 "User-Agent": "curl/8.7.1",
             })
             try:
-                with urllib.request.urlopen(req, timeout=15) as res:
+                with urllib.request.urlopen(req, timeout=30) as res:
                     self.cached_portfolio = json.loads(res.read())
                     return creds
             except urllib.error.HTTPError as exc:
@@ -142,7 +142,7 @@ class EtoroImport:
             "User-Agent": "curl/8.7.1",
         })
         try:
-            with urllib.request.urlopen(req, timeout=15) as res:
+            with urllib.request.urlopen(req, timeout=30) as res:
                 return json.loads(res.read())
         except urllib.error.HTTPError as exc:
             if exc.code in (401, 403):
@@ -443,6 +443,22 @@ class EtoroImport:
             if item["ticker"] in known_sectors:
                 item["sector"] = known_sectors[item["ticker"]]
 
+
+        old_costs = {}
+        if os.path.exists(self.portfolio_file):
+            try:
+                with open(self.portfolio_file, encoding='utf-8') as pf:
+                    old_port = json.load(pf)
+                    for h in old_port.get('holdings', []):
+                        for lot in h.get('lots', []):
+                            if 'costs' in lot:
+                                old_costs[lot['positionID']] = lot['costs']
+            except:
+                pass
+        for item in preview:
+            for lot in item.get('lots', []):
+                if lot['positionID'] in old_costs:
+                    lot['costs'] = old_costs[lot['positionID']]
         today = nyse.nyse_today().isoformat()
         self.write_portfolio(preview, today)
 

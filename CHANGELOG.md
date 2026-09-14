@@ -5,7 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.1] - 2026-09-02
+## [0.10.1] - 2026-09-14
+- Implemented Commodities 'Costs' tracking: parsed 'Opening and Closing Spread' from eToro statement, rendering it in UI, and preserving it in etoro_import.py.
 - Normalized Coffee.FUT to fully capitalized COFFEE.FUT across the app.
 - Added a placeholder 'Costs' column to the Active, Recent, and Totals tables in the Commodities tab.
 - Fixed P/L calculation double-counting fees (P/L now reflects gross profit to separate it from the fees column).
