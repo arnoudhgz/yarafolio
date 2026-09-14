@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.10.1] - 2026-09-14
 - Implemented Commodities 'Costs' tracking: parsed 'Opening and Closing Spread' from eToro statement, rendering it in UI, preserving it in etoro_import.py, and deducting it from Realized P/L.
-- Added 'Open P/L' and 'Total P/L' cards to the Commodities tab header metrics.
+- Added 'Open P/L' and 'Total P/L' cards to the Commodities tab header metrics and reordered them so Win Rate follows the P/L cluster.
 - Normalized Coffee.FUT to fully capitalized COFFEE.FUT across the app.
 - Added a placeholder 'Costs' column to the Active, Recent, and Totals tables in the Commodities tab.
 - Fixed P/L calculation double-counting fees (P/L now reflects gross profit to separate it from the fees column).
