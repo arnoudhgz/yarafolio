@@ -1,7 +1,7 @@
 // @ts-check
 import { DATA, PORTFOLIO, setDATA, setPORTFOLIO, setCanSave, activeTab, setActiveTab, LEARN, setLEARN, canSave, portfolioViewMode, setPortfolioViewMode, portfolioTabMode, setPortfolioTabMode, currentFilter, setCurrentFilter, posFilter, setPosFilter, newsFilter, setNewsFilter, ipoFilter, setIpoFilter, searchQuery, setSearchQuery, searchTimer, setSearchTimer, sortState, portfolioRendered, setPortfolioRendered, analyticsRendered } from './state.js';
 import { today, esc, tickerLink } from './utils.js';
-import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart, renderDrawdownChart, renderRealizedPnlChart, setPnlTf, setPnlYearGroup, shiftPnlDate, renderHistoryTab, renderCommoditiesTab } from './renderers.js';
+import { renderAll, renderTable, renderPositions, renderPortfolio, renderPortfolioTable, renderEOD, renderAINews, renderAnalytics, findLot, renderReviews, renderEquityChart, renderDrawdownChart, renderRealizedPnlChart, setPnlTf, setPnlYearGroup, shiftPnlDate, renderHistoryTab, renderCommoditiesTab } from './renderers.js?v=1789419128';
 import { banner, openModal, closeModal, updateMacroTimers } from './ui.js';
 import { applyChange, fetchMacro, fetchIpos, loadLearn } from './api.js';
 import { marketHolidays } from './holidays.js';
@@ -512,7 +512,7 @@ const adviceClickHandler = (ev) => {
   if (t.tagName !== 'BUTTON') return;
   document.querySelectorAll('#equityToggles button').forEach(b => b.classList.remove('active'));
   t.classList.add('active');
-  import('./renderers.js').then(r => r.renderEquityChart(t.dataset.tf));
+  import('./renderers.js?v=1789419128').then(r => r.renderEquityChart(t.dataset.tf));
 });
 
 /** @type {HTMLElement} */ (document.getElementById('drawdownToggles'))?.addEventListener('click', e => {
@@ -520,7 +520,7 @@ const adviceClickHandler = (ev) => {
   if (t.tagName !== 'BUTTON') return;
   document.querySelectorAll('#drawdownToggles button').forEach(b => b.classList.remove('active'));
   t.classList.add('active');
-  import('./renderers.js').then(r => r.renderDrawdownChart(t.dataset.tf));
+  import('./renderers.js?v=1789419128').then(r => r.renderDrawdownChart(t.dataset.tf));
 });
 
 /** @type {HTMLElement} */ (document.getElementById('dayOfWeekToggles'))?.addEventListener('click', e => {
@@ -528,7 +528,7 @@ const adviceClickHandler = (ev) => {
   if (t.tagName !== 'BUTTON') return;
   document.querySelectorAll('#dayOfWeekToggles button').forEach(b => b.classList.remove('active'));
   t.classList.add('active');
-  import('./renderers.js').then(r => {
+  import('./renderers.js?v=1789419128').then(r => {
     const soldLots = r.positionLotRows().filter(row => row.status === 'sold');
     r.renderDayOfWeekChart('chartDayOfWeek', soldLots);
   });
@@ -542,7 +542,7 @@ document.querySelectorAll('.toggle-bucket').forEach(el => {
     bucket.querySelectorAll('button').forEach(b => b.classList.remove('active'));
     t.classList.add('active');
     const targetChart = bucket.dataset.target;
-    import('./renderers.js').then(r => {
+    import('./renderers.js?v=1789419128').then(r => {
       if (r.bucketModes && targetChart) {
         r.bucketModes[targetChart] = t.dataset.type;
         r.reRenderAnalyticsChart(targetChart);
