@@ -2039,7 +2039,7 @@ export function renderCommoditiesTab() {
     total++;
     const net = (t.netProfit || 0);
     if (net > 0) wins++;
-    profit += net;
+    profit += net + (t.costs || 0);
     
     let isMorn = false;
     try {
@@ -2108,7 +2108,7 @@ export function renderCommoditiesTab() {
     const m = totalsMap[t.ticker];
     m.trades++;
     const net = (t.netProfit || 0);
-    m.realized += net;
+    m.realized += net + (t.costs || 0);
     m.fees += (t.fees || 0);
     m.costs += (t.costs || 0);
     if (net > m.maxProfit) m.maxProfit = net;
@@ -2210,6 +2210,21 @@ export function renderCommoditiesTab() {
       }
       const tbodyAct = actTable.querySelector('tbody');
       if (tbodyAct) tbodyAct.innerHTML = actHtml;
+      let openProfit = 0;
+      for (const p of active) {
+        openProfit += (p.plDollar || 0) + (p.fees || 0) + (p.costs || 0);
+      }
+      const vOpen = document.getElementById('cOpen');
+      if (vOpen) {
+          vOpen.textContent = fmtMoney(openProfit);
+          vOpen.className = 'value ' + (openProfit >= 0 ? 'pos' : 'neg');
+      }
+      const vTotal = document.getElementById('cTotal');
+      if (vTotal) {
+          const totalProfit = profit + openProfit;
+          vTotal.textContent = fmtMoney(totalProfit);
+          vTotal.className = 'value ' + (totalProfit >= 0 ? 'pos' : 'neg');
+      }
       setSearchCount(total + active.length);
   } else {
       setSearchCount(total);
