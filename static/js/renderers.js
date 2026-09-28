@@ -2081,6 +2081,8 @@ export function renderCommoditiesTab() {
           <td>${t.isBuy ? 'Buy' : 'Sell'}</td>
           <td>${localDateTime(t.openTimestamp)}</td>
           <td>${durStr}</td>
+          <td>${fmtPrice(t.openRate)}</td>
+          <td>${fmtPrice(t.closeRate)}</td>
           <td class="${((t.netProfit || 0)) >= 0 ? 'pos' : 'neg'}">${fmtMoney((t.netProfit || 0))}</td>
           <td class="${t.fees < 0 ? 'pos' : (t.fees > 0 ? 'neg' : '')}">${fmtMoney(t.fees)}</td>
           <td class="${(t.costs || 0) < 0 ? 'neg' : ''}">${fmtMoney(t.costs || 0)}</td>

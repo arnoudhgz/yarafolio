@@ -5,7 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.1] - 2026-09-14
+## [0.10.1] - 2026-09-28
+- Added Open Price and Close Price columns to the Recent Commodity Trades history table in the Commodities tab.
 - Implemented Commodities 'Costs' tracking: parsed 'Opening and Closing Spread' from eToro statement, rendering it in UI, preserving it in etoro_import.py, and deducting it from Realized P/L.
 - Added 'Open P/L' and 'Total P/L' cards to the Commodities tab header metrics and reordered them so Win Rate follows the P/L cluster.
 - Normalized Coffee.FUT to fully capitalized COFFEE.FUT across the app.
