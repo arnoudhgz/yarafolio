@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python auto_approve.py"
+            "command": "python3 auto_approve.py || python auto_approve.py"
           }
         ]
       }

@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.10.1] - 2026-09-28
+## [0.10.1] - 2026-10-21
 - Added Open Price and Close Price columns to the Recent Commodity Trades history table in the Commodities tab.
 - Implemented Commodities 'Costs' tracking: parsed 'Opening and Closing Spread' from eToro statement, rendering it in UI, preserving it in etoro_import.py, and deducting it from Realized P/L.
 - Added 'Open P/L' and 'Total P/L' cards to the Commodities tab header metrics and reordered them so Win Rate follows the P/L cluster.
@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `scripts/advice_log.py prune-text` command to strip heavy text fields (`reason`, `risk`, `notes`) from inactive positions (sold or blacklisted) to reduce JSON log bloat, while keeping notes intact for dropped positions that might be re-advised.
 
 ### Fixed
+- Fixed an issue in `scripts/autosync.py` where failed git pulls due to network or SSH authentication errors were mistaken for merge conflicts, masking the underlying error with a confusing "Failed to finalize merge commit" message.
 - Fixed the EOD skill (`/eod`) instructions to strictly enforce markdown formatting (using `###` headings and bulleted lists) so the dashboard properly parses report titles and action items instead of rendering them as a raw text block.
 - Fixed a bug where Windows line endings (`\r\n`) in `news.md` and `eod.md` prevented markdown block splitting, causing the EOD Reports and AI News tabs to render as a single large column instead of the intended 2-column masonry grid.
 - Fixed an issue where hidden tabs in the settings modal would automatically reappear after a page refresh due to aggressive auto-enable logic.

@@ -196,6 +196,10 @@ class AutoSync:
             status = self.git("ls-files", "-u")
             conflicted_files = set([line.split("\t")[1] for line in status.stdout.splitlines() if line])
             
+            if not conflicted_files:
+                logger.error(f"autosync: pull failed (network/auth issue?): {pull.stderr.strip()[-200:]}")
+                return
+
             resolved_all = True
             for file in conflicted_files:
                 if file.endswith(".json"):
