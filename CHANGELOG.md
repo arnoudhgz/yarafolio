@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `scripts/advice_log.py prune-text` command to strip heavy text fields (`reason`, `risk`, `notes`) from inactive positions (sold or blacklisted) to reduce JSON log bloat, while keeping notes intact for dropped positions that might be re-advised.
 
 ### Fixed
+- Fixed Commodities P/L calculations and totals: corrected sign handling for eToro overnight refunds (negative fees in API represent credits/rebates, not debits), aligned Active Commodity Positions row P/L to net open P/L matching the top card, backfilled missing tickers and sector mappings for Coffee and Cotton in history.json and instruments.json, and added history.json to autosync.py backup paths.
 - Fixed an issue in `scripts/autosync.py` where failed git pulls due to network or SSH authentication errors were mistaken for merge conflicts, masking the underlying error with a confusing "Failed to finalize merge commit" message.
 - Fixed the EOD skill (`/eod`) instructions to strictly enforce markdown formatting (using `###` headings and bulleted lists) so the dashboard properly parses report titles and action items instead of rendering them as a raw text block.
 - Fixed a bug where Windows line endings (`\r\n`) in `news.md` and `eod.md` prevented markdown block splitting, causing the EOD Reports and AI News tabs to render as a single large column instead of the intended 2-column masonry grid.

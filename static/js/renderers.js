@@ -2021,8 +2021,9 @@ export function renderCommoditiesTab() {
       if (!t.ticker && t.instrumentId && rev[t.instrumentId]) {
         t.ticker = rev[t.instrumentId];
       }
-      const comms = ['GOLD', 'SILVER', 'OIL', 'COPPER', 'PLATINUM', 'PALLADIUM', 'NATGAS', 'COFFEE.FUT', 'COTTON.FUT', 'WHEAT', 'CORN', 'SUGAR', 'COCOA.FUT'];
-      if (comms.includes(t.ticker) || (window.ETORO_CACHE[t.ticker] && (window.ETORO_CACHE[t.ticker].Industry === 'Commodities' || window.ETORO_CACHE[t.ticker].Sector === 'Commodities'))) {
+      const comms = ['GOLD', 'SILVER', 'OIL', 'COPPER', 'PLATINUM', 'PALLADIUM', 'NATGAS', 'COFFEE.FUT', 'COTTON.FUT', 'WHEAT', 'WHEAT.FUT', 'CORN', 'SUGAR', 'COCOA.FUT'];
+      const tickUpper = (t.ticker || '').toUpperCase();
+      if (comms.includes(t.ticker) || comms.includes(tickUpper) || (window.ETORO_CACHE[t.ticker] && (window.ETORO_CACHE[t.ticker].Industry === 'Commodities' || window.ETORO_CACHE[t.ticker].Sector === 'Commodities'))) {
         t.sector = 'Commodities';
       }
     }
@@ -2038,19 +2039,20 @@ export function renderCommoditiesTab() {
   for (const t of h) {
     total++;
     const net = (t.netProfit || 0);
-    if (net > 0) wins++;
-    profit += net + (t.costs || 0);
+    const tradeTotal = net - (t.fees || 0) + (t.costs || 0);
+    if (tradeTotal > 0) wins++;
+    profit += tradeTotal;
     
     let isMorn = false;
     try {
       const d = new Date(t.openTimestamp);
       isMorn = d.getUTCHours() < 16 || (d.getUTCHours() === 16 && d.getUTCMinutes() < 30);
     } catch (e) {}
-    if (isMorn) { mornT++; if (net > 0) mornW++; }
-    else { aftT++; if (net > 0) aftW++; }
+    if (isMorn) { mornT++; if (tradeTotal > 0) mornW++; }
+    else { aftT++; if (tradeTotal > 0) aftW++; }
     
     const hrs = (new Date(t.closeTimestamp) - new Date(t.openTimestamp)) / 36e5;
-    if (hrs < 1) { qT++; if (net > 0) qW++; }
+    if (hrs < 1) { qT++; if (tradeTotal > 0) qW++; }
     t.duration = hrs;
   }
   
@@ -2106,16 +2108,21 @@ export function renderCommoditiesTab() {
   const totalsMap = {};
   for (const t of (DATA.tradeHistory || [])) {
     if (t.sector !== 'Commodities') continue;
-    if (!totalsMap[t.ticker]) totalsMap[t.ticker] = { ticker: t.ticker, realized: 0, maxProfit: 0, maxLoss: 0, wins: 0, trades: 0, fees: 0, costs: 0 };
+    if (!totalsMap[t.ticker]) totalsMap[t.ticker] = { ticker: t.ticker, realized: 0, maxProfit: -Infinity, maxLoss: Infinity, wins: 0, trades: 0, fees: 0, costs: 0 };
     const m = totalsMap[t.ticker];
     m.trades++;
     const net = (t.netProfit || 0);
-    m.realized += net + (t.costs || 0);
+    const tradeTotal = net - (t.fees || 0) + (t.costs || 0);
+    m.realized += tradeTotal;
     m.fees += (t.fees || 0);
     m.costs += (t.costs || 0);
-    if (net > m.maxProfit) m.maxProfit = net;
-    if (net < m.maxLoss) m.maxLoss = net;
-    if (net > 0) m.wins++;
+    if (tradeTotal > m.maxProfit) m.maxProfit = tradeTotal;
+    if (tradeTotal < m.maxLoss) m.maxLoss = tradeTotal;
+    if (tradeTotal > 0) m.wins++;
+  }
+  for (const m of Object.values(totalsMap)) {
+    if (m.maxProfit === -Infinity) m.maxProfit = 0;
+    if (m.maxLoss === Infinity) m.maxLoss = 0;
   }
   let totalsArr = Object.values(totalsMap);
   const tTable = document.getElementById('commTotalsTable');
@@ -2157,29 +2164,44 @@ export function renderCommoditiesTab() {
   const actTable = document.getElementById('commActiveTable');
   if (actTable) {
       let active = (PORTFOLIO.holdings || []).filter(p => {
-        const comms = ['GOLD', 'SILVER', 'OIL', 'COPPER', 'PLATINUM', 'PALLADIUM', 'NATGAS', 'COFFEE.FUT', 'COTTON.FUT', 'WHEAT', 'CORN', 'SUGAR', 'COCOA.FUT'];
-        return p.sector === 'Commodities' || comms.includes(p.ticker) || (window.ETORO_CACHE && window.ETORO_CACHE[p.ticker] && (window.ETORO_CACHE[p.ticker].Industry === 'Commodities' || window.ETORO_CACHE[p.ticker].Sector === 'Commodities'));
+        const comms = ['GOLD', 'SILVER', 'OIL', 'COPPER', 'PLATINUM', 'PALLADIUM', 'NATGAS', 'COFFEE.FUT', 'COTTON.FUT', 'WHEAT', 'WHEAT.FUT', 'CORN', 'SUGAR', 'COCOA.FUT'];
+        const tickUpper = (p.ticker || '').toUpperCase();
+        return p.sector === 'Commodities' || comms.includes(p.ticker) || comms.includes(tickUpper) || (window.ETORO_CACHE && window.ETORO_CACHE[p.ticker] && (window.ETORO_CACHE[p.ticker].Industry === 'Commodities' || window.ETORO_CACHE[p.ticker].Sector === 'Commodities'));
       });
       let expandedActive = [];
       for (const p of active) {
         if (p.lots && p.lots.length > 0) {
           for (const lot of p.lots) {
             const isBuy = lot.isBuy !== false;
-            const pl = isBuy ? (p.currentPrice - lot.openRate) * lot.units : (lot.openRate - p.currentPrice) * lot.units;
+            const grossPl = isBuy ? (p.currentPrice - lot.openRate) * lot.units : (lot.openRate - p.currentPrice) * lot.units;
+            const fees = lot.fees || 0;
+            const costs = lot.costs || 0;
+            const netPl = grossPl - fees + costs;
             expandedActive.push({
               ...p,
               firstOpen: lot.openDate || p.firstOpen,
               avgOpen: lot.openRate || p.avgOpen,
               units: lot.units,
-              plDollar: pl,
+              plDollar: netPl,
+              grossPl: grossPl,
               positionID: lot.positionID,
               isBuy: isBuy,
-              fees: lot.fees || 0,
-              costs: lot.costs || 0
+              fees: fees,
+              costs: costs
             });
           }
         } else {
-          expandedActive.push(p);
+          const fees = p.fees || 0;
+          const costs = p.costs || 0;
+          const grossPl = p.plDollar || 0;
+          const netPl = grossPl - fees + costs;
+          expandedActive.push({
+            ...p,
+            plDollar: netPl,
+            grossPl: grossPl,
+            fees: fees,
+            costs: costs
+          });
         }
       }
       active = expandedActive;
@@ -2214,7 +2236,7 @@ export function renderCommoditiesTab() {
       if (tbodyAct) tbodyAct.innerHTML = actHtml;
       let openProfit = 0;
       for (const p of active) {
-        openProfit += (p.plDollar || 0) + (p.fees || 0) + (p.costs || 0);
+        openProfit += (p.plDollar || 0);
       }
       const vOpen = document.getElementById('cCommOpen');
       if (vOpen) {

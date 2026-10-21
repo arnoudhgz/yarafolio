@@ -18,7 +18,7 @@ from datetime import datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data", "private")
-PATHS = ["advice-log.json", "portfolio.json", "REVIEWS.md", "eod.md", "news.md", "STRATEGY.md", "equity-history.json", "correlation.json", "custom_instruments.json"]
+PATHS = ["advice-log.json", "portfolio.json", "REVIEWS.md", "eod.md", "news.md", "STRATEGY.md", "equity-history.json", "correlation.json", "custom_instruments.json", "history.json"]
 
 os.makedirs(os.path.join(ROOT, "logs"), exist_ok=True)
 logging.basicConfig(
@@ -121,6 +121,14 @@ class AutoSync:
             merged["totalInvested"] = sum(h.get("invested", 0) for h in holdings.values())
             merged["holdings"] = list(holdings.values())
             
+        elif filepath == "history.json":
+            history = {}
+            for pt in ours if isinstance(ours, list) else []:
+                if "positionId" in pt: history[pt["positionId"]] = pt
+            for pt in theirs if isinstance(theirs, list) else []:
+                if "positionId" in pt: history[pt["positionId"]] = pt
+            merged = sorted(list(history.values()), key=lambda x: x.get("closeTimestamp", ""), reverse=True)
+
         elif filepath == "equity-history.json":
             # For equity history, it's an array of data points. We can just union and deduplicate by timestamp.
             history = {}

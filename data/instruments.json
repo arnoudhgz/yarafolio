@@ -1065,7 +1065,7 @@
   "334": {
     "ticker": "COFFEE.FUT",
     "name": "Coffee Arabica (Expiring Future)",
-    "sector": "ETF / Other",
+    "sector": "Commodities",
     "mappedTicker": "COFFEE.FUT"
   },
   "1767": {
@@ -1167,5 +1167,17 @@
     "ticker": "CRUS",
     "name": "Cirrus Logic",
     "sector": "Technology"
+  },
+  "93": {
+    "ticker": "COTTON.FUT",
+    "name": "Cotton (Expiring Future)",
+    "sector": "Commodities",
+    "mappedTicker": "COTTON.FUT"
+  },
+  "100000": {
+    "ticker": "BTC",
+    "name": "Bitcoin",
+    "sector": "Crypto",
+    "mappedTicker": "BTC"
   }
 }

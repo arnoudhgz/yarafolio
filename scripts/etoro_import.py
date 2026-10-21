@@ -492,14 +492,21 @@ class EtoroImport:
                     pass
             existing_by_pid = {t["positionId"]: t for t in existing_history}
             
+            comms_set = {"GOLD", "SILVER", "OIL", "COPPER", "PLATINUM", "PALLADIUM", "NATGAS", "COFFEE.FUT", "COTTON.FUT", "WHEAT", "WHEAT.FUT", "CORN", "SUGAR", "COCOA.FUT"}
             for t in history:
                 pid = t["positionId"]
                 if pid not in existing_by_pid:
-                    iid = t.get("instrumentId")
-                    if iid and iid in inst_by_id:
-                        t["ticker"] = inst_by_id[iid].get("ticker", "")
-                        t["sector"] = inst_by_id[iid].get("sector", "")
                     existing_by_pid[pid] = t
+                rec = existing_by_pid[pid]
+                iid = rec.get("instrumentId")
+                if iid and iid in inst_by_id:
+                    if not rec.get("ticker"):
+                        rec["ticker"] = inst_by_id[iid].get("ticker", "")
+                    inst_sector = inst_by_id[iid].get("sector")
+                    if inst_sector and inst_sector != "Unknown":
+                        rec["sector"] = inst_sector
+                if rec.get("ticker") in comms_set or rec.get("instrumentId") in [17, 18, 93, 97, 334]:
+                    rec["sector"] = "Commodities"
                     
             merged_history = list(existing_by_pid.values())
             # Sort descending by close timestamp
