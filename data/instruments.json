@@ -1139,11 +1139,20 @@
     "mappedTicker": "FBIN",
     "sector": "Unknown"
   },
-  "custom_ttmi": {
-    "ticker": "TTMI.US",
-    "name": "TTM Technologies",
-    "mappedTicker": "TTMI",
-    "sector": "Unknown"
+  "9803": {
+    "ticker": "TTMI",
+    "name": "TTM Technologies Inc",
+    "sector": "Technology"
+  },
+  "1497": {
+    "ticker": "VLO",
+    "name": "Valero Energy Corp",
+    "sector": "Energy"
+  },
+  "1566": {
+    "ticker": "DINO",
+    "name": "HF Sinclair Corp.",
+    "sector": "Energy"
   },
   "custom_opln": {
     "ticker": "OPLN.US",
